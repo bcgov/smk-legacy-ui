@@ -67,9 +67,9 @@ RUN apk update \
   && apk add alpine-sdk \
   && git config --global url.https://github.com/.insteadOf git://github.com/
 
-RUN rm -rf /usr/local/tomcat/webapps/* && mkdir /usr/local/tomcat/config /usr/local/tomcat/webapps/ROOT
-RUN wget -O /tmp/app.war $APPBIN \
-  && unzip /tmp/app.war -d /usr/local/tomcat/webapps/ROOT
+#RUN rm -rf /usr/local/tomcat/webapps/* && mkdir /usr/local/tomcat/config /usr/local/tomcat/webapps/ROOT
+#RUN wget -O /tmp/app.war $APPBIN \
+#  && unzip /tmp/app.war -d /usr/local/tomcat/webapps/ROOT
 
 #Setup runtime configuration
 ##Generate GWA required configuration
