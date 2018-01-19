@@ -1,0 +1,344 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui" 
+      xmlns:c="http://java.sun.com/jsp/jstl/core">
+    <h:head>
+    	<title>Lightweight Mapping Framework</title>
+  
+    	<!-- css links -->
+    	<h:outputStylesheet library="css" name="materialize.css" />
+    	<h:outputStylesheet library="css" name="fonts.css"  />
+    	<h:outputStylesheet library="css" name="texteditor.css"  />
+    	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+    	
+    	<!-- JS links -->
+		<h:outputScript library="js" name="jquery-3.2.1.min.js" />
+		<h:outputScript library="js" name="materialize.js" />
+		<h:outputScript library="js" name="turf.min.js" />
+		<h:outputScript library="js" name="proj4.js" />
+		
+		<!-- ESRI Terraformer -->
+   		<script src="https://unpkg.com/terraformer@1.0.7"></script>
+   		<script src="https://unpkg.com/terraformer-arcgis-parser@1.0.5"></script>
+		<script src="https://unpkg.com/terraformer-wkt-parser@1.1.2"></script> 
+	    	
+		<!-- Font icons -->
+		<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+			 
+		<!-- Load scripts and css depending on the selected viewer type -->
+		<c:if test="#{ViewBean.resource.viewerType eq 'leaflet'}">
+			<link rel="stylesheet" href="https://js.arcgis.com/4.4/esri/css/main.css" />
+			<!-- Leaflet -->
+			<link rel="stylesheet" 
+				  href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css"
+				  integrity="sha512-M2wvCLH6DSRazYeZRIm1JnYyh22purTM+FDB5CsyxtQJYeKq83arPe5wgbNmcFXGqiSH2XR8dT/fJISVA1r/zQ=="
+				  crossorigin=""/>
+		
+			<script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js"
+				    integrity="sha512-lInM/apFSqyy1o6s89K4iQUKg6ppXEgsVxT35HbzUupEVRh2Eu9Wdl4tHj7dZO0s1uvplcYGmt3498TtHq+log=="
+				    crossorigin=""></script>
+			
+			<!-- ESRI Leaflet -->
+			<script src="https://unpkg.com/esri-leaflet@2.1.0/dist/esri-leaflet.js"
+    				integrity="sha512-Tojl3UMd387f6DdAJlo+fKfJZiP55fYT+6Y58yKbHydnueOdSFOxrgLPuUxm7VW1szEt3hZVwv3V2sSUCuT35w=="
+    				crossorigin=""></script>
+
+    		<!-- Omnivore -->
+    		<script src='//api.tiles.mapbox.com/mapbox.js/plugins/leaflet-omnivore/v0.3.1/leaflet-omnivore.min.js'></script>
+    		
+    		<!-- Better Scalebar -->
+    		<h:outputStylesheet library="css" name="L.Control.BetterScale.css"  />
+    		<h:outputScript library="js" name="L.Control.BetterScale.js" />
+    			
+    		<!-- Leaflet PM Draw tools -->
+    		<link rel="stylesheet" href="https://unpkg.com/leaflet.pm@0.17.3/dist/leaflet.pm.css" />
+			<script src="https://unpkg.com/leaflet.pm@0.17.3/dist/leaflet.pm.min.js"></script>
+
+			<!-- Scale factor -->
+			<h:outputStylesheet library="css" name="leaflet.scalefactor.min.css"  />
+    		<h:outputScript library="js" name="leaflet.scalefactor.min.js" target="body" />
+
+			<!-- Mouse coords -->
+			<h:outputStylesheet library="css" name="L.Control.Coordinates.css"  />
+    		<h:outputScript library="js" name="L.Control.Coordinates.js" target="body" />
+    		
+			<!-- history control -->
+			<h:outputScript library="js" name="leaflet.history.js" />
+
+			<!-- Measure tool -->
+			<h:outputStylesheet library="css" name="leaflet-measure.css"  />
+	    	<h:outputScript library="js" name="leaflet-measure.min.js" target="body" />
+	    	
+	    	<!-- minimap -->
+	    	<h:outputStylesheet library="css" name="Control.MiniMap.min.css"  />
+	    	<h:outputScript library="js" name="Control.MiniMap.min.js" target="body" />
+	    
+    		<!-- side bar css and scripts -->
+			<h:outputStylesheet library="css" name="leaflet-sidebar.css"  />
+    		<h:outputScript library="js" name="leaflet-sidebar.js" target="body" />
+    	
+    		<!-- cluster and heatmap -->
+    		<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.0.6/dist/MarkerCluster.css" />
+    		<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.0.6/dist/MarkerCluster.Default.css" />
+    		<script src="https://unpkg.com/leaflet.markercluster@1.0.6/dist/leaflet.markercluster-src.js"  target="body"></script>
+    		
+    		<h:outputScript library="js" name="leaflet-heat.js" />
+    	
+    		<!-- Map initializer -->
+			<h:outputScript library="js" name="leafletInit.js" target="body"/>
+		</c:if>
+		<c:if test="#{ViewBean.resource.viewerType eq 'esri2d'}">
+			<!-- link rel="stylesheet" href="https://js.arcgis.com/3.21/esri/css/esri.css" />
+			<script src="https://js.arcgis.com/3.21/"></script -->
+			
+			<link rel="stylesheet" href="https://js.arcgis.com/4.4/esri/css/main.css" />
+    		<script src="https://js.arcgis.com/4.4/" />
+    		
+			<h:outputScript library="js" name="esri2dInit.js" target="body"/>
+		</c:if>
+		<c:if test="#{ViewBean.resource.viewerType eq 'esri3d'}">
+			<link rel="stylesheet" href="https://js.arcgis.com/4.4/esri/css/main.css" />
+    		<script src="https://js.arcgis.com/4.4/" />
+			
+			<h:outputScript library="js" name="esri3dInit.js" target="body"/>
+		</c:if>
+				
+		<h:outputStylesheet library="css" name="dmf.css" target="body"/>
+		<h:outputScript library="js" name="dmf.js" target="body"/>
+    </h:head>
+    <h:body class="grey lighten-4" style="height: 100vh; position: relative; font-family: 'Avenir Next W00','Helvetica Neue',Helvetica,Arial,sans-serif;">
+    	<c:if test="#{ViewBean.resource.showHeader eq true}">
+   		<div id="header" class="header nrpp-blue-dark">
+			<h:graphicImage value="resources/images/bc_gov_logo_transparent.png" style="padding: 6px;" />
+			<span class="white-text" style="font-size: 30px; top: 18px; position: absolute; margin-left: 15px;">#{ViewBean.resource.name}</span>
+   		</div>
+   		</c:if>
+		<div id="content" style="#{ViewBean.contentStyle}">
+			<c:if test="#{ViewBean.resource.viewerType eq 'leaflet'}">
+				<div id="sidebar" class="sidebar collapsed" style="#{ViewBean.resource.showHeader eq true ? 'margin-top: 79px;' : '' }">
+			        <!-- Nav tabs -->
+			        <div class="sidebar-tabs">
+			            <ul role="tablist">
+			                <li><a id="homePanel" href="#home" role="tab"><i class="material-icons">menu</i></a></li>
+			                <li><a id="basemapTab" href="#basemaps" role="tab" onclick="refreshBasemapButtons()"><i class="material-icons">map</i></a></li>
+			                <li><a href="#layers" role="tab"><i class="material-icons">layers</i></a></li>
+			                <li><a href="#legend" role="tab"><i class="material-icons">terrain</i></a></li>
+			                <li id="queryAnchorLi"><a id="queryResultAnchor" href="#query" role="tab"><i class="material-icons">search</i></a></li>
+			                <li><a href="#selections" role="tab"><i class="material-icons">attachment</i></a></li>
+			                <li><a href="https://data.gov.bc.ca/" role="tab" target="_blank"><i class="material-icons">http</i></a></li>
+			            </ul>
+			            <ul role="tablist">
+			                <li><a href="#settings" role="tab"><i class="material-icons">fingerprint</i></a></li>
+			            </ul>
+			        </div>
+			        <!-- Tab panes -->
+			        <div class="sidebar-content">
+			            <div class="sidebar-pane" id="home">
+			                <h1 class="sidebar-header">
+			                    #{ViewBean.resource.name}
+			                    <span class="sidebar-close"><i class="fa fa-caret-left"></i></span>
+			                </h1>
+			                <div class="ql-editor">
+			                	<h:outputText value="#{ViewBean.resource.aboutPage}" escape="false"/>
+			                </div>
+			            </div>
+			            <div class="sidebar-pane" id="basemaps">
+			                <h1 class="sidebar-header">Basemaps<span class="sidebar-close"><i class="fa fa-caret-left"></i></span></h1>
+			                <div class="row" style="margin-top: 5px;">
+			                	<div onclick="setBasemap('Topographic');" style="cursor: pointer;">
+			                		<span style="z-index: 950; background: rgba(255, 255, 255, 0.60); position: absolute; top: 85px; width: 100%; font-weight: bold;" class="black-text">Topographic</span>
+			                		<div id="TopographicBasemap" style="height: 60px; z-index: 920;"></div>
+			                	</div>
+			                </div>
+			                <div class="row" style="margin-top: 5px;">
+			                	<div onclick="setBasemap('Streets');" style="cursor: pointer;">
+			                		<span style="z-index: 950; background: rgba(255, 255, 255, 0.60); position: absolute; top: 165px; width: 100%; font-weight: bold;" class="black-text">Streets</span>
+			                		<div id="StreetsBasemap" style="height: 60px; z-index: 920;"></div>
+			                	</div>
+			                </div>
+			                <div class="row" style="margin-top: 5px;">
+			                	<div onclick="setBasemap('Imagery');" style="cursor: pointer;">
+			                		<span style="z-index: 950; background: rgba(255, 255, 255, 0.60); position: absolute; top: 245px; width: 100%; font-weight: bold;" class="black-text">Imagery</span>
+			                		<div id="ImageryBasemap" style="height: 60px; z-index: 920;"></div>
+			                	</div>
+			                </div>
+			                <div class="row" style="margin-top: 5px;">
+			                	<div onclick="setBasemap('Oceans');" style="cursor: pointer;">
+			                		<span style="z-index: 950; background: rgba(255, 255, 255, 0.60); position: absolute; top: 325px; width: 100%; font-weight: bold;" class="black-text">Oceans</span>
+			                		<div id="OceansBasemap" style="height: 60px; z-index: 920;"></div>
+			                	</div>
+			                </div>
+			                <div class="row" style="margin-top: 5px;">
+			                	<div onclick="setBasemap('NationalGeographic');" style="cursor: pointer;">
+			                		<span style="z-index: 950; background: rgba(255, 255, 255, 0.60); position: absolute; top: 405px; width: 100%; font-weight: bold;" class="black-text">National Geographic</span>
+			                		<div id="NationalGeographicBasemap" style="height: 60px; z-index: 920;"></div>
+			                	</div>
+			                </div>
+			                <div class="row" style="margin-top: 5px;">
+			                	<div onclick="setBasemap('DarkGray');" style="cursor: pointer;">
+			                		<span style="z-index: 950; background: rgba(255, 255, 255, 0.60); position: absolute; top: 485px; width: 100%; font-weight: bold;" class="black-text">Dark</span>
+			                		<div id="DarkGrayBasemap" style="height: 60px; z-index: 920;"></div>
+			                	</div>
+			                </div>
+			                <div class="row" style="margin-top: 5px;">
+			                	<div onclick="setBasemap('Gray');" style="cursor: pointer;">
+			                		<span style="z-index: 950; background: rgba(255, 255, 255, 0.60); position: absolute; top: 565px; width: 100%; font-weight: bold;" class="black-text">Light</span>
+			                		<div id="GrayBasemap" style="height: 60px; z-index: 920;"></div>
+			                	</div>
+			                </div>
+			            </div>
+			            <div class="sidebar-pane" id="layers">
+			                <h1 class="sidebar-header">Layers<span class="sidebar-close"><i class="fa fa-caret-left"></i></span></h1>
+			                <div id="layerList">
+			                </div>
+			            </div>
+			            <div class="sidebar-pane" id="legend">
+			                <h1 class="sidebar-header">Legend<span class="sidebar-close"><i class="fa fa-caret-left"></i></span></h1>
+			                <div id="legendPanel">
+			                </div>
+			            </div>
+			            <div class="sidebar-pane" id="query">
+			                <h1 class="sidebar-header">Identify Results<span class="sidebar-close"><i class="fa fa-caret-left"></i></span></h1>
+			                <div class="row" style="margin: 0px; margin-top: 10px;">
+			                <a href="#" onclick="clearHighlights()">Clear Highlights</a>
+			                <a href="#" onclick="clearResults()" style="margin-left: 5px;">Clear Results</a>
+			                </div>
+			                <div id="queryResults">
+			                	No results to display
+			                </div>
+			            </div>
+			            <div class="sidebar-pane" id="selections">
+			                <h1 class="sidebar-header">Selected Features<span class="sidebar-close"><i class="fa fa-caret-left"></i></span></h1>
+			                <div class="row" style="margin: 0px; margin-top: 10px;">
+			                <a href="#" onclick="clearHighlights()">Clear Highlights</a>
+			                <a href="#" onclick="clearSelections()" style="margin-left: 5px;">Clear Selected Features</a>
+			                <a href="#" onclick="exportFeatures()" style="margin-left: 5px;">Export</a>
+			                </div>
+			                <div id="selectedResults">
+			                </div>
+			            </div>
+			            <div class="sidebar-pane" id="settings">
+			                <h1 class="sidebar-header">Settings<span class="sidebar-close"><i class="fa fa-caret-left"></i></span></h1>
+			            </div>
+			        </div>
+	    		</div>
+    		</c:if>
+    		<c:if test="#{ViewBean.resource.viewerType eq 'leaflet'}">
+	    		<h:form id="mapForm">
+		    		<p:remoteCommand name="buildDynamicIdentifyResults" actionListener="#{ViewBean.buildDynamicMpcmResults()}" />
+				</h:form>
+				<div id="map" class="sidebar-map" style="height: 100%; width: 100%"></div>
+				<div class="preloader-wrapper big" id="querySpinner" style="position: fixed; top: 10vh; z-index: 999999; right: 20px;">
+					<div class="spinner-layer spinner-blue">
+				    	<div class="circle-clipper left">
+				        	<div class="circle"></div>
+				        </div>
+				        <div class="gap-patch">
+				        	<div class="circle"></div>
+				        </div>
+				        <div class="circle-clipper right">
+				        	<div class="circle"></div>
+				        </div>
+					</div>
+					<div class="spinner-layer spinner-red">
+				    	<div class="circle-clipper left">
+				        	<div class="circle"></div>
+				        </div>
+				        <div class="gap-patch">
+				        	<div class="circle"></div>
+				        </div>
+				        <div class="circle-clipper right">
+				        	<div class="circle"></div>
+				        </div>
+					</div>
+					<div class="spinner-layer spinner-yellow">
+				    	<div class="circle-clipper left">
+				        	<div class="circle"></div>
+				        </div>
+				        <div class="gap-patch">
+				        	<div class="circle"></div>
+				        </div>
+				        <div class="circle-clipper right">
+				        	<div class="circle"></div>
+				        </div>
+					</div>
+					<div class="spinner-layer spinner-green">
+				    	<div class="circle-clipper left">
+				        	<div class="circle"></div>
+				        </div>
+				        <div class="gap-patch">
+				        	<div class="circle"></div>
+				        </div>
+				        <div class="circle-clipper right">
+				        	<div class="circle"></div>
+				        </div>
+					</div>
+				</div>
+			</c:if>
+			<c:if test="#{ViewBean.resource.viewerType eq 'esri2d'}">
+				<h:form id="mapForm">
+		    		<p:remoteCommand name="esri3dInit" actionListener="#{ViewBean.esri3dInit()}" />
+				</h:form>
+				<div id="map" style="height: 100%; width: 100%"></div>
+			</c:if>
+			<c:if test="#{ViewBean.resource.viewerType eq 'esri3d'}">
+				<h:form id="mapForm">
+		    		<p:remoteCommand name="esri3dInit" actionListener="#{ViewBean.esri3dInit()}" />
+				</h:form>
+				<div id="map" style="height: 100%; width: 100%"></div>
+				<div id="polygon-button" class="esri-widget-button esri-widget esri-interactive" data-position="bottom" data-delay="50" data-tooltip="Draw/Measure a Polygon">
+    				<span class="esri-icon-polygon"></span>
+  				</div>
+  				<div id="line-button" class="esri-widget-button esri-widget esri-interactive" data-position="bottom" data-delay="50" data-tooltip="Draw/Measure a Line">
+					<span class="esri-icon-polyline"></span>
+				</div>
+				<div id="clear-button" class="esri-widget-button esri-widget esri-interactive" data-position="bottom" data-delay="50" data-tooltip="Erase your markup">
+					<span class="esri-icon-erase"></span>
+				</div>
+			</c:if>
+		</div>
+		<div id="homepageDetails" style="display: none;"><h:outputText value="#{ViewBean.resource.aboutPage}" escape="false"/></div>
+    </h:body>
+    <h:outputScript>
+    	$(document).ready(function()
+    	{
+    	  	$('.tooltipped').tooltip({delay: 50});
+    	  	
+    		proj4.defs("EPSG:3005", "+proj=aea +lat_1=50 +lat_2=58.5 +lat_0=45 +lon_0=-126 +x_0=1000000 +y_0=0 +ellps=GRS80 +datum=NAD83 +units=m +no_defs");
+    		<c:if test="#{ViewBean.resource.viewerType eq 'leaflet'}">
+    		$('#homePanel')[0].click();
+    		</c:if>
+		});
+	    
+		<c:if test="#{ViewBean.resource.viewerType eq 'esri2d' or ViewBean.resource.viewerType eq 'esri3d'}">
+		function triggerSetBasemap(name)
+   		{
+   			var triggerFunction = dojo.getObject("setBasemap");
+   			triggerFunction(name);
+   		}
+   		
+   		function triggerBuildMpcmLayer(title, url, layerId, dynamicJson, visibility, opacity, metadataLink, minScale, maxScale, popupTemplate)
+   		{
+   			var triggerFunction = dojo.getObject("createMpcmLayer");
+   			triggerFunction(title, url, layerId, dynamicJson, visibility, opacity, metadataLink, minScale, maxScale, popupTemplate);
+   		}
+   		
+   		function triggerCreateWmsLayer(title, url, version, layer, style, attribution, visible, opacity)
+   		{
+   			var triggerFunction = dojo.getObject("createWmsLayer");
+   			triggerFunction(title, url, version, layer, style, attribution, visible, opacity);
+   		}
+   		
+   		function triggerMarkupTools()
+   		{
+   			var triggerFunction = dojo.getObject("setMarkupTools");
+   			triggerFunction();
+   		}
+   		</c:if>
+	</h:outputScript>
+</html>

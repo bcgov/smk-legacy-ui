@@ -1,0 +1,729 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui" 
+   	  xmlns:ui="http://java.sun.com/jsf/facelets"
+   	  xmlns:c="http://java.sun.com/jsp/jstl/core">
+    <h:head>
+    	<title>Digital Mashup Framework</title>
+  
+    	<!-- css links -->
+    	<h:outputStylesheet library="css" name="materialize.css"  />
+    	<h:outputStylesheet library="css" name="dmf.css"  />
+    	<h:outputStylesheet library="css" name="fonts.css"  />
+    	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+    	 
+    	<!-- JS links -->
+		<h:outputScript library="js" name="materialize.js" />
+		<h:outputScript library="js" name="dmf.js" target="body" />
+		
+		<link rel="stylesheet" 
+			  href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css"
+			  integrity="sha512-M2wvCLH6DSRazYeZRIm1JnYyh22purTM+FDB5CsyxtQJYeKq83arPe5wgbNmcFXGqiSH2XR8dT/fJISVA1r/zQ=="
+			  crossorigin=""/>
+		
+		<script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js"
+			    integrity="sha512-lInM/apFSqyy1o6s89K4iQUKg6ppXEgsVxT35HbzUupEVRh2Eu9Wdl4tHj7dZO0s1uvplcYGmt3498TtHq+log=="
+			    crossorigin=""></script>
+			    
+		<script src="https://unpkg.com/esri-leaflet@2.1.0/dist/esri-leaflet.js"
+    				integrity="sha512-Tojl3UMd387f6DdAJlo+fKfJZiP55fYT+6Y58yKbHydnueOdSFOxrgLPuUxm7VW1szEt3hZVwv3V2sSUCuT35w=="
+    				crossorigin=""></script>
+    	
+    	<link rel="stylesheet" href="https://js.arcgis.com/4.4/esri/css/main.css" />
+    	
+    </h:head>
+    <h:body class="grey lighten-4" style="height: 100vh; position: relative; font-family: 'Avenir Next W00','Helvetica Neue',Helvetica,Arial,sans-serif;">
+   		<div id="header" class="header nrpp-blue-dark">
+			<h:graphicImage value="resources/images/bc_gov_logo_transparent.png" style="padding: 6px;" />
+			<span class="white-text" style="font-size: 30px; top: 18px; position: absolute; margin-left: 15px;">Digital Mashup Framework</span>
+   		</div>
+   		<div id="map" style="width: 100%; height: calc(100vh - 110px); position: absolute; z-index: -10;"/>
+   		<div style="width: 100%; height: calc(100vh - 110px); position: absolute; background: rgba(0, 0, 0, 0.3);"/>
+		<div id="content" class="container" style="margin-top: 14px; min-width: 800px;">
+			<h:form id="createMashupForm">
+				<div class="row">
+					<div class="col s12">
+						<div class="card white">
+							<div class="card-content black-text">
+								<p:wizard flowListener="#{CreateBean.onFlowProcess}">
+									<p:tab id="details" title="My Mashup">
+										<p:panel header="Mashup Details">
+											<p:messages autoUpdate="true" showDetail="true" closable="true"/>
+											<div class="row" style="margin-bottom: 0px;">
+												<div class="col s12 input-field">
+													<p:inputText id="mashupName" value="#{CreateBean.resource.name}" required="true" requiredMessage="Please supply a name for your mashup" />
+													<h:outputLabel for="createMashupForm:mashupName" value="Mashup Name" />
+												</div>
+											</div>
+											<div class="row">
+												<div class="col s12 input-field">
+													<h:selectBooleanCheckbox id="showHeader" value="#{CreateBean.resource.showHeader}" />
+      												<label for="createMashupForm:showHeader">Show a title bar</label>
+												</div>
+											</div>
+											<div class="row" style="margin-top: 50px;">
+												<div class="col s12">
+													<p>What kind of map service do you want to use?</p>
+												</div>
+											</div>
+											<div class="row">
+												<div class="col s12 input-field">
+													<h:selectOneRadio value="#{CreateBean.resource.viewerType}" required="true" requireMessage="Please select a map service. If you're not sure, go with Leaflet (it's pretty awesome)">
+													   	<f:selectItem itemValue="leaflet" itemLabel="Leaflet" />
+													   	<f:selectItem itemValue="esri2d" itemLabel="ESRI ArcGIS 2D" />
+													   	<f:selectItem itemValue="esri3d" itemLabel="ESRI ArcGIS 3D" />
+													   	<p:ajax update="createMashupForm" />
+													</h:selectOneRadio>
+												</div>
+											</div>
+											<div class="row">
+												<div class="col s12">
+													<c:if test="#{CreateBean.resource.viewerType eq 'leaflet'}">
+													<p>A simple, light-weight webmapping client. This client supports DataBC's catalog, WMS, ESRI feature services, KML, and json (wkt, csv, gtx and shapefile sources coming soon!). Leaflet can run in most modern browsers (IE11, Edge, Firefox, Chrome, Safari, Opera)</p>
+													</c:if>
+													<c:if test="#{CreateBean.resource.viewerType eq 'esri2d'}">
+													<p>The ESRI javascript framework 4.4. This map service only supports the DataBC Catalog. ESRI ArcGIS for JS can run in most modern browsers (IE11, Edge, Firefox, Chrome, Safari, Opera)</p>
+													</c:if>
+													<c:if test="#{CreateBean.resource.viewerType eq 'esri3d'}">
+													<p>The ESRI javascript framework 4.4 for 3D maps. This map service only supports the DataBC Catalog, and requires a WebGL enabled browser.</p>
+													</c:if>
+												</div>
+											</div>
+										</p:panel>
+									</p:tab>
+									<p:tab id="basemap" title="Basemaps">
+										<p:panel header="Basemaps">
+											<p:messages autoUpdate="true" showDetail="true" closable="true"/>
+											<div class="row">
+												<div class="col s12 input-field">
+													<p>Select your default basemap. Note that all basemaps will be available to the mashup,
+													this is just the basemap that displays by default.</p>
+													<h:selectOneRadio value="#{CreateBean.resource.defaultBasemap}" required="true" requireMessage="Please select a default basemap. If you're not sure, go with DataBC Default." layout="pageDirection">
+													   	<!-- f:selectItem itemValue="dataBCDefault" itemLabel="DataBC Default" />
+													   	<f:selectItem itemValue="dataBCRoads" itemLabel="DataBC Roads" / -->
+													   	<f:selectItem itemValue="Topographic" itemLabel="ESRI Topographic" />
+													   	<f:selectItem itemValue="Streets" itemLabel="ESRI Streets" />
+													   	<f:selectItem itemValue="Imagery" itemLabel="ESRI Imagery" />
+													   	<f:selectItem itemValue="Oceans" itemLabel="Oceans" />
+													   	<f:selectItem itemValue="NationalGeographic" itemLabel="National Geographic" />
+													   	<f:selectItem itemValue="DarkGray" itemLabel="Dark Grey" />
+													   	<f:selectItem itemValue="Gray" itemLabel="Light Grey" />
+													   	<!-- f:selectItem itemValue="osm" itemLabel="Open Street Map" / -->
+													</h:selectOneRadio>
+												</div>
+											</div>
+										</p:panel>
+									</p:tab>
+									<p:tab id="layers" title="Layers">
+										<p:panel header="Layers">
+											<p:messages autoUpdate="true" showDetail="true" closable="true"/>
+											<div class="row">
+												<div class="col s6">
+													<table>
+														<tr><td><p>Add Layers from...</p></td></tr>
+														<tr><td><a class="waves-effect waves-dark btn grey lighten-2" href="#layerCatalogBox" style="width: 100%;">DataBC Layer Catalog</a></td></tr>
+														<c:if test="#{CreateBean.resource.viewerType eq 'leaflet'}"><tr><td><a class="waves-effect waves-dark btn grey lighten-2" href="#wmsServiceBox" style="width: 100%;">WMS Service</a></td></tr></c:if>
+														<tr><td><a class="waves-effect waves-dark btn grey lighten-2" href="#esriFeatureServiceBox" style="width: 100%;">ESRI Feature Service</a></td></tr>
+														<c:if test="#{CreateBean.resource.viewerType eq 'leaflet'}"><tr><td><a class="waves-effect waves-dark btn grey lighten-2" href="#importKmlBox" style="width: 100%;">KML Import</a></td></tr></c:if>
+														<c:if test="#{CreateBean.resource.viewerType eq 'leaflet'}"><tr><td><a class="waves-effect waves-dark btn grey lighten-2" href="#importGeoJsonBox" style="width: 100%;">GeoJSON Import</a></td></tr></c:if>
+													</table>
+												</div>
+												<div class="col s6">
+													<p>My Layers</p>
+													<p:outputPanel style="overflow: auto; display: block; width: 100%; height: 320px;">
+														<p:tree id="layerList" 
+																value="#{CreateBean.layerNodes}" 
+																var="node" 
+																selectionMode="single"
+												                draggable="true" 
+												                droppable="true"
+												                dynamic="true"
+												                selection="#{CreateBean.selectedLayerNode}"
+												                animate="true"
+												                style="width: 100%">
+												            <p:ajax event="dragdrop" listener="#{CreateBean.onDragDrop}"  />
+												            <p:treeNode>
+												                <h:outputText value="#{node}" />
+												            </p:treeNode>
+												        </p:tree>
+											        </p:outputPanel>
+											        <div class="row" style="margin-top: 10px;">
+											        	<div class="col s12">
+											        		<a class="waves-effect waves-dark btn grey lighten-2" href="#" onclick="removeLayer();">Remove layer from Mashup</a>
+															<p:remoteCommand name="removeLayer" actionListener="#{CreateBean.removeSelectedLayer()}" />
+															<a class="waves-effect waves-dark btn grey lighten-2" href="#" onclick="editLayer();">Edit layer</a>
+															<p:remoteCommand name="editLayer" actionListener="#{CreateBean.editSelectedLayer()}" />
+											        	</div>
+											        </div>
+												</div>
+											</div>
+										</p:panel>
+									</p:tab>
+									<p:tab id="tools" title="Tools">
+										<p:panel header="Tools">
+											<p:messages autoUpdate="true" showDetail="true" closable="true"/>
+											<div class="row">
+												<div class="col s12">
+													<p:pickList id="toolsPicklist" 
+																value="#{CreateBean.tools}" 
+																var="tool"
+																itemLabel="#{tool}" 
+																itemValue="#{tool}" 
+																responsive="true">
+                										<f:facet name="sourceCaption">Available Tools</f:facet>
+        												<f:facet name="targetCaption">Added Tools</f:facet>
+                									</p:pickList>
+												</div>
+											</div>
+										</p:panel>
+									</p:tab>
+									<p:tab id="homePage" title="Home Page">
+										<p:panel header="Home Page">
+											<p:messages autoUpdate="true" showDetail="true" closable="true"/>
+											<div class="row">
+												<div class="col s12">
+													<p:textEditor id="aboutPageEditor" widgetVar="editorWidget" value="#{CreateBean.resource.aboutPage}" height="300" style="margin-bottom:10px"/>
+												</div>
+											</div>
+										</p:panel>
+									</p:tab>
+									<p:tab id="publish" title="Publish">
+										<p:panel header="Publish">
+											<p:messages autoUpdate="true" showDetail="true" closable="true"/>
+											<div class="row">
+												<div class="col s12">
+													<p>Your map is now ready to publish! Click "Publish" below to make your mashup available to the world.
+													if you just want to save your mashup but leave it unpublished for now, that's fine too, just click finish
+													and your mashup is saved. You'll be redirected to the mashup listings.</p>
+													<p>If you want to embed this mashup in another application, you can use an iframe:</p>
+												</div>
+											</div>
+											<div class="row">
+												<div class="col s12">
+													<a class="waves-effect waves-light btn light-blue lighten-2" href="#" onclick="saveAndPublish();">Publish immediately!</a>
+													<p:remoteCommand name="saveAndPublish" actionListener="#{CreateBean.saveAndPublish()}" />
+													<a class="waves-effect waves-light btn light-blue lighten-2" href="#" onclick="save();">Just save for now, thanks</a>
+													<p:remoteCommand name="save" actionListener="#{CreateBean.save()}" />
+												</div>
+											</div>
+										</p:panel>
+									</p:tab>
+								</p:wizard>
+							</div>
+						</div>
+					</div>
+				</div>
+			</h:form>
+			<div id="layerCatalogBox" class="modal modal-fixed-footer">
+				<div class="modal-content">
+					<h4>DataBC Catalog Layers</h4>
+					<h:form id="mpcmLayerForm" style="height: calc(100% - 51px); margin-bottom: 0px;">
+						<div class="row" style="height: 100%;">
+							<div style="height: 100%; width: 320px;">
+								<p:outputPanel style="overflow: auto; display: block; width: 320px;height: 100%;">
+									<p:tree id="catalog" 
+											value="#{CreateBean.getCatalogLayers()}" 
+											var="node" 
+											selectionMode="single"
+							                draggable="false" 
+							                droppable="false"
+							                selection="#{CreateBean.selectedLayerNode}"
+							                dynamic="true"
+							                animate="true">
+							            <p:ajax event="select" update="mpcmLayerForm:mpcmLayerPanel" listener="#{CreateBean.onMpcmNodeSelect}" />
+							            <p:treeNode>
+							                <h:outputText value="#{node}" />
+							            </p:treeNode>
+							        </p:tree>
+						        </p:outputPanel>
+							</div>
+							<div style="margin-left: 321px; position: fixed; right: 14px; top: 75px; width: calc(100% - 355px);">
+								<p:panel id="mpcmLayerPanel" style="overflow: auto; display: block; height: 511px;">
+									<h5>#{CreateBean.selectedLayerNode.data.label}</h5>
+									<p:panel id="secureLayer" rendered="#{not CreateBean.selectedLayerNode.data.getMpcmWorkspace() eq 'MPCM_ALL_PUB'}">
+										<p>This is a secure only layer, and cannot be used in the Digital Mashup Framework at this time</p>
+									</p:panel>
+									<p:panel id="publicLayer" rendered="#{CreateBean.selectedLayerNode.data.getMpcmWorkspace() eq 'MPCM_ALL_PUB'}">
+										<div class="row">
+											<div class="col s12">
+												<a href="#{CreateBean.selectedLayerNode.data.metadataUrl}" target="_blank" style="color: #039be5;">Layer Metadata</a>
+											</div>
+										</div>
+										<div class="row">
+											<div class="col s12 input-field" style="padding: 0px; margin-left: 0px; margin-right: 0px; margin-bottom: 0px; margin-top: -16px;">
+												<h:selectBooleanCheckbox id="layerVisible" value="#{CreateBean.selectedLayerNode.data.isVisible}" />
+												<h:outputLabel for="mpcmLayerForm:layerVisible" value="Visible by default" />
+											</div>
+										</div>
+										<div class="row">
+											<div class="col s12 input-field">
+												<p:inputText id="opacity" value="#{CreateBean.selectedLayerNode.data.opacity}" required="false" />
+												<h:outputLabel for="mpcmLayerForm:opacity" value="Opacity" />
+											</div>
+										</div>
+										<div class="row">
+											<div class="col s12 input-field">
+												<p:inputText id="attribution" value="#{CreateBean.selectedLayerNode.data.attribution}" required="false" />
+												<h:outputLabel for="mpcmLayerForm:attribution" value="Attribution" />
+											</div>
+										</div>
+										<p:panel id="attributePanel">
+											<div class="row">
+												<div class="col s12">
+													<h5>Attributes</h5>
+												</div>
+											</div>
+											<ui:repeat value="#{CreateBean.selectedLayerNode.data.attributes}" var="field">
+									            <div class="row">
+									            	<div class="col s12">
+									            		<h:outputLabel value="#{field.name}" />
+									            	</div>
+									            </div>
+									            <div class="row">
+									            	<div class="col s8 input-field">
+									            		<p:inputText id="fieldAlias" value="#{field.alias}" required="true" />
+														<h:outputLabel for="mpcmLayerForm:attributePanel:fieldAlias" value="Alias" />
+									            	</div>
+									            	<div class="col s4 input-field">
+									            		<h:selectBooleanCheckbox id="fieldVisible" value="#{field.visible}" style="padding: 0px; margin-left: 0px; margin-right: 0px; margin-bottom: 0px; margin-top: -16px;"/>
+														<h:outputLabel for="mpcmLayerForm:attributePanel:fieldVisible" value="Visible" />
+									            	</div>
+									            </div>
+									        </ui:repeat>
+										</p:panel>
+										<div class="row">
+											<div class="col s12">
+												<a class="waves-effect waves-light btn light-blue lighten-2" href="#" onclick="addMpcmLayer();">Add Layer to Mashup</a>
+												<p:remoteCommand name="addLayer" actionListener="#{CreateBean.addSelectedLayerMpcm()}" />
+											</div>
+										</div>
+									</p:panel>
+								</p:panel>
+							</div>
+						</div>
+					</h:form>
+				</div>
+				<div class="modal-footer">
+					<a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat">Done</a>
+				</div>
+			</div>
+			<div id="wmsServiceBox" class="modal modal-fixed-footer">
+				<div class="modal-content">
+					<h4>WMS Service</h4>
+					<h:form id="wmsForm">
+						<div class="row">
+							<div class="col s12 input-field">
+								<p:inputText id="wmsTitle" value="#{CreateBean.wmsLayerTitle}" required="false" />
+								<h:outputLabel for="wmsForm:wmsTitle" value="Layer Title" />
+							</div>
+						</div>
+						<div class="row">
+							<div class="col s8 input-field">
+								<p:inputText id="wmsUrl" value="#{CreateBean.wmsServiceUrl}" required="true" requiredMessage="A Service URL is required" />
+								<h:outputLabel for="wmsForm:wmsUrl" value="Service URL" />
+							</div>
+							<div class="col s4 input-field">
+								<p:inputText id="wmsVersion" value="#{CreateBean.wmsVersion}" required="true" requiredMessage="A WMS Version is required" />
+								<h:outputLabel for="wmsForm:wmsVersion" value="Service Version" />
+							</div>
+						</div>
+						<div class="row">
+							<div class="col s12">
+								<a class="waves-effect waves-light btn light-blue lighten-2" href="#" onclick="buildWmsLayerList();">Load Layer List</a>
+								<p:remoteCommand name="buildWmsLayers" actionListener="#{CreateBean.buildWmsLayerList()}" />
+							</div>
+						</div>
+						<div class="row">
+							<div class="col s6">
+								<p:dataTable id="allServiceLayers"
+											 styleClass="bordered highlight responsive-table" 
+											 var="lyr" 
+											 value="#{CreateBean.allServiceLayers}" 
+											 selectionMode="single" 
+											 selection="#{CreateBean.selectedServiceLayer}" 
+											 rowKey="#{lyr.title}"
+											 rows="10"
+					                         paginator="true"
+					                         rowsPerPageTemplate="10,20,50"
+					                         paginatorPosition="bottom">
+								     <f:facet name="header">
+								         Service Layers
+								     </f:facet>
+								     <p:ajax event="rowSelect" update="wmsForm:allServiceLayerStyles" />
+								     <p:column headerText="Title">
+								         <h:outputText value="#{lyr.title}" />
+								     </p:column>
+								 </p:dataTable>
+							</div>
+							<div class="col s6">
+								<p:dataTable id="allServiceLayerStyles"
+											 styleClass="bordered highlight responsive-table" 
+											 var="lyrStyle" 
+											 value="#{CreateBean.selectedServiceLayer.styles}" 
+											 selectionMode="single" 
+											 selection="#{CreateBean.selectedServiceStyle}" 
+											 rowKey="#{lyrStyle}">
+								     <f:facet name="header">
+								         Service Layer Styles
+								     </f:facet>
+								     <p:column headerText="Style">
+								         <h:outputText value="#{lyrStyle}" />
+								     </p:column>
+								 </p:dataTable>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col s12 input-field" style="padding: 0px; margin-left: 0px; margin-right: 0px; margin-bottom: 0px; margin-top: -16px;">
+								<h:selectBooleanCheckbox id="wmsLayerVisible" value="#{CreateBean.wmsIsVisible}" />
+								<h:outputLabel for="wmsForm:wmsLayerVisible" value="Visible by default" />
+							</div>
+						</div>
+						<div class="row">
+							<div class="col s12 input-field">
+								<p:inputText id="wmsOpacity" value="#{CreateBean.wmsOpacity}" />
+								<h:outputLabel for="wmsForm:wmsOpacity" value="Layer Opacity" />
+							</div>
+						</div>
+						<div class="row">
+							<div class="col s12">
+								<a class="waves-effect waves-light btn light-blue lighten-2" href="#" onclick="addWmsLayer();">Add Layer to Mashup</a>
+								<p:remoteCommand name="addLayerWms" actionListener="#{CreateBean.addSelectedLayerWms()}" />
+							</div>
+						</div>
+					</h:form>
+				</div>
+				<div class="modal-footer">
+					<a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat">Done</a>
+				</div>
+			</div>
+			<div id="esriFeatureServiceBox" class="modal modal-fixed-footer">
+				<div class="modal-content">
+					<h4>ESRI Feature Service</h4>
+					<h:form id="featureServiceForm">
+						<div class="row">
+							<div class="col s12 input-field">
+								<p:inputText id="fsTitle" value="#{CreateBean.fsLayerTitle}" required="true" requiredMessage="A Feature Service title is required. Use the name of your layer." />
+								<h:outputLabel for="featureServiceForm:fsTitle" value="Layer Title" />
+							</div>
+						</div>
+						<div class="row">
+							<div class="col s8 input-field">
+								<p:inputText id="fsUrl" value="#{CreateBean.fsServiceUrl}" required="true" requiredMessage="A Service URL is required" />
+								<h:outputLabel for="featureServiceForm:fsUrl" value="Service and layer URL" />
+							</div>
+							<div class="col s4 input-field">
+								<p:inputText id="fsLayerId" value="#{CreateBean.fsLayerId}" required="true" requiredMessage="A layer ID is required" />
+								<h:outputLabel for="featureServiceForm:fsLayerId" value="Layer ID" />
+							</div>
+						</div>
+						<div class="row">
+							<div class="col s12 input-field" style="padding: 0px; margin-left: 0px; margin-right: 0px; margin-bottom: 0px; margin-top: -16px;">
+								<h:selectBooleanCheckbox id="fsLayerVisible" value="#{CreateBean.fsIsVisible}" />
+								<h:outputLabel for="featureServiceForm:fsLayerVisible" value="Visible by default" />
+							</div>
+						</div>
+						<div class="row">
+							<div class="col s12 input-field">
+								<p:inputText id="fsOpacity" value="#{CreateBean.fsOpacity}" />
+								<h:outputLabel for="featureServiceForm:fsOpacity" value="Layer Opacity" />
+							</div>
+						</div>
+						<div class="row">
+							<div class="col s12 input-field">
+								<h:selectBooleanCheckbox id="fsClusterPoints" value="#{CreateBean.fsClusterPoints}" />
+								<h:outputLabel for="featureServiceForm:fsClusterPoints" value="Cluster point features" />
+							</div>
+						</div>
+						<div class="row">
+							<div class="col s12 input-field">
+								<h:selectBooleanCheckbox id="fsHeatmapPoints" value="#{CreateBean.fsHeatmapPoints}" />
+								<h:outputLabel for="featureServiceForm:fsHeatmapPoints" value="Point features as Heatmap (this will override clustering)" />
+							</div>
+						</div>
+						<div class="row">
+							<div class="col s12">
+								<a class="waves-effect waves-light btn light-blue lighten-2" href="#" onclick="addFsLayer();">Add Layer to Mashup</a>
+								<p:remoteCommand name="addLayerFs" actionListener="#{CreateBean.addSelectedLayerFeatureService()}" />
+							</div>
+						</div>
+					</h:form>
+				</div>
+				<div class="modal-footer">
+					<a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat">Done</a>
+				</div>
+			</div>
+			<div id="importKmlBox" class="modal modal-fixed-footer">
+				<div class="modal-content">
+					<h4>Import KML File</h4>
+					<h:form id="kmlForm">
+						<div class="row">
+							<div class="col s12 input-field">
+								<p:inputText id="kmlTitle" value="#{CreateBean.kmlLayerTitle}" required="true" requiredMessage="A title is required." />
+								<h:outputLabel for="kmlForm:kmlTitle" value="Layer Title" />
+							</div>
+						</div>
+						<div class="row">
+							<div class="col s12 input-field">
+								<p:fileUpload ajax="true" 
+											  mode="advanced" 
+											  fileLimit="1" 
+											  sizeLimit="52428800" 
+											  invalidSizeMessage="The selected file exceeds the limit of 50 MB"
+											  fileUploadListener="#{CreateBean.uploadDocument}"  />
+							</div>
+						</div>
+						<div class="row">
+							<div class="col s12 input-field" style="padding: 0px; margin-left: 0px; margin-right: 0px; margin-bottom: 0px; margin-top: -16px;">
+								<h:selectBooleanCheckbox id="kmlLayerVisible" value="#{CreateBean.kmlIsVisible}" />
+								<h:outputLabel for="kmlForm:kmlLayerVisible" value="Visible by default" />
+							</div>
+						</div>
+						<div class="row">
+							<div class="col s4 input-field">
+								<p:inputText id="kmlOpacity" value="#{CreateBean.kmlOpacity}" />
+								<h:outputLabel for="kmlForm:kmlOpacity" value="Layer Opacity" />
+							</div>
+							<div class="col s4 input-field">
+								<h:selectBooleanCheckbox id="kmlClusterPoints" value="#{CreateBean.kmlClusterPoints}" />
+								<h:outputLabel for="kmlForm:kmlClusterPoints" value="Cluster point features" />
+							</div>
+							<div class="col s4 input-field">
+								<h:selectBooleanCheckbox id="kmlHeatmapPoints" value="#{CreateBean.kmlHeatmapPoints}" />
+								<h:outputLabel for="kmlForm:kmlHeatmapPoints" value="Point features as Heatmap (this will add another layer)" />
+							</div>
+						</div>
+						<div class="row">
+							<div class="col s4 input-field">
+								<p:inputText id="kmlStrokeWidth" value="#{CreateBean.kmlStrokeWidth}" />
+								<h:outputLabel for="kmlForm:kmlStrokeWidth" value="Line Width" />
+							</div>
+							<div class="col s4 input-field">
+								<p:inputText id="kmlStrokeOpacity" value="#{CreateBean.kmlStrokeOpacity}" />
+								<h:outputLabel for="kmlForm:kmlStrokeOpacity" value="Line Opacity" />
+							</div>
+							<div class="col s4 input-field">
+								<p:colorPicker id="kmlStrokeColor" value="#{CreateBean.kmlStrokeColor}" /> 
+							</div>
+						</div>
+						<div class="row">
+							<div class="col s6 input-field">
+								<p:inputText id="kmlFillOpacity" value="#{CreateBean.kmlFillOpacity}" />
+								<h:outputLabel for="kmlForm:kmlFillOpacity" value="Fill Opacity" />
+							</div>
+							<div class="col s6 input-field">
+								<p:colorPicker id="kmlFillColor" value="#{CreateBean.kmlFillColor}" /> 
+							</div>
+						</div>
+						<div class="row">
+							<div class="col s12">
+								<a class="waves-effect waves-light btn light-blue lighten-2" href="#" onclick="addKmlLayer();">Add Layer to Mashup</a>
+								<p:remoteCommand name="addLayerKml" actionListener="#{CreateBean.addSelectedKml()}" />
+							</div>
+						</div>
+					</h:form>
+				</div>
+				<div class="modal-footer">
+					<a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat">Done</a>
+				</div>
+			</div>
+			<div id="importGeoJsonBox" class="modal modal-fixed-footer">
+				<div class="modal-content">
+					<h4>Import GeoJSON</h4>
+					<h:form id="jsonForm">
+						<div class="row">
+							<div class="col s12 input-field">
+								<p:inputText id="jsonTitle" value="#{CreateBean.jsonLayerTitle}" required="true" requiredMessage="A title is required." />
+								<h:outputLabel for="jsonForm:jsonTitle" value="Layer Title" />
+							</div>
+						</div>
+						<div class="row">
+							<div class="col s12">
+								<p>GeoJSON data used by DMF is expected to be in Feature Collections. Any submitted GeoJSON data that is not stored within a feature collection will be ignored.</p>
+								<p>Example: {"type":"FeatureCollection","features":[{"type":"Feature","geometry":{"type":"GeometryCollection","geometries":[{"type":"Point","coordinates":[-125, 50]}]}}]}</p>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col s12 input-field">
+								<p:fileUpload ajax="true" 
+											  mode="advanced" 
+											  fileLimit="1" 
+											  sizeLimit="52428800" 
+											  invalidSizeMessage="The selected file exceeds the limit of 50 MB"
+											  fileUploadListener="#{CreateBean.uploadDocument}"  />
+							</div>
+						</div>
+						<div class="row">
+							<div class="col s12 input-field" style="padding: 0px; margin-left: 0px; margin-right: 0px; margin-bottom: 0px; margin-top: -16px;">
+								<h:selectBooleanCheckbox id="jsonLayerVisible" value="#{CreateBean.jsonIsVisible}" />
+								<h:outputLabel for="jsonForm:jsonLayerVisible" value="Visible by default" />
+							</div>
+						</div>
+						<div class="row">
+							<div class="col s4 input-field">
+								<p:inputText id="jsonOpacity" value="#{CreateBean.jsonOpacity}" />
+								<h:outputLabel for="jsonForm:jsonOpacity" value="Layer Opacity" />
+							</div>
+							<div class="col s4 input-field">
+								<h:selectBooleanCheckbox id="jsonClusterPoints" value="#{CreateBean.jsonClusterPoints}" />
+								<h:outputLabel for="jsonForm:jsonClusterPoints" value="Cluster point features" />
+							</div>
+							<div class="col s4 input-field">
+								<h:selectBooleanCheckbox id="jsonHeatmapPoints" value="#{CreateBean.jsonHeatmapPoints}" />
+								<h:outputLabel for="jsonForm:jsonHeatmapPoints" value="Point features as Heatmap (this will add another layer)" />
+							</div>
+						</div>
+						<div class="row">
+							<div class="col s4 input-field">
+								<p:inputText id="jsonStrokeWidth" value="#{CreateBean.jsonStrokeWidth}" />
+								<h:outputLabel for="jsonForm:jsonStrokeWidth" value="Line Width" />
+							</div>
+							<div class="col s4 input-field">
+								<p:inputText id="jsonStrokeOpacity" value="#{CreateBean.jsonStrokeOpacity}" />
+								<h:outputLabel for="jsonForm:jsonStrokeOpacity" value="Line Opacity" />
+							</div>
+							<div class="col s4 input-field">
+								<p:colorPicker id="jsonStrokeColor" value="#{CreateBean.jsonStrokeColor}" /> 
+							</div>
+						</div>
+						<div class="row">
+							<div class="col s6 input-field">
+								<p:inputText id="jsonFillOpacity" value="#{CreateBean.jsonFillOpacity}" />
+								<h:outputLabel for="jsonForm:jsonFillOpacity" value="Fill Opacity" />
+							</div>
+							<div class="col s6 input-field">
+								<p:colorPicker id="jsonFillColor" value="#{CreateBean.jsonFillColor}" /> 
+							</div>
+						</div>
+						<div class="row">
+							<div class="col s12">
+								<a class="waves-effect waves-light btn light-blue lighten-2" href="#" onclick="addJsonLayer();">Add Layer to Mashup</a>
+								<p:remoteCommand name="addLayerJson" actionListener="#{CreateBean.addSelectedJson()}" />
+							</div>
+						</div>
+					</h:form>
+				</div>
+				<div class="modal-footer">
+					<a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat">Done</a>
+				</div>
+			</div>
+		</div>
+		<div id="footer" class="footer nrpp-blue-dark">
+		</div>
+		
+		<div class="spinner-modal" id="waitingDialog">
+			<div class="spinner-modal-content">
+				<div class="spinner-modal-header">
+					<span class="spinner-modal-close" onclick="closeModal()">&times;</span>
+				    <h5 id="modalHeader">Loading...</h5>
+				</div>
+				<div class="spinner-modal-body">
+				    <div class="sk-folding-cube">
+					  <div class="sk-cube1 sk-cube" style="background-color: lightblue;"></div>
+					  <div class="sk-cube2 sk-cube" style="background-color: lightblue;"></div>
+					  <div class="sk-cube4 sk-cube" style="background-color: lightblue;"></div>
+					  <div class="sk-cube3 sk-cube" style="background-color: lightblue;"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+    </h:body>
+    <h:outputScript>
+    	$(document).ready(function()
+    	{
+		    $(".modal").modal(
+		    {
+			      dismissible: true, // Modal can be dismissed by clicking outside of the modal
+			      opacity: .5, // Opacity of modal background
+			      inDuration: 300, // Transition in duration
+			      outDuration: 200
+			});
+			
+			// init background map
+	    	var map = L.map('map', { zoomControl: false });
+	    	map.touchZoom.disable();
+			map.doubleClickZoom.disable();
+			map.scrollWheelZoom.disable();
+			map.boxZoom.disable();
+			map.keyboard.disable();
+	    
+	    	var rndLat = Math.random() * (60 - 48.3) + 47.294;
+	    	var rndLon = (Math.random() * (124 - 111.291) + 114) * -1;
+	    	var rndZoom = Math.floor(Math.random() * (12 - 9) + 9);
+	    
+	    	map.setView(new L.latLng(rndLat, rndLon), rndZoom);
+                
+	    	var bm = L.esri.basemapLayer("Topographic");
+			
+			map.addLayer(bm);
+		});
+		
+		function addMpcmLayer()
+		{
+			addLayer();
+		}
+		
+		function addWmsLayer()
+		{
+			addLayerWms();
+		}
+		
+		function addFsLayer()
+		{
+			addLayerFs();
+		}
+		
+		function addKmlLayer()
+		{
+			addLayerKml();
+		}
+		
+		function addJsonLayer()
+		{
+			addLayerJson();
+		}
+		
+		function removeLayer()
+		{
+			removeLayer();
+		}
+		
+		function editLayer()
+		{
+			editLayer();
+		}
+		
+		function save()
+		{
+			save();
+		}
+		
+		function saveAndPublish()
+		{
+			saveAndPublish();
+		}
+		
+		function buildWmsLayerList()
+		{
+			buildWmsLayers();
+			openModal();
+		}
+		
+		function openModal()
+		{
+		    var modal = document.getElementById('waitingDialog');
+		    modal.style.display = "block";
+		    $('body').addClass("body-no-scroll");
+		}
+		
+		function closeModal()
+		{
+			var modal = document.getElementById('waitingDialog');
+			modal.style.display = "none";
+			$('body').removeClass("body-no-scroll");
+		}
+	</h:outputScript>
+</html>
