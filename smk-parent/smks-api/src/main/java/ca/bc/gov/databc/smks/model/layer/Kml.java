@@ -1,10 +1,12 @@
-package ca.bc.gov.databc.smks.model;
+package ca.bc.gov.databc.smks.model.layer;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
+import ca.bc.gov.databc.smks.model.Layer;
+
 @JsonInclude(Include.NON_NULL)
-public class KmlLayer extends Layer 
+public class Kml extends Layer
 {
 	private boolean useClustering;
 	private boolean useHeatmapping;
@@ -15,80 +17,80 @@ public class KmlLayer extends Layer
 	private String fillColor;
 	private Double fillOpacity;
 	private String markerSymbolPath;
-	
+
 	public KmlLayer() { }
-	
-	public boolean getUseClustering() 
+
+	public boolean getUseClustering()
 	{
 		return useClustering;
 	}
 
-	public void setUseClustering(boolean useClustering) 
+	public void setUseClustering(boolean useClustering)
 	{
 		this.useClustering = useClustering;
 	}
 
-	public boolean getUseHeatmapping() 
+	public boolean getUseHeatmapping()
 	{
 		return useHeatmapping;
 	}
 
-	public void setUseHeatmapping(boolean useHeatmapping) 
+	public void setUseHeatmapping(boolean useHeatmapping)
 	{
 		this.useHeatmapping = useHeatmapping;
 	}
-	
-	public Double getStrokeWidth() 
+
+	public Double getStrokeWidth()
 	{
 		return strokeWidth;
 	}
 
-	public void setStrokeWidth(Double strokeWidth) 
+	public void setStrokeWidth(Double strokeWidth)
 	{
 		this.strokeWidth = strokeWidth;
 	}
 
-	public String getStrokeStyle() 
+	public String getStrokeStyle()
 	{
 		return strokeStyle;
 	}
 
-	public void setStrokeStyle(String strokeStyle) 
+	public void setStrokeStyle(String strokeStyle)
 	{
 		this.strokeStyle = strokeStyle;
 	}
 
-	public String getStrokeColor() 
+	public String getStrokeColor()
 	{
 		return strokeColor;
 	}
 
-	public void setStrokeColor(String strokeColor) 
+	public void setStrokeColor(String strokeColor)
 	{
 		this.strokeColor = strokeColor;
 	}
 
-	public Double getStrokeOpacity() 
+	public Double getStrokeOpacity()
 	{
 		return strokeOpacity;
 	}
 
-	public void setStrokeOpacity(Double strokeOpacity) 
+	public void setStrokeOpacity(Double strokeOpacity)
 	{
 		this.strokeOpacity = strokeOpacity;
 	}
 
-	public String getFillColor() 
+	public String getFillColor()
 	{
 		return fillColor;
 	}
 
-	public void setFillColor(String fillColor) 
+	public void setFillColor(String fillColor)
 	{
 		this.fillColor = fillColor;
 	}
 
-	public Double getFillOpacity() 
+	public Double getFillOpacity()
 	{
 		return fillOpacity;
 	}
@@ -98,20 +100,20 @@ public class KmlLayer extends Layer
 		this.fillOpacity = fillOpacity;
 	}
 
-	public String getMarkerSymbolPath() 
+	public String getMarkerSymbolPath()
 	{
 		return markerSymbolPath;
 	}
 
-	public void setMarkerSymbolPath(String markerSymbolPath) 
+	public void setMarkerSymbolPath(String markerSymbolPath)
 	{
 		this.markerSymbolPath = markerSymbolPath;
 	}
-	
+
 	public KmlLayer clone()
 	{
 		KmlLayer clone = new KmlLayer();
-		
+
 		clone.setAttribution(getAttribution());
 		clone.setFormat(getFormat());
 		clone.setId(getId());
@@ -131,12 +133,12 @@ public class KmlLayer extends Layer
 		clone.setStrokeWidth(strokeWidth);
 		clone.setUseClustering(useClustering);
 		clone.setUseHeatmapping(useHeatmapping);
-		
+
 		for(Attribute a : getAttributes())
 		{
 			clone.getAttributes().add(a.clone());
 		}
-		
+
 		return clone;
 	}
 }

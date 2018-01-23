@@ -1,4 +1,4 @@
-package ca.bc.gov.databc.smks.model;
+package ca.bc.gov.databc.smks.model.layer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,61 +6,53 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
+import ca.bc.gov.databc.smks.model.Layer;
+
 @JsonInclude(Include.NON_NULL)
-public class DynamicServiceLayer extends Layer 
+public class EsriDynamic extends Layer
 {
 	private Integer mpcmId;
 	private String mpcmWorkspace;
-	private String metadataUrl;
+	// private String metadataUrl;
 	private List<String> dynamicLayers;
-	
-	public DynamicServiceLayer() { }
-	
-	public Integer getMpcmId() 
+
+	public EsriDynamic() { }
+
+	public Integer getMpcmId()
 	{
 		return mpcmId;
 	}
 
-	public void setMpcmId(Integer mpcmId) 
+	public void setMpcmId(Integer mpcmId)
 	{
 		this.mpcmId = mpcmId;
 	}
 
-	public String getMpcmWorkspace() 
+	public String getMpcmWorkspace()
 	{
 		return mpcmWorkspace;
 	}
 
-	public void setMpcmWorkspace(String mpcmWorkspace) 
+	public void setMpcmWorkspace(String mpcmWorkspace)
 	{
 		this.mpcmWorkspace = mpcmWorkspace;
 	}
-	
-	public String getMetadataUrl() 
-	{
-		return metadataUrl;
-	}
 
-	public void setMetadataUrl(String metadataUrl) 
-	{
-		this.metadataUrl = metadataUrl;
-	}
-	
-	public List<String> getDynamicLayers() 
+	public List<String> getDynamicLayers()
 	{
 		if(dynamicLayers == null) dynamicLayers = new ArrayList<String>();
 		return dynamicLayers;
 	}
 
-	public void setDynamicLayers(List<String> dynamicLayers) 
+	public void setDynamicLayers(List<String> dynamicLayers)
 	{
 		this.dynamicLayers = dynamicLayers;
 	}
-	
+
 	public DynamicServiceLayer clone()
 	{
 		DynamicServiceLayer clone = new DynamicServiceLayer();
-		
+
 		clone.setAttribution(getAttribution());
 		clone.setFormat(getFormat());
 		clone.setId(getId());
@@ -74,17 +66,17 @@ public class DynamicServiceLayer extends Layer
 		clone.setMetadataUrl(metadataUrl);
 		clone.setMpcmId(mpcmId);
 		clone.setMpcmWorkspace(mpcmWorkspace);
-		
+
 		for(String s : dynamicLayers)
 		{
 			clone.getDynamicLayers().add(s);
 		}
-		
+
 		for(Attribute a : getAttributes())
 		{
 			clone.getAttributes().add(a.clone());
 		}
-		
+
 		return clone;
 	}
 }

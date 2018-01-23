@@ -1,16 +1,16 @@
-package ca.bc.gov.databc.smks.model;
+package ca.bc.gov.databc.smks.model.layer;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 @JsonInclude(Include.NON_NULL)
-public class Attribute implements Cloneable 
+public class Attribute implements Cloneable
 {
 	private Integer id;
 	private String name;
-	private String alias;
-	private Boolean visible;
-	
+	private String title;
+	// private Boolean visible;
+
 	public Attribute() { }
 
 	public Integer getId() {
@@ -29,31 +29,31 @@ public class Attribute implements Cloneable
 		this.name = name;
 	}
 
-	public String getAlias() {
-		return alias;
+	public String getTitle() {
+		return title;
 	}
 
-	public void setAlias(String alias) {
-		this.alias = alias;
+	public void setTitle(String title) {
+		this.title = title;
 	}
 
-	public Boolean getVisible() {
-		return visible;
-	}
+	// public Boolean getVisible() {
+	// 	return visible;
+	// }
 
-	public void setVisible(Boolean visible) {
-		this.visible = visible;
-	}
-	
+	// public void setVisible(Boolean visible) {
+	// 	this.visible = visible;
+	// }
+
 	public Attribute clone()
 	{
 		Attribute clone = new Attribute();
-		
-		clone.setAlias(alias);
+
 		clone.setId(id);
+		clone.setTitle(title);
 		clone.setName(name);
-		clone.setVisible(visible);
-		
+		// clone.setVisible(visible);
+
 		return clone;
 	}
 }
