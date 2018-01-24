@@ -3,22 +3,54 @@ package ca.bc.gov.databc.smks.model.layer;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
-import ca.bc.gov.databc.smks.model.Layer;
+import ca.bc.gov.databc.smks.model.FeatureLayer;
+import ca.bc.gov.databc.smks.model.LayerStyle;
 
 @JsonInclude(Include.NON_NULL)
-public class Kml extends Layer
+public class Kml extends FeatureLayer
 {
+	private String dataUrl;
 	private boolean useClustering;
 	private boolean useHeatmapping;
-	private Double strokeWidth;
-	private String strokeStyle;
-	private String strokeColor;
-	private Double strokeOpacity;
-	private String fillColor;
-	private Double fillOpacity;
-	private String markerSymbolPath;
+	// private Double strokeWidth;
+	// private String strokeStyle;
+	// private String strokeColor;
+	// private Double strokeOpacity;
+	// private String fillColor;
+	// private Double fillOpacity;
+	// private String markerSymbolPath;
+	private LayerStyle style;
 
-	public KmlLayer() { }
+	public Kml() { }
+
+	protected Kml( Kml layer ) {
+		super( layer );
+
+		this.setDataUrl(layer.getDataUrl());
+		this.setUseClustering(layer.getUseClustering());
+		this.setUseHeatmapping(layer.getUseHeatmapping());
+		this.setStyle(layer.getStyle().clone());
+
+		// this.setId(layer.getId());
+		// this.setTitle(layer.getTitle());
+		// this.setAttribution(layer.getAttribution());
+		// this.setMetadataUrl(layer.getMetadataUrl());
+		// this.setIsVisible(layer.getIsVisible());
+		// this.setMaxScale(layer.getMaxScale());
+		// this.setMinScale(layer.getMinScale());
+		// this.setOpacity(layer.getOpacity());
+		// this.setAttributes(layer.getAttributes());
+	}
+
+	public String getDataUrl()
+	{
+		return dataUrl;
+	}
+
+	public void setDataUrl(String dataUrl)
+	{
+		this.dataUrl = dataUrl;
+	}
 
 	public boolean getUseClustering()
 	{
@@ -40,105 +72,126 @@ public class Kml extends Layer
 		this.useHeatmapping = useHeatmapping;
 	}
 
-	public Double getStrokeWidth()
+	public LayerStyle getStyle()
 	{
-		return strokeWidth;
+		return style;
 	}
 
-	public void setStrokeWidth(Double strokeWidth)
+	public void setStyle(LayerStyle style)
 	{
-		this.strokeWidth = strokeWidth;
+		this.style = style;
 	}
 
-	public String getStrokeStyle()
+	// public Double getStrokeWidth()
+	// {
+	// 	return strokeWidth;
+	// }
+
+	// public void setStrokeWidth(Double strokeWidth)
+	// {
+	// 	this.strokeWidth = strokeWidth;
+	// }
+
+	// public String getStrokeStyle()
+	// {
+	// 	return strokeStyle;
+	// }
+
+	// public void setStrokeStyle(String strokeStyle)
+	// {
+	// 	this.strokeStyle = strokeStyle;
+	// }
+
+	// public String getStrokeColor()
+	// {
+	// 	return strokeColor;
+	// }
+
+	// public void setStrokeColor(String strokeColor)
+	// {
+	// 	this.strokeColor = strokeColor;
+	// }
+
+	// public Double getStrokeOpacity()
+	// {
+	// 	return strokeOpacity;
+	// }
+
+	// public void setStrokeOpacity(Double strokeOpacity)
+	// {
+	// 	this.strokeOpacity = strokeOpacity;
+	// }
+
+	// public String getFillColor()
+	// {
+	// 	return fillColor;
+	// }
+
+	// public void setFillColor(String fillColor)
+	// {
+	// 	this.fillColor = fillColor;
+	// }
+
+	// public Double getFillOpacity()
+	// {
+	// 	return fillOpacity;
+	// }
+
+	// public void setFillOpacity(Double fillOpacity)
+	// {
+	// 	this.fillOpacity = fillOpacity;
+	// }
+
+	// public String getMarkerSymbolPath()
+	// {
+	// 	return markerSymbolPath;
+	// }
+
+	// public void setMarkerSymbolPath(String markerSymbolPath)
+	// {
+	// 	this.markerSymbolPath = markerSymbolPath;
+	// }
+
+	public Kml clone()
 	{
-		return strokeStyle;
-	}
+		Kml clone = new Kml( this );
 
-	public void setStrokeStyle(String strokeStyle)
-	{
-		this.strokeStyle = strokeStyle;
-	}
-
-	public String getStrokeColor()
-	{
-		return strokeColor;
-	}
-
-	public void setStrokeColor(String strokeColor)
-	{
-		this.strokeColor = strokeColor;
-	}
-
-	public Double getStrokeOpacity()
-	{
-		return strokeOpacity;
-	}
-
-	public void setStrokeOpacity(Double strokeOpacity)
-	{
-		this.strokeOpacity = strokeOpacity;
-	}
-
-	public String getFillColor()
-	{
-		return fillColor;
-	}
-
-	public void setFillColor(String fillColor)
-	{
-		this.fillColor = fillColor;
-	}
-
-	public Double getFillOpacity()
-	{
-		return fillOpacity;
-	}
-
-	public void setFillOpacity(Double fillOpacity)
-	{
-		this.fillOpacity = fillOpacity;
-	}
-
-	public String getMarkerSymbolPath()
-	{
-		return markerSymbolPath;
-	}
-
-	public void setMarkerSymbolPath(String markerSymbolPath)
-	{
-		this.markerSymbolPath = markerSymbolPath;
-	}
-
-	public KmlLayer clone()
-	{
-		KmlLayer clone = new KmlLayer();
-
-		clone.setAttribution(getAttribution());
-		clone.setFormat(getFormat());
-		clone.setId(getId());
-		clone.setIsTransparent(getIsTransparent());
-		clone.setIsVisible(getIsVisible());
-		clone.setLabel(getLabel());
-		clone.setMaxScale(getMaxScale());
-		clone.setMinScale(getMinScale());
-		clone.setOpacity(getOpacity());
-		clone.setServiceUrl(getServiceUrl());
-		clone.setFillColor(fillColor);
-		clone.setFillOpacity(fillOpacity);
-		clone.setMarkerSymbolPath(markerSymbolPath);
-		clone.setStrokeColor(strokeColor);
-		clone.setStrokeOpacity(strokeOpacity);
-		clone.setStrokeStyle(strokeStyle);
-		clone.setStrokeWidth(strokeWidth);
-		clone.setUseClustering(useClustering);
-		clone.setUseHeatmapping(useHeatmapping);
-
-		for(Attribute a : getAttributes())
-		{
-			clone.getAttributes().add(a.clone());
-		}
+		// clone.setDataUrl(dataUrl);
+		// clone.setUseClustering(useClustering);
+		// clone.setUseHeatmapping(useHeatmapping);
 
 		return clone;
 	}
+
+	// public KmlLayer clone()
+	// {
+	// 	KmlLayer clone = new KmlLayer();
+
+	// 	clone.setAttribution(getAttribution());
+	// 	clone.setFormat(getFormat());
+	// 	clone.setId(getId());
+	// 	clone.setIsTransparent(getIsTransparent());
+	// 	clone.setIsVisible(getIsVisible());
+	// 	clone.setLabel(getLabel());
+	// 	clone.setMaxScale(getMaxScale());
+	// 	clone.setMinScale(getMinScale());
+	// 	clone.setOpacity(getOpacity());
+	// 	clone.setServiceUrl(getServiceUrl());
+	// 	clone.setFillColor(fillColor);
+	// 	clone.setFillOpacity(fillOpacity);
+	// 	clone.setMarkerSymbolPath(markerSymbolPath);
+	// 	clone.setStrokeColor(strokeColor);
+	// 	clone.setStrokeOpacity(strokeOpacity);
+	// 	clone.setStrokeStyle(strokeStyle);
+	// 	clone.setStrokeWidth(strokeWidth);
+	// 	clone.setUseClustering(useClustering);
+	// 	clone.setUseHeatmapping(useHeatmapping);
+
+	// 	for(Attribute a : getAttributes())
+	// 	{
+	// 		clone.getAttributes().add(a.clone());
+	// 	}
+
+	// 	return clone;
+	// }
 }

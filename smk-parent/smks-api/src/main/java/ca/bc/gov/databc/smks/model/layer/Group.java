@@ -1,54 +1,23 @@
-package ca.bc.gov.databc.smks.model;
-
-import java.util.ArrayList;
-import java.util.List;
+package ca.bc.gov.databc.smks.model.layer;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
+import ca.bc.gov.databc.smks.model.CollectionLayer;
+
 @JsonInclude(Include.NON_NULL)
-public class GroupLayer extends Layer 
+public class Group extends CollectionLayer
 {
-	private List<Layer> sublayers; // for group and folder objects
-	
-	public GroupLayer() { }
-	
-	public List<Layer> getSublayers() 
-	{
-		if(sublayers == null) sublayers = new ArrayList<Layer>();
-		return sublayers;
+	public Group() { }
+
+	protected Group( Group layer ) {
+		super( layer );
 	}
 
-	public void setSublayers(List<Layer> sublayers) 
+	public Group clone()
 	{
-		this.sublayers = sublayers;
-	}
-	
-	public GroupLayer clone()
-	{
-		GroupLayer clone = new GroupLayer();
-		
-		clone.setAttribution(getAttribution());
-		clone.setFormat(getFormat());
-		clone.setId(getId());
-		clone.setIsTransparent(getIsTransparent());
-		clone.setIsVisible(getIsVisible());
-		clone.setLabel(getLabel());
-		clone.setMaxScale(getMaxScale());
-		clone.setMinScale(getMinScale());
-		clone.setOpacity(getOpacity());
-		clone.setServiceUrl(getServiceUrl());
-		
-		for(Layer layer : sublayers)
-		{
-			clone.getSublayers().add(layer.clone());
-		}
-		
-		for(Attribute a : getAttributes())
-		{
-			clone.getAttributes().add(a.clone());
-		}
-		
+		Group clone = new Group( this );
+
 		return clone;
 	}
 }

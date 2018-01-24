@@ -1,114 +1,91 @@
-package ca.bc.gov.databc.smks.model;
-
-import java.util.ArrayList;
-import java.util.List;
+package ca.bc.gov.databc.smks.model.layer;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
+import ca.bc.gov.databc.smks.model.FeatureLayer;
+
 @JsonInclude(Include.NON_NULL)
-public class WMSLayer extends Layer 
+public class Wms extends FeatureLayer
 {
-	private String wmsVersion;
-	private String wmsStyleId;
-	private String wmsStyleName;
-	private String wmsLegendUrl;
-	private String metadataUrl;
-	private List<String> layers;
-	
-	public WMSLayer() { }
-	
-	public String getWmsVersion() 
-	{
-		return wmsVersion;
+	private String version;
+	// private String wmsStyleId;
+	private String layerName;
+	private String styleName;
+	// private String wmsLegendUrl;
+	// private String metadataUrl;
+	// private List<String> layers;
+
+	public Wms() { }
+
+	protected Wms( Wms layer ) {
+		super( layer );
+
+		this.setVersion(layer.getVersion());
+		this.setLayerName(layer.getLayerName());
+		this.setStyleName(layer.getStyleName());
 	}
 
-	public void setWmsVersion(String wmsVersion) 
+	public String getVersion()
 	{
-		this.wmsVersion = wmsVersion;
+		return version;
 	}
 
-	public String getWmsStyleId() 
+	public void setVersion(String version)
 	{
-		return wmsStyleId;
+		this.version = version;
 	}
 
-	public void setWmsStyleId(String wmsStyleId) 
+	public String getStyleName()
 	{
-		this.wmsStyleId = wmsStyleId;
+		return styleName;
 	}
 
-	public String getWmsStyleName() 
+	public void setStyleName(String styleName)
 	{
-		return wmsStyleName;
+		this.styleName = styleName;
 	}
 
-	public void setWmsStyleName(String wmsStyleName) 
+	public String getLayerName()
 	{
-		this.wmsStyleName = wmsStyleName;
-	}
-	
-	public String getWmsLegendUrl()
-	{
-		return wmsLegendUrl;
-	}
-	
-	public void setWmsLegendUrl(String wmsLegendUrl)
-	{
-		this.wmsLegendUrl = wmsLegendUrl;
-	}
-	
-	public String getMetadataUrl() 
-	{
-		return metadataUrl;
+		return layerName;
 	}
 
-	public void setMetadataUrl(String metadataUrl) 
+	public void setLayerName(String layerName)
 	{
-		this.metadataUrl = metadataUrl;
-	}
-	
-	public List<String> getLayers() 
-	{
-		if(layers == null) layers = new ArrayList<String>();
-		return layers;
+		this.layerName = layerName;
 	}
 
-	public void setLayers(List<String> layers) 
+	public Wms clone()
 	{
-		this.layers = layers;
-	}
-	
-	public WMSLayer clone()
-	{
-		WMSLayer clone = new WMSLayer();
-		
-		clone.setAttribution(getAttribution());
-		clone.setFormat(getFormat());
-		clone.setId(getId());
-		clone.setIsTransparent(getIsTransparent());
-		clone.setIsVisible(getIsVisible());
-		clone.setLabel(getLabel());
-		clone.setMaxScale(getMaxScale());
-		clone.setMinScale(getMinScale());
-		clone.setOpacity(getOpacity());
-		clone.setServiceUrl(getServiceUrl());
-		clone.setWmsStyleId(wmsStyleId);
-		clone.setWmsVersion(wmsVersion);
-		clone.setMetadataUrl(metadataUrl);
-		clone.setWmsLegendUrl(wmsLegendUrl);
-		clone.setWmsStyleName(wmsStyleName);
-		
-		for(String s : layers)
-		{
-			clone.getLayers().add(s);
-		}
-		
-		for(Attribute a : getAttributes())
-		{
-			clone.getAttributes().add(a.clone());
-		}
-		
+		Wms clone = new Wms( this );
+
+		// clone.setAttribution(getAttribution());
+		// clone.setFormat(getFormat());
+		// clone.setId(getId());
+		// clone.setIsTransparent(getIsTransparent());
+		// clone.setIsVisible(getIsVisible());
+		// clone.setLabel(getLabel());
+		// clone.setMaxScale(getMaxScale());
+		// clone.setMinScale(getMinScale());
+		// clone.setOpacity(getOpacity());
+		// clone.setServiceUrl(getServiceUrl());
+		// clone.setWmsStyleId(wmsStyleId);
+		// clone.setWmsVersion(wmsVersion);
+		// clone.setMetadataUrl(metadataUrl);
+		// clone.setWmsLegendUrl(wmsLegendUrl);
+		// clone.setWmsStyleName(wmsStyleName);
+
+		// for(String s : layers)
+		// {
+		// 	clone.getLayers().add(s);
+		// }
+
+		// for(Attribute a : getAttributes())
+		// {
+		// 	clone.getAttributes().add(a.clone());
+		// }
+
 		return clone;
 	}
 }

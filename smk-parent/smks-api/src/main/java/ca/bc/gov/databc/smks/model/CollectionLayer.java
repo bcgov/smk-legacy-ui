@@ -7,15 +7,15 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 @JsonInclude(Include.NON_NULL)
-public class LayerData extends LayerBase
+public class CollectionLayer extends Layer
 {
-	private List<Attribute> attributes;
+	private List<Layer> layers;
 
-	public LayerData()
+	public CollectionLayer()
 	{
 	}
 
-	protected LayerData( LayerBase layer )
+	protected CollectionLayer( Layer layer )
 	{
 		this.setId(layer.getId());
 		this.setTitle(layer.getTitle());
@@ -27,24 +27,24 @@ public class LayerData extends LayerBase
 		this.setOpacity(layer.getOpacity());
 	}
 
-	public List<Attribute> getAttributes()
+	public List<Layer> getLayers()
 	{
-		if(attributes == null) attributes = new ArrayList<Attribute>();
-		return attributes;
+		if(layers == null) layers = new ArrayList<Layer>();
+		return layers;
 	}
 
-	public void setAttributes(List<Attribute> attributes)
+	public void setLayers(List<Layer> layers)
 	{
-		this.attributes = attributes;
+		this.layers = layers;
 	}
 
-	public LayerData clone()
+	public CollectionLayer clone()
 	{
-		LayerData clone = new LayerData( super.clone() );
+		CollectionLayer clone = new CollectionLayer( super.clone() );
 
-		for(Attribute a : attributes)
+		for(Layer a : layers)
 		{
-			clone.getAttributes().add(a.clone());
+			clone.getLayers().add(a.clone());
 		}
 
 		return clone;

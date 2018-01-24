@@ -1,142 +1,207 @@
-package ca.bc.gov.databc.smks.model;
+package ca.bc.gov.databc.smks.model.layer;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
+import ca.bc.gov.databc.smks.model.FeatureLayer;
+import ca.bc.gov.databc.smks.model.LayerStyle;
+
 @JsonInclude(Include.NON_NULL)
-public class JsonLayer extends Layer 
+public class Geojson extends FeatureLayer
 {
+	private String dataUrl;
 	private boolean useClustering;
 	private boolean useHeatmapping;
-	private Double strokeWidth;
-	private String strokeStyle;
-	private String strokeColor;
-	private Double strokeOpacity;
-	private String fillColor;
-	private Double fillOpacity;
-	private String markerSymbolPath;
-	
-	public JsonLayer() { }
-	
-	public boolean getUseClustering() 
+	// private Double strokeWidth;
+	// private String strokeStyle;
+	// private String strokeColor;
+	// private Double strokeOpacity;
+	// private String fillColor;
+	// private Double fillOpacity;
+	// private String markerSymbolPath;
+	private LayerStyle style;
+
+	public Geojson() { }
+
+	protected Geojson( Geojson layer ) {
+		super( layer );
+
+		this.setDataUrl(layer.getDataUrl());
+		this.setUseClustering(layer.getUseClustering());
+		this.setUseHeatmapping(layer.getUseHeatmapping());
+		this.setStyle(layer.getStyle().clone());
+	}
+
+	public String getDataUrl()
+	{
+		return dataUrl;
+	}
+
+	public void setDataUrl(String dataUrl)
+	{
+		this.dataUrl = dataUrl;
+	}
+
+	public boolean getUseClustering()
 	{
 		return useClustering;
 	}
 
-	public void setUseClustering(boolean useClustering) 
+	public void setUseClustering(boolean useClustering)
 	{
 		this.useClustering = useClustering;
 	}
 
-	public boolean getUseHeatmapping() 
+	public boolean getUseHeatmapping()
 	{
 		return useHeatmapping;
 	}
 
-	public void setUseHeatmapping(boolean useHeatmapping) 
+	public void setUseHeatmapping(boolean useHeatmapping)
 	{
 		this.useHeatmapping = useHeatmapping;
 	}
-	
-	public Double getStrokeWidth() 
+
+	public LayerStyle getStyle()
 	{
-		return strokeWidth;
+		return style;
 	}
 
-	public void setStrokeWidth(Double strokeWidth) 
+	public void setStyle(LayerStyle style)
 	{
-		this.strokeWidth = strokeWidth;
+		this.style = style;
 	}
 
-	public String getStrokeStyle() 
-	{
-		return strokeStyle;
-	}
+	// public Double getStrokeWidth()
+	// {
+	// 	return strokeWidth;
+	// }
 
-	public void setStrokeStyle(String strokeStyle) 
-	{
-		this.strokeStyle = strokeStyle;
-	}
+	// public void setStrokeWidth(Double strokeWidth)
+	// {
+	// 	this.strokeWidth = strokeWidth;
+	// }
 
-	public String getStrokeColor() 
-	{
-		return strokeColor;
-	}
+	// public String getStrokeStyle()
+	// {
+	// 	return strokeStyle;
+	// }
 
-	public void setStrokeColor(String strokeColor) 
-	{
-		this.strokeColor = strokeColor;
-	}
+	// public void setStrokeStyle(String strokeStyle)
+	// {
+	// 	this.strokeStyle = strokeStyle;
+	// }
 
-	public Double getStrokeOpacity() 
-	{
-		return strokeOpacity;
-	}
+	// public String getStrokeColor()
+	// {
+	// 	return strokeColor;
+	// }
 
-	public void setStrokeOpacity(Double strokeOpacity) 
-	{
-		this.strokeOpacity = strokeOpacity;
-	}
+	// public void setStrokeColor(String strokeColor)
+	// {
+	// 	this.strokeColor = strokeColor;
+	// }
 
-	public String getFillColor() 
-	{
-		return fillColor;
-	}
+	// public Double getStrokeOpacity()
+	// {
+	// 	return strokeOpacity;
+	// }
 
-	public void setFillColor(String fillColor) 
-	{
-		this.fillColor = fillColor;
-	}
+	// public void setStrokeOpacity(Double strokeOpacity)
+	// {
+	// 	this.strokeOpacity = strokeOpacity;
+	// }
 
-	public Double getFillOpacity() 
-	{
-		return fillOpacity;
-	}
+	// public String getFillColor()
+	// {
+	// 	return fillColor;
+	// }
 
-	public void setFillOpacity(Double fillOpacity)
-	{
-		this.fillOpacity = fillOpacity;
-	}
+	// public void setFillColor(String fillColor)
+	// {
+	// 	this.fillColor = fillColor;
+	// }
 
-	public String getMarkerSymbolPath() 
-	{
-		return markerSymbolPath;
-	}
+	// public Double getFillOpacity()
+	// {
+	// 	return fillOpacity;
+	// }
 
-	public void setMarkerSymbolPath(String markerSymbolPath) 
+	// public void setFillOpacity(Double fillOpacity)
+	// {
+	// 	this.fillOpacity = fillOpacity;
+	// }
+
+	// public String getMarkerSymbolPath()
+	// {
+	// 	return markerSymbolPath;
+	// }
+
+	// public void setMarkerSymbolPath(String markerSymbolPath)
+	// {
+	// 	this.markerSymbolPath = markerSymbolPath;
+	// }
+
+	public Geojson clone()
 	{
-		this.markerSymbolPath = markerSymbolPath;
-	}
-	
-	public JsonLayer clone()
-	{
-		JsonLayer clone = new JsonLayer();
-		
-		clone.setAttribution(getAttribution());
-		clone.setFormat(getFormat());
-		clone.setId(getId());
-		clone.setIsTransparent(getIsTransparent());
-		clone.setIsVisible(getIsVisible());
-		clone.setLabel(getLabel());
-		clone.setMaxScale(getMaxScale());
-		clone.setMinScale(getMinScale());
-		clone.setOpacity(getOpacity());
-		clone.setServiceUrl(getServiceUrl());
-		clone.setFillColor(fillColor);
-		clone.setFillOpacity(fillOpacity);
-		clone.setMarkerSymbolPath(markerSymbolPath);
-		clone.setStrokeColor(strokeColor);
-		clone.setStrokeOpacity(strokeOpacity);
-		clone.setStrokeStyle(strokeStyle);
-		clone.setStrokeWidth(strokeWidth);
-		clone.setUseClustering(useClustering);
-		clone.setUseHeatmapping(useHeatmapping);
-		
-		for(Attribute a : getAttributes())
-		{
-			clone.getAttributes().add(a.clone());
-		}
-		
+		Geojson clone = new Geojson( this );
+
+		// clone.setAttribution(getAttribution());
+		// clone.setFormat(getFormat());
+		// clone.setId(getId());
+		// clone.setIsTransparent(getIsTransparent());
+		// clone.setIsVisible(getIsVisible());
+		// clone.setLabel(getLabel());
+		// clone.setMaxScale(getMaxScale());
+		// clone.setMinScale(getMinScale());
+		// clone.setOpacity(getOpacity());
+		// clone.setServiceUrl(getServiceUrl());
+		// clone.setDataUrl(dataUrl);
+		// clone.setUseClustering(useClustering);
+		// clone.setUseHeatmapping(useHeatmapping);
+
+		// for(String s : dynamicLayers)
+		// {
+		// 	clone.getDynamicLayers().add(s);
+		// }
+
+		// for(Attribute a : getAttributes())
+		// {
+		// 	clone.getAttributes().add(a.clone());
+		// }
+
 		return clone;
 	}
+
+	// public JsonLayer clone()
+	// {
+	// 	JsonLayer clone = new JsonLayer();
+
+	// 	clone.setAttribution(getAttribution());
+	// 	clone.setFormat(getFormat());
+	// 	clone.setId(getId());
+	// 	clone.setIsTransparent(getIsTransparent());
+	// 	clone.setIsVisible(getIsVisible());
+	// 	clone.setLabel(getLabel());
+	// 	clone.setMaxScale(getMaxScale());
+	// 	clone.setMinScale(getMinScale());
+	// 	clone.setOpacity(getOpacity());
+	// 	clone.setServiceUrl(getServiceUrl());
+	// 	clone.setFillColor(fillColor);
+	// 	clone.setFillOpacity(fillOpacity);
+	// 	clone.setMarkerSymbolPath(markerSymbolPath);
+	// 	clone.setStrokeColor(strokeColor);
+	// 	clone.setStrokeOpacity(strokeOpacity);
+	// 	clone.setStrokeStyle(strokeStyle);
+	// 	clone.setStrokeWidth(strokeWidth);
+	// 	clone.setUseClustering(useClustering);
+	// 	clone.setUseHeatmapping(useHeatmapping);
+
+	// 	for(Attribute a : getAttributes())
+	// 	{
+	// 		clone.getAttributes().add(a.clone());
+	// 	}
+
+	// 	return clone;
+	// }
 }

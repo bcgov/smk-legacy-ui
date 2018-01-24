@@ -1,4 +1,4 @@
-package ca.bc.gov.databc.smks.model.layer;
+package ca.bc.gov.databc.smks.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;

@@ -30,7 +30,7 @@ import ca.bc.gov.databc.smks.model.layer.Geojson;
 	@Type( name = "geojson",      value = Geojson.class )
 } )
 @JsonInclude(Include.NON_NULL)
-public class LayerBase implements Cloneable
+public class Layer implements Cloneable
 {
 	// private Integer id;
 	private String id;
@@ -47,8 +47,20 @@ public class LayerBase implements Cloneable
 	private Double minScale;
 	private Double maxScale;
 
-	public LayerBase()
+	public Layer()
 	{
+	}
+
+	protected Layer( Layer layer )
+	{
+		this.setId(layer.getId());
+		this.setTitle(layer.getTitle());
+		this.setAttribution(layer.getAttribution());
+		this.setMetadataUrl(layer.getMetadataUrl());
+		this.setIsVisible(layer.getIsVisible());
+		this.setMaxScale(layer.getMaxScale());
+		this.setMinScale(layer.getMinScale());
+		this.setOpacity(layer.getOpacity());
 	}
 
 	public String getId()
@@ -178,21 +190,21 @@ public class LayerBase implements Cloneable
 	// 	this.attributes = attributes;
 	// }
 
-	public LayerBase clone()
+	public Layer clone()
 	{
-		LayerBase clone = new LayerBase();
+		Layer clone = new Layer( this );
 
-		clone.setId(id);
-		clone.setTitle(title);
-		clone.setAttribution(attribution);
-		clone.setMetadataUrl(metadataUrl);
-		// clone.setFormat(format);
-		// clone.setIsTransparent(isTransparent);
-		clone.setIsVisible(isVisible);
-		// clone.setLabel(label);
-		clone.setMaxScale(maxScale);
-		clone.setMinScale(minScale);
-		clone.setOpacity(opacity);
+		// clone.setId(id);
+		// clone.setTitle(title);
+		// clone.setAttribution(attribution);
+		// clone.setMetadataUrl(metadataUrl);
+		// // clone.setFormat(format);
+		// // clone.setIsTransparent(isTransparent);
+		// clone.setIsVisible(isVisible);
+		// // clone.setLabel(label);
+		// clone.setMaxScale(maxScale);
+		// clone.setMinScale(minScale);
+		// clone.setOpacity(opacity);
 		// clone.setServiceUrl(serviceUrl);
 
 		// for(Attribute a : attributes)
