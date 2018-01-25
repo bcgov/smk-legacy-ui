@@ -27,14 +27,6 @@ public class FeatureLayer extends Layer
 		{
 			this.getAttributes().add(a.clone());
 		}
-		// this.setId(layer.getId());
-		// this.setTitle(layer.getTitle());
-		// this.setAttribution(layer.getAttribution());
-		// this.setMetadataUrl(layer.getMetadataUrl());
-		// this.setIsVisible(layer.getIsVisible());
-		// this.setMaxScale(layer.getMaxScale());
-		// this.setMinScale(layer.getMinScale());
-		// this.setOpacity(layer.getOpacity());
 	}
 
 	public String getGeometryAttribute()
@@ -71,13 +63,6 @@ public class FeatureLayer extends Layer
 	public FeatureLayer clone()
 	{
 		FeatureLayer clone = new FeatureLayer( this );
-
-		// clone.setGeometryAttribute(geometryAttribute);
-		// clone.setTitleAttribute(titleAttribute);
-		// for(Attribute a : attributes)
-		// {
-		// 	clone.getAttributes().add(a.clone());
-		// }
 
 		return clone;
 	}

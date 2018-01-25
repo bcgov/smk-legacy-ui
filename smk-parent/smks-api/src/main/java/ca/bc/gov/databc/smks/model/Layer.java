@@ -32,18 +32,12 @@ import ca.bc.gov.databc.smks.model.layer.Geojson;
 @JsonInclude(Include.NON_NULL)
 public class Layer implements Cloneable
 {
-	// private Integer id;
 	private String id;
-	// private String label;
 	private String title;
 	private Boolean isVisible;
 	private String attribution;
 	private String metadataUrl;
-	// private List<Attribute> attributes;
-	// private String serviceUrl; // also used as path for KML and JSON
-	// private String format;
 	private Double opacity;
-	// private Boolean isTransparent;
 	private Double minScale;
 	private Double maxScale;
 
@@ -113,26 +107,6 @@ public class Layer implements Cloneable
 		this.metadataUrl = metadataUrl;
 	}
 
-	// public String getServiceUrl()
-	// {
-	// 	return serviceUrl;
-	// }
-
-	// public void setServiceUrl(String serviceUrl)
-	// {
-	// 	this.serviceUrl = serviceUrl;
-	// }
-
-	// public String getFormat()
-	// {
-	// 	return format;
-	// }
-
-	// public void setFormat(String format)
-	// {
-	// 	this.format = format;
-	// }
-
 	public Double getOpacity()
 	{
 		return opacity;
@@ -142,16 +116,6 @@ public class Layer implements Cloneable
 	{
 		this.opacity = opacity;
 	}
-
-	// public Boolean getIsTransparent()
-	// {
-	// 	return isTransparent;
-	// }
-
-	// public void setIsTransparent(Boolean isTransparent)
-	// {
-	// 	this.isTransparent = isTransparent;
-	// }
 
 	public Double getMinScale()
 	{
@@ -179,38 +143,9 @@ public class Layer implements Cloneable
 		return this.getTitle();
 	}
 
-	// public List<Attribute> getAttributes()
-	// {
-	// 	if(attributes == null) attributes = new ArrayList<Attribute>();
-	// 	return attributes;
-	// }
-
-	// public void setAttributes(List<Attribute> attributes)
-	// {
-	// 	this.attributes = attributes;
-	// }
-
 	public Layer clone()
 	{
 		Layer clone = new Layer( this );
-
-		// clone.setId(id);
-		// clone.setTitle(title);
-		// clone.setAttribution(attribution);
-		// clone.setMetadataUrl(metadataUrl);
-		// // clone.setFormat(format);
-		// // clone.setIsTransparent(isTransparent);
-		// clone.setIsVisible(isVisible);
-		// // clone.setLabel(label);
-		// clone.setMaxScale(maxScale);
-		// clone.setMinScale(minScale);
-		// clone.setOpacity(opacity);
-		// clone.setServiceUrl(serviceUrl);
-
-		// for(Attribute a : attributes)
-		// {
-		// 	clone.getAttributes().add(a.clone());
-		// }
 
 		return clone;
 	}

@@ -3,12 +3,12 @@ package ca.bc.gov.databc.smks.model;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.ektorp.Attachment;
-import org.ektorp.support.CouchDbDocument;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
+import org.ektorp.Attachment;
+import org.ektorp.support.CouchDbDocument;
 
 @JsonIgnoreProperties({"id", "revision"})
 @JsonInclude(Include.NON_NULL)
@@ -24,144 +24,98 @@ public class MapConfiguration extends CouchDbDocument implements Cloneable
 
 	// metadata
 	private String createdBy;
+	private boolean isPublished; // is published indicator
 
 	// settings
-	private String viewerType;
-	private boolean showHeader;
-	private String headerImage; // the attachment ID for the header image, or the URL.
-	private String aboutPage;
-	private String defaultBasemap;
-	private List<Double> bbox;
-	private boolean allowMouseWheelZoom;
+	private MapSurround surround;
+	private MapViewport viewport;
+	private MapTools tools;
 
-	// layer and tool configs
-	private List<String> tools; // just the ID's of tools: pan, zoom, directions, markup, measure. Import/export excluded for now?
+	// private String viewerType;
+	// private boolean showHeader;
+	// private String headerImage; // the attachment ID for the header image, or the URL.
+	// private String aboutPage;
+	// private String defaultBasemap;
+	// private List<Double> bbox;
+	// private boolean allowMouseWheelZoom;
+
+	// // layer and tool configs
+	// private List<String> tools; // just the ID's of tools: pan, zoom, directions, markup, measure. Import/export excluded for now?
+	// layer configs
 	private List<Layer> layers;
 
-	// is published indicator
-	private boolean isPublished;
+	public MapConfiguration() {}
 
-	public MapConfiguration()
-	{
-	}
+	protected MapConfiguration( MapConfiguration mapConfiguration ) {
+		this.setLmfId(mapConfiguration.getLmfId());
+		this.setLmfRevision(mapConfiguration.getLmfRevision());
+		this.setName(mapConfiguration.getName());
+		this.setProject(mapConfiguration.getProject());
 
-	public Layer getLayerByID(String layerId)
-	{
-		Layer resourceLayer = null;
+		this.setCreatedBy(mapConfiguration.getCreatedBy());
+		this.setIsPublished(mapConfiguration.getIsPublished());
 
-		for(Layer lyr : getLayers())
+		this.setSurround(mapConfiguration.getSurround().clone());
+		this.setViewport(mapConfiguration.getViewport().clone());
+		this.setTools(mapConfiguration.getTools().clone());
+
+		for(Layer layer : layers)
 		{
-			if(lyr.getLabel().equals(layerId))
-			{
-				resourceLayer = lyr;
-				break;
-			}
+			mapConfiguration.getLayers().add(layer.clone());
 		}
-
-		return resourceLayer;
 	}
 
-	public String getName()
-	{
-		return name;
-	}
+	public String getLmfId() { return lmfId; }
+	public void setLmfId(String lmfId) { this.lmfId = lmfId; }
 
-	public void setName(String name)
-	{
-		this.name = name;
-	}
+	public int getLmfRevision() { return lmfRevision; }
+	public void setLmfRevision(int lmfRevision) { this.lmfRevision = lmfRevision; }
 
-	public boolean isShowHeader()
-	{
-		return showHeader;
-	}
+	public String getName() { return name; }
+	public void setName(String name) { this.name = name; }
 
-	public void setShowHeader(boolean showHeader)
-	{
-		this.showHeader = showHeader;
-	}
+	public String getProject() { return this.project; }
+	public void setProject(String project) { this.project = project; }
 
-	public String getHeaderImage()
-	{
-		return headerImage;
-	}
 
-	public void setHeaderImage(String headerImage)
-	{
-		this.headerImage = headerImage;
-	}
+	public String getCreatedBy() { return this.createdBy; }
+	public void setCreatedBy(String createdBy) { this.createdBy = createdBy; }
 
-	public String getAboutPage()
-	{
-		return aboutPage;
-	}
+	public boolean getIsPublished() { return this.isPublished; }
+	public void setIsPublished(boolean isPublished) { this.isPublished = isPublished; }
 
-	public void setAboutPage(String aboutPage)
-	{
-		this.aboutPage = aboutPage;
-	}
 
-	public List<String> getTools()
-	{
-		if(tools == null) tools = new ArrayList<String>();
-		return tools;
+	public MapSurround getSurround() {
+		if ( surround == null ) surround = new MapSurround();
+		return this.surround;
 	}
+	public void setSurround(MapSurround surround) { this.surround = surround; }
 
-	public void setTools(List<String> tools)
-	{
-		this.tools = tools;
-	}
 
-	public String getDefaultBasemap()
-	{
-		return this.defaultBasemap;
+	public MapViewport getViewport() {
+		if ( viewport == null ) viewport = new MapViewport();
+		return this.viewport;
 	}
+	public void setViewport(MapViewport viewport) { this.viewport = viewport; }
 
-	public void setDefaultBasemap(String defaultBasemap)
-	{
-		this.defaultBasemap = defaultBasemap;
+
+	public MapTools getTools() {
+		if ( tools == null ) tools = new MapTools();
+		return this.tools;
 	}
+	public void setTools(MapTools tools) { this.tools = tools; }
+
 
 	public List<Layer> getLayers()
 	{
 		if(layers == null) layers = new ArrayList<Layer>();
 		return layers;
 	}
-
 	public void setLayers(List<Layer> layers)
 	{
 		this.layers = layers;
 	}
 
-	public String getViewerType()
-	{
-		return this.viewerType;
-	}
-
-	public void setViewerType(String mapType)
-	{
-		this.viewerType = mapType;
-	}
-
-	public boolean isPublished()
-	{
-		return isPublished;
-	}
-
-	public void setPublished(boolean isPublished)
-	{
-		this.isPublished = isPublished;
-	}
-
-	public String getCreatedBy()
-	{
-		return createdBy;
-	}
-
-	public void setCreatedBy(String createdBy)
-	{
-		this.createdBy = createdBy;
-	}
 
 	public void addInlineAttachment(Attachment a)
 	{
@@ -170,7 +124,7 @@ public class MapConfiguration extends CouchDbDocument implements Cloneable
 
 	public Attachment getInlineAttachment(Layer layer)
 	{
-		return getInlineAttachment(layer.getLabel());
+		return getInlineAttachment(layer.getTitle());
 	}
 
 	public Attachment getInlineAttachment(String id)
@@ -178,89 +132,24 @@ public class MapConfiguration extends CouchDbDocument implements Cloneable
 		return super.getAttachments().get(id);
 	}
 
-	public String getLmfId()
-	{
-		return lmfId;
-	}
-
-	public void setLmfId(String lmfId)
-	{
-		this.lmfId = lmfId;
-	}
-
-	public int getLmfRevision()
-	{
-		return lmfRevision;
-	}
-
-	public void setLmfRevision(int lmfRevision)
-{
-		this.lmfRevision = lmfRevision;
-	}
-
-	public List<Double> getBbox()
-	{
-		if(bbox == null) bbox = new ArrayList<Double>();
-		return bbox;
-	}
-
-	public void setBbox(List<Double> bbox)
-	{
-		this.bbox = bbox;
-	}
-
-	public boolean isAllowMouseWheelZoom()
-	{
-		return allowMouseWheelZoom;
-	}
-
-	public void setAllowMouseWheelZoom(boolean allowMouseWheelZoom)
-	{
-		this.allowMouseWheelZoom = allowMouseWheelZoom;
-	}
-
-	public String getProject()
-	{
-		return this.project;
-	}
-
-	public void setProject(String project)
-	{
-		this.project = project;
-	}
 
 	public MapConfiguration clone()
 	{
-		MapConfiguration clone = new MapConfiguration();
-
-		clone.setAboutPage(aboutPage);
-		clone.setAllowMouseWheelZoom(allowMouseWheelZoom);
-		clone.setCreatedBy(createdBy);
-		clone.setDefaultBasemap(defaultBasemap);
-		clone.setHeaderImage(headerImage);
-		clone.setLmfId(lmfId);
-		clone.setLmfRevision(lmfRevision);
-		clone.setName(name);
-		clone.setProject(project);
-		clone.setPublished(isPublished);
-		clone.setShowHeader(showHeader);
-		clone.setViewerType(viewerType);
-
-		for(String tool : tools)
-		{
-			clone.getTools().add(tool);
-		}
-
-		for(Double val : bbox)
-		{
-			clone.getBbox().add(val);
-		}
-
-		for(Layer layer : layers)
-		{
-			clone.getLayers().add(layer.clone());
-		}
+		MapConfiguration clone = new MapConfiguration( this );
 
 		return clone;
+	}
+
+	public Layer getLayerByID(String layerId)
+	{
+		for(Layer lyr : getLayers())
+		{
+			if(lyr.getId().equals(layerId))
+			{
+				return lyr;
+			}
+		}
+
+		return null;
 	}
 }

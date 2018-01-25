@@ -1,9 +1,10 @@
+peout
 package ca.bc.gov.databc.smks.model;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class WMSInfoLayer 
+public class WMSInfoLayer
 {
 	private String title;
 	private String name;
@@ -11,11 +12,11 @@ public class WMSInfoLayer
 	private String wmsVersion;
 	private String metadataUrl;
 	private List<WMSInfoStyle> styles;
-	
+
 	public WMSInfoLayer()
 	{
 	}
-	
+
 	public WMSInfoLayer(String title, String name)
 	{
 		this.title = title;
@@ -23,63 +24,63 @@ public class WMSInfoLayer
 		styles = new ArrayList<WMSInfoStyle>();
 	}
 
-	public String getName() 
+	public String getName()
 	{
 		return name;
 	}
 
-	public void setName(String name) 
+	public void setName(String name)
 	{
 		this.name = name;
 	}
 
-	public String getTitle() 
+	public String getTitle()
 	{
 		return title;
 	}
 
-	public void setTitle(String title) 
+	public void setTitle(String title)
 	{
 		this.title = title;
 	}
 
-	public List<WMSInfoStyle> getStyles() 
+	public List<WMSInfoStyle> getStyles()
 	{
 		if(styles == null) styles = new ArrayList<WMSInfoStyle>();
 		return styles;
 	}
 
-	public void setStyles(List<WMSInfoStyle> styles) 
+	public void setStyles(List<WMSInfoStyle> styles)
 	{
 		this.styles = styles;
 	}
 
-	public String getServiceUrl() 
+	public String getServiceUrl()
 	{
 		return serviceUrl;
 	}
 
-	public void setServiceUrl(String serviceUrl) 
+	public void setServiceUrl(String serviceUrl)
 	{
 		this.serviceUrl = serviceUrl;
 	}
 
-	public String getWmsVersion() 
+	public String getWmsVersion()
 	{
 		return wmsVersion;
 	}
 
-	public void setWmsVersion(String wmsVersion) 
+	public void setWmsVersion(String wmsVersion)
 	{
 		this.wmsVersion = wmsVersion;
 	}
 
-	public String getMetadataUrl() 
+	public String getMetadataUrl()
 	{
 		return metadataUrl;
 	}
 
-	public void setMetadataUrl(String metadataUrl) 
+	public void setMetadataUrl(String metadataUrl)
 	{
 		this.metadataUrl = metadataUrl;
 	}
