@@ -7,37 +7,6 @@ node ('master'){
         deleteDir()
 //        git branch: '${gitTag}', url: 'https://github.com/bcgov/smk.git'
         checkout([$class: 'GitSCM', branches: [[name: '${gitTag}']], doGenerateSubmoduleConfigurations: false, extensions: [], gitTool: 'Default', submoduleCfg: [], userRemoteConfigs: [[url: 'https://github.com/bcgov/smk.git']]])
-        withMaven(jdk: 'JDK8', maven: 'm3') {
-            sh 'mvn versions:set -DnewVersion="${mvnTag}"'
-        }
-    }
-    
-    stage ('Sonar'){
-        withSonarQubeEnv('appqa') {
-        withMaven(jdk: 'JDK8', maven: 'm3') {
-            sh 'mvn clean package org.sonarsource.scanner.maven:sonar-maven-plugin:3.2:sonar'
-            }
-        }
-    }
- 
-    stage ('Artifactory configuration'){
-        rtMaven.tool = 'm3' // Tool name from Jenkins configuration
-        rtMaven.deployer releaseRepo: 'libs-release-local', snapshotRepo: 'libs-snapshot-local', server: server
-        rtMaven.resolver releaseRepo: 'repo', snapshotRepo: 'repo', server: server
-        rtMaven.deployer.deployArtifacts = false // Disable artifacts deployment during Maven run
-        buildInfo = Artifactory.newBuildInfo()
-    }
-
-    stage ('Maven Install'){
-        rtMaven.run pom: 'pom.xml', goals: 'clean install', buildInfo: buildInfo
-    }
-    
-    stage ('Artifactory Deploy'){
-        rtMaven.deployer.deployArtifacts buildInfo
-    }
-    
-    stage ('Artifactory Publish build info'){
-        server.publishBuildInfo buildInfo
     }
 
     stage ('OpenShift Build'){
