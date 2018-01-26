@@ -69,10 +69,21 @@ RUN apk update \
   && apk add alpine-sdk \
   && git config --global url.https://github.com/.insteadOf git://github.com/
 
-#RUN rm -rf /usr/local/tomcat/webapps/* && mkdir /usr/local/tomcat/config /usr/local/tomcat/webapps/ROOT
-#RUN wget -O /tmp/app.war $APPBIN \
-#  && unzip /tmp/app.war -d /usr/local/tomcat/webapps/ROOT
 
+RUN rm -rf /usr/local/tomcat/webapps/* && mkdir /usr/local/tomcat/config /usr/local/tomcat/webapps/ROOT
+
+#Copy client war
+RUN wget -O /tmp/smk-client.war $APPBIN/smk-client/1.0.0-SNAPSHOT/smk-client-1.0.0-SNAPSHOT.war \
+  && unzip /tmp/smk-client.war -d /usr/local/tomcat/webapps/ROOT
+
+#Copy SMK Admin UI
+RUN wget -O /tmp/smk-ui.war $APPBIN/smk-ui/1.0.0-SNAPSHOT/smk-ui-1.0.0-SNAPSHOT.war \
+  && unzip /tmp/smk-ui.war -d /usr/local/tomcat/webapps/ROOT
+
+#Copy SMK api
+RUN wget -O /tmp/smks-api.war $APPBIN/smks-api/1.0.0-SNAPSHOT/smks-api-1.0.0-SNAPSHOT.war \
+  && unzip /tmp/smks-api.war -d /usr/local/tomcat/webapps/ROOT
+  
 #Setup runtime configuration
 ##Generate GWA required configuration
 ##RUN printf "$KAURL\n$KUSER\n$KPWD\n$appterm\n$GWA_ORG\n$GH_CID\n$GH_CIS\n$GH_ATOKEN" > /usr/local/tomcat/config/gwa.properties
