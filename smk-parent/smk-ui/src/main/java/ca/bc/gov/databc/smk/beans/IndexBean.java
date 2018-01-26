@@ -16,7 +16,7 @@ import org.primefaces.context.RequestContext;
 
 import ca.bc.gov.databc.smk.dao.CouchDAO;
 import ca.bc.gov.databc.smk.dao.SMKServiceHandler;
-import ca.bc.gov.databc.smk.model.DMFResource;
+import ca.bc.gov.databc.smks.model.MapConfiguration;
 
 @SuppressWarnings("restriction")
 @ManagedBean(name="IndexBean", eager=true)
@@ -27,8 +27,8 @@ public class IndexBean implements Serializable
 
 	//private CouchDAO mashupDao;
 	private SMKServiceHandler service;
-	private List<DMFResource> editableConfigs;
-	private List<DMFResource> publishedConfigs;
+	private List<MapConfiguration> editableConfigs;
+	private List<MapConfiguration> publishedConfigs;
 	
 	@PostConstruct
     public void init() 
@@ -45,13 +45,13 @@ public class IndexBean implements Serializable
 			publishedConfigs = service.getPublishedConfigs();
 
 			// set published document flags
-			for(DMFResource published : publishedConfigs)
+			for(MapConfiguration published : publishedConfigs)
 			{
-				for(DMFResource editable : editableConfigs)
+				for(MapConfiguration editable : editableConfigs)
 				{
 					if(published.getLmfId().equals(editable.getLmfId()))
 					{
-						editable.setPublished(true);
+						editable.setIsPublished(true);
 						break;
 					}
 				}
@@ -79,9 +79,9 @@ public class IndexBean implements Serializable
 	    Map map = context.getExternalContext().getRequestParameterMap();
 	    String value = (String) map.get("param");
 	    
-	    DMFResource resourceToPublish = null;
+	    MapConfiguration resourceToPublish = null;
 	    
-	    for(DMFResource resource : editableConfigs)
+	    for(MapConfiguration resource : editableConfigs)
 		{
 			if(resource.getLmfId().equals(value))
 			{
@@ -117,9 +117,9 @@ public class IndexBean implements Serializable
 	    Map map = context.getExternalContext().getRequestParameterMap();
 	    String value = (String) map.get("param");
 		
-		DMFResource deadResource = null;
+		MapConfiguration deadResource = null;
 		
-		for(DMFResource resource : publishedConfigs)
+		for(MapConfiguration resource : publishedConfigs)
 		{
 			if(resource.getLmfId().equals(value))
 			{
@@ -130,7 +130,7 @@ public class IndexBean implements Serializable
 		
 		if(deadResource == null)
 		{
-			for(DMFResource resource : editableConfigs)
+			for(MapConfiguration resource : editableConfigs)
 			{
 				if(resource.getLmfId().equals(value))
 				{
@@ -144,7 +144,7 @@ public class IndexBean implements Serializable
 		{
 			try 
 			{
-				if(deadResource.isPublished())
+				if(deadResource.getIsPublished())
 				{
 					service.unPublishResource(deadResource);
 				}
@@ -174,22 +174,22 @@ public class IndexBean implements Serializable
 		
 	}
 	
-	public List<DMFResource> getEditableConfigs()
+	public List<MapConfiguration> getEditableConfigs()
 	{
 		return editableConfigs;
 	}
 
-	public void setEditableConfigs(List<DMFResource> configs) 
+	public void setEditableConfigs(List<MapConfiguration> configs) 
 	{		
 		this.editableConfigs = configs;
 	}
 	
-	public List<DMFResource> getPublishedConfigs()
+	public List<MapConfiguration> getPublishedConfigs()
 	{
 		return publishedConfigs;
 	}
 
-	public void setPublishedConfigs(List<DMFResource> configs) 
+	public void setPublishedConfigs(List<MapConfiguration> configs) 
 	{		
 		this.publishedConfigs = configs;
 	}
