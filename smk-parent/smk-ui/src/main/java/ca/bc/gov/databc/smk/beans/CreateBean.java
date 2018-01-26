@@ -38,11 +38,18 @@ import org.w3c.dom.NodeList;
 import ca.bc.gov.databc.smk.controllers.LayerController;
 import ca.bc.gov.databc.smk.dao.CouchDAO;
 import ca.bc.gov.databc.smk.dao.SMKServiceHandler;
-import ca.bc.gov.databc.smk.model.DMFResource;
-import ca.bc.gov.databc.smk.model.Layer;
-import ca.bc.gov.databc.smk.model.RelationalTreeNode;
-import ca.bc.gov.databc.smk.model.WMSLayer;
-import ca.bc.gov.databc.smk.model.Layer.LayerTypes;
+
+import ca.bc.gov.databc.smks.model.CollectionLayer;
+import ca.bc.gov.databc.smks.model.Layer;
+import ca.bc.gov.databc.smks.model.LayerStyle;
+import ca.bc.gov.databc.smks.model.MapConfiguration;
+import ca.bc.gov.databc.smks.model.Tool;
+import ca.bc.gov.databc.smks.model.WMSInfoLayer;
+import ca.bc.gov.databc.smks.model.WMSInfoStyle;
+import ca.bc.gov.databc.smks.model.layer.Geojson;
+import ca.bc.gov.databc.smks.model.layer.Kml;
+import ca.bc.gov.databc.smks.model.layer.Wms;
+import ca.bc.gov.databc.smks.model.layer.EsriDynamic;
 
 @SuppressWarnings("restriction")
 @ManagedBean(name="CreateBean", eager=true)
@@ -51,14 +58,14 @@ public class CreateBean implements Serializable
 {
 	private static final long serialVersionUID = -4244352433273633895L;
 
-	private DMFResource resource;
+	private MapConfiguration resource;
 	private TreeNode layerNodes;
 	private TreeNode selectedLayerNode;
 
 	private TreeNode catalog;
 	private ArrayList<TreeNode> catalogNodes;
 
-	private DualListModel<String> tools;
+	private DualListModel<Tool> tools;
 
 	// for WMS popup
 	private boolean wmsIsVisible;
@@ -66,9 +73,9 @@ public class CreateBean implements Serializable
 	private String wmsLayerTitle;
 	private String wmsServiceUrl = "https://openmaps.gov.bc.ca/geo/pub/ows";
 	private String wmsVersion = "1.3.0";
-	private WMSLayer selectedServiceLayer;
+	private WMSInfoLayer selectedServiceLayer;
 	private String selectedServiceStyle;
-	private ArrayList<WMSLayer> allServiceLayers;
+	private ArrayList<WMSInfoLayer> allServiceLayers;
 
 	// for Feature Service layer
 	private boolean fsIsVisible;
@@ -109,24 +116,24 @@ public class CreateBean implements Serializable
     public void init()
 	{
 		// init the DMF Resource object that will be stored in couch, or read from couch
-		resource = new DMFResource();
-		resource.setShowHeader(true);
-		resource.setViewerType("leaflet");
+		resource = new MapConfiguration();
+		// resource.setShowHeader(true);
+		resource.getViewport().setType("leaflet");
 
 		// init the root node for the layer listing
 		layerNodes = new DefaultTreeNode("root", null);
 
 		// init the tools selector
-		List<String> toolsSource = new ArrayList<String>();
-        List<String> toolsTarget = new ArrayList<String>();
+		List<Tool> toolsSource = new ArrayList<Tool>();
+        List<Tool> toolsTarget = new ArrayList<Tool>();
 
-        toolsSource.add("Pan");
-        toolsSource.add("Zoom");
-        toolsSource.add("Measure");
-        toolsSource.add("Markup");
-        toolsSource.add("Directions");
+        toolsSource.add(Tool.Type.pan.create());
+        toolsSource.add(Tool.Type.zoom.create());
+        toolsSource.add(Tool.Type.measure.create());
+        toolsSource.add(Tool.Type.markup.create());
+        toolsSource.add(Tool.Type.directions.create());
 
-        tools = new DualListModel<String>(toolsSource, toolsTarget);
+        tools = new DualListModel<Tool>(toolsSource, toolsTarget);
 
         // check if we're loading an existing resource
         ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
@@ -153,14 +160,13 @@ public class CreateBean implements Serializable
 				// recursive layer node creator
 				loadLayerNodes(layerNodes, resource.getLayers());
 
-				for(String tool : resource.getTools())
-				{
-					toolsTarget.add(tool);
-					toolsSource.remove(tool);
+				for (Tool.Type toolType : Tool.Type.values() ) {
+					toolsTarget.add(toolType.create());
+					toolsSource.remove(toolType.create());				
 				}
-
+				
 				resource.getLayers().clear();
-				resource.getTools().clear();
+//				resource.getTools().clear();
 
 				// set the wms to databc's default
 				wmsServiceUrl = "https://openmaps.gov.bc.ca/geo/pub/ows";
@@ -187,9 +193,10 @@ public class CreateBean implements Serializable
 			layerNode.setParent(parent);
 			parent.getChildren().add(layerNode);
 
-			if(child.getSublayers().size() > 0)
-			{
-				loadLayerNodes(layerNode, child.getSublayers());
+			if ( child instanceof CollectionLayer ) {
+				CollectionLayer collection = (CollectionLayer)child;
+				if(collection.getLayers().size() > 0) continue;
+				loadLayerNodes(layerNode, collection.getLayers());
 			}
 		}
 	}
@@ -223,7 +230,9 @@ public class CreateBean implements Serializable
 		                String title = layerElement.getElementsByTagName("Title").item(0).getTextContent();
 		                String name = layerElement.getElementsByTagName("Name").item(0).getTextContent();
 
-		                WMSLayer layer = new WMSLayer(title, name);
+		                WMSInfoLayer layer = new WMSInfoLayer();
+						layer.setTitle( title);
+						layer.setName( name);
 
 		                allServiceLayers.add(layer);
 
@@ -235,7 +244,9 @@ public class CreateBean implements Serializable
 		    		        {
 		    		        	Element styleElement = (Element) layerStyles.item(s);
 
-		    		        	layer.getStyles().add(styleElement.getElementsByTagName("Name").item(0).getTextContent());
+								WMSInfoStyle style = new WMSInfoStyle();
+								style.setName( styleElement.getElementsByTagName("Name").item(0).getTextContent());
+		    		        	layer.getStyles().add(style);
 		    		        }
 		    		    }
 		            }
@@ -299,17 +310,17 @@ public class CreateBean implements Serializable
 			wmsLayerTitle = selectedServiceLayer.getTitle();
 		}
 
-		Layer lyr = new Layer();
-		lyr.setLabel(wmsLayerTitle);
+		Wms lyr = new Wms();
+		lyr.setTitle(wmsLayerTitle);
 		lyr.setServiceUrl(wmsServiceUrl);
-		lyr.setWmsVersion(wmsVersion);
-		lyr.getLayers().add(selectedServiceLayer.getName());
-		lyr.setWmsStyle(selectedServiceStyle);
-		lyr.setLayerTypeCode(LayerTypes.wmsLayer);
-		//lyr.setId(id);
+		lyr.setVersion(wmsVersion);
+		lyr.setLayerName(selectedServiceLayer.getName());
+		lyr.setStyleName(selectedServiceStyle);
+		// lyr.setLayerTypeCode(LayerTypes.wmsLayer);
+		// lyr.setId(id);
 		lyr.setIsVisible(wmsIsVisible);
-		lyr.setIsSelectable(true);
-		lyr.setIsExportable(true);
+		// lyr.setIsSelectable(true);
+		// lyr.setIsExportable(true);
 	    lyr.setOpacity(wmsOpacity);
 
 		wmsLayerTitle = null;
@@ -335,15 +346,15 @@ public class CreateBean implements Serializable
 	public void addSelectedLayerFeatureService()
 	{
 		Layer lyr = new Layer();
-		lyr.setLabel(fsLayerTitle);
-		lyr.setServiceUrl(fsServiceUrl);
-		lyr.getLayers().add(fsLayerId);
-		lyr.setLayerTypeCode(LayerTypes.featureLayer);
+		lyr.setTitle(fsLayerTitle);
+		// lyr.setServiceUrl(fsServiceUrl);
+		// lyr.getLayers().add(fsLayerId);
+		// lyr.setLayerTypeCode(LayerTypes.featureLayer);
 		lyr.setIsVisible(fsIsVisible);
-		lyr.setIsSelectable(true);
-		lyr.setIsExportable(true);
-		lyr.setUseClustering(fsClusterPoints);
-		lyr.setUseHeatmapping(fsHeatmapPoints);
+		// lyr.setIsSelectable(true);
+		// lyr.setIsExportable(true);
+		// lyr.setUseClustering(fsClusterPoints);
+		// lyr.setUseHeatmapping(fsHeatmapPoints);
 	    lyr.setOpacity(fsOpacity);
 
 	    fsLayerTitle = "";
@@ -366,21 +377,22 @@ public class CreateBean implements Serializable
 	{
 		try
 	    {
-			Layer lyr = new Layer();
-			lyr.setLabel(kmlLayerTitle);
-			lyr.setLayerTypeCode(LayerTypes.kmlLayer);
+			Kml lyr = new Kml();
+			lyr.setTitle(kmlLayerTitle);
+			// lyr.setLayerTypeCode(LayerTypes.kmlLayer);
 			lyr.setIsVisible(kmlIsVisible);
-			lyr.setIsSelectable(true);
-			lyr.setIsExportable(true);
+			// lyr.setIsSelectable(true);
+			// lyr.setIsExportable(true);
 			lyr.setUseClustering(kmlClusterPoints);
 			lyr.setUseHeatmapping(kmlHeatmapPoints);
 		    lyr.setOpacity(kmlOpacity);
 
-		    lyr.setStrokeWidth(kmlStrokeWidth);
-		    lyr.setStrokeOpacity(kmlStrokeOpacity);
-		    lyr.setStrokeColor(kmlStrokeColor);
-		    lyr.setFillColor(kmlFillColor);
-		    lyr.setFillOpacity(kmlFillOpacity);
+			LayerStyle style = lyr.getStyle();
+		    style.setStrokeWidth(kmlStrokeWidth);
+		    style.setStrokeOpacity(kmlStrokeOpacity);
+		    style.setStrokeColor(kmlStrokeColor);
+		    style.setFillColor(kmlFillColor);
+		    style.setFillOpacity(kmlFillOpacity);
 
 		    kmlLayerTitle = "";
 		    kmlIsVisible = false;
@@ -393,7 +405,7 @@ public class CreateBean implements Serializable
 		    kmlFillColor = "000";
 		    kmlFillOpacity = 0.65;
 
-		    Attachment kmlAttachment = new Attachment(lyr.getLabel(), uploadFileAttachmentBytes, uploadContentType);
+		    Attachment kmlAttachment = new Attachment(lyr.getTitle(), uploadFileAttachmentBytes, uploadContentType);
 		    resource.addInlineAttachment(kmlAttachment);
 
 		    TreeNode kmlNode = new DefaultTreeNode(lyr, layerNodes);
@@ -415,21 +427,22 @@ public class CreateBean implements Serializable
 	{
 		try
 	    {
-			Layer lyr = new Layer();
-			lyr.setLabel(jsonLayerTitle);
-			lyr.setLayerTypeCode(LayerTypes.jsonLayer);
+			Geojson lyr = new Geojson();
+			lyr.setTitle(jsonLayerTitle);
+			// lyr.setLayerTypeCode(LayerTypes.jsonLayer);
 			lyr.setIsVisible(jsonIsVisible);
-			lyr.setIsSelectable(true);
-			lyr.setIsExportable(true);
+			// lyr.setIsSelectable(true);
+			// lyr.setIsExportable(true);
 			lyr.setUseClustering(jsonClusterPoints);
 			lyr.setUseHeatmapping(jsonHeatmapPoints);
 		    lyr.setOpacity(jsonOpacity);
 
-		    lyr.setStrokeWidth(jsonStrokeWidth);
-		    lyr.setStrokeOpacity(jsonStrokeOpacity);
-		    lyr.setStrokeColor(jsonStrokeColor);
-		    lyr.setFillColor(jsonFillColor);
-		    lyr.setFillOpacity(jsonFillOpacity);
+			LayerStyle style = lyr.getStyle();
+		    style.setStrokeWidth(jsonStrokeWidth);
+		    style.setStrokeOpacity(jsonStrokeOpacity);
+		    style.setStrokeColor(jsonStrokeColor);
+		    style.setFillColor(jsonFillColor);
+		    style.setFillOpacity(jsonFillOpacity);
 
 		    jsonLayerTitle = "";
 		    jsonIsVisible = false;
@@ -442,7 +455,7 @@ public class CreateBean implements Serializable
 		    jsonFillColor = "000";
 		    jsonFillOpacity = 0.65;
 
-		    Attachment jsonAttachment = new Attachment(lyr.getLabel(), uploadFileAttachmentBytes, uploadContentType);
+		    Attachment jsonAttachment = new Attachment(lyr.getTitle(), uploadFileAttachmentBytes, uploadContentType);
 		    resource.addInlineAttachment(jsonAttachment);
 
 		    TreeNode jsonNode = new DefaultTreeNode(lyr, layerNodes);
@@ -509,22 +522,22 @@ public class CreateBean implements Serializable
 		TreeNode parent = selectedLayerNode.getParent();
 		parent.getChildren().remove(selectedLayerNode);
 		// is this an MPCM layer? We can tell because it'll be using a relational tree node
-		if(selectedLayerNode instanceof RelationalTreeNode)
-		{
-			RelationalTreeNode node = (RelationalTreeNode)selectedLayerNode;
-
-			node.clearParent();
-
-			node.setParent(node.getOriginalParent());
-			node.getOriginalParent().getChildren().add(node);
-
-			RequestContext.getCurrentInstance().update("mpcmLayerForm:catalog");
-			RequestContext.getCurrentInstance().update("mpcmLayerForm:mpcmLayerPanel");
-		}
+//		if(selectedLayerNode instanceof RelationalTreeNode)
+//		{
+//			RelationalTreeNode node = (RelationalTreeNode)selectedLayerNode;
+//
+//			node.clearParent();
+//
+//			node.setParent(node.getOriginalParent());
+//			node.getOriginalParent().getChildren().add(node);
+//
+//			RequestContext.getCurrentInstance().update("mpcmLayerForm:catalog");
+//			RequestContext.getCurrentInstance().update("mpcmLayerForm:mpcmLayerPanel");
+//		}
 
 		Layer data = (Layer)selectedLayerNode.getData();
 
-		if(data.getLayerTypeCode().equals(LayerTypes.kmlLayer) || data.getLayerTypeCode().equals(LayerTypes.jsonLayer))
+		if(data.getType().equals(Layer.Type.Kml.getJsonType()) || data.getType().equals(Layer.Type.Geojson.getJsonType()))
 		{
 			if(data.getId() != null)
 			{
@@ -561,9 +574,9 @@ public class CreateBean implements Serializable
 		{
 			Layer data = (Layer) node.getData();
 
-			if(container != null)
-			{
-				container.getSublayers().add(data);
+			if(container != null && container instanceof CollectionLayer )
+			{				
+				((CollectionLayer)container).getLayers().add(data);
 			}
 			else
 			{
@@ -679,9 +692,9 @@ public class CreateBean implements Serializable
 		try
 		{
 			Layer layer = (Layer)event.getTreeNode().getData();
-			if(layer.getType().equals("dynamicServiceLayer") && layer.getDynamicLayers().size() == 0)
+			if(layer.getType().equals(Layer.Type.EsriDynamic.getJsonType()) && ((EsriDynamic)layer).getDynamicLayers().size() == 0)
 			{
-				LayerController.loadMpcmLayerDetails(layer);
+				LayerController.loadMpcmLayerDetails((EsriDynamic)layer);
 			}
 
 			this.setSelectedLayerNode(event.getTreeNode());
@@ -720,12 +733,12 @@ public class CreateBean implements Serializable
         return event.getNewStep();
     }
 
-	public DMFResource getResource()
+	public MapConfiguration getResource()
 	{
 		return resource;
 	}
 
-	public void setResource(DMFResource resource)
+	public void setResource(MapConfiguration resource)
 	{
 		this.resource = resource;
 	}
@@ -751,12 +764,12 @@ public class CreateBean implements Serializable
 		this.selectedLayerNode = selectedLayerNode;
 	}
 
-	public DualListModel<String> getTools()
+	public DualListModel<Tool> getTools()
 	{
 		return tools;
 	}
 
-	public void setTools(DualListModel<String> tools)
+	public void setTools(DualListModel<Tool> tools)
 	{
 		this.tools = tools;
 	}
@@ -781,12 +794,12 @@ public class CreateBean implements Serializable
 		this.wmsVersion = wmsVersion;
 	}
 
-	public WMSLayer getSelectedServiceLayer()
+	public WMSInfoLayer getSelectedServiceLayer()
 	{
 		return selectedServiceLayer;
 	}
 
-	public void setSelectedServiceLayer(WMSLayer selectedServiceLayer)
+	public void setSelectedServiceLayer(WMSInfoLayer selectedServiceLayer)
 	{
 		this.selectedServiceLayer = selectedServiceLayer;
 	}
@@ -801,13 +814,13 @@ public class CreateBean implements Serializable
 		this.selectedServiceStyle = selectedServiceStyle;
 	}
 
-	public ArrayList<WMSLayer> getAllServiceLayers()
+	public ArrayList<WMSInfoLayer> getAllServiceLayers()
 	{
-		if(allServiceLayers == null) allServiceLayers = new ArrayList<WMSLayer>();
+		if(allServiceLayers == null) allServiceLayers = new ArrayList<WMSInfoLayer>();
 		return allServiceLayers;
 	}
 
-	public void setAllServiceLayers(ArrayList<WMSLayer> allServiceLayers)
+	public void setAllServiceLayers(ArrayList<WMSInfoLayer> allServiceLayers)
 	{
 		this.allServiceLayers = allServiceLayers;
 	}

@@ -7,8 +7,10 @@
   <version>1.0.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <modules>
+  	<module>smks-model</module>
   	<module>smk-ui</module>
   	<module>smks-api</module>
+  	<module>smk-client</module>
   </modules>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

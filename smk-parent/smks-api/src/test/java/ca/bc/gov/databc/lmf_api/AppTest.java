@@ -42,12 +42,12 @@ import ca.bc.gov.databc.smks.model.MapConfiguration;
  * Unit tests for LMF endpoints.
  */
 
-@EnableWebMvc 
+@EnableWebMvc
 @RunWith(SpringJUnit4ClassRunner.class)
 @ComponentScan(basePackages = "ca.bc.gov.databc.smks")
 @ContextConfiguration(classes = WebConfig.class)
 @WebAppConfiguration("src/main/webapp")
-public class AppTest extends WebMvcConfigurationSupport 
+public class AppTest extends WebMvcConfigurationSupport
 {
 	@Rule
 	public JUnitRestDocumentation restDocumentation = new JUnitRestDocumentation();
@@ -55,14 +55,14 @@ public class AppTest extends WebMvcConfigurationSupport
 	@Resource
 	private WebApplicationContext context;
 	private MockMvc mockMvc;
-	
+
 	@Autowired
 	private CouchDAO couchDAO;
-	
+
 	@Before
 	public void setUp() {
 		this.mockMvc = MockMvcBuilders.webAppContextSetup(this.context)
-				.apply(documentationConfiguration(this.restDocumentation)) 
+				.apply(documentationConfiguration(this.restDocumentation))
 				.build();
 	}
 
@@ -82,7 +82,7 @@ public class AppTest extends WebMvcConfigurationSupport
 			e.printStackTrace();
 		}
     }
-    
+
 	@Test
     public void testLayerConfig()
     {
@@ -92,7 +92,7 @@ public class AppTest extends WebMvcConfigurationSupport
 			e.printStackTrace();
 		}
     }
-	
+
 	@Test
     public void testMapConfig()
     {
@@ -102,7 +102,7 @@ public class AppTest extends WebMvcConfigurationSupport
 			e.printStackTrace();
 		}
     }
-    
+
     public void generateMapConfigServiceDocs() throws Exception
     {
     	// crud operations for map configurations
@@ -113,14 +113,14 @@ public class AppTest extends WebMvcConfigurationSupport
     																fieldWithPath("id").description("The ID of the LMF Map Configuration"),
     																fieldWithPath("revision").description("The current revision of the LMF Map Configuration"),
 																	fieldWithPath("creator").description("The creator of the LMF Map Configuration"))));
-    	
+
     	// create and update
     	MapConfiguration test = new MapConfiguration();
     	test.setName("My Application");
-    	
+
     	ObjectMapper mapper = new ObjectMapper();
     	String json = mapper.writeValueAsString(test);
-    	
+
     	// the create new
     	this.mockMvc.perform(post("/MapConfigurations/")
     				.contentType(MediaType.APPLICATION_JSON)
@@ -128,18 +128,18 @@ public class AppTest extends WebMvcConfigurationSupport
     				.accept(MediaType.APPLICATION_JSON))
     				.andExpect(status().isCreated())
     				.andDo(document("mapconfig-crt"));
-    	
+
     	test = couchDAO.getMapConfiguration("my-application");
-    	
+
     	// get
     	this.mockMvc.perform(get("/MapConfigurations/{id}", "my-application")
 					.accept(MediaType.APPLICATION_JSON))
 					.andExpect(status().isOk())
 					.andDo(document("mapconfig-get", pathParameters(parameterWithName("id").description("The LMF Map Configuration ID"))));
-    	
-    	test.setShowHeader(false);
+
+    	// test.setShowHeader(false);
     	json = mapper.writeValueAsString(test);
-    	
+
     	// the update
     	this.mockMvc.perform(put("/MapConfigurations/{id}", "my-application")
     				.contentType(MediaType.APPLICATION_JSON)
@@ -153,7 +153,7 @@ public class AppTest extends WebMvcConfigurationSupport
     				.accept(MediaType.APPLICATION_JSON))
     				.andExpect(status().isOk())
     				.andDo(document("mapconfig-del", pathParameters(parameterWithName("id").description("The LMF Map Configuration ID"))));
-    	
+
     	// crud operations for map configurations attachments
     	//this.mockMvc.perform(get("/MapConfigurations/{id}/Attachments/").accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk()).andDo(document("mapconfig-attch-all", pathParameters(parameterWithName("id").description("The LMF Map Configuration ID"))));
     	//this.mockMvc.perform(get("/MapConfigurations/{id}/Attachments/{attachment_id}", 1, 1).accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk()).andDo(document("mapconfig-attch-get", pathParameters(parameterWithName("id").description("The LMF Map Configuration ID"), parameterWithName("attachment_id").description("The attachment ID for a map configurations attachment"))));
@@ -161,7 +161,7 @@ public class AppTest extends WebMvcConfigurationSupport
     	//this.mockMvc.perform(put("/MapConfigurations/{id}/Attachments/{attachment_id}", 1, 1).accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk()).andDo(document("mapconfig-attch-upd", pathParameters(parameterWithName("id").description("The LMF Map Configuration ID"), parameterWithName("attachment_id").description("The attachment ID for a map configurations attachment"))));
     	//this.mockMvc.perform(delete("/MapConfigurations/{id}/Attachments/{attachment_id}", 1, 1).accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk()).andDo(document("mapconfig-attch-del", pathParameters(parameterWithName("id").description("The LMF Map Configuration ID"), parameterWithName("attachment_id").description("The attachment ID for a map configurations attachment"))));
     }
-    
+
     public void generateRootServiceDocs() throws Exception
     {
     	this.mockMvc.perform(get("/Health")
@@ -170,10 +170,10 @@ public class AppTest extends WebMvcConfigurationSupport
     	            .andDo(document("index", responseFields(fieldWithPath("serviceStatus").description("Indicates if the service is running"),
     	            										fieldWithPath("couchDBStatus").description("Indicates if the Couch DB is running"))));
     }
-    
+
     public void generateLayerConfigServiceDocs() throws Exception
     {
-    	FieldDescriptor[] mpcmInfoLayer = new FieldDescriptor[] 
+    	FieldDescriptor[] mpcmInfoLayer = new FieldDescriptor[]
     	{
 			fieldWithPath("id").description("The layer ID used by LMF"),
 			fieldWithPath("mpcmId").description("The layers ID used in MPCM"),
@@ -181,13 +181,13 @@ public class AppTest extends WebMvcConfigurationSupport
 			fieldWithPath("sublayers").description("A listing of layers that are referenced by this folder or group"),
 			fieldWithPath("layerUrl").description("The URL used for referencing this layer in the MPCM Layer Catalog")
 		};
-    	
+
     	// default "all" fetch for DataBC layer catalog
     	this.mockMvc.perform(get("/LayerLibrary/")
     						 .accept(MediaType.APPLICATION_JSON))
     						 .andExpect(status().isOk())
     						 .andDo(document("layercatalog-all"));
-    	
+
 
     	FieldDescriptor[] dynamicService = new FieldDescriptor[]
 		{
@@ -214,8 +214,8 @@ public class AppTest extends WebMvcConfigurationSupport
 					 .andExpect(status().isOk())
 					 .andDo(document("layercatalog-get", pathParameters(parameterWithName("id").description("The MPCM id of a Layer in the Layer Catalog"))))
 					 .andDo(document("index"));
-    	
-    	FieldDescriptor[] wmsInfoLayer = new FieldDescriptor[] 
+
+    	FieldDescriptor[] wmsInfoLayer = new FieldDescriptor[]
     	{
 			fieldWithPath("title").description("The title of the layer"),
 			fieldWithPath("name").description("The identifying name of the layer used by GeoServer"),
