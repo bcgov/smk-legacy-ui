@@ -72,4 +72,7 @@
 	</dependency>
   </dependencies>
   <name>smk-ui</name>
+	<build>
+		<finalName>smk-ui</finalName>
+	</build>
 </project>

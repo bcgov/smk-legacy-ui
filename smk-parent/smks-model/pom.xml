@@ -43,7 +43,7 @@
 
 	</dependencies>
 	<build>
-		<finalName>smks-model</finalName>
+		<!-- <finalName>smks-model</finalName> -->
 		<plugins>
 		  <plugin>
 			<groupId>org.apache.maven.plugins</groupId>
