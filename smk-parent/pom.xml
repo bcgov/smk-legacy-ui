@@ -1,0 +1,18 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <name>smk-parent</name>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>ca.bc.gov.databc</groupId>
+  <artifactId>smk-parent</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
+  <modules>
+  	<module>smks-model</module>
+  	<module>smk-ui</module>
+  	<module>smks-api</module>
+  	<module>smk-client</module>
+  </modules>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+</project>

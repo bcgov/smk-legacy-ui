@@ -1,0 +1,13 @@
+{
+  "_id": "_design/fetch-configs",
+  "_rev": "21-71dd12942288c7743da50dcc8d691523",
+  "views": {
+    "fetch-all-configs": {
+      "map": "function (doc) {\n   emit(doc.lmfId, doc.lmfRevision);\n}"
+    },
+    "fetch-published-configs": {
+      "map": "function (doc) \n{\n  if(doc.published)\n  {\n    emit(doc.lmfId, doc.lmfRevision);\n  }\n}"
+    }
+  },
+  "language": "javascript"
+}

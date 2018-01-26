@@ -1,0 +1,101 @@
+<kml xmlns="http://earth.google.com/kml/2.0">
+	<Document>
+		<Style id="cwmDefaultStyle">
+			<LineStyle>
+				<color>
+					ff0000ff
+				</color>
+				<width>
+					1
+				</width>
+			</LineStyle>
+			<PolyStyle>
+				<color>
+					4c0000ff
+				</color>
+				<fill>
+					1
+				</fill>
+				<outline>
+					1
+				</outline>
+			</PolyStyle>
+		</Style>
+		<Folder>
+			<name>
+				Feature Export from CWM
+			</name>
+			<description>
+				Exported from CWM on 2017-07-05 12:21{proj:webmercator}
+			</description>
+			<Placemark>
+				<styleUrl>
+					#cwmDefaultStyle
+				</styleUrl>
+				<name>
+					OpenLayers_Feature_Vector_470
+				</name>
+				<description>
+					No description available
+				</description>
+				<Polygon>
+					<outerBoundaryIs>
+						<LinearRing>
+							<coordinates>
+								-13766751.229358,6216390.886783691 -13761821.041033998,6216811.290439301 -13761821.041033998,6206262.980537401 -13766751.229358,6216390.886783691
+							</coordinates>
+						</LinearRing>
+					</outerBoundaryIs>
+				</Polygon>
+			</Placemark>
+			<Placemark>
+				<name>
+					OpenLayers_Feature_Vector_479
+				</name>
+				<description>
+					No description available
+				</description>
+				<Polygon>
+					<outerBoundaryIs>
+						<LinearRing>
+							<coordinates>
+								-13769732.273461,6204046.306717394 -13766254.388673998,6201906.069925701 -13770649.5178,6193536.2153297 -13769732.273461,6204046.306717394
+							</coordinates>
+						</LinearRing>
+					</outerBoundaryIs>
+				</Polygon>
+				<ExtendedData>
+					<Data name="sequenceNum">
+						<value>
+							1
+						</value>
+					</Data>
+				</ExtendedData>
+			</Placemark>
+			<Placemark>
+				<name>
+					OpenLayers_Feature_Vector_494
+				</name>
+				<description>
+					No description available
+				</description>
+				<Polygon>
+					<outerBoundaryIs>
+						<LinearRing>
+							<coordinates>
+								-13778140.346571,6211804.6650872985 -13779057.590910003,6211116.731832797 -13775885.454236997,6209473.3357249 -13778140.346571,6211804.6650872985
+							</coordinates>
+						</LinearRing>
+					</outerBoundaryIs>
+				</Polygon>
+				<ExtendedData>
+					<Data name="sequenceNum">
+						<value>
+							2
+						</value>
+					</Data>
+				</ExtendedData>
+			</Placemark>
+		</Folder>
+	</Document>
+</kml>

@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui" >
+    <h:head>
+    	<title>Lightweight Mapping Framework</title>
+  
+    	<!-- css links -->
+    	<h:outputStylesheet library="css" name="materialize.css"  />
+    	<h:outputStylesheet library="css" name="dmf.css"  />
+    	<h:outputStylesheet library="css" name="fonts.css"  />
+    	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+    	 
+    	<!-- JS links -->
+		<h:outputScript library="js" name="jquery-3.2.1.min.js" />
+		<h:outputScript library="js" name="materialize.js" />
+		<h:outputScript library="js" name="dmf.js" target="body" />
+				
+		<link rel="stylesheet" 
+			  href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css"
+			  integrity="sha512-M2wvCLH6DSRazYeZRIm1JnYyh22purTM+FDB5CsyxtQJYeKq83arPe5wgbNmcFXGqiSH2XR8dT/fJISVA1r/zQ=="
+			  crossorigin=""/>
+		
+		<script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js"
+			    integrity="sha512-lInM/apFSqyy1o6s89K4iQUKg6ppXEgsVxT35HbzUupEVRh2Eu9Wdl4tHj7dZO0s1uvplcYGmt3498TtHq+log=="
+			    crossorigin=""></script>
+			    
+		<script src="https://unpkg.com/esri-leaflet@2.1.0/dist/esri-leaflet.js"
+    			integrity="sha512-Tojl3UMd387f6DdAJlo+fKfJZiP55fYT+6Y58yKbHydnueOdSFOxrgLPuUxm7VW1szEt3hZVwv3V2sSUCuT35w=="
+    			crossorigin=""></script>
+    				
+    	<link rel="stylesheet" href="https://js.arcgis.com/4.4/esri/css/main.css" />
+    </h:head>
+    <h:body class="grey lighten-4" style="height: 100vh; position: relative; font-family: 'Avenir Next W00','Helvetica Neue',Helvetica,Arial,sans-serif;">
+	    <h:form id="dmf">
+	   		<div id="header" class="header nrpp-blue-dark">
+				<h:graphicImage value="resources/images/bc_gov_logo_transparent.png" style="padding: 6px;" />
+				<span class="white-text" style="font-size: 30px; top: 18px; position: absolute; margin-left: 15px;">Lightweight Mapping Framework</span>
+	   		</div>
+	   		<div id="map" style="width: 100%; height: calc(100vh - 110px); position: absolute; z-index: -10;"/>
+   			<div style="width: 100%; height: calc(100vh - 110px); position: absolute; background: rgba(0, 0, 0, 0.3);"/>
+			<div id="content" class="container" style="margin-top: 14px; min-width: 800px;">
+			
+				<div class="row">
+					<div class="col s12">
+						<div class="card white">
+							<div class="card-content black-text">
+								<div class="row" style="padding: 0px; margin-bottom: 0px;">
+									<div class="col s12">
+										<h3>Welcome to the Lightweight Mapping Framework</h3>
+									</div>
+								</div>
+								<div class="row" style="padding: 0px;">
+									<div class="col s12">
+										<p>The Lightweight Mapping Framework allows you to create custom linkable and embedable 
+										maps using data mashed up from DataBC's catalog, GeoServer and other external sources.
+										To view your map or create a new one, check the "My Maps" tab below. To discover
+										other maps, check out "All Maps". To learn more about LMF, check the about tab.</p>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="col s12">
+						<ul class="tabs navbar tabs-fixed-width nrpp-blue-dark">
+							<div class="indicator nrpp-yellow" style="z-index:1"></div>
+							<li class="tab col s3"><a class="active" href="#mymashups">My Maps</a></li>
+							<li class="tab col s3"><a href="#allmashups">All Maps</a></li>
+							<li class="tab col s3"><a href="#about">About</a></li>
+						</ul>
+					</div>
+					<div id="mymashups" class="col s12">
+						<div class="card white" style="/*height: calc(100vh - 500px);*/">
+							<div class="card-content black-text">
+								<p>Check out your maps below</p>
+								<div>
+									<h:dataTable id="myMashups"
+												 styleClass="bordered highlight responsive-table"
+												 value="#{IndexBean.editableConfigs}"
+												 var="mashup">
+										<h:column>
+						    				<f:facet name="header">Name</f:facet>
+						    				#{mashup.name}
+						    			</h:column>
+						    			<h:column>
+						    				<f:facet name="header">Viewer</f:facet>
+						    				#{mashup.viewerType}
+						    			</h:column>
+						    			<h:column>
+						    				<f:facet name="header">Link</f:facet>
+						    				<a href="view.xhtml?id=#{mashup.lmfId}&amp;version=#{mashup.lmfRevision}" target="_blank">View Map</a>
+						    			</h:column>
+									    <h:column>
+						    				<f:facet name="header">Published</f:facet>
+						    				#{mashup.isPublished()}
+						    			</h:column>
+						    			<h:column>
+						    				<f:facet name="header">Version</f:facet>
+						    				#{mashup.getVersionLabel()}
+						    			</h:column>
+						    			<h:column>
+						    				<f:facet name="header"></f:facet>
+											<a href="#" onclick="publishResource([{name: 'param', value: '#{mashup.lmfId}'}])">Publish</a>
+						    				<p:remoteCommand name="publishResource" actionListener="#{IndexBean.publishResource()}" />
+						    			</h:column>
+						    			<h:column>
+						    				<f:facet name="header"></f:facet>
+						    				<a href="create.xhtml?id=#{mashup.lmfId}">Edit</a>
+						    			</h:column>
+						    			<h:column>
+						    				<f:facet name="header"></f:facet>
+											<a href="#" onclick="deleteResource([{name: 'param', value: '#{mashup.lmfId}'}])"> #{mashup.isPublished() ? 'Un-Publish' : 'Delete'}</a>
+						    				<p:remoteCommand name="deleteResource" actionListener="#{IndexBean.deleteResource()}" />
+						    			</h:column>
+						    			<!-- <h:column>
+						    				<f:facet name="header"></f:facet>
+											<a href="#" onclick="exportResource([{name: 'param', value: '#{mashup.id}'}])">Export</a>
+						    				<p:remoteCommand name="exportResource" actionListener="#{IndexBean.exportResource()}" />
+						    			</h:column> -->
+									</h:dataTable>
+								</div>
+							</div>
+							<div class="card-action">
+								<a href="create.xhtml">Create a new Map</a>
+							</div>
+						</div>
+					</div>
+					<div id="allmashups" class="col s12">
+						<div class="card white" style="/*height: calc(100vh - 500px);*/">
+							<div class="card-content black-text">
+								<p>Check out a collection of published maps created by other users below</p>
+								<div>
+									<h:dataTable id="allMashups"
+												 styleClass="bordered highlight responsive-table"
+												 value="#{IndexBean.publishedConfigs}"
+												 var="mashup">
+										<h:column>
+						    				<f:facet name="header">Name</f:facet>
+						    				#{mashup.name}
+						    			</h:column>
+						    			<h:column>
+						    				<f:facet name="header">Viewer</f:facet>
+						    				#{mashup.viewerType}
+						    			</h:column>
+						    			<h:column>
+						    				<f:facet name="header">Created By</f:facet>
+						    				#{mashup.createdBy}
+						    			</h:column>
+						    			<h:column>
+						    				<f:facet name="header">Version</f:facet>
+						    				#{mashup.lmfRevision}
+						    			</h:column>
+						    			<h:column>
+						    				<f:facet name="header">Link</f:facet>
+						    				<a href="view.xhtml?id=#{mashup.lmfId}" target="_blank">View Map</a>
+						    			</h:column>
+									</h:dataTable>
+								</div>						
+							</div>
+						</div>
+					</div>
+					<div id="about" class="col s12">
+						<div class="card white" style="/*height: calc(100vh - 500px);*/">
+							<div class="card-content black-text">
+								<p>Info about LMF, help, etc...</p>						
+							</div>
+						</div>
+					</div>
+				</div>								
+			</div>
+			<div id="footer" class="footer nrpp-blue-dark">
+			</div>
+		</h:form>
+    </h:body>
+    <h:outputScript>
+    	$(document).ready(function()
+    	{
+			// init background map
+	    	var map = L.map('map', { zoomControl: false });
+	    	map.touchZoom.disable();
+			map.doubleClickZoom.disable();
+			map.scrollWheelZoom.disable();
+			map.boxZoom.disable();
+			map.keyboard.disable();
+	    
+	    	var rndLat = Math.random() * (60 - 48.3) + 47.294;
+	    	var rndLon = (Math.random() * (124 - 111.291) + 114) * -1;
+	    	var rndZoom = Math.floor(Math.random() * (12 - 9) + 9);
+	    
+	    	map.setView(new L.latLng(rndLat, rndLon), rndZoom);
+                
+	    	var bm = L.esri.basemapLayer("Topographic");
+			
+			map.addLayer(bm);
+		});
+	</h:outputScript>
+</html>
