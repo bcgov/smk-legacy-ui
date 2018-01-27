@@ -74,15 +74,20 @@ RUN rm -rf /usr/local/tomcat/webapps/* && mkdir /usr/local/tomcat/config /usr/lo
 
 #Copy client war
 RUN wget -O /tmp/smk-client.war $APPBIN/smk-client/1.0.0/smk-client-1.0.0.war \
-  && unzip /tmp/smk-client.war -d /usr/local/tomcat/webapps/ROOT
+  && cp /tmp/smk-client.war /usr/local/tomcat/webapps
+  # && unzip /tmp/smk-client.war -d /usr/local/tomcat/webapps/ROOT
 
 #Copy SMK Admin UI
 RUN wget -O /tmp/smk-ui.war $APPBIN/smk-ui/1.0.0/smk-ui-1.0.0.war \
-  && unzip /tmp/smk-ui.war -d /usr/local/tomcat/webapps/ROOT
+  && cp /tmp/smk-ui.war /usr/local/tomcat/webapps
+  # && unzip /tmp/smk-ui.war -d /usr/local/tomcat/webapps/ROOT
 
 #Copy SMK api
 RUN wget -O /tmp/smks-api.war $APPBIN/smks-api/1.0.0/smks-api-1.0.0.war \
-  && unzip /tmp/smks-api.war -d /usr/local/tomcat/webapps/ROOT
+  # && cp /tmp/smks-api.war /usr/local/tomcat/webapps
+  && unzip /tmp/smks-api.war -d /usr/local/tomcat/webapps/smks-api
+
+RUN cat "couchdb.admin.password=$COUCHPW" > /usr/local/tomcat/webapps/smks-api/WEB-INF/classes/application.properties
 
 #Setup runtime configuration
 ##Generate GWA required configuration
@@ -102,4 +107,4 @@ RUN apk del --purge alpine-sdk
 USER tomcat
 
 EXPOSE 8080
-# CMD catalina.sh run
+CMD catalina.sh run

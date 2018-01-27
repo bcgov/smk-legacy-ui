@@ -3,14 +3,17 @@ node ('master'){
     def rtMaven = Artifactory.newMavenBuild()
     def buildInfo
 
-    stage ('SCM prepare'){
-        deleteDir()
-//        git branch: '${gitTag}', url: 'https://github.com/bcgov/smk.git'
-        checkout([$class: 'GitSCM', branches: [[name: '${gitTag}']], doGenerateSubmoduleConfigurations: false, extensions: [], gitTool: 'Default', submoduleCfg: [], userRemoteConfigs: [[url: 'https://github.com/bcgov/smk.git']]])
-    }
+//     stage ('SCM prepare'){
+//         deleteDir()
+// //        git branch: '${gitTag}', url: 'https://github.com/bcgov/smk.git'
+//         // checkout([$class: 'GitSCM', branches: [[name: '${gitTag}']], doGenerateSubmoduleConfigurations: false, extensions: [], gitTool: 'Default', submoduleCfg: [], userRemoteConfigs: [[url: 'https://github.com/bcgov/smk.git']]])
+//     }
 
     stage ('OpenShift Build'){
-    openshiftBuild apiURL: 'https://console.pathfinder.gov.bc.ca', authToken: '${OCP_TOKEN}', bldCfg: 'smk', buildName: '', checkForTriggeredDeployments: 'true', commitID: '', env: [[name: 'APPBIN', value: 'http://delivery.apps.bcgov/artifactory/libs-release-local/ca/bc/gov/databc'], [name: 'KAURL', value: '${KongAdminURL}'], [name: 'KUSER', value: '${KongAdminUID}'], [name: 'KPWD', value: '${KongAdminPWD}'], [name: 'GWA_ORG', value: '${GIT_OAUTH_ORG}'], [name: 'GH_CID', value: '${GIT_OAUTH_CLIENTID}'], [name: 'GH_CIS', value: '${GIT_OAUTH_CLIENTSECRET}'], [name: 'GH_ATOKEN', value: '${GIT_ADMIN_TOKEN}']], namespace: 'dbc-mapsdk-tools', showBuildLogs: 'true', verbose: 'true', waitTime: '', waitUnit: 'sec'
+    openshiftBuild apiURL: 'https://console.pathfinder.gov.bc.ca', authToken: '${OCP_TOKEN}', bldCfg: 'smk', buildName: '', checkForTriggeredDeployments: 'true', commitID: '', env: [
+            [name: 'APPBIN', value: 'http://delivery.apps.bcgov/artifactory/libs-release-local/ca/bc/gov/databc'],
+            [name: 'COUCHPW', value: '${COUCHPW}']
+        ], namespace: 'dbc-mapsdk-tools', showBuildLogs: 'true', verbose: 'true', waitTime: '', waitUnit: 'sec'
     }
 
     stage ('OpenShift Image Release'){

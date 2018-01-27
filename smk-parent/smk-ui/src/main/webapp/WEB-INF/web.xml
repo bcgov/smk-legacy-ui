@@ -7,11 +7,13 @@
   </context-param>
   <context-param>
     <param-name>couchdb</param-name>
-    <param-value>${smk.couchdb.uri}</param-value>
+    <param-value>http://couchdb-dbc-mapsdk-tools.pathfinder.gov.bc.ca/</param-value>
+    <!-- <param-value>${smk.couchdb.uri}</param-value> -->
   </context-param>
   <context-param>
     <param-name>lmfService</param-name>
-    <param-value>${smks.uri}</param-value>
+    <param-value>https://smks-api.pathfinder.gov.bc.ca/smks-api</param-value>
+    <!-- <param-value>${smks.uri}</param-value> -->
   </context-param>
   <welcome-file-list>
     <welcome-file>index.xhtml</welcome-file>
