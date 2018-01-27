@@ -17,10 +17,11 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import ca.bc.gov.databc.smk.model.Attribute;
-import ca.bc.gov.databc.smk.model.Layer;
-import ca.bc.gov.databc.smk.model.RelationalTreeNode;
-import ca.bc.gov.databc.smk.model.Layer.LayerTypes;
+import ca.bc.gov.databc.smks.model.Attribute;
+import ca.bc.gov.databc.smks.model.Layer;
+import ca.bc.gov.databc.smks.model.layer.EsriDynamic;
+//import ca.bc.gov.databc.smk.model.RelationalTreeNode;
+//import ca.bc.gov.databc.smk.model.Layer.LayerTypes;
 
 public class LayerController 
 {
@@ -52,9 +53,9 @@ public class LayerController
                 TreeNode root = new DefaultTreeNode(rootLayer, null);
                 
                 // populate the rootLayer object with the folder details.
-                rootLayer.setLayerTypeCode(LayerTypes.folder);
-                rootLayer.setId(itemId);
-                rootLayer.setLabel(folder.getElementsByTagName("folderName").item(0).getTextContent());
+//                rootLayer.setLayerTypeCode(LayerTypes.folder);
+//                rootLayer.setId(itemId);
+//                rootLayer.setLabel(folder.getElementsByTagName("folderName").item(0).getTextContent());
                 
                 // finally, add the node and increment the itemId
                 catalogNodes.add(root);
@@ -113,16 +114,16 @@ public class LayerController
 	                //for each folder, create a root layer object. Add to a tree node. No parent
 	                
 	                Layer layer = new Layer();
-	                TreeNode layerNode = new RelationalTreeNode(layer, parent);
+//	                TreeNode layerNode = new RelationalTreeNode(layer, parent);
 	                
 	                // populate the rootLayer object with the folder details.
-	                layer.setLayerTypeCode(LayerTypes.folder);
-	                layer.setId(id);
-	                layer.setLabel(name);
+//	                layer.setLayerTypeCode(LayerTypes.folder);
+//	                layer.setId(id);
+//	                layer.setLabel(name);
 	                
 	                // finally, add the node and increment the itemId
-	                layerNode.setParent(parent);
-	                parent.getChildren().add(layerNode);
+//	                layerNode.setParent(parent);
+//	                parent.getChildren().add(layerNode);
 	                id++;
 	                
 	                // Each root node folder may have layer and/or folders within
@@ -133,7 +134,7 @@ public class LayerController
 	                if(subfolderElement != null)
 	                {
 	                	NodeList subfoldersNodes = subfolderElement.getChildNodes();
-	                	id = processFolders(subfoldersNodes, layerNode, id);
+//	                	id = processFolders(subfoldersNodes, layerNode, id);
 	                }
 	                
 	                Element sublayerElement = (Element)folder.getElementsByTagName("layers").item(0); 
@@ -141,7 +142,7 @@ public class LayerController
 	                if(sublayerElement != null)
 	                {
 	                	NodeList sublayerNodes = sublayerElement.getChildNodes();
-	                	id = processLayers(sublayerNodes, layerNode, id);
+//	                	id = processLayers(sublayerNodes, layerNode, id);
 	                }
                 }
 	        }
@@ -150,7 +151,7 @@ public class LayerController
 		return id;
 	}
 	
-	public static void loadMpcmLayerDetails(Layer layer) throws SAXException, IOException, ParserConfigurationException
+	public static void loadMpcmLayerDetails(EsriDynamic layer) throws SAXException, IOException, ParserConfigurationException
 	{
 		if(layer.getMpcmId() != null)
 		{
@@ -183,7 +184,7 @@ public class LayerController
 		                String type = el.getElementsByTagName("key").item(0).getTextContent();
 		                String value = el.getElementsByTagName("value").item(0).getTextContent();
 		                
-		                layer.setIsSelectable(false);
+//		                layer.setIsSelectable(false);
 		                layer.setOpacity(0.65);
 		                
 		                if(type.equals("metadata.url"))
@@ -192,7 +193,7 @@ public class LayerController
 		                }
 		                else if(type.equals("extractable"))
 		                {
-		                	layer.setIsExportable(new Boolean(value));
+//		                	layer.setIsExportable(new Boolean(value));
 		                }
 		                else if(type.equals("visible"))
 		                {
@@ -216,13 +217,13 @@ public class LayerController
 		                Attribute attribute = new Attribute();
 		                
 		                attribute.setName(el.getElementsByTagName("fieldName").item(0).getTextContent());
-		                attribute.setAlias(el.getElementsByTagName("fieldAlias").item(0).getTextContent());
-		                attribute.setVisible(Boolean.parseBoolean(el.getElementsByTagName("visible").item(0).getTextContent()));
+		                attribute.setTitle(el.getElementsByTagName("fieldAlias").item(0).getTextContent());
+//		                attribute.setVisible(Boolean.parseBoolean(el.getElementsByTagName("visible").item(0).getTextContent()));
 		                
-		                if(attribute.getVisible())
-		                {
+//		                if(attribute.getVisible())
+//		                {
 		                	layer.getAttributes().add(attribute);
-		                }
+//		                }
 		            }
 		        }
 		    }
@@ -244,17 +245,17 @@ public class LayerController
                 if(!name.toLowerCase().contains("- internal"))
                 {
 	                Layer layer = new Layer();
-	                TreeNode layerNode = new RelationalTreeNode(layer, parent);
+//	                TreeNode layerNode = new RelationalTreeNode(layer, parent);
 	                
 	                // populate the rootLayer object with the folder details.
-	                layer.setLayerTypeCode(LayerTypes.dynamicServiceLayer);
-	                layer.setId(id);
-	                layer.setMpcmId(new Integer(layerElement.getElementsByTagName("layerId").item(0).getTextContent()));
-	                layer.setLabel(layerElement.getElementsByTagName("layerDisplayName").item(0).getTextContent());
+//	                layer.setLayerTypeCode(LayerTypes.dynamicServiceLayer);
+//	                layer.setId(id);
+//	                layer.setMpcmId(new Integer(layerElement.getElementsByTagName("layerId").item(0).getTextContent()));
+//	                layer.setLabel(layerElement.getElementsByTagName("layerDisplayName").item(0).getTextContent());
 	                
 	                // finally, add the node and increment the itemId
-	                layerNode.setParent(parent);
-	                parent.getChildren().add(layerNode);
+//	                layerNode.setParent(parent);
+//	                parent.getChildren().add(layerNode);
 	                id++;
                 }
 	        }

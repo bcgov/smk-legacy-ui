@@ -8,13 +8,18 @@
     <artifactId>smk-parent</artifactId>
     <version>1.0.0-SNAPSHOT</version>
   </parent>
-	
+
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
   <dependencies>
+		<dependency>
+		    <groupId>ca.bc.gov.databc</groupId>
+			<artifactId>smks-model</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
     <dependency>
 		<groupId>javax.servlet</groupId>
 		<artifactId>jstl</artifactId>
@@ -64,7 +69,10 @@
 	    <groupId>org.apache.commons</groupId>
 	    <artifactId>commons-lang3</artifactId>
 	    <version>3.6</version>
-	</dependency>	
+	</dependency>
   </dependencies>
   <name>smk-ui</name>
+	<build>
+		<finalName>smk-ui</finalName>
+	</build>
 </project>

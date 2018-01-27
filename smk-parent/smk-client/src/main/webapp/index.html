@@ -1,0 +1,68 @@
+<html>
+    <head>
+        <title>STANDALONE</title>
+    </head>
+    <body >
+        <div id="smk-map-frame"></div>
+
+        <!-- <script src="/service/lib/smk-bootstrap.js" smk-standalone smk-config="LAND-TENURES-1.json"> -->
+        <!-- <script src="/service/lib/smk-bootstrap.js" smk-standalone smk-config="STATIC-DATA.json"> -->
+        <script src="lib/smk-bootstrap.js" smk-standalone smk-config="STATIC-DATA.json, LAND-TENURES-1.json, BCGW-ESRI.json, LAND-TENURES-2.json, BASE-LAYERS.json, WATER-MANAGEMENT.json">
+        return {
+            "_id": "1",
+            "_rev": "29-1442dc3c9b983dc90e19edb49915fa06",
+            "smkId": "bens-app",
+            "smkRevision": 1,
+            "name": "SMK Demo App",
+            "createdBy": "bwj",
+            "viewerType": "leaflet",
+            "published": false,
+
+            "surround": {
+                "title": "Standalone SMK Demo App",
+                "surroundType": "default",
+                "showHeader": true
+                // "aboutPage": "This application is a demonstration of Simple Mapping Kit (SMK).<p>It is a standalone web app."
+                // "showSidebar": true
+            },
+
+            "viewport": {
+                "bbox": [ -139.1782, 47.6039, -110.3533, 60.5939 ],
+                // "baseMap": "Streets",
+                "baseMap": "Topographic"
+            },
+
+            "tools": {
+                "measure": true,
+                "scale": true,
+                "scaleFactor": true,
+                "coordinate": true,
+                "minimap": true,
+                "markup": true,
+                "directions": false,
+                "pan": true,
+                "zoom": {
+                    "mouseWheel": false
+                },
+
+                "about": {
+                    "startOpen": true,
+                    "content": "This application is a demonstration of Simple Mapping Kit (SMK).<p>It is a standalone web app."
+                },
+                "baseMaps": true,
+                "layers": true,
+                // "legend": true,
+                "identify": true,
+                "select": true
+                // "sidebar": {
+                //     "container": "smk-sidebar",
+                //     "pane": {
+                //     }
+                // },
+            }
+
+        }
+        </script>
+    </body>
+</html>
+
