@@ -88,7 +88,7 @@ RUN wget -O /tmp/smks-api.war $APPBIN/smks-api/1.0.0/smks-api-1.0.0.war \
   && mkdir -p /usr/local/tomcat/webapps/smks-api \
   && unzip /tmp/smks-api.war -d /usr/local/tomcat/webapps/smks-api
 
-RUN cat "couchdb.admin.password=$COUCHPW" >> /usr/local/tomcat/webapps/smks-api/WEB-INF/classes/application.properties
+RUN echo "couchdb.admin.password=$COUCHPW" >> /usr/local/tomcat/webapps/smks-api/WEB-INF/classes/application.properties
 
 #Setup runtime configuration
 ##Generate GWA required configuration
