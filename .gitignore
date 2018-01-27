@@ -46,3 +46,4 @@ smk-parent/smks-api/.settings/org.eclipse.wst.jsdt.ui.superType.container
 smk-parent/smks-api/.settings/org.eclipse.wst.jsdt.ui.superType.name
 smk-parent/smks-api/.settings/org.eclipse.wst.validation.prefs
 smk-parent/smk-ui/src/main/webapp/resources/js/leaflet.history.js
+smk-parent/smk-client/target
