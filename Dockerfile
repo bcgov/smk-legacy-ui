@@ -85,7 +85,7 @@ RUN wget -O /tmp/smk-ui.war $APPBIN/smk-ui/1.0.0/smk-ui-1.0.0.war \
 #Copy SMK api
 RUN wget -O /tmp/smks-api.war $APPBIN/smks-api/1.0.0/smks-api-1.0.0.war \
   # && cp /tmp/smks-api.war /usr/local/tomcat/webapps
-  && mkpath -p /usr/local/tomcat/webapps/smks-api \
+  && mkdir -p /usr/local/tomcat/webapps/smks-api \
   && unzip /tmp/smks-api.war -d /usr/local/tomcat/webapps/smks-api
 
 RUN cat "couchdb.admin.password=$COUCHPW" >> /usr/local/tomcat/webapps/smks-api/WEB-INF/classes/application.properties
