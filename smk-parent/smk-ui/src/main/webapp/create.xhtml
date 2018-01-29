@@ -4,37 +4,37 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://java.sun.com/jsf/html"
       xmlns:f="http://java.sun.com/jsf/core"
-      xmlns:p="http://primefaces.org/ui" 
+      xmlns:p="http://primefaces.org/ui"
    	  xmlns:ui="http://java.sun.com/jsf/facelets"
    	  xmlns:c="http://java.sun.com/jsp/jstl/core">
     <h:head>
     	<title>Digital Mashup Framework</title>
-  
+
     	<!-- css links -->
     	<h:outputStylesheet library="css" name="materialize.css"  />
     	<h:outputStylesheet library="css" name="dmf.css"  />
     	<h:outputStylesheet library="css" name="fonts.css"  />
     	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
-    	 
+
     	<!-- JS links -->
 		<h:outputScript library="js" name="materialize.js" />
 		<h:outputScript library="js" name="dmf.js" target="body" />
-		
-		<link rel="stylesheet" 
+
+		<link rel="stylesheet"
 			  href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css"
 			  integrity="sha512-M2wvCLH6DSRazYeZRIm1JnYyh22purTM+FDB5CsyxtQJYeKq83arPe5wgbNmcFXGqiSH2XR8dT/fJISVA1r/zQ=="
 			  crossorigin=""/>
-		
+
 		<script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js"
 			    integrity="sha512-lInM/apFSqyy1o6s89K4iQUKg6ppXEgsVxT35HbzUupEVRh2Eu9Wdl4tHj7dZO0s1uvplcYGmt3498TtHq+log=="
 			    crossorigin=""></script>
-			    
+
 		<script src="https://unpkg.com/esri-leaflet@2.1.0/dist/esri-leaflet.js"
     				integrity="sha512-Tojl3UMd387f6DdAJlo+fKfJZiP55fYT+6Y58yKbHydnueOdSFOxrgLPuUxm7VW1szEt3hZVwv3V2sSUCuT35w=="
     				crossorigin=""></script>
-    	
+
     	<link rel="stylesheet" href="https://js.arcgis.com/4.4/esri/css/main.css" />
-    	
+
     </h:head>
     <h:body class="grey lighten-4" style="height: 100vh; position: relative; font-family: 'Avenir Next W00','Helvetica Neue',Helvetica,Arial,sans-serif;">
    		<div id="header" class="header nrpp-blue-dark">
@@ -59,12 +59,12 @@
 													<h:outputLabel for="createMashupForm:mashupName" value="Mashup Name" />
 												</div>
 											</div>
-											<div class="row">
+											<!-- <div class="row">
 												<div class="col s12 input-field">
-													<h:selectBooleanCheckbox id="showHeader" value="#{CreateBean.resource.showHeader}" />
+													<h:selectBooleanCheckbox id="showHeader" value="#{'CreateBean.resource.showHeader'}" />
       												<label for="createMashupForm:showHeader">Show a title bar</label>
 												</div>
-											</div>
+											</div> -->
 											<div class="row" style="margin-top: 50px;">
 												<div class="col s12">
 													<p>What kind of map service do you want to use?</p>
@@ -72,23 +72,23 @@
 											</div>
 											<div class="row">
 												<div class="col s12 input-field">
-													<h:selectOneRadio value="#{CreateBean.resource.viewerType}" required="true" requireMessage="Please select a map service. If you're not sure, go with Leaflet (it's pretty awesome)">
+													<h:selectOneRadio value="#{CreateBean.resource.viewer.type}" required="true" requireMessage="Please select a map service. If you're not sure, go with Leaflet (it's pretty awesome)">
 													   	<f:selectItem itemValue="leaflet" itemLabel="Leaflet" />
-													   	<f:selectItem itemValue="esri2d" itemLabel="ESRI ArcGIS 2D" />
-													   	<f:selectItem itemValue="esri3d" itemLabel="ESRI ArcGIS 3D" />
+													   	<f:selectItem itemValue="esri2d" itemLabel="ESRI ArcGIS 2D" itemDisabled="true"/>
+													   	<f:selectItem itemValue="esri3d" itemLabel="ESRI ArcGIS 3D" itemDisabled="true" />
 													   	<p:ajax update="createMashupForm" />
 													</h:selectOneRadio>
 												</div>
 											</div>
 											<div class="row">
 												<div class="col s12">
-													<c:if test="#{CreateBean.resource.viewerType eq 'leaflet'}">
+													<c:if test="#{CreateBean.resource.viewer.type eq 'leaflet'}">
 													<p>A simple, light-weight webmapping client. This client supports DataBC's catalog, WMS, ESRI feature services, KML, and json (wkt, csv, gtx and shapefile sources coming soon!). Leaflet can run in most modern browsers (IE11, Edge, Firefox, Chrome, Safari, Opera)</p>
 													</c:if>
-													<c:if test="#{CreateBean.resource.viewerType eq 'esri2d'}">
+													<c:if test="#{CreateBean.resource.viewer.type eq 'esri2d'}">
 													<p>The ESRI javascript framework 4.4. This map service only supports the DataBC Catalog. ESRI ArcGIS for JS can run in most modern browsers (IE11, Edge, Firefox, Chrome, Safari, Opera)</p>
 													</c:if>
-													<c:if test="#{CreateBean.resource.viewerType eq 'esri3d'}">
+													<c:if test="#{CreateBean.resource.viewer.type eq 'esri3d'}">
 													<p>The ESRI javascript framework 4.4 for 3D maps. This map service only supports the DataBC Catalog, and requires a WebGL enabled browser.</p>
 													</c:if>
 												</div>
@@ -102,7 +102,7 @@
 												<div class="col s12 input-field">
 													<p>Select your default basemap. Note that all basemaps will be available to the mashup,
 													this is just the basemap that displays by default.</p>
-													<h:selectOneRadio value="#{CreateBean.resource.defaultBasemap}" required="true" requireMessage="Please select a default basemap. If you're not sure, go with DataBC Default." layout="pageDirection">
+													<h:selectOneRadio value="#{CreateBean.resource.viewer.baseMap}" required="true" requireMessage="Please select a default basemap. If you're not sure, go with DataBC Default." layout="pageDirection">
 													   	<!-- f:selectItem itemValue="dataBCDefault" itemLabel="DataBC Default" />
 													   	<f:selectItem itemValue="dataBCRoads" itemLabel="DataBC Roads" / -->
 													   	<f:selectItem itemValue="Topographic" itemLabel="ESRI Topographic" />
@@ -126,20 +126,20 @@
 													<table>
 														<tr><td><p>Add Layers from...</p></td></tr>
 														<tr><td><a class="waves-effect waves-dark btn grey lighten-2" href="#layerCatalogBox" style="width: 100%;">DataBC Layer Catalog</a></td></tr>
-														<c:if test="#{CreateBean.resource.viewerType eq 'leaflet'}"><tr><td><a class="waves-effect waves-dark btn grey lighten-2" href="#wmsServiceBox" style="width: 100%;">WMS Service</a></td></tr></c:if>
+														<c:if test="#{CreateBean.resource.viewer.type eq 'leaflet'}"><tr><td><a class="waves-effect waves-dark btn grey lighten-2" href="#wmsServiceBox" style="width: 100%;">WMS Service</a></td></tr></c:if>
 														<tr><td><a class="waves-effect waves-dark btn grey lighten-2" href="#esriFeatureServiceBox" style="width: 100%;">ESRI Feature Service</a></td></tr>
-														<c:if test="#{CreateBean.resource.viewerType eq 'leaflet'}"><tr><td><a class="waves-effect waves-dark btn grey lighten-2" href="#importKmlBox" style="width: 100%;">KML Import</a></td></tr></c:if>
-														<c:if test="#{CreateBean.resource.viewerType eq 'leaflet'}"><tr><td><a class="waves-effect waves-dark btn grey lighten-2" href="#importGeoJsonBox" style="width: 100%;">GeoJSON Import</a></td></tr></c:if>
+														<c:if test="#{CreateBean.resource.viewer.type eq 'leaflet'}"><tr><td><a class="waves-effect waves-dark btn grey lighten-2" href="#importKmlBox" style="width: 100%;">KML Import</a></td></tr></c:if>
+														<c:if test="#{CreateBean.resource.viewer.type eq 'leaflet'}"><tr><td><a class="waves-effect waves-dark btn grey lighten-2" href="#importGeoJsonBox" style="width: 100%;">GeoJSON Import</a></td></tr></c:if>
 													</table>
 												</div>
 												<div class="col s6">
 													<p>My Layers</p>
 													<p:outputPanel style="overflow: auto; display: block; width: 100%; height: 320px;">
-														<p:tree id="layerList" 
-																value="#{CreateBean.layerNodes}" 
-																var="node" 
+														<p:tree id="layerList"
+																value="#{CreateBean.layerNodes}"
+																var="node"
 																selectionMode="single"
-												                draggable="true" 
+												                draggable="true"
 												                droppable="true"
 												                dynamic="true"
 												                selection="#{CreateBean.selectedLayerNode}"
@@ -168,11 +168,11 @@
 											<p:messages autoUpdate="true" showDetail="true" closable="true"/>
 											<div class="row">
 												<div class="col s12">
-													<p:pickList id="toolsPicklist" 
-																value="#{CreateBean.tools}" 
+													<p:pickList id="toolsPicklist"
+																value="#{CreateBean.tools}"
 																var="tool"
-																itemLabel="#{tool}" 
-																itemValue="#{tool}" 
+																itemLabel="#{tool}"
+																itemValue="#{tool}"
 																responsive="true">
                 										<f:facet name="sourceCaption">Available Tools</f:facet>
         												<f:facet name="targetCaption">Added Tools</f:facet>
@@ -225,11 +225,11 @@
 						<div class="row" style="height: 100%;">
 							<div style="height: 100%; width: 320px;">
 								<p:outputPanel style="overflow: auto; display: block; width: 320px;height: 100%;">
-									<p:tree id="catalog" 
-											value="#{CreateBean.getCatalogLayers()}" 
-											var="node" 
+									<p:tree id="catalog"
+											value="#{CreateBean.getCatalogLayers()}"
+											var="node"
 											selectionMode="single"
-							                draggable="false" 
+							                draggable="false"
 							                droppable="false"
 							                selection="#{CreateBean.selectedLayerNode}"
 							                dynamic="true"
@@ -340,11 +340,11 @@
 						<div class="row">
 							<div class="col s6">
 								<p:dataTable id="allServiceLayers"
-											 styleClass="bordered highlight responsive-table" 
-											 var="lyr" 
-											 value="#{CreateBean.allServiceLayers}" 
-											 selectionMode="single" 
-											 selection="#{CreateBean.selectedServiceLayer}" 
+											 styleClass="bordered highlight responsive-table"
+											 var="lyr"
+											 value="#{CreateBean.allServiceLayers}"
+											 selectionMode="single"
+											 selection="#{CreateBean.selectedServiceLayer}"
 											 rowKey="#{lyr.title}"
 											 rows="10"
 					                         paginator="true"
@@ -361,11 +361,11 @@
 							</div>
 							<div class="col s6">
 								<p:dataTable id="allServiceLayerStyles"
-											 styleClass="bordered highlight responsive-table" 
-											 var="lyrStyle" 
-											 value="#{CreateBean.selectedServiceLayer.styles}" 
-											 selectionMode="single" 
-											 selection="#{CreateBean.selectedServiceStyle}" 
+											 styleClass="bordered highlight responsive-table"
+											 var="lyrStyle"
+											 value="#{CreateBean.selectedServiceLayer.styles}"
+											 selectionMode="single"
+											 selection="#{CreateBean.selectedServiceStyle}"
 											 rowKey="#{lyrStyle}">
 								     <f:facet name="header">
 								         Service Layer Styles
@@ -468,10 +468,10 @@
 						</div>
 						<div class="row">
 							<div class="col s12 input-field">
-								<p:fileUpload ajax="true" 
-											  mode="advanced" 
-											  fileLimit="1" 
-											  sizeLimit="52428800" 
+								<p:fileUpload ajax="true"
+											  mode="advanced"
+											  fileLimit="1"
+											  sizeLimit="52428800"
 											  invalidSizeMessage="The selected file exceeds the limit of 50 MB"
 											  fileUploadListener="#{CreateBean.uploadDocument}"  />
 							</div>
@@ -506,7 +506,7 @@
 								<h:outputLabel for="kmlForm:kmlStrokeOpacity" value="Line Opacity" />
 							</div>
 							<div class="col s4 input-field">
-								<p:colorPicker id="kmlStrokeColor" value="#{CreateBean.kmlStrokeColor}" /> 
+								<p:colorPicker id="kmlStrokeColor" value="#{CreateBean.kmlStrokeColor}" />
 							</div>
 						</div>
 						<div class="row">
@@ -515,7 +515,7 @@
 								<h:outputLabel for="kmlForm:kmlFillOpacity" value="Fill Opacity" />
 							</div>
 							<div class="col s6 input-field">
-								<p:colorPicker id="kmlFillColor" value="#{CreateBean.kmlFillColor}" /> 
+								<p:colorPicker id="kmlFillColor" value="#{CreateBean.kmlFillColor}" />
 							</div>
 						</div>
 						<div class="row">
@@ -548,10 +548,10 @@
 						</div>
 						<div class="row">
 							<div class="col s12 input-field">
-								<p:fileUpload ajax="true" 
-											  mode="advanced" 
-											  fileLimit="1" 
-											  sizeLimit="52428800" 
+								<p:fileUpload ajax="true"
+											  mode="advanced"
+											  fileLimit="1"
+											  sizeLimit="52428800"
 											  invalidSizeMessage="The selected file exceeds the limit of 50 MB"
 											  fileUploadListener="#{CreateBean.uploadDocument}"  />
 							</div>
@@ -586,7 +586,7 @@
 								<h:outputLabel for="jsonForm:jsonStrokeOpacity" value="Line Opacity" />
 							</div>
 							<div class="col s4 input-field">
-								<p:colorPicker id="jsonStrokeColor" value="#{CreateBean.jsonStrokeColor}" /> 
+								<p:colorPicker id="jsonStrokeColor" value="#{CreateBean.jsonStrokeColor}" />
 							</div>
 						</div>
 						<div class="row">
@@ -595,7 +595,7 @@
 								<h:outputLabel for="jsonForm:jsonFillOpacity" value="Fill Opacity" />
 							</div>
 							<div class="col s6 input-field">
-								<p:colorPicker id="jsonFillColor" value="#{CreateBean.jsonFillColor}" /> 
+								<p:colorPicker id="jsonFillColor" value="#{CreateBean.jsonFillColor}" />
 							</div>
 						</div>
 						<div class="row">
@@ -613,7 +613,7 @@
 		</div>
 		<div id="footer" class="footer nrpp-blue-dark">
 		</div>
-		
+
 		<div class="spinner-modal" id="waitingDialog">
 			<div class="spinner-modal-content">
 				<div class="spinner-modal-header">
@@ -641,7 +641,7 @@
 			      inDuration: 300, // Transition in duration
 			      outDuration: 200
 			});
-			
+
 			// init background map
 	    	var map = L.map('map', { zoomControl: false });
 	    	map.touchZoom.disable();
@@ -649,76 +649,76 @@
 			map.scrollWheelZoom.disable();
 			map.boxZoom.disable();
 			map.keyboard.disable();
-	    
+
 	    	var rndLat = Math.random() * (60 - 48.3) + 47.294;
 	    	var rndLon = (Math.random() * (124 - 111.291) + 114) * -1;
 	    	var rndZoom = Math.floor(Math.random() * (12 - 9) + 9);
-	    
+
 	    	map.setView(new L.latLng(rndLat, rndLon), rndZoom);
-                
+
 	    	var bm = L.esri.basemapLayer("Topographic");
-			
+
 			map.addLayer(bm);
 		});
-		
+
 		function addMpcmLayer()
 		{
 			addLayer();
 		}
-		
+
 		function addWmsLayer()
 		{
 			addLayerWms();
 		}
-		
+
 		function addFsLayer()
 		{
 			addLayerFs();
 		}
-		
+
 		function addKmlLayer()
 		{
 			addLayerKml();
 		}
-		
+
 		function addJsonLayer()
 		{
 			addLayerJson();
 		}
-		
+
 		function removeLayer()
 		{
 			removeLayer();
 		}
-		
+
 		function editLayer()
 		{
 			editLayer();
 		}
-		
+
 		function save()
 		{
 			save();
 		}
-		
+
 		function saveAndPublish()
 		{
 			saveAndPublish();
 		}
-		
+
 		function buildWmsLayerList()
 		{
 			buildWmsLayers();
 			openModal();
 		}
-		
+
 		function openModal()
 		{
 		    var modal = document.getElementById('waitingDialog');
 		    modal.style.display = "block";
 		    $('body').addClass("body-no-scroll");
 		}
-		
+
 		function closeModal()
 		{
 			var modal = document.getElementById('waitingDialog');

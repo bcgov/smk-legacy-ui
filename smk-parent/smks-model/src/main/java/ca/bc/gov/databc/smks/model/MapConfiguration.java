@@ -28,7 +28,7 @@ public class MapConfiguration extends CouchDbDocument implements Cloneable
 
 	// settings
 	private MapSurround surround;
-	private MapViewport viewport;
+	private MapViewer viewer;
 //	private MapTools tools;
 
 	// private String viewerType;
@@ -40,7 +40,7 @@ public class MapConfiguration extends CouchDbDocument implements Cloneable
 	// private boolean allowMouseWheelZoom;
 
 	// // layer and tool configs
-    private List<Tool> tools; 
+    private List<Tool> tools;
 	// layer configs
 	private List<Layer> layers;
 
@@ -56,8 +56,8 @@ public class MapConfiguration extends CouchDbDocument implements Cloneable
 		this.setIsPublished(mapConfiguration.getIsPublished());
 
 		this.setSurround(mapConfiguration.getSurround().clone());
-		this.setViewport(mapConfiguration.getViewport().clone());
-		
+		this.setViewer(mapConfiguration.getViewer().clone());
+
 		for(Tool tool : tools)
 		{
 			mapConfiguration.getTools().add(tool.clone());
@@ -96,11 +96,11 @@ public class MapConfiguration extends CouchDbDocument implements Cloneable
 	public void setSurround(MapSurround surround) { this.surround = surround; }
 
 
-	public MapViewport getViewport() {
-		if ( viewport == null ) viewport = new MapViewport();
-		return this.viewport;
+	public MapViewer getViewer() {
+		if ( viewer == null ) viewer = new MapViewer();
+		return this.viewer;
 	}
-	public void setViewport(MapViewport viewport) { this.viewport = viewport; }
+	public void setViewer(MapViewer viewer) { this.viewer = viewer; }
 
 
 	public List<Tool> getTools() {

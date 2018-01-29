@@ -4,18 +4,18 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 @JsonInclude(Include.NON_NULL)
-public class MapViewport implements Cloneable
+public class MapViewer implements Cloneable
 {
 	private String type;
 	private Double[] initialExtent;
 	private String baseMap;
 
-	public MapViewport() { }
+	public MapViewer() { }
 
-	protected MapViewport( MapViewport mapViewport ) {
-		this.setType(mapViewport.getType());
-		this.setInitialExtent(mapViewport.getInitialExtent().clone());
-		this.setBaseMap(mapViewport.getBaseMap());
+	protected MapViewer( MapViewer mapViewer ) {
+		this.setType(mapViewer.getType());
+		this.setInitialExtent(mapViewer.getInitialExtent().clone());
+		this.setBaseMap(mapViewer.getBaseMap());
 	}
 
 	public String getType() { return type; }
@@ -30,9 +30,9 @@ public class MapViewport implements Cloneable
 	public String getBaseMap() { return baseMap; }
 	public void setBaseMap(String baseMap) { this.baseMap = baseMap; }
 
-	public MapViewport clone()
+	public MapViewer clone()
 	{
-		MapViewport clone = new MapViewport( this );
+		MapViewer clone = new MapViewer( this );
 
 		return clone;
 	}

@@ -118,7 +118,7 @@ public class CreateBean implements Serializable
 		// init the DMF Resource object that will be stored in couch, or read from couch
 		resource = new MapConfiguration();
 		// resource.setShowHeader(true);
-		resource.getViewport().setType("leaflet");
+		resource.getViewer().setType("leaflet");
 
 		// init the root node for the layer listing
 		layerNodes = new DefaultTreeNode("root", null);
@@ -162,9 +162,9 @@ public class CreateBean implements Serializable
 
 				for (Tool.Type toolType : Tool.Type.values() ) {
 					toolsTarget.add(toolType.create());
-					toolsSource.remove(toolType.create());				
+					toolsSource.remove(toolType.create());
 				}
-				
+
 				resource.getLayers().clear();
 //				resource.getTools().clear();
 
@@ -575,7 +575,7 @@ public class CreateBean implements Serializable
 			Layer data = (Layer) node.getData();
 
 			if(container != null && container instanceof CollectionLayer )
-			{				
+			{
 				((CollectionLayer)container).getLayers().add(data);
 			}
 			else
