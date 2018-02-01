@@ -75,7 +75,7 @@ public class CreateBean implements Serializable
 	private ToolConverter converter;
 
 	// for WMS popup
-	private boolean wmsIsVisible;
+	private boolean wmsIsVisible = true;
 	private double wmsOpacity = 0.65;
 	private String wmsLayerTitle;
 	private String wmsServiceUrl = "https://openmaps.gov.bc.ca/geo/pub/ows";
@@ -818,6 +818,16 @@ public class CreateBean implements Serializable
 	public void setSelectedServiceLayer(WMSInfoLayer selectedServiceLayer)
 	{
 		this.selectedServiceLayer = selectedServiceLayer;
+		if ( selectedServiceLayer == null ) return;
+
+		wmsLayerTitle = selectedServiceLayer.getTitle();
+
+		if ( !selectedServiceLayer.getStyles().isEmpty() ) {
+			selectedServiceStyle = selectedServiceLayer.getStyles().get(0);
+		}
+
+		RequestContext.getCurrentInstance().update("wmsForm");
+		RequestContext.getCurrentInstance().execute("Materialize.updateTextFields();");
 	}
 
 	public WMSInfoStyle getSelectedServiceStyle()
