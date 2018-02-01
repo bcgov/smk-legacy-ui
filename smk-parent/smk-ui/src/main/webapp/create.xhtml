@@ -127,10 +127,12 @@
 														<tr><td><p>Add Layers from...</p></td></tr>
 														<tr><td><a class="waves-effect waves-dark btn grey lighten-2" href="#layerCatalogBox" style="width: 100%;">DataBC Layer Catalog</a></td></tr>
 														<c:if test="#{CreateBean.resource.viewer.type eq 'leaflet'}"><tr><td><a class="waves-effect waves-dark btn grey lighten-2" href="#wmsServiceBox" style="width: 100%;">WMS Service</a></td></tr></c:if>
-														<tr><td><a class="waves-effect waves-dark btn grey lighten-2" href="#esriFeatureServiceBox" style="width: 100%;">ESRI Feature Service</a></td></tr>
-														<c:if test="#{CreateBean.resource.viewer.type eq 'leaflet'}"><tr><td><a class="waves-effect waves-dark btn grey lighten-2" href="#importKmlBox" onclick="resetKml()" style="width: 100%;">KML Import</a></td></tr></c:if>
-														<p:remoteCommand name="resetKml" actionListener="#{CreateBean.resetKml()}" />
-														<c:if test="#{CreateBean.resource.viewer.type eq 'leaflet'}"><tr><td><a class="waves-effect waves-dark btn grey lighten-2" href="#importGeoJsonBox" style="width: 100%;">GeoJSON Import</a></td></tr></c:if>
+														<!-- <tr><td><a class="waves-effect waves-dark btn grey lighten-2" href="#esriFeatureServiceBox" style="width: 100%;">ESRI Feature Service</a></td></tr> -->
+														<c:if test="#{CreateBean.resource.viewer.type eq 'leaflet'}"><tr><td><a class="waves-effect waves-dark btn grey lighten-2" href="#importBox" onclick="initImportKml()" style="width: 100%;">KML Import</a></td></tr></c:if>
+														<c:if test="#{CreateBean.resource.viewer.type eq 'leaflet'}"><tr><td><a class="waves-effect waves-dark btn grey lighten-2" href="#importBox" onclick="initImportJson()" style="width: 100%;">GeoJSON Import</a></td></tr></c:if>
+
+														<p:remoteCommand name="initImportKml" actionListener="#{CreateBean.initImportKml()}" />
+														<p:remoteCommand name="initImportJson" actionListener="#{CreateBean.initImportJson()}" />
 													</table>
 												</div>
 												<div class="col s6">
@@ -313,6 +315,8 @@
 					<a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat">Done</a>
 				</div>
 			</div>
+
+
 			<div id="wmsServiceBox" class="modal modal-fixed-footer">
 				<div class="modal-content">
 					<h4>WMS Service</h4>
@@ -402,6 +406,8 @@
 					<a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat">Done</a>
 				</div>
 			</div>
+
+
 			<div id="esriFeatureServiceBox" class="modal modal-fixed-footer">
 				<div class="modal-content">
 					<h4>ESRI Feature Service</h4>
@@ -458,165 +464,87 @@
 					<a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat">Done</a>
 				</div>
 			</div>
-			<div id="importKmlBox" class="modal modal-fixed-footer">
-				<div class="modal-content">
-					<h4>Import KML File</h4>
-					<h:form id="kmlForm">
-						<div class="row">
-							<div class="col s12 input-field">
-								<p:inputText id="kmlTitle" value="#{CreateBean.kmlLayerTitle}" required="true" requiredMessage="A title is required." />
-								<h:outputLabel for="kmlForm:kmlTitle" value="Layer Title" />
+
+
+			<div id="importBox" class="modal modal-fixed-footer">
+				<h:form id="importForm">
+					<div class="modal-content">
+						<h4>Import #{CreateBean.importTitle}</h4>
+							<div class="row">
+								<div class="col s12 input-field">
+									<p:fileUpload ajax="true"
+										update="@this"
+										mode="advanced"
+										fileLimit="1"
+										sizeLimit="52428800"
+										invalidSizeMessage="The selected file exceeds the limit of 50 MB"
+										fileUploadListener="#{CreateBean.uploadDocument}"
+									/>
+								</div>
 							</div>
-						</div>
-						<div class="row">
-							<div class="col s12 input-field">
-								<p:fileUpload ajax="true"
-											  update="@this"
-											  mode="advanced"
-											  fileLimit="1"
-											  sizeLimit="52428800"
-											  invalidSizeMessage="The selected file exceeds the limit of 50 MB"
-											  fileUploadListener="#{CreateBean.uploadDocument}"  />
+							<div class="row">
+								<div class="col s12 input-field">
+									<p:inputText id="Title" value="#{CreateBean.importLayerTitle}" required="true" requiredMessage="A title is required." />
+									<h:outputLabel for="importForm:Title" value="Layer Title" />
+								</div>
 							</div>
-						</div>
-						<div class="row">
-							<div class="col s12 input-field" style="padding: 0px; margin-left: 0px; margin-right: 0px; margin-bottom: 0px; margin-top: -16px;">
-								<h:selectBooleanCheckbox id="kmlLayerVisible" value="#{CreateBean.kmlIsVisible}" />
-								<h:outputLabel for="kmlForm:kmlLayerVisible" value="Visible by default" />
+							<div class="row">
+								<div class="col s4 input-field">
+									<h:selectBooleanCheckbox id="LayerVisible" value="#{CreateBean.importIsVisible}" />
+									<h:outputLabel for="importForm:LayerVisible" value="Visible by default" />
+								</div>
+								<div class="col s4 input-field">
+									<h:selectBooleanCheckbox id="ClusterPoints" value="#{CreateBean.importClusterPoints}" />
+									<h:outputLabel for="importForm:ClusterPoints" value="Cluster point features" />
+								</div>
+								<!-- <div class="col s4 input-field">
+									<h:selectBooleanCheckbox id="HeatmapPoints" value="#{'CreateBean.importHeatmapPoints'}" />
+									<h:outputLabel for="importForm:HeatmapPoints" value="Point features as Heatmap (this will add another layer)" />
+								</div> -->
 							</div>
-						</div>
-						<div class="row">
-							<div class="col s4 input-field">
-								<p:inputText id="kmlOpacity" value="#{CreateBean.kmlOpacity}" />
-								<h:outputLabel for="kmlForm:kmlOpacity" value="Layer Opacity" />
+							<div class="row">
+								<div class="col s4 input-field">
+									<p:inputText id="Opacity" value="#{CreateBean.importOpacity}" />
+									<h:outputLabel for="importForm:Opacity" value="Layer Opacity" />
+								</div>
 							</div>
-							<div class="col s4 input-field">
-								<h:selectBooleanCheckbox id="kmlClusterPoints" value="#{CreateBean.kmlClusterPoints}" />
-								<h:outputLabel for="kmlForm:kmlClusterPoints" value="Cluster point features" />
+							<div class="row">
+								<div class="col s4 input-field">
+									<p:inputText id="StrokeOpacity" value="#{CreateBean.importStrokeOpacity}" />
+									<h:outputLabel for="importForm:StrokeOpacity" value="Line Opacity" />
+								</div>
+								<div class="col s4 input-field">
+									<p:inputText id="StrokeWidth" value="#{CreateBean.importStrokeWidth}" />
+									<h:outputLabel for="importForm:StrokeWidth" value="Line Width" />
+								</div>
+								<div class="col s4 input-field">
+									<p:colorPicker id="StrokeColor" value="#{CreateBean.importStrokeColor}" />
+								</div>
 							</div>
-							<div class="col s4 input-field">
-								<h:selectBooleanCheckbox id="kmlHeatmapPoints" value="#{CreateBean.kmlHeatmapPoints}" />
-								<h:outputLabel for="kmlForm:kmlHeatmapPoints" value="Point features as Heatmap (this will add another layer)" />
+							<div class="row">
+								<div class="col s4 input-field">
+									<p:inputText id="FillOpacity" value="#{CreateBean.importFillOpacity}" />
+									<h:outputLabel for="importForm:FillOpacity" value="Fill Opacity" />
+								</div>
+								<div class="col s4 input-field">
+									<p:colorPicker id="FillColor" value="#{CreateBean.importFillColor}" />
+								</div>
 							</div>
-						</div>
-						<div class="row">
-							<div class="col s4 input-field">
-								<p:inputText id="kmlStrokeWidth" value="#{CreateBean.kmlStrokeWidth}" />
-								<h:outputLabel for="kmlForm:kmlStrokeWidth" value="Line Width" />
-							</div>
-							<div class="col s4 input-field">
-								<p:inputText id="kmlStrokeOpacity" value="#{CreateBean.kmlStrokeOpacity}" />
-								<h:outputLabel for="kmlForm:kmlStrokeOpacity" value="Line Opacity" />
-							</div>
-							<div class="col s4 input-field">
-								<p:colorPicker id="kmlStrokeColor" value="#{CreateBean.kmlStrokeColor}" />
-							</div>
-						</div>
-						<div class="row">
-							<div class="col s6 input-field">
-								<p:inputText id="kmlFillOpacity" value="#{CreateBean.kmlFillOpacity}" />
-								<h:outputLabel for="kmlForm:kmlFillOpacity" value="Fill Opacity" />
-							</div>
-							<div class="col s6 input-field">
-								<p:colorPicker id="kmlFillColor" value="#{CreateBean.kmlFillColor}" />
-							</div>
-						</div>
-						<div class="row">
-							<div class="col s12">
-								<a class="waves-effect waves-light btn light-blue lighten-2" href="#" onclick="addKmlLayer();">Add Layer to Mashup</a>
-								<p:remoteCommand name="addLayerKml" actionListener="#{CreateBean.addSelectedKml()}" />
-							</div>
-						</div>
-					</h:form>
-				</div>
-				<div class="modal-footer">
-					<a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat">Done</a>
-				</div>
-			</div>
-			<div id="importGeoJsonBox" class="modal modal-fixed-footer">
-				<div class="modal-content">
-					<h4>Import GeoJSON</h4>
-					<h:form id="jsonForm">
-						<div class="row">
-							<div class="col s12 input-field">
-								<p:inputText id="jsonTitle" value="#{CreateBean.jsonLayerTitle}" required="true" requiredMessage="A title is required." />
-								<h:outputLabel for="jsonForm:jsonTitle" value="Layer Title" />
-							</div>
-						</div>
-						<div class="row">
-							<div class="col s12">
-								<p>GeoJSON data used by DMF is expected to be in Feature Collections. Any submitted GeoJSON data that is not stored within a feature collection will be ignored.</p>
-								<p>Example: {"type":"FeatureCollection","features":[{"type":"Feature","geometry":{"type":"GeometryCollection","geometries":[{"type":"Point","coordinates":[-125, 50]}]}}]}</p>
-							</div>
-						</div>
-						<div class="row">
-							<div class="col s12 input-field">
-								<p:fileUpload ajax="true"
-											  update="@this"
-											  mode="advanced"
-											  fileLimit="1"
-											  sizeLimit="52428800"
-											  invalidSizeMessage="The selected file exceeds the limit of 50 MB"
-											  fileUploadListener="#{CreateBean.uploadDocument}"  />
-							</div>
-						</div>
-						<div class="row">
-							<div class="col s12 input-field" style="padding: 0px; margin-left: 0px; margin-right: 0px; margin-bottom: 0px; margin-top: -16px;">
-								<h:selectBooleanCheckbox id="jsonLayerVisible" value="#{CreateBean.jsonIsVisible}" />
-								<h:outputLabel for="jsonForm:jsonLayerVisible" value="Visible by default" />
-							</div>
-						</div>
-						<div class="row">
-							<div class="col s4 input-field">
-								<p:inputText id="jsonOpacity" value="#{CreateBean.jsonOpacity}" />
-								<h:outputLabel for="jsonForm:jsonOpacity" value="Layer Opacity" />
-							</div>
-							<div class="col s4 input-field">
-								<h:selectBooleanCheckbox id="jsonClusterPoints" value="#{CreateBean.jsonClusterPoints}" />
-								<h:outputLabel for="jsonForm:jsonClusterPoints" value="Cluster point features" />
-							</div>
-							<div class="col s4 input-field">
-								<h:selectBooleanCheckbox id="jsonHeatmapPoints" value="#{CreateBean.jsonHeatmapPoints}" />
-								<h:outputLabel for="jsonForm:jsonHeatmapPoints" value="Point features as Heatmap (this will add another layer)" />
-							</div>
-						</div>
-						<div class="row">
-							<div class="col s4 input-field">
-								<p:inputText id="jsonStrokeWidth" value="#{CreateBean.jsonStrokeWidth}" />
-								<h:outputLabel for="jsonForm:jsonStrokeWidth" value="Line Width" />
-							</div>
-							<div class="col s4 input-field">
-								<p:inputText id="jsonStrokeOpacity" value="#{CreateBean.jsonStrokeOpacity}" />
-								<h:outputLabel for="jsonForm:jsonStrokeOpacity" value="Line Opacity" />
-							</div>
-							<div class="col s4 input-field">
-								<p:colorPicker id="jsonStrokeColor" value="#{CreateBean.jsonStrokeColor}" />
-							</div>
-						</div>
-						<div class="row">
-							<div class="col s6 input-field">
-								<p:inputText id="jsonFillOpacity" value="#{CreateBean.jsonFillOpacity}" />
-								<h:outputLabel for="jsonForm:jsonFillOpacity" value="Fill Opacity" />
-							</div>
-							<div class="col s6 input-field">
-								<p:colorPicker id="jsonFillColor" value="#{CreateBean.jsonFillColor}" />
-							</div>
-						</div>
-						<div class="row">
-							<div class="col s12">
-								<a class="waves-effect waves-light btn light-blue lighten-2" href="#" onclick="addJsonLayer();">Add Layer to Mashup</a>
-								<p:remoteCommand name="addLayerJson" actionListener="#{CreateBean.addSelectedJson()}" />
-							</div>
-						</div>
-					</h:form>
-				</div>
-				<div class="modal-footer">
-					<a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat">Done</a>
-				</div>
+					</div>
+					<div class="modal-footer">
+						<a href="#!" onclick="$('#importBox').modal('close');" class="modal-action modal-close waves-effect waves-green btn-flat">Cancel</a>
+
+						<a class="waves-effect waves-light btn light-blue lighten-2" onclick="addImportLayer(); $('#importBox').modal('close');">Add Layer</a>
+						<p:remoteCommand name="addImportLayer" actionListener="#{CreateBean.addImportLayer()}" />
+					</div>
+				</h:form>
 			</div>
 		</div>
+
+
 		<div id="footer" class="footer nrpp-blue-dark">
 		</div>
+
 
 		<div class="spinner-modal" id="waitingDialog">
 			<div class="spinner-modal-content">

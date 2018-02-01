@@ -259,4 +259,17 @@ public class SMKServiceHandler
 
         return result;
 	}
+
+	public static String convertNameToId( String name ) {
+		return name.toLowerCase().replaceAll("[^0-9a-z]+", "-").replaceAll("^[-]+", "").replaceAll("[-]+$", "");
+    }
+
+	public static String convertNamesToId( List<String> names ) {
+        if ( names.isEmpty() ) return "";
+        String out = "";
+        for ( String n : names )
+		    out = out.concat( convertNameToId( n ) ).concat( "--" );
+        return out.substring( 0, out.length() - 3 );
+    }
+
 }
