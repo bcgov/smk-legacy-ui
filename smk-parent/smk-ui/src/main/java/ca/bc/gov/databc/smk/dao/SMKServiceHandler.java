@@ -15,10 +15,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import ca.bc.gov.databc.smks.model.MapConfiguration;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 // import ca.bc.gov.databc.smk.model.MapConfiguration;
 
 public class SMKServiceHandler
 {
+	private static Log logger = LogFactory.getLog(SMKServiceHandler.class);
+
 	private String serviceUrl;
 
 	public SMKServiceHandler(String url) throws MalformedURLException
@@ -39,6 +44,7 @@ public class SMKServiceHandler
 
         ObjectMapper mapper = new ObjectMapper();
         String json = mapper.writeValueAsString(resource);
+		logger.debug("sending " + json);
 
         OutputStream os = conn.getOutputStream();
         os.write(json.getBytes("UTF-8"));

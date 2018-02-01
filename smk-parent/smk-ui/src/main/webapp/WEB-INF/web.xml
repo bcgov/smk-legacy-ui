@@ -12,7 +12,8 @@
   </context-param>
   <context-param>
     <param-name>lmfService</param-name>
-    <param-value>https://smks-api.pathfinder.gov.bc.ca/smks-api</param-value>
+    <param-value>http://localhost:8080/smks-api/</param-value>
+    <!-- <param-value>https://smks-api.pathfinder.gov.bc.ca/smks-api</param-value> -->
     <!-- <param-value>${smks.uri}</param-value> -->
   </context-param>
   <welcome-file-list>

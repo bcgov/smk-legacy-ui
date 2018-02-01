@@ -2,6 +2,7 @@ package ca.bc.gov.databc.smks.model.tool;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import ca.bc.gov.databc.smks.model.Tool;
 
@@ -17,10 +18,14 @@ public class Sidebar extends Tool
 		this.setInitialOpen( sidebar.getInitialOpen());
 	}
 
-	public String getId() {
+	public String getType() {
 		return Tool.Type.sidebar.toString();
 	}
-	
+
+	public String getTitle() {
+		return "Sidebar";
+	}
+
 	public String getInitialOpen() { return initialOpen; }
 	public void setInitialOpen(String initialOpen) { this.initialOpen = initialOpen; }
 

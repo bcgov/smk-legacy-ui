@@ -2,6 +2,7 @@ package ca.bc.gov.databc.smks.model.tool;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import ca.bc.gov.databc.smks.model.Tool;
 
@@ -17,8 +18,12 @@ public class About extends Tool
 		this.setContent( about.getContent());
 	}
 
-	public String getId() {
+	public String getType() {
 		return Tool.Type.about.toString();
+	}
+
+	public String getTitle() {
+		return "About Panel";
 	}
 
 	public String getContent() { return content; }

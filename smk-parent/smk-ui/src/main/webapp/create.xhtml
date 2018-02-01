@@ -128,7 +128,8 @@
 														<tr><td><a class="waves-effect waves-dark btn grey lighten-2" href="#layerCatalogBox" style="width: 100%;">DataBC Layer Catalog</a></td></tr>
 														<c:if test="#{CreateBean.resource.viewer.type eq 'leaflet'}"><tr><td><a class="waves-effect waves-dark btn grey lighten-2" href="#wmsServiceBox" style="width: 100%;">WMS Service</a></td></tr></c:if>
 														<tr><td><a class="waves-effect waves-dark btn grey lighten-2" href="#esriFeatureServiceBox" style="width: 100%;">ESRI Feature Service</a></td></tr>
-														<c:if test="#{CreateBean.resource.viewer.type eq 'leaflet'}"><tr><td><a class="waves-effect waves-dark btn grey lighten-2" href="#importKmlBox" style="width: 100%;">KML Import</a></td></tr></c:if>
+														<c:if test="#{CreateBean.resource.viewer.type eq 'leaflet'}"><tr><td><a class="waves-effect waves-dark btn grey lighten-2" href="#importKmlBox" onclick="resetKml()" style="width: 100%;">KML Import</a></td></tr></c:if>
+														<p:remoteCommand name="resetKml" actionListener="#{CreateBean.resetKml()}" />
 														<c:if test="#{CreateBean.resource.viewer.type eq 'leaflet'}"><tr><td><a class="waves-effect waves-dark btn grey lighten-2" href="#importGeoJsonBox" style="width: 100%;">GeoJSON Import</a></td></tr></c:if>
 													</table>
 												</div>
@@ -169,9 +170,10 @@
 											<div class="row">
 												<div class="col s12">
 													<p:pickList id="toolsPicklist"
+																converter="#{CreateBean.toolConverter}"
 																value="#{CreateBean.tools}"
 																var="tool"
-																itemLabel="#{tool}"
+																itemLabel="#{tool.title}"
 																itemValue="#{tool}"
 																responsive="true">
                 										<f:facet name="sourceCaption">Available Tools</f:facet>
@@ -181,16 +183,16 @@
 											</div>
 										</p:panel>
 									</p:tab>
-									<p:tab id="homePage" title="Home Page">
+									<!-- <p:tab id="homePage" title="Home Page">
 										<p:panel header="Home Page">
 											<p:messages autoUpdate="true" showDetail="true" closable="true"/>
 											<div class="row">
 												<div class="col s12">
-													<p:textEditor id="aboutPageEditor" widgetVar="editorWidget" value="#{CreateBean.resource.aboutPage}" height="300" style="margin-bottom:10px"/>
+													<p:textEditor id="aboutPageEditor" widgetVar="editorWidget" value="#{'CreateBean.resource.aboutPage'}" height="300" style="margin-bottom:10px"/>
 												</div>
 											</div>
 										</p:panel>
-									</p:tab>
+									</p:tab> -->
 									<p:tab id="publish" title="Publish">
 										<p:panel header="Publish">
 											<p:messages autoUpdate="true" showDetail="true" closable="true"/>
@@ -346,15 +348,15 @@
 											 selectionMode="single"
 											 selection="#{CreateBean.selectedServiceLayer}"
 											 rowKey="#{lyr.title}"
-											 rows="10"
+											 rows="5"
 					                         paginator="true"
 					                         rowsPerPageTemplate="10,20,50"
 					                         paginatorPosition="bottom">
-								     <f:facet name="header">
+								     <!-- <f:facet name="header">
 								         Service Layers
-								     </f:facet>
+								     </f:facet> -->
 								     <p:ajax event="rowSelect" update="wmsForm:allServiceLayerStyles" />
-								     <p:column headerText="Title">
+								     <p:column headerText="Service layers">
 								         <h:outputText value="#{lyr.title}" />
 								     </p:column>
 								 </p:dataTable>
@@ -366,12 +368,12 @@
 											 value="#{CreateBean.selectedServiceLayer.styles}"
 											 selectionMode="single"
 											 selection="#{CreateBean.selectedServiceStyle}"
-											 rowKey="#{lyrStyle}">
-								     <f:facet name="header">
+											 rowKey="#{lyrStyle.name}">
+								     <!-- <f:facet name="header">
 								         Service Layer Styles
-								     </f:facet>
-								     <p:column headerText="Style">
-								         <h:outputText value="#{lyrStyle}" />
+								     </f:facet> -->
+								     <p:column headerText="Styles for layer">
+								         <h:outputText value="#{lyrStyle.name}" />
 								     </p:column>
 								 </p:dataTable>
 							</div>
@@ -469,6 +471,7 @@
 						<div class="row">
 							<div class="col s12 input-field">
 								<p:fileUpload ajax="true"
+											  update="@this"
 											  mode="advanced"
 											  fileLimit="1"
 											  sizeLimit="52428800"
@@ -549,6 +552,7 @@
 						<div class="row">
 							<div class="col s12 input-field">
 								<p:fileUpload ajax="true"
+											  update="@this"
 											  mode="advanced"
 											  fileLimit="1"
 											  sizeLimit="52428800"

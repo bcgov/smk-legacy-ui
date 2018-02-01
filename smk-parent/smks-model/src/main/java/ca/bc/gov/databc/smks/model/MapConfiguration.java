@@ -17,7 +17,7 @@ public class MapConfiguration extends CouchDbDocument implements Cloneable
 	private static final long serialVersionUID = -8711804469072616248L;
 
 	// ID and naming
-	private String lmfId;
+	private String lmfId = "1";
 	private int lmfRevision;
 	private String name;
 	private String project;

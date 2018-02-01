@@ -17,9 +17,12 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
+import javax.faces.convert.Converter;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.ektorp.Attachment;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
@@ -38,7 +41,6 @@ import org.w3c.dom.NodeList;
 import ca.bc.gov.databc.smk.controllers.LayerController;
 import ca.bc.gov.databc.smk.dao.CouchDAO;
 import ca.bc.gov.databc.smk.dao.SMKServiceHandler;
-
 import ca.bc.gov.databc.smks.model.CollectionLayer;
 import ca.bc.gov.databc.smks.model.Layer;
 import ca.bc.gov.databc.smks.model.LayerStyle;
@@ -46,16 +48,18 @@ import ca.bc.gov.databc.smks.model.MapConfiguration;
 import ca.bc.gov.databc.smks.model.Tool;
 import ca.bc.gov.databc.smks.model.WMSInfoLayer;
 import ca.bc.gov.databc.smks.model.WMSInfoStyle;
+import ca.bc.gov.databc.smks.model.layer.EsriDynamic;
 import ca.bc.gov.databc.smks.model.layer.Geojson;
 import ca.bc.gov.databc.smks.model.layer.Kml;
 import ca.bc.gov.databc.smks.model.layer.Wms;
-import ca.bc.gov.databc.smks.model.layer.EsriDynamic;
 
 @SuppressWarnings("restriction")
 @ManagedBean(name="CreateBean", eager=true)
 @ViewScoped
 public class CreateBean implements Serializable
 {
+	private static Log logger = LogFactory.getLog(CreateBean.class);
+
 	private static final long serialVersionUID = -4244352433273633895L;
 
 	private MapConfiguration resource;
@@ -66,6 +70,7 @@ public class CreateBean implements Serializable
 	private ArrayList<TreeNode> catalogNodes;
 
 	private DualListModel<Tool> tools;
+	private ToolConverter converter;
 
 	// for WMS popup
 	private boolean wmsIsVisible;
@@ -74,7 +79,7 @@ public class CreateBean implements Serializable
 	private String wmsServiceUrl = "https://openmaps.gov.bc.ca/geo/pub/ows";
 	private String wmsVersion = "1.3.0";
 	private WMSInfoLayer selectedServiceLayer;
-	private String selectedServiceStyle;
+	private WMSInfoStyle selectedServiceStyle;
 	private ArrayList<WMSInfoLayer> allServiceLayers;
 
 	// for Feature Service layer
@@ -112,13 +117,20 @@ public class CreateBean implements Serializable
 	private double jsonFillOpacity= 0.65;
 	private String jsonFillColor= "000";
 
+	// public String getViewerType() {
+	// 	return resource.getViewerx().getType();
+	// }
+
 	@PostConstruct
     public void init()
 	{
+		converter = new ToolConverter();
+
 		// init the DMF Resource object that will be stored in couch, or read from couch
 		resource = new MapConfiguration();
 		// resource.setShowHeader(true);
 		resource.getViewer().setType("leaflet");
+		resource.getViewer().setBaseMap("Topographic");
 
 		// init the root node for the layer listing
 		layerNodes = new DefaultTreeNode("root", null);
@@ -126,21 +138,21 @@ public class CreateBean implements Serializable
 		// init the tools selector
 		List<Tool> toolsSource = new ArrayList<Tool>();
         List<Tool> toolsTarget = new ArrayList<Tool>();
-
-        toolsSource.add(Tool.Type.pan.create());
-        toolsSource.add(Tool.Type.zoom.create());
-        toolsSource.add(Tool.Type.measure.create());
-        toolsSource.add(Tool.Type.markup.create());
-        toolsSource.add(Tool.Type.directions.create());
-
         tools = new DualListModel<Tool>(toolsSource, toolsTarget);
 
         // check if we're loading an existing resource
         ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
 		Map<String, String> queryString = externalContext.getRequestParameterMap();
 
-		if(queryString.containsKey("id"))
-		{
+		if( !queryString.containsKey("id") ) {
+			toolsTarget.add(Tool.Type.pan.create());
+			toolsTarget.add(Tool.Type.zoom.create());
+			toolsTarget.add(Tool.Type.measure.create());
+			toolsTarget.add(Tool.Type.markup.create());
+			toolsTarget.add(Tool.Type.directions.create());
+
+		}
+		else {
 			// load the resource from couch... that's pretty much it.
 			try
 			{
@@ -160,13 +172,12 @@ public class CreateBean implements Serializable
 				// recursive layer node creator
 				loadLayerNodes(layerNodes, resource.getLayers());
 
-				for (Tool.Type toolType : Tool.Type.values() ) {
-					toolsTarget.add(toolType.create());
-					toolsSource.remove(toolType.create());
+				for ( Tool tool: resource.getTools() ) {
+					toolsTarget.add(tool);
 				}
 
 				resource.getLayers().clear();
-//				resource.getTools().clear();
+				resource.getTools().clear();
 
 				// set the wms to databc's default
 				wmsServiceUrl = "https://openmaps.gov.bc.ca/geo/pub/ows";
@@ -183,6 +194,19 @@ public class CreateBean implements Serializable
 				e.printStackTrace();
 			}
 		}
+
+		for (Tool.Type toolType : Tool.Type.values() ) {
+			if ( toolType == Tool.Type.unknown ) continue;
+
+			Tool t = toolType.create();
+			if ( toolsTarget.contains( t ) ) continue;
+
+			toolsSource.add( t );
+		}
+	}
+
+	public Converter getToolConverter() {
+		return converter;
 	}
 
 	public void loadLayerNodes(TreeNode parent, List<Layer> children)
@@ -315,7 +339,7 @@ public class CreateBean implements Serializable
 		lyr.setServiceUrl(wmsServiceUrl);
 		lyr.setVersion(wmsVersion);
 		lyr.setLayerName(selectedServiceLayer.getName());
-		lyr.setStyleName(selectedServiceStyle);
+		lyr.setStyleName(selectedServiceStyle.getName());
 		// lyr.setLayerTypeCode(LayerTypes.wmsLayer);
 		// lyr.setId(id);
 		lyr.setIsVisible(wmsIsVisible);
@@ -394,16 +418,6 @@ public class CreateBean implements Serializable
 		    style.setFillColor(kmlFillColor);
 		    style.setFillOpacity(kmlFillOpacity);
 
-		    kmlLayerTitle = "";
-		    kmlIsVisible = false;
-		    kmlClusterPoints = false;
-		    kmlHeatmapPoints = false;
-		    kmlOpacity = 0.65;
-		    kmlStrokeWidth = 1.0;
-		    kmlStrokeOpacity = 1.0;
-		    kmlStrokeColor = "000";
-		    kmlFillColor = "000";
-		    kmlFillOpacity = 0.65;
 
 		    Attachment kmlAttachment = new Attachment(lyr.getTitle(), uploadFileAttachmentBytes, uploadContentType);
 		    resource.addInlineAttachment(kmlAttachment);
@@ -421,6 +435,22 @@ public class CreateBean implements Serializable
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error writing KML document:", e.getMessage()));
 			e.printStackTrace();
 		}
+	}
+
+	public void resetKml() {
+		    kmlLayerTitle = "";
+		    kmlIsVisible = false;
+		    kmlClusterPoints = false;
+		    kmlHeatmapPoints = false;
+		    kmlOpacity = 0.65;
+		    kmlStrokeWidth = 1.0;
+		    kmlStrokeOpacity = 1.0;
+		    kmlStrokeColor = "000";
+		    kmlFillColor = "000";
+		    kmlFillOpacity = 0.65;
+
+			RequestContext.getCurrentInstance().update("kmlForm");
+		    RequestContext.getCurrentInstance().execute("Materialize.updateTextFields();");
 	}
 
 	public void addSelectedJson()
@@ -604,6 +634,9 @@ public class CreateBean implements Serializable
 
 			//push the tools up to the resource
 			resource.setTools(tools.getTarget());
+			// for ( Tool t: tools.getTarget() ) {
+			// 	resource.getTools().add( t );
+			// }
 
 			// we've got a complete resource at this point. set the publish flag
 			//resource.setPublished(publish);
@@ -804,12 +837,12 @@ public class CreateBean implements Serializable
 		this.selectedServiceLayer = selectedServiceLayer;
 	}
 
-	public String getSelectedServiceStyle()
+	public WMSInfoStyle getSelectedServiceStyle()
 	{
 		return selectedServiceStyle;
 	}
 
-	public void setSelectedServiceStyle(String selectedServiceStyle)
+	public void setSelectedServiceStyle(WMSInfoStyle selectedServiceStyle)
 	{
 		this.selectedServiceStyle = selectedServiceStyle;
 	}

@@ -8,31 +8,31 @@
       xmlns:p="http://primefaces.org/ui" >
     <h:head>
     	<title>Lightweight Mapping Framework</title>
-  
+
     	<!-- css links -->
     	<h:outputStylesheet library="css" name="materialize.css"  />
     	<h:outputStylesheet library="css" name="dmf.css"  />
     	<h:outputStylesheet library="css" name="fonts.css"  />
     	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
-    	 
+
     	<!-- JS links -->
 		<h:outputScript library="js" name="jquery-3.2.1.min.js" />
 		<h:outputScript library="js" name="materialize.js" />
 		<h:outputScript library="js" name="dmf.js" target="body" />
-				
-		<link rel="stylesheet" 
+
+		<link rel="stylesheet"
 			  href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css"
 			  integrity="sha512-M2wvCLH6DSRazYeZRIm1JnYyh22purTM+FDB5CsyxtQJYeKq83arPe5wgbNmcFXGqiSH2XR8dT/fJISVA1r/zQ=="
 			  crossorigin=""/>
-		
+
 		<script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js"
 			    integrity="sha512-lInM/apFSqyy1o6s89K4iQUKg6ppXEgsVxT35HbzUupEVRh2Eu9Wdl4tHj7dZO0s1uvplcYGmt3498TtHq+log=="
 			    crossorigin=""></script>
-			    
+
 		<script src="https://unpkg.com/esri-leaflet@2.1.0/dist/esri-leaflet.js"
     			integrity="sha512-Tojl3UMd387f6DdAJlo+fKfJZiP55fYT+6Y58yKbHydnueOdSFOxrgLPuUxm7VW1szEt3hZVwv3V2sSUCuT35w=="
     			crossorigin=""></script>
-    				
+
     	<link rel="stylesheet" href="https://js.arcgis.com/4.4/esri/css/main.css" />
     </h:head>
     <h:body class="grey lighten-4" style="height: 100vh; position: relative; font-family: 'Avenir Next W00','Helvetica Neue',Helvetica,Arial,sans-serif;">
@@ -44,7 +44,7 @@
 	   		<div id="map" style="width: 100%; height: calc(100vh - 110px); position: absolute; z-index: -10;"/>
    			<div style="width: 100%; height: calc(100vh - 110px); position: absolute; background: rgba(0, 0, 0, 0.3);"/>
 			<div id="content" class="container" style="margin-top: 14px; min-width: 800px;">
-			
+
 				<div class="row">
 					<div class="col s12">
 						<div class="card white">
@@ -56,7 +56,7 @@
 								</div>
 								<div class="row" style="padding: 0px;">
 									<div class="col s12">
-										<p>The Lightweight Mapping Framework allows you to create custom linkable and embedable 
+										<p>The Lightweight Mapping Framework allows you to create custom linkable and embedable
 										maps using data mashed up from DataBC's catalog, GeoServer and other external sources.
 										To view your map or create a new one, check the "My Maps" tab below. To discover
 										other maps, check out "All Maps". To learn more about LMF, check the about tab.</p>
@@ -91,7 +91,7 @@
 						    			</h:column>
 						    			<h:column>
 						    				<f:facet name="header">Viewer</f:facet>
-						    				#{mashup.viewerType}
+						    				#{mashup.viewer.type}
 						    			</h:column>
 						    			<h:column>
 						    				<f:facet name="header">Link</f:facet>
@@ -99,12 +99,12 @@
 						    			</h:column>
 									    <h:column>
 						    				<f:facet name="header">Published</f:facet>
-						    				#{mashup.isPublished()}
+						    				#{mashup.isPublished}
 						    			</h:column>
-						    			<h:column>
+						    			<!-- <h:column>
 						    				<f:facet name="header">Version</f:facet>
-						    				#{mashup.getVersionLabel()}
-						    			</h:column>
+						    				#{'mashup.getVersionLabel()'}
+						    			</h:column> -->
 						    			<h:column>
 						    				<f:facet name="header"></f:facet>
 											<a href="#" onclick="publishResource([{name: 'param', value: '#{mashup.lmfId}'}])">Publish</a>
@@ -116,7 +116,7 @@
 						    			</h:column>
 						    			<h:column>
 						    				<f:facet name="header"></f:facet>
-											<a href="#" onclick="deleteResource([{name: 'param', value: '#{mashup.lmfId}'}])"> #{mashup.isPublished() ? 'Un-Publish' : 'Delete'}</a>
+											<a href="#" onclick="deleteResource([{name: 'param', value: '#{mashup.lmfId}'}])"> #{mashup.isPublished ? 'Un-Publish' : 'Delete'}</a>
 						    				<p:remoteCommand name="deleteResource" actionListener="#{IndexBean.deleteResource()}" />
 						    			</h:column>
 						    			<!-- <h:column>
@@ -147,7 +147,7 @@
 						    			</h:column>
 						    			<h:column>
 						    				<f:facet name="header">Viewer</f:facet>
-						    				#{mashup.viewerType}
+						    				#{mashup.viewer.type}
 						    			</h:column>
 						    			<h:column>
 						    				<f:facet name="header">Created By</f:facet>
@@ -162,18 +162,18 @@
 						    				<a href="view.xhtml?id=#{mashup.lmfId}" target="_blank">View Map</a>
 						    			</h:column>
 									</h:dataTable>
-								</div>						
+								</div>
 							</div>
 						</div>
 					</div>
 					<div id="about" class="col s12">
 						<div class="card white" style="/*height: calc(100vh - 500px);*/">
 							<div class="card-content black-text">
-								<p>Info about LMF, help, etc...</p>						
+								<p>Info about LMF, help, etc...</p>
 							</div>
 						</div>
 					</div>
-				</div>								
+				</div>
 			</div>
 			<div id="footer" class="footer nrpp-blue-dark">
 			</div>
@@ -189,15 +189,15 @@
 			map.scrollWheelZoom.disable();
 			map.boxZoom.disable();
 			map.keyboard.disable();
-	    
+
 	    	var rndLat = Math.random() * (60 - 48.3) + 47.294;
 	    	var rndLon = (Math.random() * (124 - 111.291) + 114) * -1;
 	    	var rndZoom = Math.floor(Math.random() * (12 - 9) + 9);
-	    
+
 	    	map.setView(new L.latLng(rndLat, rndLon), rndZoom);
-                
+
 	    	var bm = L.esri.basemapLayer("Topographic");
-			
+
 			map.addLayer(bm);
 		});
 	</h:outputScript>
