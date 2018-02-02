@@ -23,7 +23,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.http.conn.routing.RouteInfo.LayerType;
 import org.ektorp.Attachment;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
@@ -34,6 +33,7 @@ import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.DualListModel;
 import org.primefaces.model.TreeNode;
 import org.primefaces.model.UploadedFile;
+import org.primefaces.event.SelectEvent;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -109,6 +109,8 @@ public class CreateBean implements Serializable
 	private double importStrokeOpacity = 1.0;
 	private double importFillOpacity= 0.65;
 	private String importFillColor= "0F0";
+
+	private Tool configureTool;
 
 	@PostConstruct
     public void init()
@@ -196,6 +198,26 @@ public class CreateBean implements Serializable
 
 	public Converter getToolConverter() {
 		return converter;
+	}
+
+	public void onToolSelect( SelectEvent event ) {
+		configureTool = ( Tool )event.getObject();
+		logger.debug("select "+configureTool.getType());
+	}
+
+	public void configureTool() {
+		// logger.debug(configureTool.getType());
+		RequestContext.getCurrentInstance().update("toolForm");
+	    RequestContext.getCurrentInstance().execute("Materialize.updateTextFields();");
+	}
+
+	public void configureToolDone() {
+		// logger.debug("configureDone");
+		int pos = tools.getTarget().indexOf(configureTool);
+		tools.getTarget().remove(configureTool);
+		tools.getTarget().add(pos,configureTool);
+		RequestContext.getCurrentInstance().update("createMashupForm:toolsPicklist");
+	    // RequestContext.getCurrentInstance().execute("Materialize.updateTextFields();");
 	}
 
 	public void loadLayerNodes(TreeNode parent, List<Layer> children)
@@ -984,4 +1006,9 @@ public class CreateBean implements Serializable
 
 	public String getImportFillColor() { return importFillColor; }
 	public void setImportFillColor(String importFillColor) { this.importFillColor = importFillColor; }
+
+
+	public Tool getConfigureTool() { return configureTool; }
+	public void setConfigureTool(Tool configureTool) { this.configureTool = configureTool; }
+
 }

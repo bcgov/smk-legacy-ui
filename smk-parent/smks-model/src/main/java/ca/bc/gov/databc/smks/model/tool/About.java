@@ -6,9 +6,14 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import ca.bc.gov.databc.smks.model.Tool;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 @JsonInclude(Include.NON_NULL)
 public class About extends Tool
 {
+	private static Log logger = LogFactory.getLog(About.class);
+
     private String content;
 
 	public About() {}
@@ -26,8 +31,14 @@ public class About extends Tool
 		return "About Panel";
 	}
 
-	public String getContent() { return content; }
-	public void setContent(String content) { this.content = content; }
+	public String getContent() {
+		logger.debug( "get " + content );
+		return content;
+	}
+	public void setContent(String content) {
+		logger.debug( "set " + content );
+		this.content = content;
+	}
 
 	public About clone()
 	{

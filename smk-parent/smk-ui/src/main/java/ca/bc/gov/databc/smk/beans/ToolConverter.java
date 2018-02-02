@@ -31,7 +31,7 @@ public class ToolConverter implements Converter {
     @Override
     public Object getAsObject(FacesContext context, UIComponent component, String value) {
         try {
-            // logger.debug(value);
+            logger.debug("get obj "+value);
 
             return mapper.readValue( value, Tool.class );
         }
@@ -48,7 +48,7 @@ public class ToolConverter implements Converter {
 
         try {
             String json = mapper.writeValueAsString(value);
-            // logger.debug(json);
+            logger.debug(value + " get string "+json);
             return json;
         }
         catch (JsonProcessingException e) {

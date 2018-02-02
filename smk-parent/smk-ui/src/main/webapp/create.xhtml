@@ -180,7 +180,14 @@
 																responsive="true">
                 										<f:facet name="sourceCaption">Available Tools</f:facet>
         												<f:facet name="targetCaption">Added Tools</f:facet>
+														<p:ajax event="select" listener="#{CreateBean.onToolSelect}"  />
                 									</p:pickList>
+												</div>
+											</div>
+											<div class="row">
+												<div class="col s12">
+													<a class="waves-effect waves-dark btn grey lighten-2" href="#configureToolBox" onclick="configureTool();">Configure Tool...</a>
+													<p:remoteCommand name="configureTool" actionListener="#{CreateBean.configureTool()}" />
 												</div>
 											</div>
 										</p:panel>
@@ -539,8 +546,65 @@
 					</div>
 				</h:form>
 			</div>
-		</div>
 
+			<div id="configureToolBox" class="modal modal-fixed-footer">
+				<h:form id="toolForm">
+					<div class="modal-content">
+						<h4>Configure #{CreateBean.configureTool.title}</h4>
+
+						<c:if test="#{CreateBean.configureTool.type eq 'about'}">
+							<div class="row">
+								<div class="col s12">
+									<p:textEditor id="aboutPageEditor" widgetVar="editorWidget" value="#{CreateBean.configureTool.content}" height="300" style="margin-bottom:10px"/>
+								</div>
+							</div>
+						</c:if>
+
+						<c:if test="#{CreateBean.configureTool.type eq 'scale'}">
+							<div class="row">
+								<div class="col s6 input-field">
+									<h:selectBooleanCheckbox id="ScaleFactor" value="#{CreateBean.configureTool.showFactor}" />
+									<h:outputLabel for="toolForm:ScaleFactor" value="Show Factor" />
+								</div>
+								<div class="col s6 input-field">
+									<h:selectBooleanCheckbox id="ScaleBar" value="#{CreateBean.configureTool.showBar}" />
+									<h:outputLabel for="importForm:ScaleBar" value="Show Bar" />
+								</div>
+							</div>
+						</c:if>
+
+						<c:if test="#{CreateBean.configureTool.type eq 'zoom'}">
+							<div class="row">
+								<div class="col s6 input-field">
+									<h:selectBooleanCheckbox id="ZoomBox" value="#{CreateBean.configureTool.box}" />
+									<h:outputLabel for="toolForm:ZoomBox" value="Box" />
+								</div>
+								<div class="col s6 input-field">
+									<h:selectBooleanCheckbox id="ZoomControl" value="#{CreateBean.configureTool.control}" />
+									<h:outputLabel for="importForm:ZoomControl" value="Control" />
+								</div>
+							</div>
+							<div class="row">
+								<div class="col s6 input-field">
+									<h:selectBooleanCheckbox id="ZoomDoubleClick" value="#{CreateBean.configureTool.doubleClick}" />
+									<h:outputLabel for="toolForm:ZoomDoubleClick" value="Double-click" />
+								</div>
+								<div class="col s6 input-field">
+									<h:selectBooleanCheckbox id="ZoomMouseWheel" value="#{CreateBean.configureTool.mouseWheel}" />
+									<h:outputLabel for="importForm:ZoomMouseWheel" value="Mouse wheel" />
+								</div>
+							</div>
+						</c:if>
+
+					</div>
+					<div class="modal-footer">
+						<a href="#!" onclick="configureToolDone(); $('#configureToolBox').modal('close');" class="modal-action modal-close waves-effect waves-green btn-flat">Done</a>
+						<p:remoteCommand name="configureToolDone" actionListener="#{CreateBean.configureToolDone()}" />
+					</div>
+				</h:form>
+			</div>
+
+		</div>
 
 		<div id="footer" class="footer nrpp-blue-dark">
 		</div>
