@@ -76,6 +76,11 @@
         config:         scriptConfig,
     }
 
+    if ( arg.config.error ) {
+        document.getElementById( arg.containerId ).innerHTML = '<h1 class="error">Startup error: ' + arg.config.error + '</h1>';
+        return
+    }
+
     if ( window.include ) {
         initializeSMK( arg )
     }
@@ -88,7 +93,7 @@
         el.addEventListener( 'error', function( ev ) {
             throw new Error( 'failed to load script from ' + el.src )
         } )
-        el.setAttribute( 'src',        'lib/include.js' )
+        el.setAttribute( 'src',        '../smk-client/lib/include.js' )
     // el.setAttribute( 'data-main',  '/service/lib/main.js' )
     // el.setAttribute( 'data-arg',   JSON.stringify( arg ) )
     // el.setAttribute( 'data-tags',  'tags.json' )
@@ -97,7 +102,7 @@
     }
 
     function initializeSMK( smkArg ) {
-        include.option( { baseUrl: new URL( 'lib/', document.location ).toString() } )
+        include.option( { baseUrl: new URL( '../smk-client/lib/', document.location ).toString() } )
 
         include( { loader: 'tags', url: 'tags.json' } )
             .then( function () {

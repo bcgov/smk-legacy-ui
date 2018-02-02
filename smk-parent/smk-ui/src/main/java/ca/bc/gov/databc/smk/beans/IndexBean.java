@@ -29,15 +29,15 @@ public class IndexBean implements Serializable
 	private SMKServiceHandler service;
 	private List<MapConfiguration> editableConfigs;
 	private List<MapConfiguration> publishedConfigs;
-	
+
 	@PostConstruct
-    public void init() 
+    public void init()
 	{
-		try 
+		try
 		{
 			FacesContext ctx = FacesContext.getCurrentInstance();
 			//String myConstantValue = ctx.getExternalContext().getInitParameter("couchdb");
-			
+
 			String serviceUrl = ctx.getExternalContext().getInitParameter("lmfService");
 			service  = new SMKServiceHandler(serviceUrl);
 
@@ -51,22 +51,22 @@ public class IndexBean implements Serializable
 				{
 					if(published.getLmfId().equals(editable.getLmfId()))
 					{
-						editable.setIsPublished(true);
+						editable.setPublished(true);
 						break;
 					}
 				}
 			}
-			
+
 			//mashupDao = new CouchDAO(myConstantValue);
 			//allMashups = mashupDao.getAllResources();
-			
-		} 
-		catch (MalformedURLException e) 
+
+		}
+		catch (MalformedURLException e)
 		{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		catch (IOException e) 
+		catch (IOException e)
 		{
 			e.printStackTrace();
 		}
@@ -78,9 +78,9 @@ public class IndexBean implements Serializable
 		FacesContext context = FacesContext.getCurrentInstance();
 	    Map map = context.getExternalContext().getRequestParameterMap();
 	    String value = (String) map.get("param");
-	    
+
 	    MapConfiguration resourceToPublish = null;
-	    
+
 	    for(MapConfiguration resource : editableConfigs)
 		{
 			if(resource.getLmfId().equals(value))
@@ -89,36 +89,36 @@ public class IndexBean implements Serializable
 				break;
 			}
 		}
-	    
+
 	    if(resourceToPublish != null)
 	    {
-		    try 
+		    try
 			{
 				service.publish(resourceToPublish);
-			} 
-			catch (MalformedURLException e) 
+			}
+			catch (MalformedURLException e)
 			{
 				e.printStackTrace();
-			} 
-			catch (IOException e) 
+			}
+			catch (IOException e)
 			{
 				e.printStackTrace();
 			}
 	    }
-	    
+
 		RequestContext.getCurrentInstance().update("dmf:myMashups");
 		RequestContext.getCurrentInstance().update("dmf:allMashups");
 	}
-	
+
 	@SuppressWarnings("rawtypes")
 	public void deleteResource()
 	{
 		FacesContext context = FacesContext.getCurrentInstance();
 	    Map map = context.getExternalContext().getRequestParameterMap();
 	    String value = (String) map.get("param");
-		
+
 		MapConfiguration deadResource = null;
-		
+
 		for(MapConfiguration resource : publishedConfigs)
 		{
 			if(resource.getLmfId().equals(value))
@@ -127,7 +127,7 @@ public class IndexBean implements Serializable
 				break;
 			}
 		}
-		
+
 		if(deadResource == null)
 		{
 			for(MapConfiguration resource : editableConfigs)
@@ -139,12 +139,12 @@ public class IndexBean implements Serializable
 				}
 			}
 		}
-		
+
 		if(deadResource != null)
 		{
-			try 
+			try
 			{
-				if(deadResource.getIsPublished())
+				if(deadResource.isPublished())
 				{
 					service.unPublishResource(deadResource);
 				}
@@ -152,45 +152,45 @@ public class IndexBean implements Serializable
 				{
 					service.deleteResource(deadResource);
 				}
-			} 
-			catch (MalformedURLException e) 
-			{
-				e.printStackTrace();
-			} 
-			catch (IOException e) 
+			}
+			catch (MalformedURLException e)
 			{
 				e.printStackTrace();
 			}
-			
+			catch (IOException e)
+			{
+				e.printStackTrace();
+			}
+
 			//mashupDao.removeResource(deadResource);
-			
+
 			RequestContext.getCurrentInstance().update("dmf:myMashups");
 			RequestContext.getCurrentInstance().update("dmf:allMashups");
 		}
 	}
-	
+
 	public void exportResource()
 	{
-		
+
 	}
-	
+
 	public List<MapConfiguration> getEditableConfigs()
 	{
 		return editableConfigs;
 	}
 
-	public void setEditableConfigs(List<MapConfiguration> configs) 
-	{		
+	public void setEditableConfigs(List<MapConfiguration> configs)
+	{
 		this.editableConfigs = configs;
 	}
-	
+
 	public List<MapConfiguration> getPublishedConfigs()
 	{
 		return publishedConfigs;
 	}
 
-	public void setPublishedConfigs(List<MapConfiguration> configs) 
-	{		
+	public void setPublishedConfigs(List<MapConfiguration> configs)
+	{
 		this.publishedConfigs = configs;
 	}
 }

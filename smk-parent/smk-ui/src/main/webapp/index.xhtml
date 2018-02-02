@@ -87,7 +87,7 @@
 												 var="mashup">
 										<h:column>
 						    				<f:facet name="header">Name</f:facet>
-						    				<a href="view.xhtml?id=#{mashup.lmfId}&amp;version=#{mashup.lmfRevision}" target="_blank">#{mashup.name}</a>
+						    				<a href="view.xhtml?id=#{mashup.lmfId}&amp;version=#{mashup.lmfRevision}" target="_#{mashup.lmfId}">#{mashup.name}</a>
 						    			</h:column>
 						    			<!-- <h:column>
 						    				<f:facet name="header"></f:facet>
@@ -99,7 +99,7 @@
 						    			</h:column>
 									    <h:column>
 						    				<f:facet name="header">Published</f:facet>
-						    				#{mashup.isPublished}
+						    				#{mashup.published}
 						    			</h:column>
 						    			<!-- <h:column>
 						    				<f:facet name="header">Version</f:facet>
@@ -116,8 +116,8 @@
 						    			</h:column>
 						    			<h:column>
 						    				<f:facet name="header"></f:facet>
-											<a href="#" onclick="deleteResource([{name: 'param', value: '#{mashup.lmfId}'}])"> #{mashup.isPublished ? 'Un-Publish' : 'Delete'}</a>
-						    				<p:remoteCommand name="deleteResource" actionListener="#{IndexBean.deleteResource()}" />
+											<a href="#" onclick="deleteResource([{name: 'param', value: '#{mashup.lmfId}'}])"> #{mashup.published ? 'Un-Publish' : 'Delete'}</a>
+						    				<p:remoteCommand name="deleteResource" actionListener="#{IndexBean.deleteResource()}" update="dmf:myMashups"/>
 						    			</h:column>
 						    			<!-- <h:column>
 						    				<f:facet name="header"></f:facet>
@@ -143,7 +143,7 @@
 												 var="mashup">
 										<h:column>
 						    				<f:facet name="header">Name</f:facet>
-						    				<a href="view.xhtml?id=#{mashup.lmfId}" target="_blank">#{mashup.name}</a>
+						    				<a href="view.xhtml?id=#{mashup.lmfId}" target="_#{mashup.lmfId}">#{mashup.name}</a>
 						    			</h:column>
 						    			<h:column>
 						    				<f:facet name="header">Viewer</f:facet>

@@ -7,10 +7,11 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 public class MapViewer implements Cloneable
 {
 	private String type;
-	private Double[] initialExtent;
+	private Double[] initialExtent = {-139.1782, 47.6039, -110.3533, 60.5939};
 	private String baseMap;
 
-	public MapViewer() { }
+	public MapViewer() {
+	}
 
 	protected MapViewer( MapViewer mapViewer ) {
 		this.setType(mapViewer.getType());

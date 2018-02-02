@@ -42,10 +42,10 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
     ViewerBase.prototype.initializeLayers = function ( smk ) {
         var self = this;
 
-        if ( !smk.layers || smk.layers.length == 0 ) return
+        if ( !smk.layers || smk.layers.length == 0 ) return SMK.UTIL.resolved()
 
         self.layerIds = smk.layers.map( function ( ly, i ) {
-            self.layerId[ ly.id ] = new SMK.TYPE.Layer[ ly.type ][ smk.viewerType ]( ly )
+            self.layerId[ ly.id ] = new SMK.TYPE.Layer[ ly.type ][ smk.viewer.type ]( ly )
             self.layerId[ ly.id ].initialize()
             self.layerId[ ly.id ].index = i
 
@@ -53,6 +53,7 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
         } )
 
         return self.setLayersVisible( self.layerIds.filter( function ( id ) { return self.layerId[ id ].config.isVisible } ), true )
+            .catch( function () {} )
     }
 
     ViewerBase.prototype.createLayer = function ( id, layers, zIndex, create ) {

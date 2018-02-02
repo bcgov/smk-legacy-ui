@@ -73,11 +73,11 @@ public class CouchDAO
 
 		DesignDocument doc = new DesignDocument("_design/fetch-configs");
 
-		String fetchAllString = "function (doc) \n{\n   emit(doc.lmfId, doc.lmfRevision);\n}";
+		String fetchAllString = "function ( doc ) { emit( doc.lmfId, doc.lmfRevision ) }";
 		DesignDocument.View fetchAll = new DesignDocument.View(fetchAllString);
 		doc.addView("fetch-all-configs", fetchAll);
 
-		String fetchPubString = "function (doc) \n{\n  if(doc.published)\n  {\n    emit(doc.lmfId, doc.lmfRevision);\n  }\n}";
+		String fetchPubString = "function ( doc ) { if( doc.published ) { emit( doc.lmfId, doc.lmfRevision ) } }";
 		DesignDocument.View fetchPub = new DesignDocument.View(fetchPubString);
 		doc.addView("fetch-published-configs", fetchPub);
 

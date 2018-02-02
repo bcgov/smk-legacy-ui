@@ -10,7 +10,7 @@ include.module( 'tool-baseMaps', [ 'smk', 'sidebar', 'base-maps-panel' ], functi
                 panel: {
                     center:   null,
                     zoom:     null,
-                    current:  smk.viewport.baseMap,
+                    current:  smk.viewer.baseMap,
                     basemaps: [
                         { id: 'Topographic', title: 'Topographic' },
                         { id: 'Streets', title: 'Streets' },

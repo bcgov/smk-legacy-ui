@@ -24,14 +24,14 @@ include.module( 'viewer-leaflet', [ 'viewer', 'leaflet' ], function () {
         // this.map.fitBounds(bounds);
 
 
-        if ( smk.viewport ) {
-            if ( smk.viewport.bbox ) {
-                var bx = smk.viewport.bbox
+        if ( smk.viewer ) {
+            if ( smk.viewer.initialExtent ) {
+                var bx = smk.viewer.initialExtent
                 this.map.fitBounds( [ [ bx[ 1 ], bx[ 0 ] ], [ bx[ 3 ], bx[ 2 ] ] ] );
             }
 
-            if ( smk.viewport.baseMap )
-                this.setBasemap( smk.viewport.baseMap )
+            if ( smk.viewer.baseMap )
+                this.setBasemap( smk.viewer.baseMap )
         }
 
         this.map.on( 'zoomstart', changedView )

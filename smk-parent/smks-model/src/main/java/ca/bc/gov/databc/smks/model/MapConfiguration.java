@@ -25,7 +25,7 @@ public class MapConfiguration extends CouchDbDocument implements Cloneable
 
 	// metadata
 	private String createdBy;
-	private boolean isPublished; // is published indicator
+	private boolean published; // is published indicator
 
 	// settings
 	private MapSurround surround;
@@ -54,7 +54,7 @@ public class MapConfiguration extends CouchDbDocument implements Cloneable
 		this.setProject(mapConfiguration.getProject());
 
 		this.setCreatedBy(mapConfiguration.getCreatedBy());
-		this.setIsPublished(mapConfiguration.getIsPublished());
+		this.setPublished(mapConfiguration.isPublished());
 
 		this.setSurround(mapConfiguration.getSurround().clone());
 		this.setViewer(mapConfiguration.getViewer().clone());
@@ -86,8 +86,8 @@ public class MapConfiguration extends CouchDbDocument implements Cloneable
 	public String getCreatedBy() { return this.createdBy; }
 	public void setCreatedBy(String createdBy) { this.createdBy = createdBy; }
 
-	public boolean getIsPublished() { return this.isPublished; }
-	public void setIsPublished(boolean isPublished) { this.isPublished = isPublished; }
+	public boolean isPublished() { return this.published; }
+	public void setPublished(boolean published) { this.published = published; }
 
 
 	public MapSurround getSurround() {

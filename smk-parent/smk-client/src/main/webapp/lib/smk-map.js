@@ -78,7 +78,7 @@ include.module( 'smk-map', [ 'smk', 'jquery', 'util', 'viewer', 'layer' ], funct
             return include( 'map-frame-styles' ).then( function () {
                 $( self.$option.container )
                     .addClass( 'smk-map-frame' )
-                    .addClass( 'smk-viewer-' + self.viewerType )
+                    .addClass( 'smk-viewer-' + self.viewer.type )
             } )
         }
 
@@ -87,7 +87,7 @@ include.module( 'smk-map', [ 'smk', 'jquery', 'util', 'viewer', 'layer' ], funct
 
             return include( 'surround' ).then( function ( inc ) {
                 $( self.$option.container )
-                    .toggleClass( 'smk-show-header', self.surround.showHeader )
+                    .toggleClass( 'smk-show-header' ) //, self.surround.showHeader )
 
                 var expanded = SMK.UTIL.templateReplace( inc.surround[ 'surround-header' ], function ( k ) {
                     return eval( 'self.' + k )
@@ -98,33 +98,34 @@ include.module( 'smk-map', [ 'smk', 'jquery', 'util', 'viewer', 'layer' ], funct
         }
 
         function loadViewer() {
-            return include( 'viewer-' + self.viewerType )
+            return include( 'viewer-' + self.viewer.type )
         }
 
         function initViewer() {
-            self.$viewer = new SMK.TYPE.Viewer[ self.viewerType ]()
+            self.$viewer = new SMK.TYPE.Viewer[ self.viewer.type ]()
             return self.$viewer.initialize( self )
         }
 
         function loadTools() {
             if ( !self.tools ) return
-            var toolIds = Object.keys( self.tools )
-            if ( toolIds.length == 0 ) return
+            // var toolIds = Object.keys( self.tools )
+            if ( self.tools.length == 0 ) return
 
             self.$tool = {}
 
-            return SMK.UTIL.waitAll( toolIds.map( function ( t ) {
-                var tag = 'tool-' + t + '-' + self.viewerType
+            return SMK.UTIL.waitAll( self.tools.map( function ( t ) {
+                var tag = 'tool-' + t.type + '-' + self.viewer.type
                 return include( tag )
                     .catch( function () {
-                        tag = 'tool-' + t
+                        tag = 'tool-' + t.type
                         return include( tag )
                     } )
                     .then( function ( inc ) {
-                        self.$tool[ t ] = inc[ tag ]
+                        self.$tool[ t.type ] = inc[ tag ]
+                        self.tools[ t.type ] = t
                     } )
                     .catch( function () {
-                        console.warn( 'tool "' + t + '" has no implementation' )
+                        console.warn( 'tool "' + t.type + '" has no implementation' )
                     } )
             } ) )
         }
