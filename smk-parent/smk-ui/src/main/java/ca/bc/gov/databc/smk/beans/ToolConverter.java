@@ -15,6 +15,7 @@ import ca.bc.gov.databc.smks.model.Tool;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.commons.codec.binary.Base64;
 
 // @FacesConverter( value = "toolConverter" )
 public class ToolConverter implements Converter {
@@ -31,9 +32,10 @@ public class ToolConverter implements Converter {
     @Override
     public Object getAsObject(FacesContext context, UIComponent component, String value) {
         try {
-            logger.debug("get obj "+value);
+            byte[] dec = Base64.decodeBase64( value );
+            // logger.debug("get obj " + dec);
 
-            return mapper.readValue( value, Tool.class );
+            return mapper.readValue( dec, Tool.class );
         }
         catch (IOException e) {
             logger.debug(e);
@@ -48,8 +50,8 @@ public class ToolConverter implements Converter {
 
         try {
             String json = mapper.writeValueAsString(value);
-            logger.debug(value + " get string "+json);
-            return json;
+            // logger.debug(value + " get string "+json);
+            return Base64.encodeBase64String( json.getBytes() );
         }
         catch (JsonProcessingException e) {
             logger.debug(e);

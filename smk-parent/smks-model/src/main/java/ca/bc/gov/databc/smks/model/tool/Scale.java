@@ -28,6 +28,14 @@ public class Scale extends Tool
 		return "Scale";
 	}
 
+    public String getDescription() {
+        return "Scale options for the map.";
+    }
+
+    public boolean isConfigured() {
+        return true;
+    }
+
 	public boolean getShowFactor() { return showFactor; }
 	public void setShowFactor(boolean showFactor) { this.showFactor = showFactor; }
 

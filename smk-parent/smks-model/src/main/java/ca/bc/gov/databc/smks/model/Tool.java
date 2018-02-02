@@ -47,7 +47,7 @@ import ca.bc.gov.databc.smks.model.tool.Select;
     @Type( name = "identify",		value = Identify.class ),
     @Type( name = "select",			value = Select.class )
 } )
-@JsonInclude(Include.NON_NULL)
+@JsonInclude(Include.NON_DEFAULT)
 public class Tool implements Cloneable
 {
     public enum Type {
@@ -86,10 +86,10 @@ public class Tool implements Cloneable
         }
     }
 
-    private boolean enabled = true;
+    private boolean enabled;
 
     public Tool() {
-        // enabled = true;
+        enabled = true;
     }
 
     protected Tool( Tool tool ) {}
@@ -102,6 +102,16 @@ public class Tool implements Cloneable
     @JsonIgnore
     public String getTitle() {
         return "Unknown";
+    }
+
+    @JsonIgnore
+    public String getDescription() {
+        return "This is the base class";
+    }
+
+    @JsonIgnore
+    public boolean isConfigured() {
+        return false;
     }
 
     public boolean isEnabled() {

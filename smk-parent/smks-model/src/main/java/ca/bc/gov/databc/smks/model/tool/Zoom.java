@@ -32,6 +32,14 @@ public class Zoom extends Tool
 		return Tool.Type.zoom.toString();
 	}
 
+    public String getDescription() {
+        return "Zooming options for the viewer.";
+    }
+
+    public boolean isConfigured() {
+        return true;
+    }
+
 	public boolean getMouseWheel() { return mouseWheel; }
 	public void setMouseWheel(boolean mouseWheel) { this.mouseWheel = mouseWheel; }
 

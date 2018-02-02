@@ -180,16 +180,18 @@
 																responsive="true">
                 										<f:facet name="sourceCaption">Available Tools</f:facet>
         												<f:facet name="targetCaption">Added Tools</f:facet>
-														<p:ajax event="select" listener="#{CreateBean.onToolSelect}"  />
+														<p:ajax event="select" listener="#{CreateBean.onToolSelect}" />
                 									</p:pickList>
 												</div>
 											</div>
-											<div class="row">
-												<div class="col s12">
-													<a class="waves-effect waves-dark btn grey lighten-2" href="#configureToolBox" onclick="configureTool();">Configure Tool...</a>
-													<p:remoteCommand name="configureTool" actionListener="#{CreateBean.configureTool()}" />
+											<p:outputPanel id="configureToolBoxButton">
+												<div class="row">
+													<div class="col s12">
+														<a class="waves-effect waves-dark btn grey lighten-2 #{CreateBean.configureToolDisable}" href="#configureToolBox" onclick="configureTool();">Configure Tool...</a>
+														<p:remoteCommand name="configureTool" actionListener="#{CreateBean.configureTool()}" />
+													</div>
 												</div>
-											</div>
+											</p:outputPanel>
 										</p:panel>
 									</p:tab>
 									<!-- <p:tab id="homePage" title="Home Page">
@@ -550,7 +552,8 @@
 			<div id="configureToolBox" class="modal modal-fixed-footer">
 				<h:form id="toolForm">
 					<div class="modal-content">
-						<h4>Configure #{CreateBean.configureTool.title}</h4>
+						<h4>#{CreateBean.configureTool.title} Configuration</h4>
+						<h5>#{CreateBean.configureTool.description}</h5>
 
 						<c:if test="#{CreateBean.configureTool.type eq 'about'}">
 							<div class="row">

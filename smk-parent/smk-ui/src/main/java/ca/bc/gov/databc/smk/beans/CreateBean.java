@@ -203,6 +203,8 @@ public class CreateBean implements Serializable
 	public void onToolSelect( SelectEvent event ) {
 		configureTool = ( Tool )event.getObject();
 		logger.debug("select "+configureTool.getType());
+		RequestContext.getCurrentInstance().update("createMashupForm:configureToolBoxButton" );
+		// RequestContext.getCurrentInstance().update("createMashupForm:toolsPicklist");
 	}
 
 	public void configureTool() {
@@ -1011,4 +1013,9 @@ public class CreateBean implements Serializable
 	public Tool getConfigureTool() { return configureTool; }
 	public void setConfigureTool(Tool configureTool) { this.configureTool = configureTool; }
 
+	public String getConfigureToolDisable() {
+		// logger.debug( configureTool.getType() + ":" + configureTool.isConfigured() );
+		if ( configureTool == null ) return "disabled";
+		return configureTool.isConfigured() ? "" : "disabled";
+	}
 }

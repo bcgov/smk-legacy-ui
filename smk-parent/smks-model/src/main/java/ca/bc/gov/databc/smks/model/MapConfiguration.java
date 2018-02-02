@@ -11,7 +11,8 @@ import org.ektorp.Attachment;
 import org.ektorp.support.CouchDbDocument;
 
 @JsonIgnoreProperties({"id", "revision"})
-@JsonInclude(Include.NON_NULL)
+// @JsonInclude(Include.NON_NULL)
+@JsonInclude(Include.NON_DEFAULT)
 public class MapConfiguration extends CouchDbDocument implements Cloneable
 {
 	private static final long serialVersionUID = -8711804469072616248L;

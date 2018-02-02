@@ -31,6 +31,14 @@ public class About extends Tool
 		return "About Panel";
 	}
 
+    public String getDescription() {
+        return "Provide the contents of about panel.";
+    }
+
+    public boolean isConfigured() {
+        return true;
+    }
+
 	public String getContent() {
 		logger.debug( "get " + content );
 		return content;
