@@ -8,6 +8,7 @@ import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -28,12 +29,12 @@ import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.FlowEvent;
 import org.primefaces.event.NodeSelectEvent;
+import org.primefaces.event.SelectEvent;
 import org.primefaces.event.TreeDragDropEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.DualListModel;
 import org.primefaces.model.TreeNode;
 import org.primefaces.model.UploadedFile;
-import org.primefaces.event.SelectEvent;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -348,6 +349,7 @@ public class CreateBean implements Serializable
 		}
 
 		Wms lyr = new Wms();
+		lyr.setId(SMKServiceHandler.convertNamesToId(Arrays.asList(selectedServiceLayer.getName(),selectedServiceStyle.getName())));
 		lyr.setTitle(wmsLayerTitle);
 		lyr.setServiceUrl(wmsServiceUrl);
 		lyr.setVersion(wmsVersion);
@@ -655,6 +657,9 @@ public class CreateBean implements Serializable
 				logger.debug("id = "+id);
 				resource.setLmfId(id);
 			}
+
+			if(resource.getSurround().getTitle() == null || resource.getSurround().getTitle().isEmpty() )
+				resource.getSurround().setTitle(resource.getName());
 
 			// we're done, so write to couch!
 			FacesContext ctx = FacesContext.getCurrentInstance();

@@ -269,7 +269,7 @@ public class SMKServiceHandler
         String out = "";
         for ( String n : names )
 		    out = out.concat( convertNameToId( n ) ).concat( "--" );
-        return out.substring( 0, out.length() - 3 );
+        return out.substring( 0, out.length() - 2 );
     }
 
 }

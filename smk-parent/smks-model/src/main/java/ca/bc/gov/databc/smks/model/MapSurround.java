@@ -9,7 +9,9 @@ public class MapSurround implements Cloneable
 	private String type;
 	private String title;
 
-	public MapSurround() { }
+	public MapSurround() {
+		type = "default";
+	}
 
 	protected MapSurround( MapSurround mapSurround ) {
 		this.setType(mapSurround.getType());

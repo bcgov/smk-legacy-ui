@@ -7,7 +7,7 @@
       xmlns:ui="http://java.sun.com/jsf/facelets"
       xmlns:p="http://primefaces.org/ui" >
     <h:head>
-    	<title>Lightweight Mapping Framework</title>
+    	<title>Configurations - SMK</title>
 
     	<!-- css links -->
     	<h:outputStylesheet library="css" name="materialize.css"  />
@@ -39,7 +39,7 @@
 	    <h:form id="dmf">
 	   		<div id="header" class="header nrpp-blue-dark">
 				<h:graphicImage value="resources/images/bc_gov_logo_transparent.png" style="padding: 6px;" />
-				<span class="white-text" style="font-size: 30px; top: 18px; position: absolute; margin-left: 15px;">Lightweight Mapping Framework</span>
+				<span class="white-text" style="font-size: 30px; top: 18px; position: absolute; margin-left: 15px;">Simple Map Kit Configurations</span>
 	   		</div>
 	   		<div id="map" style="width: 100%; height: calc(100vh - 110px); position: absolute; z-index: -10;"/>
    			<div style="width: 100%; height: calc(100vh - 110px); position: absolute; background: rgba(0, 0, 0, 0.3);"/>
@@ -51,15 +51,15 @@
 							<div class="card-content black-text">
 								<div class="row" style="padding: 0px; margin-bottom: 0px;">
 									<div class="col s12">
-										<h3>Welcome to the Lightweight Mapping Framework</h3>
+										<h3>Welcome to the Simple Map Kit</h3>
 									</div>
 								</div>
 								<div class="row" style="padding: 0px;">
 									<div class="col s12">
-										<p>The Lightweight Mapping Framework allows you to create custom linkable and embedable
+										<p>The Simple Map Kit allows you to create custom linkable and embedable
 										maps using data mashed up from DataBC's catalog, GeoServer and other external sources.
 										To view your map or create a new one, check the "My Maps" tab below. To discover
-										other maps, check out "All Maps". To learn more about LMF, check the about tab.</p>
+										other maps, check out "All Maps". To learn more about SMK, check the about tab.</p>
 									</div>
 								</div>
 							</div>
@@ -79,7 +79,7 @@
 					<div id="mymashups" class="col s12">
 						<div class="card white" style="/*height: calc(100vh - 500px);*/">
 							<div class="card-content black-text">
-								<p>Check out your maps below</p>
+								<p>Click on name to see map. <a href="create.xhtml">Create a new map.</a></p>
 								<div>
 									<h:dataTable id="myMashups"
 												 styleClass="bordered highlight responsive-table"
@@ -87,15 +87,15 @@
 												 var="mashup">
 										<h:column>
 						    				<f:facet name="header">Name</f:facet>
-						    				#{mashup.name}
+						    				<a href="view.xhtml?id=#{mashup.lmfId}&amp;version=#{mashup.lmfRevision}" target="_blank">#{mashup.name}</a>
 						    			</h:column>
+						    			<!-- <h:column>
+						    				<f:facet name="header"></f:facet>
+						    				<a href="view.xhtml?id=#{mashup.lmfId}&amp;version=#{mashup.lmfRevision}" target="_blank">View Map</a>
+						    			</h:column> -->
 						    			<h:column>
 						    				<f:facet name="header">Viewer</f:facet>
 						    				#{mashup.viewer.type}
-						    			</h:column>
-						    			<h:column>
-						    				<f:facet name="header">Link</f:facet>
-						    				<a href="view.xhtml?id=#{mashup.lmfId}&amp;version=#{mashup.lmfRevision}" target="_blank">View Map</a>
 						    			</h:column>
 									    <h:column>
 						    				<f:facet name="header">Published</f:facet>
@@ -127,9 +127,9 @@
 									</h:dataTable>
 								</div>
 							</div>
-							<div class="card-action">
+							<!-- <div class="card-action">
 								<a href="create.xhtml">Create a new Map</a>
-							</div>
+							</div> -->
 						</div>
 					</div>
 					<div id="allmashups" class="col s12">
@@ -143,7 +143,7 @@
 												 var="mashup">
 										<h:column>
 						    				<f:facet name="header">Name</f:facet>
-						    				#{mashup.name}
+						    				<a href="view.xhtml?id=#{mashup.lmfId}" target="_blank">#{mashup.name}</a>
 						    			</h:column>
 						    			<h:column>
 						    				<f:facet name="header">Viewer</f:facet>
@@ -157,10 +157,10 @@
 						    				<f:facet name="header">Version</f:facet>
 						    				#{mashup.lmfRevision}
 						    			</h:column>
-						    			<h:column>
+						    			<!-- <h:column>
 						    				<f:facet name="header">Link</f:facet>
 						    				<a href="view.xhtml?id=#{mashup.lmfId}" target="_blank">View Map</a>
-						    			</h:column>
+						    			</h:column> -->
 									</h:dataTable>
 								</div>
 							</div>
@@ -169,7 +169,7 @@
 					<div id="about" class="col s12">
 						<div class="card white" style="/*height: calc(100vh - 500px);*/">
 							<div class="card-content black-text">
-								<p>Info about LMF, help, etc...</p>
+								<p>Info about SMK, help, etc...</p>
 							</div>
 						</div>
 					</div>
@@ -189,16 +189,21 @@
 			map.scrollWheelZoom.disable();
 			map.boxZoom.disable();
 			map.keyboard.disable();
-
-	    	var rndLat = Math.random() * (60 - 48.3) + 47.294;
-	    	var rndLon = (Math.random() * (124 - 111.291) + 114) * -1;
-	    	var rndZoom = Math.floor(Math.random() * (12 - 9) + 9);
-
-	    	map.setView(new L.latLng(rndLat, rndLon), rndZoom);
-
 	    	var bm = L.esri.basemapLayer("Topographic");
-
 			map.addLayer(bm);
+
+			function changeLocation() {
+				var rndLat = Math.random() * (60 - 48.3) + 47.294;
+				var rndLon = (Math.random() * (124 - 111.291) + 114) * -1;
+				var rndZoom = Math.floor(Math.random() * (12 - 9) + 9);
+
+				map.setView(new L.latLng(rndLat, rndLon), rndZoom, { animate: true, duration: 60 } );
+			}
+
+			map.on( 'moveend', function () {
+				setTimeout( changeLocation, 10 * 1000 )
+			} )
+			changeLocation();
 		});
 	</h:outputScript>
 </html>

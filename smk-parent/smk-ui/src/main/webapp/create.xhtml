@@ -8,7 +8,7 @@
    	  xmlns:ui="http://java.sun.com/jsf/facelets"
    	  xmlns:c="http://java.sun.com/jsp/jstl/core">
     <h:head>
-    	<title>Digital Mashup Framework</title>
+    	<title>Builder - SMK Configuration</title>
 
     	<!-- css links -->
     	<h:outputStylesheet library="css" name="materialize.css"  />
@@ -39,7 +39,7 @@
     <h:body class="grey lighten-4" style="height: 100vh; position: relative; font-family: 'Avenir Next W00','Helvetica Neue',Helvetica,Arial,sans-serif;">
    		<div id="header" class="header nrpp-blue-dark">
 			<h:graphicImage value="resources/images/bc_gov_logo_transparent.png" style="padding: 6px;" />
-			<span class="white-text" style="font-size: 30px; top: 18px; position: absolute; margin-left: 15px;">Digital Mashup Framework</span>
+			<span class="white-text" style="font-size: 30px; top: 18px; position: absolute; margin-left: 15px;">Simple Map Kit Configuration Builder</span>
    		</div>
    		<div id="map" style="width: 100%; height: calc(100vh - 110px); position: absolute; z-index: -10;"/>
    		<div style="width: 100%; height: calc(100vh - 110px); position: absolute; background: rgba(0, 0, 0, 0.3);"/>
@@ -50,13 +50,19 @@
 						<div class="card white">
 							<div class="card-content black-text">
 								<p:wizard flowListener="#{CreateBean.onFlowProcess}">
-									<p:tab id="details" title="My Mashup">
-										<p:panel header="Mashup Details">
+									<p:tab id="details" title="Identity">
+										<p:panel header="Configuration identity">
 											<p:messages autoUpdate="true" showDetail="true" closable="true"/>
 											<div class="row" style="margin-bottom: 0px;">
 												<div class="col s12 input-field">
-													<p:inputText id="mashupName" value="#{CreateBean.resource.name}" required="true" requiredMessage="Please supply a name for your mashup" />
-													<h:outputLabel for="createMashupForm:mashupName" value="Mashup Name" />
+													<p:inputText id="mashupName" value="#{CreateBean.resource.name}" required="true" requiredMessage="Please supply a name for your configuration" />
+													<h:outputLabel for="createMashupForm:mashupName" value="Name" />
+												</div>
+											</div>
+											<div class="row" style="margin-bottom: 0px;">
+												<div class="col s12 input-field">
+													<p:inputText id="mashupTitle" value="#{CreateBean.resource.surround.title}" />
+													<h:outputLabel for="createMashupForm:mashupTitle" value="Title" />
 												</div>
 											</div>
 											<!-- <div class="row">
@@ -95,13 +101,13 @@
 											</div>
 										</p:panel>
 									</p:tab>
-									<p:tab id="basemap" title="Basemaps">
-										<p:panel header="Basemaps">
+									<p:tab id="basemap" title="Base Maps">
+										<p:panel header="Base Maps">
 											<p:messages autoUpdate="true" showDetail="true" closable="true"/>
 											<div class="row">
 												<div class="col s12 input-field">
-													<p>Select your default basemap. Note that all basemaps will be available to the mashup,
-													this is just the basemap that displays by default.</p>
+													<p>Select your default base map.</p>
+													<p>Note: all base maps will be available to the application, this is just the base map that is displayed by default.</p>
 													<h:selectOneRadio value="#{CreateBean.resource.viewer.baseMap}" required="true" requireMessage="Please select a default basemap. If you're not sure, go with DataBC Default." layout="pageDirection">
 													   	<!-- f:selectItem itemValue="dataBCDefault" itemLabel="DataBC Default" />
 													   	<f:selectItem itemValue="dataBCRoads" itemLabel="DataBC Roads" / -->
@@ -210,16 +216,16 @@
 											<div class="row">
 												<div class="col s12">
 													<p>Your map is now ready to publish! Click "Publish" below to make your mashup available to the world.
-													if you just want to save your mashup but leave it unpublished for now, that's fine too, just click finish
-													and your mashup is saved. You'll be redirected to the mashup listings.</p>
-													<p>If you want to embed this mashup in another application, you can use an iframe:</p>
+													if you just want to save your configuration but leave it unpublished for now, that's fine too, just click finish
+													and your configuration is saved. You'll be redirected to the configuration listings.</p>
+
 												</div>
 											</div>
 											<div class="row">
 												<div class="col s12">
-													<a class="waves-effect waves-light btn light-blue lighten-2" href="#" onclick="saveAndPublish();">Publish immediately!</a>
+													<a class="waves-effect waves-light btn light-blue lighten-2" href="#" onclick="saveAndPublish();">Publish Now</a>
 													<p:remoteCommand name="saveAndPublish" actionListener="#{CreateBean.saveAndPublish()}" />
-													<a class="waves-effect waves-light btn light-blue lighten-2" href="#" onclick="save();">Just save for now, thanks</a>
+													<a class="waves-effect waves-light btn light-blue lighten-2" href="#" onclick="save();">save without publishing</a>
 													<p:remoteCommand name="save" actionListener="#{CreateBean.save()}" />
 												</div>
 											</div>
