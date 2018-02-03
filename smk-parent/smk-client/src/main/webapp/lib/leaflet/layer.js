@@ -90,11 +90,18 @@ include.module( 'layer-leaflet', [ 'smk', 'layer', 'util' ], function () {
         var jsonLayer = L.geoJson( null, {
             style: convertStyle( layers[ 0 ].config.style ),
             coordsToLatLng: function ( xy ) {
+                // if ( !layers[ 0 ].config.CRS ) return xy
                 return L.CRS[ layers[ 0 ].config.CRS ].unproject( L.point( xy ) )
             },
             renderer: L.svg(),
             interactive: false
         } )
+
+        if ( !layers[ 0 ].config.dataUrl )
+            layers[ 0 ].config.dataUrl = '../smks-api/MapConfigurations/' + this.lmfId + '/Attachments/' + layers[ 0 ].config.id
+
+        if ( !layers[ 0 ].config.CRS )
+            layers[ 0 ].config.CRS = 'EPSG4326'
 
         var kmlLayer = omnivore.kml( layers[ 0 ].config.dataUrl, null, jsonLayer )
 
@@ -142,6 +149,7 @@ include.module( 'layer-leaflet', [ 'smk', 'layer', 'util' ], function () {
         var layer = new L.geoJson( null, {
             style: convertStyle( layers[ 0 ].config.style ),
             coordsToLatLng: function ( xy ) {
+                // if ( !layers[ 0 ].config.CRS ) return xy
                 return L.CRS[ layers[ 0 ].config.CRS ].unproject( L.point( xy ) )
             },
             renderer: L.svg(),
@@ -165,6 +173,12 @@ include.module( 'layer-leaflet', [ 'smk', 'layer', 'util' ], function () {
             }
         } )
 
+        if ( !layers[ 0 ].config.dataUrl )
+            layers[ 0 ].config.dataUrl = '../smks-api/MapConfigurations/' + this.lmfId + '/Attachments/' + layers[ 0 ].config.id
+
+        if ( !layers[ 0 ].config.CRS )
+            layers[ 0 ].config.CRS = 'EPSG4326'
+
         return $.get( layers[ 0 ].config.dataUrl, null, null, 'json' )
             .then( function ( data ) {
                 console.log( 'loaded', layers[ 0 ].config.dataUrl )
@@ -178,7 +192,7 @@ include.module( 'layer-leaflet', [ 'smk', 'layer', 'util' ], function () {
     function convertStyle( styleConfig ) {
         return {
             // stroke:      true,
-            color:       styleConfig.strokeColor,
+            color:       '#' + styleConfig.strokeColor,
             weight:      styleConfig.strokeWidth,
             opacity:     styleConfig.strokeOpacity,
             // lineCap:     styleConfig.,
@@ -186,7 +200,7 @@ include.module( 'layer-leaflet', [ 'smk', 'layer', 'util' ], function () {
             // dashArray:   styleConfig.,
             // dashOffset:  styleConfig.,
             // fill:        styleConfig.,
-            fillColor:   styleConfig.fillColor,
+            fillColor:   '#' + styleConfig.fillColor,
             fillOpacity: styleConfig.fillOpacity,
             // fillRule:    styleConfig.,
         }

@@ -267,11 +267,11 @@ include.module( 'layer', [ 'smk', 'jquery', 'util' ], function () {
         var cv = $( '<canvas width="' + width + '" height="' + height + '">' ).get( 0 )
         var ctx = cv.getContext( '2d' )
 
-        ctx.fillStyle = this.config.style.fillColor
+        ctx.fillStyle = '#' + this.config.style.fillColor
         ctx.fillRect( 0, 0, width, height )
 
         ctx.lineWidth = this.config.style.strokeWidth
-        ctx.strokeStyle = this.config.style.strokeColor
+        ctx.strokeStyle = '#' + this.config.style.strokeColor
         ctx.strokeRect( 0, 0, width, height )
 
         return SMK.UTIL.resolved( [ {

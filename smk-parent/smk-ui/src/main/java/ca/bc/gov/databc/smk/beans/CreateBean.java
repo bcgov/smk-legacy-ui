@@ -106,10 +106,10 @@ public class CreateBean implements Serializable
 	private boolean importClusterPoints;
 	private boolean importHeatmapPoints;
 	private double importStrokeWidth = 1;
-	private String importStrokeColor = "F00";
+	private String importStrokeColor = "ff0000";
 	private double importStrokeOpacity = 1.0;
 	private double importFillOpacity= 0.65;
-	private String importFillColor= "0F0";
+	private String importFillColor= "00ff00";
 
 	private Tool configureTool;
 
@@ -431,8 +431,8 @@ public class CreateBean implements Serializable
 		importOpacity = 0.65;
 		importStrokeWidth = 1.0;
 		importStrokeOpacity = 1.0;
-		importStrokeColor = "f00";
-		importFillColor = "0f0";
+		importStrokeColor = "ff0000";
+		importFillColor = "00ff00";
 		importFillOpacity = 0.65;
 
 		RequestContext.getCurrentInstance().update("importForm");
@@ -448,6 +448,7 @@ public class CreateBean implements Serializable
 			case Kml:
 				layer = new Kml();
 
+				// ( ( Kml )layer ).setDataUrl( url );
 				( ( Kml )layer ).setUseClustering(importClusterPoints);
 				( ( Kml )layer ).setUseHeatmapping(importHeatmapPoints);
 
@@ -462,6 +463,7 @@ public class CreateBean implements Serializable
 			case Geojson:
 				layer = new Geojson();
 
+				// ( ( Geojson )layer ).setDataUrl( url );
 				( ( Geojson )layer ).setUseClustering(importClusterPoints);
 				( ( Geojson )layer ).setUseHeatmapping(importHeatmapPoints);
 

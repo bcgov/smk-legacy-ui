@@ -24,6 +24,7 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
     ViewerBase.prototype.initialize = function ( smk ) {
         var self = this
 
+        this.lmfId = smk.lmfId
         this.identified = new SMK.TYPE.FeatureSet()
         this.selected = new SMK.TYPE.FeatureSet()
 
