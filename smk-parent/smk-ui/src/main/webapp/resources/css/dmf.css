@@ -16,7 +16,7 @@
 
 .header
 {
-	height: 80px; 
+	height: 80px;
 	width: 100%;
 	border-bottom: 2px solid #fcba19;
 }
@@ -36,18 +36,18 @@
 
 /* Materialize Overrides */
 
-.tab a.active 
+.tab a.active
 {
 	color: white !important;
 	background-color: #38598a !important;
 }
 
-.tabs .tab a:hover 
+.tabs .tab a:hover
 {
   color: white !important;
 }
 
-.tabs .tab a 
+.tabs .tab a
 {
   color: white !important;
 }
@@ -112,7 +112,7 @@
 }
 
 /* Modal Content/Box */
-.spinner-modal 
+.spinner-modal
 {
     display: none; /* Hidden by default */
     position: fixed; /* Stay in place */
@@ -126,7 +126,7 @@
     background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
 }
 
-.spinner-modal-content 
+.spinner-modal-content
 {
     /*background-color: #fefefe;*/
     margin: 15% auto; /* 15% from the top and centered */
@@ -161,11 +161,11 @@
     -webkit-animation-name: animatetop;
     -webkit-animation-duration: 0.4s;
     animation-name: animateModalTop;
-    animation-duration: 0.4s	
+    animation-duration: 0.4s
 }
 
 /* The Close Button */
-.spinner-modal-close 
+.spinner-modal-close
 {
     color: white;
     float: right;
@@ -205,7 +205,7 @@
 
 /* Add Animation */
 @-webkit-keyframes animateModalTop {
-    from {top: -300px; opacity: 0} 
+    from {top: -300px; opacity: 0}
     to {top: 0; opacity: 1}
 }
 
@@ -231,7 +231,7 @@
   position: relative;
   -webkit-transform: scale(1.1);
       -ms-transform: scale(1.1);
-          transform: scale(1.1); 
+          transform: scale(1.1);
 }
 .sk-folding-cube .sk-cube:before {
   content: '';
@@ -265,7 +265,7 @@
 }
 .sk-folding-cube .sk-cube3:before {
   -webkit-animation-delay: 0.6s;
-          animation-delay: 0.6s; 
+          animation-delay: 0.6s;
 }
 .sk-folding-cube .sk-cube4:before {
   -webkit-animation-delay: 0.9s;
@@ -275,31 +275,31 @@
   0%, 10% {
     -webkit-transform: perspective(140px) rotateX(-180deg);
             transform: perspective(140px) rotateX(-180deg);
-    opacity: 0; 
+    opacity: 0;
   } 25%, 75% {
     -webkit-transform: perspective(140px) rotateX(0deg);
             transform: perspective(140px) rotateX(0deg);
-    opacity: 1; 
+    opacity: 1;
   } 90%, 100% {
     -webkit-transform: perspective(140px) rotateY(180deg);
             transform: perspective(140px) rotateY(180deg);
-    opacity: 0; 
-  } 
+    opacity: 0;
+  }
 }
 
 @keyframes sk-foldCubeAngle {
   0%, 10% {
     -webkit-transform: perspective(140px) rotateX(-180deg);
             transform: perspective(140px) rotateX(-180deg);
-    opacity: 0; 
+    opacity: 0;
   } 25%, 75% {
     -webkit-transform: perspective(140px) rotateX(0deg);
             transform: perspective(140px) rotateX(0deg);
-    opacity: 1; 
+    opacity: 1;
   } 90%, 100% {
     -webkit-transform: perspective(140px) rotateY(180deg);
             transform: perspective(140px) rotateY(180deg);
-    opacity: 0; 
+    opacity: 0;
   }
 }
 
@@ -308,7 +308,7 @@
 	border-radius: 0px !important;
 }
 
-.leaflet-popup-content 
+.leaflet-popup-content
 {
     max-width: 600px;
     width: 500px;
@@ -329,7 +329,7 @@
     height: 2rem;
 }
 
-.esri-draw-button 
+.esri-draw-button
 {
     background-color: rgba(255, 255, 255, 0.65);
     cursor: pointer;
@@ -338,15 +338,20 @@
     font-size: 1.5em;
 }
 
-.esri-draw-button-selected 
+.esri-draw-button-selected
 {
     opacity: 1;
     background-color: rgba(102, 0, 255, 0.75);
     color: white;
 }
 
-.esri-draw-button-selected:hover 
+.esri-draw-button-selected:hover
 {
 	background-color: rgba(102, 0, 255, 0.3);
 	color: white;
+}
+
+.ui-selectlistbox-listcontainer .ui-selectlistbox-item td {
+    padding: 0;
+    white-space: nowrap;
 }

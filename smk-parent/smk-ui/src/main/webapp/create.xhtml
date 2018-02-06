@@ -319,7 +319,7 @@
 										<div class="row">
 											<div class="col s12">
 												<a class="waves-effect waves-light btn light-blue lighten-2" href="#" onclick="addMpcmLayer();">Add Layer to Mashup</a>
-												<p:remoteCommand name="addLayer" actionListener="#{CreateBean.addSelectedLayerMpcm()}" />
+												<p:remoteCommand name="addMpcmLayer" actionListener="#{CreateBean.addSelectedLayerMpcm()}" />
 											</div>
 										</div>
 									</p:panel>
@@ -338,12 +338,7 @@
 				<h:form id="wmsForm">
 					<div class="modal-content">
 						<h4>WMS Service</h4>
-						<div class="row">
-							<div class="col s12 input-field">
-								<p:inputText id="wmsTitle" value="#{CreateBean.wmsLayerTitle}" required="false" />
-								<h:outputLabel for="wmsForm:wmsTitle" value="Layer Title" />
-							</div>
-						</div>
+
 						<div class="row">
 							<div class="col s8 input-field">
 								<h:selectBooleanCheckbox id="wmsLayerVisible" value="#{CreateBean.wmsIsVisible}" />
@@ -354,6 +349,7 @@
 								<h:outputLabel for="wmsForm:wmsOpacity" value="Layer Opacity" />
 							</div>
 						</div>
+
 						<div class="row">
 							<div class="col s8 input-field">
 								<p:inputText id="wmsUrl" value="#{CreateBean.wmsServiceUrl}" required="true" requiredMessage="A Service URL is required" />
@@ -364,60 +360,72 @@
 								<h:outputLabel for="wmsForm:wmsVersion" value="Service Version" />
 							</div>
 						</div>
+
 						<div class="row">
-							<div class="col s8">
-								<p:dataTable id="allServiceLayers"
-											styleClass="bordered highlight responsive-table"
-											var="lyr"
-											value="#{CreateBean.allServiceLayers}"
-											selectionMode="single"
-											selection="#{CreateBean.selectedServiceLayer}"
-											rowKey="#{lyr.title}"
-											rows="4"
-											paginator="true"
-											rowsPerPageTemplate="5"
-											paginatorPosition="bottom">
-									<!-- <f:facet name="header">
-										Service Layers
-									</f:facet> -->
-									<p:ajax event="rowSelect" update="wmsForm:allServiceLayerStyles" />
-									<p:column headerText="Service layers">
-										<h:outputText value="#{lyr.title}" />
+							<div class="col s6">
+								<p:outputLabel for="allServiceLayers" value="Service Layers" />
+								<p:selectOneListbox
+									id="allServiceLayers"
+									value="#{CreateBean.selectedServiceLayer}"
+									var="lyr"
+									filter="true"
+									filterMatchMode="contains"
+									scrollHeight="275"
+									converter="#{CreateBean.layerConverter}"
+									style="width: 100%;"
+								>
+									<f:selectItems
+										value="#{CreateBean.allServiceLayers}"
+										var="lyrItem"
+										itemLabel="#{lyrItem.title}"
+										itemValue="#{lyrItem}"
+									/>
+
+									<p:column>
+										#{lyr.title}
 									</p:column>
-								</p:dataTable>
+
+									<p:ajax event="valueChange" update="wmsForm" />
+								</p:selectOneListbox>
 							</div>
-							<div class="col s4">
-								<p:dataTable id="allServiceLayerStyles"
-											styleClass="bordered highlight responsive-table"
-											var="lyrStyle"
-											value="#{CreateBean.selectedServiceLayer.styles}"
-											selectionMode="single"
-											selection="#{CreateBean.selectedServiceStyle}"
-											rowKey="#{lyrStyle.name}">
-									<!-- <f:facet name="header">
-										Service Layer Styles
-									</f:facet> -->
-									<p:column headerText="Styles for layer">
-										<h:outputText value="#{lyrStyle.name}" />
+
+							<div class="col s6">
+								<p:outputLabel for="allServiceLayerStyles" value="Layer Styles" />
+								<p:selectOneListbox
+									id="allServiceLayerStyles"
+									value="#{CreateBean.selectedServiceStyle}"
+									var="stl"
+									filter="true"
+									filterMatchMode="contains"
+									scrollHeight="275"
+									converter="#{CreateBean.styleConverter}"
+									style="width: 100%;"
+								>
+									<f:selectItems
+										value="#{CreateBean.selectedServiceLayer.styles}"
+										var="stlItem"
+										itemLabel="#{stlItem.title}"
+										itemValue="#{stlItem}"
+									/>
+
+									<p:column>
+										#{stl.title}
 									</p:column>
-								</p:dataTable>
+
+									<p:ajax event="valueChange" update="wmsForm" />
+								</p:selectOneListbox>
 							</div>
 						</div>
-						<!-- <div class="row">
-							<div class="col s12">
-								<a class="waves-effect waves-light btn light-blue lighten-2" href="#" onclick="addWmsLayer();">Add Layer to Mashup</a>
-								<p:remoteCommand name="addLayerWms" actionListener="#{'CreateBean.addSelectedLayerWms()'}" />
-							</div>
-						</div> -->
 					</div>
+
 					<div class="modal-footer">
 						<a href="#!" onclick="$('#wmsServiceBox').modal('close');" class="modal-action modal-close waves-effect waves-green btn-flat">Cancel</a>
 
-						<a class="waves-effect waves-light btn light-blue lighten-2" href="#" onclick="buildWmsLayerList();">Load Layer List</a>
-						<p:remoteCommand name="buildWmsLayers" actionListener="#{CreateBean.buildWmsLayerList()}" />
+						<a class="waves-effect waves-light btn light-blue lighten-2" href="#" onclick="buildWmsLayerList(); openModal();">Load Layer List</a>
+						<p:remoteCommand name="buildWmsLayerList" actionListener="#{CreateBean.buildWmsLayerList()}" />
 
 						<a class="waves-effect waves-light btn light-blue lighten-2" href="#" onclick="addWmsLayer(); $('#wmsServiceBox').modal('close');">Add Layer</a>
-						<p:remoteCommand name="addLayerWms" actionListener="#{CreateBean.addSelectedLayerWms()}" />
+						<p:remoteCommand name="addWmsLayer" actionListener="#{CreateBean.addSelectedLayerWms()}" />
 					</div>
 				</h:form>
 			</div>
@@ -470,7 +478,7 @@
 						<div class="row">
 							<div class="col s12">
 								<a class="waves-effect waves-light btn light-blue lighten-2" href="#" onclick="addFsLayer();">Add Layer to Mashup</a>
-								<p:remoteCommand name="addLayerFs" actionListener="#{CreateBean.addSelectedLayerFeatureService()}" />
+								<p:remoteCommand name="addFsLayer" actionListener="#{CreateBean.addSelectedLayerFeatureService()}" />
 							</div>
 						</div>
 					</h:form>
@@ -637,84 +645,19 @@
 		</div>
     </h:body>
     <h:outputScript>
-    	$(document).ready(function()
-    	{
-		    $(".modal").modal(
-		    {
-			      dismissible: true, // Modal can be dismissed by clicking outside of the modal
-			      opacity: .5, // Opacity of modal background
-			      inDuration: 300, // Transition in duration
-			      outDuration: 200
-			});
+    	$( function() {
+		    $( ".modal" ).modal( {
+			      dismissible: 	true, // Modal can be dismissed by clicking outside of the modal
+			      opacity: 		.5, // Opacity of modal background
+			      inDuration: 	300, // Transition in duration
+			      outDuration: 	200
+			} );
 
-			// init background map
-	    	var map = L.map('map', { zoomControl: false });
-	    	map.touchZoom.disable();
-			map.doubleClickZoom.disable();
-			map.scrollWheelZoom.disable();
-			map.boxZoom.disable();
-			map.keyboard.disable();
-
-	    	var rndLat = Math.random() * (60 - 48.3) + 47.294;
-	    	var rndLon = (Math.random() * (124 - 111.291) + 114) * -1;
-	    	var rndZoom = Math.floor(Math.random() * (12 - 9) + 9);
-
-	    	map.setView(new L.latLng(rndLat, rndLon), rndZoom);
-
-	    	var bm = L.esri.basemapLayer("Topographic");
-
-			map.addLayer(bm);
+			fixSelectOneListFilter()
 		});
 
-		function addMpcmLayer()
-		{
-			addLayer();
-		}
-
-		function addWmsLayer()
-		{
-			addLayerWms();
-		}
-
-		function addFsLayer()
-		{
-			addLayerFs();
-		}
-
-		function addKmlLayer()
-		{
-			addLayerKml();
-		}
-
-		function addJsonLayer()
-		{
-			addLayerJson();
-		}
-
-		function removeLayer()
-		{
-			removeLayer();
-		}
-
-		function editLayer()
-		{
-			editLayer();
-		}
-
-		function save()
-		{
-			save();
-		}
-
-		function saveAndPublish()
-		{
-			saveAndPublish();
-		}
-
-		function buildWmsLayerList()
-		{
-			buildWmsLayers();
-			openModal();
+		function fixSelectOneListFilter() {
+			$( '.ui-selectonelistbox .ui-selectlistbox-filter' ).addClass( 'browser-default' )
 		}
 
 		function openModal()

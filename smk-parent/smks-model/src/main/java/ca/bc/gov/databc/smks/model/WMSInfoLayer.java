@@ -83,4 +83,18 @@ public class WMSInfoLayer
 	{
 		this.metadataUrl = metadataUrl;
 	}
+
+    @Override
+    public boolean equals( Object other ) {
+        if ( other == null ) return false;
+        if ( other == this ) return true;
+        if ( !( other instanceof WMSInfoLayer ) ) return false;
+
+        return ( ( WMSInfoLayer )other ).getName().equals( getName() );
+    }
+
+    @Override
+    public int hashCode() {
+        return getName().hashCode();
+    }
 }

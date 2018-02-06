@@ -135,7 +135,7 @@ public class Tool implements Cloneable
         if ( other == this ) return true;
         if ( !( other instanceof Tool ) ) return false;
 
-        return ( ( Tool )other ).getType() == getType();
+        return ( ( Tool )other ).getType().equals( getType() );
     }
 
     @Override

@@ -19,7 +19,12 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
+import javax.faces.event.AjaxBehaviorEvent;
 import javax.xml.parsers.DocumentBuilderFactory;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.logging.Log;
@@ -73,7 +78,10 @@ public class CreateBean implements Serializable
 	private ArrayList<TreeNode> catalogNodes;
 
 	private DualListModel<Tool> tools;
-	private ToolConverter converter;
+
+	private ToolConverter toolConverter;
+	private LayerConverter layerConverter;
+	private StyleConverter styleConverter;
 
 	// for WMS popup
 	private boolean wmsIsVisible = true;
@@ -116,7 +124,9 @@ public class CreateBean implements Serializable
 	@PostConstruct
     public void init()
 	{
-		converter = new ToolConverter();
+		toolConverter = new ToolConverter();
+		layerConverter = new LayerConverter();
+		styleConverter = new StyleConverter();
 
 		// init the DMF Resource object that will be stored in couch, or read from couch
 		resource = new MapConfiguration();
@@ -198,7 +208,15 @@ public class CreateBean implements Serializable
 	}
 
 	public Converter getToolConverter() {
-		return converter;
+		return toolConverter;
+	}
+
+	public Converter getLayerConverter() {
+		return layerConverter;
+	}
+
+	public Converter getStyleConverter() {
+		return styleConverter;
 	}
 
 	public void onToolSelect( SelectEvent event ) {
@@ -276,6 +294,7 @@ public class CreateBean implements Serializable
 
 		                NodeList layerStyles = layerElement.getElementsByTagName("Style");
 
+						List<WMSInfoStyle> styles = layer.getStyles();
 		                if (layerStyles != null)
 		    		    {
 		    		        for (int s = 0; s < layerStyles.getLength(); s++)
@@ -284,8 +303,38 @@ public class CreateBean implements Serializable
 
 								WMSInfoStyle style = new WMSInfoStyle();
 								style.setName( styleElement.getElementsByTagName("Name").item(0).getTextContent());
-		    		        	layer.getStyles().add(style);
+								style.setTitle( styleElement.getElementsByTagName("Title").item(0).getTextContent().replace("_", " "));
+
+								if ( !styles.contains( style ) )
+		    		        		styles.add(style);
 		    		        }
+
+							int p = 0;
+							String s0 = styles.get( 0 ).getTitle();
+							if ( styles.size() > 1 ) {
+								OUTER: while ( true ) {
+									if ( p >= s0.length() ) break OUTER;
+
+									char c0 = s0.charAt( p );
+									for ( int j = 1; j < styles.size(); j++ ) {
+										String n = styles.get( j ).getTitle();
+										if ( p >= n.length() ) break OUTER;
+
+										if ( c0 != n.charAt( p ) ) break OUTER;
+									}
+
+									p += 1;
+								}
+							}
+							// logger.debug( s0 + ", " + p );
+
+							if ( p > 0 )
+								for ( int j = 0; j < styles.size(); j++ ) {
+									WMSInfoStyle s = styles.get( j );
+									if ( p < ( s.getTitle().length() - 1 ) )
+										s.setTitle( "..." + s.getTitle().substring( p ) );
+									// logger.debug( s.getTitle() );
+								}
 		    		    }
 		            }
 		        }
@@ -294,12 +343,17 @@ public class CreateBean implements Serializable
 		    RequestContext.getCurrentInstance().update("wmsForm");
 		    RequestContext.getCurrentInstance().execute("Materialize.updateTextFields();");
 		    RequestContext.getCurrentInstance().execute("closeModal()");
+		    RequestContext.getCurrentInstance().execute("fixSelectOneListFilter()");
 		}
 		catch (Exception e)
 		{
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error parsing WMS capabilities:", e.getMessage()));
 			e.printStackTrace();
 		}
+	}
+
+	public void layerMessage( AjaxBehaviorEvent event ) {
+		logger.debug( event.toString() );
 	}
 
 	public TreeNode getCatalogLayers()
@@ -848,17 +902,27 @@ public class CreateBean implements Serializable
 
 	public void setSelectedServiceLayer(WMSInfoLayer selectedServiceLayer)
 	{
+		try {
+		logger.debug( (new ObjectMapper()).writeValueAsString(selectedServiceLayer));
+		}
+        catch (JsonProcessingException e) {}
+
 		this.selectedServiceLayer = selectedServiceLayer;
-		if ( selectedServiceLayer == null ) return;
+		if ( selectedServiceLayer != null ) {
+			wmsLayerTitle = selectedServiceLayer.getTitle();
 
-		wmsLayerTitle = selectedServiceLayer.getTitle();
-
-		if ( !selectedServiceLayer.getStyles().isEmpty() ) {
-			selectedServiceStyle = selectedServiceLayer.getStyles().get(0);
+			if ( !selectedServiceLayer.getStyles().isEmpty() ) {
+				selectedServiceStyle = selectedServiceLayer.getStyles().get(0);
+			}
+		}
+		else {
+			wmsLayerTitle = null;
+			selectedServiceStyle = null;
 		}
 
 		RequestContext.getCurrentInstance().update("wmsForm");
 		RequestContext.getCurrentInstance().execute("Materialize.updateTextFields();");
+		RequestContext.getCurrentInstance().execute("fixSelectOneListFilter()");
 	}
 
 	public WMSInfoStyle getSelectedServiceStyle()
@@ -869,6 +933,10 @@ public class CreateBean implements Serializable
 	public void setSelectedServiceStyle(WMSInfoStyle selectedServiceStyle)
 	{
 		this.selectedServiceStyle = selectedServiceStyle;
+
+		RequestContext.getCurrentInstance().update("wmsForm");
+		RequestContext.getCurrentInstance().execute("Materialize.updateTextFields();");
+		RequestContext.getCurrentInstance().execute("fixSelectOneListFilter()");
 	}
 
 	public ArrayList<WMSInfoLayer> getAllServiceLayers()
