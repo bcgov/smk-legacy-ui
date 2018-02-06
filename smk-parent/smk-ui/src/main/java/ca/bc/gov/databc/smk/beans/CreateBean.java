@@ -387,8 +387,11 @@ public class CreateBean implements Serializable
 
 	public void addSelectedLayerMpcm()
 	{
+		// logger.debug( "addSelectedLayerMpcm " + selectedLayerNode );
+
 		layerNodes.getChildren().add(selectedLayerNode);
 		selectedLayerNode.setParent(layerNodes);
+
 		RequestContext.getCurrentInstance().update("createMashupForm:layerList");
 		RequestContext.getCurrentInstance().update("mpcmLayerForm:catalog");
 		RequestContext.getCurrentInstance().update("mpcmLayerForm:mpcmLayerPanel");
@@ -409,11 +412,7 @@ public class CreateBean implements Serializable
 		lyr.setVersion(wmsVersion);
 		lyr.setLayerName(selectedServiceLayer.getName());
 		lyr.setStyleName(selectedServiceStyle.getName());
-		// lyr.setLayerTypeCode(LayerTypes.wmsLayer);
-		// lyr.setId(id);
 		lyr.setIsVisible(wmsIsVisible);
-		// lyr.setIsSelectable(true);
-		// lyr.setIsExportable(true);
 	    lyr.setOpacity(wmsOpacity);
 
 		wmsLayerTitle = null;
@@ -790,24 +789,24 @@ public class CreateBean implements Serializable
 
 	public void onMpcmNodeSelect(NodeSelectEvent event)
 	{
-		try
-		{
-			Layer layer = (Layer)event.getTreeNode().getData();
-			if(layer.getType().equals(Layer.Type.EsriDynamic.getJsonType()) && ((EsriDynamic)layer).getDynamicLayers().size() == 0)
-			{
-				LayerController.loadMpcmLayerDetails((EsriDynamic)layer);
+		TreeNode node = event.getTreeNode();
+		this.setSelectedLayerNode( node );
+
+		if ( node != null && node.getData() != null ) {
+			Layer layer = ( Layer )node.getData();
+
+			if ( layer instanceof EsriDynamic ) {
+				try {
+					LayerController.loadMpcmLayerDetails( ( EsriDynamic )layer );
+				}
+				catch ( Exception e) {
+					logger.error( e );
+				}
 			}
-
-			this.setSelectedLayerNode(event.getTreeNode());
-
-			RequestContext.getCurrentInstance().update("mpcmLayerForm:mpcmLayerPanel");
-			RequestContext.getCurrentInstance().execute("Materialize.updateTextFields();");
 		}
-		catch (Exception e)
-		{
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error selecting node:", e.getMessage()));
-			e.printStackTrace();
-		}
+
+		RequestContext.getCurrentInstance().update("mpcmLayerForm:mpcmLayerPanel");
+		RequestContext.getCurrentInstance().execute("Materialize.updateTextFields();");
     }
 
 	public void onDragDrop(TreeDragDropEvent event)
@@ -902,10 +901,10 @@ public class CreateBean implements Serializable
 
 	public void setSelectedServiceLayer(WMSInfoLayer selectedServiceLayer)
 	{
-		try {
-		logger.debug( (new ObjectMapper()).writeValueAsString(selectedServiceLayer));
-		}
-        catch (JsonProcessingException e) {}
+		// try {
+		// logger.debug( (new ObjectMapper()).writeValueAsString(selectedServiceLayer));
+		// }
+        // catch (JsonProcessingException e) {}
 
 		this.selectedServiceLayer = selectedServiceLayer;
 		if ( selectedServiceLayer != null ) {

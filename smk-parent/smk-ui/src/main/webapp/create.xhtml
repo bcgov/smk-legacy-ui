@@ -240,97 +240,94 @@
 
 
 			<div id="layerCatalogBox" class="modal modal-fixed-footer">
-				<div class="modal-content">
-					<h4>DataBC Catalog Layers</h4>
-					<h:form id="mpcmLayerForm" style="height: calc(100% - 51px); margin-bottom: 0px;">
+				<h:form id="mpcmLayerForm" style="height: calc(100% - 51px); margin-bottom: 0px;">
+					<div class="modal-content">
+						<h4>DataBC Catalog Layers</h4>
+
 						<div class="row" style="height: 100%;">
-							<div style="height: 100%; width: 320px;">
-								<p:outputPanel style="overflow: auto; display: block; width: 320px;height: 100%;">
-									<p:tree id="catalog"
-											value="#{CreateBean.getCatalogLayers()}"
-											var="node"
-											selectionMode="single"
-							                draggable="false"
-							                droppable="false"
-							                selection="#{CreateBean.selectedLayerNode}"
-							                dynamic="true"
-							                animate="true">
-							            <p:ajax event="select" update="mpcmLayerForm:mpcmLayerPanel" listener="#{CreateBean.onMpcmNodeSelect}" />
-							            <p:treeNode>
-							                <h:outputText value="#{node}" />
-							            </p:treeNode>
-							        </p:tree>
-						        </p:outputPanel>
+							<div class="col s6">
+								<p:tree id="catalog"
+										value="#{CreateBean.getCatalogLayers()}"
+										var="node"
+										selectionMode="single"
+										draggable="false"
+										droppable="false"
+										selection="#{CreateBean.selectedLayerNode}"
+										dynamic="true"
+										animate="true"
+										style="height: 500px; overflow: scroll;"
+								>
+									<p:ajax event="select" update="mpcmLayerForm:mpcmLayerPanel" listener="#{CreateBean.onMpcmNodeSelect}" />
+									<p:treeNode>
+										<h:outputText value="#{node}" />
+									</p:treeNode>
+								</p:tree>
 							</div>
-							<div style="margin-left: 321px; position: fixed; right: 14px; top: 75px; width: calc(100% - 355px);">
-								<p:panel id="mpcmLayerPanel" style="overflow: auto; display: block; height: 511px;">
-									<h5>#{CreateBean.selectedLayerNode.data.label}</h5>
-									<p:panel id="secureLayer" rendered="#{not CreateBean.selectedLayerNode.data.getMpcmWorkspace() eq 'MPCM_ALL_PUB'}">
-										<p>This is a secure only layer, and cannot be used in the Digital Mashup Framework at this time</p>
-									</p:panel>
-									<p:panel id="publicLayer" rendered="#{CreateBean.selectedLayerNode.data.getMpcmWorkspace() eq 'MPCM_ALL_PUB'}">
-										<div class="row">
-											<div class="col s12">
-												<a href="#{CreateBean.selectedLayerNode.data.metadataUrl}" target="_blank" style="color: #039be5;">Layer Metadata</a>
-											</div>
-										</div>
-										<div class="row">
-											<div class="col s12 input-field" style="padding: 0px; margin-left: 0px; margin-right: 0px; margin-bottom: 0px; margin-top: -16px;">
-												<h:selectBooleanCheckbox id="layerVisible" value="#{CreateBean.selectedLayerNode.data.isVisible}" />
-												<h:outputLabel for="mpcmLayerForm:layerVisible" value="Visible by default" />
-											</div>
-										</div>
-										<div class="row">
-											<div class="col s12 input-field">
-												<p:inputText id="opacity" value="#{CreateBean.selectedLayerNode.data.opacity}" required="false" />
-												<h:outputLabel for="mpcmLayerForm:opacity" value="Opacity" />
-											</div>
-										</div>
-										<div class="row">
-											<div class="col s12 input-field">
-												<p:inputText id="attribution" value="#{CreateBean.selectedLayerNode.data.attribution}" required="false" />
-												<h:outputLabel for="mpcmLayerForm:attribution" value="Attribution" />
-											</div>
-										</div>
-										<p:panel id="attributePanel">
+
+							<div class="col s6">
+								<p:outputPanel id="mpcmLayerPanel" style="overflow: auto; display: block; height: 500px;">
+									<c:if test="#{ CreateBean.selectedLayerNode.data.type eq 'esri-dynamic' }">
+										<h5>#{CreateBean.selectedLayerNode.data.title}</h5>
+
+										<p:panel id="noLayer" rendered="#{ empty CreateBean.selectedLayerNode.data.getMpcmWorkspace() }">
+											<p>Select a layer</p>
+										</p:panel>
+
+										<p:panel id="secureLayer" rendered="#{ not empty CreateBean.selectedLayerNode.data.getMpcmWorkspace() and CreateBean.selectedLayerNode.data.getMpcmWorkspace() ne 'MPCM_ALL_PUB' }">
+											<p>This is a secure only layer, and cannot be used in the Digital Mashup Framework at this time</p>
+										</p:panel>
+
+										<p:outputPanel id="publicLayer" rendered="#{CreateBean.selectedLayerNode.data.getMpcmWorkspace() eq 'MPCM_ALL_PUB'}">
 											<div class="row">
 												<div class="col s12">
-													<h5>Attributes</h5>
+													<a href="#{CreateBean.selectedLayerNode.data.metadataUrl}" target="_blank" style="color: #039be5;">Layer Metadata</a>
 												</div>
 											</div>
-											<ui:repeat value="#{CreateBean.selectedLayerNode.data.attributes}" var="field">
-									            <div class="row">
-									            	<div class="col s12">
-									            		<h:outputLabel value="#{field.name}" />
-									            	</div>
-									            </div>
-									            <div class="row">
-									            	<div class="col s8 input-field">
-									            		<p:inputText id="fieldAlias" value="#{field.alias}" required="true" />
-														<h:outputLabel for="mpcmLayerForm:attributePanel:fieldAlias" value="Alias" />
-									            	</div>
-									            	<div class="col s4 input-field">
-									            		<h:selectBooleanCheckbox id="fieldVisible" value="#{field.visible}" style="padding: 0px; margin-left: 0px; margin-right: 0px; margin-bottom: 0px; margin-top: -16px;"/>
-														<h:outputLabel for="mpcmLayerForm:attributePanel:fieldVisible" value="Visible" />
-									            	</div>
-									            </div>
-									        </ui:repeat>
-										</p:panel>
-										<div class="row">
-											<div class="col s12">
-												<a class="waves-effect waves-light btn light-blue lighten-2" href="#" onclick="addMpcmLayer();">Add Layer to Mashup</a>
-												<p:remoteCommand name="addMpcmLayer" actionListener="#{CreateBean.addSelectedLayerMpcm()}" />
+											<div class="row">
+												<div class="col s6 input-field" style="padding: 0px; margin-left: 0px; margin-right: 0px; margin-bottom: 0px; margin-top: -16px;">
+													<h:selectBooleanCheckbox id="layerVisible" value="#{CreateBean.selectedLayerNode.data.isVisible}" />
+													<h:outputLabel for="mpcmLayerForm:layerVisible" value="Visible by default" />
+												</div>
+												<div class="col s6 input-field">
+													<p:inputText id="opacity" value="#{CreateBean.selectedLayerNode.data.opacity}" required="false" />
+													<h:outputLabel for="mpcmLayerForm:opacity" value="Opacity" />
+												</div>
 											</div>
-										</div>
-									</p:panel>
-								</p:panel>
+											<div class="row">
+												<div class="col s12 input-field">
+													<p:inputText id="attribution" value="#{CreateBean.selectedLayerNode.data.attribution}" required="false" />
+													<h:outputLabel for="mpcmLayerForm:attribution" value="Attribution" />
+												</div>
+											</div>
+											<p:outputPanel id="attributePanel">
+												<div class="row">
+													<div class="col s12">
+														<h5>Attributes</h5>
+													</div>
+												</div>
+												<ui:repeat id="attrs" value="#{CreateBean.selectedLayerNode.data.attributes}" var="field">
+													<div class="row">
+														<div class="col s12 input-field">
+															<h:selectBooleanCheckbox id="visible" value="#{field.visible}" style="padding: 0px; margin-left: 0px; margin-right: 0px; margin-bottom: 0px; margin-top: -16px;"/>
+															<h:outputLabel for="visible" value="#{field.name}" />
+															<p:inputText id="title" value="#{field.title}" required="true" />
+														</div>
+													</div>
+												</ui:repeat>
+											</p:outputPanel>
+										</p:outputPanel>
+									</c:if>
+								</p:outputPanel>
 							</div>
 						</div>
-					</h:form>
-				</div>
-				<div class="modal-footer">
-					<a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat">Done</a>
-				</div>
+					</div>
+					<div class="modal-footer">
+						<a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat">Cancel</a>
+
+						<a class="waves-effect waves-light btn light-blue lighten-2" onclick="addMpcmLayer(); $('#layerCatalogBox').modal('close');">Add Layer</a>
+						<p:remoteCommand name="addMpcmLayer" actionListener="#{CreateBean.addSelectedLayerMpcm()}" />
+					</div>
+				</h:form>
 			</div>
 
 
