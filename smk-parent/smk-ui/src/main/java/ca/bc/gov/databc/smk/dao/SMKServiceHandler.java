@@ -102,6 +102,20 @@ public class SMKServiceHandler
         conn.disconnect();
 	}
 
+	public void deleteAttachment(MapConfiguration resource, String layerId ) throws MalformedURLException, IOException
+	{
+		HttpURLConnection conn = (HttpURLConnection) new URL(serviceUrl + "MapConfigurations/" + resource.getLmfId() + "/Attachments/" + layerId ).openConnection();
+		conn.setDoOutput(true);
+        conn.setRequestMethod("DELETE");
+        conn.setRequestProperty("Content-Type", "application/json");
+
+        if (conn.getResponseCode() == HttpURLConnection.HTTP_OK)
+        {
+        }
+
+        conn.disconnect();
+	}
+
 	public MapConfiguration getResource(String id) throws MalformedURLException, IOException
 	{
 		MapConfiguration result = null;

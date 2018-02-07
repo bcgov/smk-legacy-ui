@@ -611,43 +611,27 @@ public class CreateBean implements Serializable
 	{
 		TreeNode parent = selectedLayerNode.getParent();
 		parent.getChildren().remove(selectedLayerNode);
-		// is this an MPCM layer? We can tell because it'll be using a relational tree node
-//		if(selectedLayerNode instanceof RelationalTreeNode)
-//		{
-//			RelationalTreeNode node = (RelationalTreeNode)selectedLayerNode;
-//
-//			node.clearParent();
-//
-//			node.setParent(node.getOriginalParent());
-//			node.getOriginalParent().getChildren().add(node);
-//
-//			RequestContext.getCurrentInstance().update("mpcmLayerForm:catalog");
-//			RequestContext.getCurrentInstance().update("mpcmLayerForm:mpcmLayerPanel");
-//		}
 
-		Layer data = (Layer)selectedLayerNode.getData();
+		if ( selectedLayerNode.getData() != null ) {
+			Layer data = (Layer)selectedLayerNode.getData();
 
-		if(data.getType().equals(Layer.Type.Kml.getJsonType()) || data.getType().equals(Layer.Type.Geojson.getJsonType()))
-		{
-			if(data.getId() != null)
-			{
-				// delete the document in the couchDB
-				try
-				{
-					FacesContext ctx = FacesContext.getCurrentInstance();
-					String myConstantValue = ctx.getExternalContext().getInitParameter("couchdb");
+			if ( data instanceof Geojson || data instanceof Kml ) {
 
-					CouchDAO dao = new CouchDAO(myConstantValue, "", "");
-					dao.deleteAttachment(resource, data);
+				try {
+					String serviceUrl = FacesContext.getCurrentInstance().getExternalContext().getInitParameter("lmfService");
+					SMKServiceHandler service  = new SMKServiceHandler(serviceUrl);
+
+					service.deleteAttachment( resource, data.getId() );
 				}
-				catch (MalformedURLException e)
-				{
-					e.printStackTrace();
+				catch (MalformedURLException e) {
+				}
+				catch( IOException e ) {
 				}
 			}
+
+			selectedLayerNode = null;
 		}
 
-		selectedLayerNode = null;
 		RequestContext.getCurrentInstance().update("createMashupForm:layerList");
 	}
 
@@ -756,18 +740,14 @@ public class CreateBean implements Serializable
 
 	public void navigateToHome()
 	{
-		boolean flag = FacesContext.getCurrentInstance().getExternalContext().isResponseCommitted();
-		if (!flag)
+		try
 		{
-		    try
-		    {
-				FacesContext.getCurrentInstance().getExternalContext().redirect("index.xhtml");
-			}
-		    catch (IOException e)
-		    {
-		    	FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error forwarding to home page:", e.getMessage()));
-				e.printStackTrace();
-			}
+			FacesContext.getCurrentInstance().getExternalContext().redirect("index.xhtml");
+		}
+		catch (IOException e)
+		{
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error forwarding to home page:", e.getMessage()));
+			e.printStackTrace();
 		}
 	}
 

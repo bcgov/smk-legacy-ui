@@ -76,7 +76,7 @@
 							<li class="tab col s3"><a href="#about">About</a></li>
 						</ul>
 					</div>
-					<div id="mymashups" class="col s12">
+					<div  class="col s12">
 						<div class="card white" style="/*height: calc(100vh - 500px);*/">
 							<div class="card-content black-text">
 								<p>Click on name to see map. <a href="create.xhtml">Create a new map.</a></p>
@@ -89,10 +89,6 @@
 						    				<f:facet name="header">Name</f:facet>
 						    				<a href="view.xhtml?id=#{mashup.lmfId}&amp;version=#{mashup.lmfRevision}" target="_#{mashup.lmfId}">#{mashup.name}</a>
 						    			</h:column>
-						    			<!-- <h:column>
-						    				<f:facet name="header"></f:facet>
-						    				<a href="view.xhtml?id=#{mashup.lmfId}&amp;version=#{mashup.lmfRevision}" target="_blank">View Map</a>
-						    			</h:column> -->
 						    			<h:column>
 						    				<f:facet name="header">Viewer</f:facet>
 						    				#{mashup.viewer.type}
@@ -108,7 +104,7 @@
 						    			<h:column>
 						    				<f:facet name="header"></f:facet>
 											<a href="#" onclick="publishResource([{name: 'param', value: '#{mashup.lmfId}'}])">Publish</a>
-						    				<p:remoteCommand name="publishResource" actionListener="#{IndexBean.publishResource()}" />
+						    				<p:remoteCommand name="publishResource" actionListener="#{IndexBean.publishResource()}"  update="dmf:myMashups"/>
 						    			</h:column>
 						    			<h:column>
 						    				<f:facet name="header"></f:facet>
@@ -157,10 +153,6 @@
 						    				<f:facet name="header">Version</f:facet>
 						    				#{mashup.lmfRevision}
 						    			</h:column>
-						    			<!-- <h:column>
-						    				<f:facet name="header">Link</f:facet>
-						    				<a href="view.xhtml?id=#{mashup.lmfId}" target="_blank">View Map</a>
-						    			</h:column> -->
 									</h:dataTable>
 								</div>
 							</div>
@@ -200,9 +192,10 @@
 				map.setView(new L.latLng(rndLat, rndLon), rndZoom, { animate: true, duration: 60 } );
 			}
 
-			map.on( 'moveend', function () {
-				setTimeout( changeLocation, 10 * 1000 )
-			} )
+			// induce nausea
+			//map.on( 'moveend', function () {
+			//	setTimeout( changeLocation, 10 * 1000 )
+			//} )
 			changeLocation();
 		});
 	</h:outputScript>

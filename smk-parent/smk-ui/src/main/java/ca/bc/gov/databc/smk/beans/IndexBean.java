@@ -25,10 +25,7 @@ public class IndexBean implements Serializable
 {
 	private static final long serialVersionUID = -3809642415932829264L;
 
-	//private CouchDAO mashupDao;
 	private SMKServiceHandler service;
-	private List<MapConfiguration> editableConfigs;
-	private List<MapConfiguration> publishedConfigs;
 
 	@PostConstruct
     public void init()
@@ -36,34 +33,12 @@ public class IndexBean implements Serializable
 		try
 		{
 			FacesContext ctx = FacesContext.getCurrentInstance();
-			//String myConstantValue = ctx.getExternalContext().getInitParameter("couchdb");
 
 			String serviceUrl = ctx.getExternalContext().getInitParameter("lmfService");
 			service  = new SMKServiceHandler(serviceUrl);
-
-			editableConfigs = service.getEditableConfigs();
-			publishedConfigs = service.getPublishedConfigs();
-
-			// set published document flags
-			for(MapConfiguration published : publishedConfigs)
-			{
-				for(MapConfiguration editable : editableConfigs)
-				{
-					if(published.getLmfId().equals(editable.getLmfId()))
-					{
-						editable.setPublished(true);
-						break;
-					}
-				}
-			}
-
-			//mashupDao = new CouchDAO(myConstantValue);
-			//allMashups = mashupDao.getAllResources();
-
 		}
 		catch (MalformedURLException e)
 		{
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		catch (IOException e)
@@ -81,7 +56,7 @@ public class IndexBean implements Serializable
 
 	    MapConfiguration resourceToPublish = null;
 
-	    for(MapConfiguration resource : editableConfigs)
+	    for(MapConfiguration resource : getEditableConfigs())
 		{
 			if(resource.getLmfId().equals(value))
 			{
@@ -119,7 +94,7 @@ public class IndexBean implements Serializable
 
 		MapConfiguration deadResource = null;
 
-		for(MapConfiguration resource : publishedConfigs)
+		for(MapConfiguration resource : getPublishedConfigs())
 		{
 			if(resource.getLmfId().equals(value))
 			{
@@ -130,7 +105,7 @@ public class IndexBean implements Serializable
 
 		if(deadResource == null)
 		{
-			for(MapConfiguration resource : editableConfigs)
+			for(MapConfiguration resource : getEditableConfigs())
 			{
 				if(resource.getLmfId().equals(value))
 				{
@@ -162,8 +137,6 @@ public class IndexBean implements Serializable
 				e.printStackTrace();
 			}
 
-			//mashupDao.removeResource(deadResource);
-
 			RequestContext.getCurrentInstance().update("dmf:myMashups");
 			RequestContext.getCurrentInstance().update("dmf:allMashups");
 		}
@@ -176,21 +149,33 @@ public class IndexBean implements Serializable
 
 	public List<MapConfiguration> getEditableConfigs()
 	{
-		return editableConfigs;
-	}
-
-	public void setEditableConfigs(List<MapConfiguration> configs)
-	{
-		this.editableConfigs = configs;
+		try {
+			return service.getEditableConfigs();
+		}
+		catch (MalformedURLException e)
+		{
+			e.printStackTrace();
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	public List<MapConfiguration> getPublishedConfigs()
 	{
-		return publishedConfigs;
-	}
-
-	public void setPublishedConfigs(List<MapConfiguration> configs)
-	{
-		this.publishedConfigs = configs;
+		try {
+			return service.getPublishedConfigs();
+		}
+		catch (MalformedURLException e)
+		{
+			e.printStackTrace();
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+		return null;
 	}
 }

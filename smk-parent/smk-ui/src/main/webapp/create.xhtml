@@ -232,6 +232,9 @@
 										</p:panel>
 									</p:tab>
 								</p:wizard>
+
+								<a class="waves-effect waves-light btn light-blue lighten-2" onclick="navigateToHome(); ">Cancel</a>
+								<p:remoteCommand name="navigateToHome" actionListener="#{CreateBean.navigateToHome()}" />
 							</div>
 						</div>
 					</div>
@@ -620,7 +623,7 @@
 
 		</div>
 
-		<div id="footer" class="footer nrpp-blue-dark">
+		<div class="footer nrpp-blue-dark">
 		</div>
 
 
