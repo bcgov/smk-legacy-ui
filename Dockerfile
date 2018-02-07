@@ -15,7 +15,7 @@ ENV CATALINA_HOME="/usr/local/tomcat"
 
 # ENV JRE_DL_URL=http://download.oracle.com/otn-pub/java/jdk/${JAVA_VERSION}u${JAVA_UPDATE}-b${JAVA_BUILD}/e758a0de34e24606bca991d704f6dcbf/server-jre-${JAVA_VERSION}u${JAVA_UPDATE}-linux-x64.tar.gz
 
-RUN apk add curl
+RUN apk upgrade --update && apk add --update curl
 
 # http://download.oracle.com/otn-pub/java/jdk/8u151-b12/e758a0de34e24606bca991d704f6dcbf/server-jre-8u151-linux-x64.tar.gz
 # #Patch GLIBC required by Oracle JDK
