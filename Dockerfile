@@ -73,17 +73,17 @@ WORKDIR /tmp
 # RUN rm -rf /usr/local/tomcat/webapps/* && mkdir /usr/local/tomcat/config /usr/local/tomcat/webapps/ROOT
 
 #Copy client war
-RUN wget -O /tmp/smk-client.war $APPBIN/smk-client/1.0.0/smk-client-1.0.0.war \
+RUN wget -O /tmp/smk-client.war $APPBIN/smk-client/$SMKVER/smk-client-$SMKVER.war \
   && cp /tmp/smk-client.war /usr/local/tomcat/webapps
   # && unzip /tmp/smk-client.war -d /usr/local/tomcat/webapps/ROOT
 
 #Copy SMK Admin UI
-RUN wget -O /tmp/smk-ui.war $APPBIN/smk-ui/1.0.0/smk-ui-1.0.0.war \
+RUN wget -O /tmp/smk-ui.war $APPBIN/smk-ui/$SMKVER/smk-ui-$SMKVER.war \
   && cp /tmp/smk-ui.war /usr/local/tomcat/webapps
   # && unzip /tmp/smk-ui.war -d /usr/local/tomcat/webapps/ROOT
 
 #Copy SMK api
-RUN wget -O /tmp/smks-api.war $APPBIN/smks-api/1.0.0/smks-api-1.0.0.war \
+RUN wget -O /tmp/smks-api.war $APPBIN/smks-api/$SMKVER/smks-api-$SMKVER.war \
   # && cp /tmp/smks-api.war /usr/local/tomcat/webapps
   && mkdir -p /usr/local/tomcat/webapps/smks-api \
   && unzip /tmp/smks-api.war -d /usr/local/tomcat/webapps/smks-api
