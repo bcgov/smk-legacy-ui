@@ -104,8 +104,14 @@
     function initializeSMK( smkArg ) {
         include.option( { baseUrl: new URL( '../smk-client/lib/', document.location ).toString() } )
 
-        include( { loader: 'tags', url: 'tags.json' } )
-            .then( function () {
+        try {
+            include.tag( 'smk-tags' )
+        }
+        catch ( e ) {
+            include.tag( 'smk-tags', { loader: 'tags', url: 'tags.json' } )
+        }
+
+        include( 'smk-tags' ).then( function () {
                 include( 'jquery', 'smk' ).then( function ( inc ) {
                     // inc.smk.MODULE.jQuery = $;
                     include.tag( 'jquery' ).exported = $

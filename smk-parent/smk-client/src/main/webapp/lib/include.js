@@ -101,7 +101,7 @@
 
         if ( inc.load ) {
             return new Promise( function ( res, rej ) {
-                res( inc.load() )
+                res( inc.load.call( window ) )
             } )
         }
         else if ( inc.url ) {

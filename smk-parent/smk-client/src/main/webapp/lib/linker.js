@@ -22,7 +22,7 @@ var loader = {
     script: function ( tag, inc ) {
         var f = fs.readFileSync( path.join( basePath, inc.url ) )
 
-        return '{ loader: "script", load: function () {\n' + f + '\n} }'
+        return '{ loader: "script", load: function () { console.log( "['+inc.url+']" );\n' + f + '\n} }'
     },
     style: function ( tag, inc ) {
         var f = fs.readFileSync( path.join( basePath, inc.url ) )
@@ -42,12 +42,12 @@ var loader = {
     sequence: function ( tag, inc ) {
         var g = inc.tags.map( function ( inc ) { return load( null, inc ) } ).join( ',\n  ' )
 
-        return '{ loader: "group", tags: [\n  ' + g + '\n] }'
+        return '{ loader: "sequence", tags: [\n  ' + g + '\n] }'
     }
 }
 
-objs.push(  'document={location:"."}' )
-objs.push(  'window=global' )
+// objs.push(  'document={location:"."}' )
+// objs.push(  'window=global' )
 objs.push(  '//include.js' )
 objs.push(  fs.readFileSync( 'include.js' ) )
 tags.forEach( function ( t ) {
@@ -59,9 +59,10 @@ tags.forEach( function ( t ) {
         objs.push( load( t, inc ) )
     } 
     catch (e) {
-        console.log( t, e )
+        console.error( t, e )
     }
 } )
+objs.push(  'include.tag( \'smk-tags\', { include: Promise.resolve() } );' );
 objs.push(  '//smk-bootstrap.js' )
 objs.push(  fs.readFileSync( 'smk-bootstrap.js' ) )
 
