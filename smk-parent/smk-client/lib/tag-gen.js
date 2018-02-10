@@ -1,3 +1,7 @@
+var fs = require( 'fs' )
+var path = require('path')
+var glob = require('glob')
+
 var ts =  function () {}
 exports.TagSet = ts
 
@@ -60,5 +64,30 @@ tl.prototype.style = function ( url, option ) {
 
 tl.prototype.template = function ( url, option ) {
     this.push( Object.assign( option || {}, { url: url, loader: 'template' } ) )
+    return this
+}
+
+var extTemplate = {
+    js: 'script',
+    css: 'style',
+    html: 'template'
+}
+
+tl.prototype.dir = function ( pattern, option ) {
+    var self = this
+
+    glob( pattern, option, function ( err, files ) {
+        files.forEach( function ( f ) {
+            var ext = path.extname( f )
+            // var url = path.join( dir, f )
+
+            var loader = extTemplate[ ext ]
+            if ( loader )
+                self.push( { url: f, loader: loader } )
+        } )
+    } )
+    // var files = fs.readdirSync( dir )
+
+
     return this
 }

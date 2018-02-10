@@ -1,79 +1,81 @@
-var tg = require( './tag-gen' )
-var fs = require( 'fs' )
+// var fs = require( 'fs' )
 
 // process.stdout.setEncoding( 'utf8' )
 // process.stdout.write( tags().stringify() )
 
-var t = new tg.TagSet()
+exports.gen = function () {
+    var tg = require( './lib/tag-gen' )
 
-t.script( "jquery", "resources/js/jquery-1.11.2.js" )
-t.script( "vue", "resources/js/vue-2.5.11.js" )
+    var t = new tg.TagSet()
 
-t.script( "smk", "smk.js" )
-t.script( "util", "util.js" )
-t.script( "event", "event.js" )
-t.script( "smk-map", "smk-map.js" )
-t.script( "viewer", "viewer.js" )
-t.script( "layer", "layer.js" )
-t.script( "feature-set", "feature-set.js" )
+    t.script( "jquery", "lib/jquery-1.11.2.js" )
+    t.script( "vue", "lib/vue-2.5.11.js" )
 
-t.sequence( "map-frame-styles" )
-    .script( "resources/css/smk-map-frame.css" )
-    .script( "resources/css/materialize.css" )
-    .script( "resources/css/fonts.css" )
-    .style( "https://fonts.googleapis.com/icon?family=Material+Icons" )
-    .script( "resources/css/dmf.css" )
+    t.script( "smk", "smk.js" )
+    t.script( "util", "util.js" )
+    t.script( "event", "event.js" )
+    t.script( "smk-map", "smk-map.js" )
+    t.script( "viewer", "viewer.js" )
+    t.script( "layer", "layer.js" )
+    t.script( "feature-set", "feature-set.js" )
 
-t.template( "surround-header", "resources/template/header.html" )
+    t.sequence( "map-frame-styles" )
+        .script( "resources/css/smk-map-frame.css" )
+        .script( "resources/css/materialize.css" )
+        .script( "resources/css/fonts.css" )
+        .style( "https://fonts.googleapis.com/icon?family=Material+Icons" )
+        .script( "resources/css/dmf.css" )
 
-t.group( "surround" )
-    .style( "resources/css/smk-standalone.css" )
-    .tag( "surround-header" )
+    t.template( "surround-header", "resources/template/header.html" )
 
-    // tools
+    t.group( "surround" )
+        .style( "resources/css/smk-standalone.css" )
+        .tag( "surround-header" )
 
-    // "tool-measure" : { "loader": "group", "tags": [
-    //     { "url": "tool/measure.js" }
-    // ] },
-    // "tool-scale" : { "loader": "group", "tags": [
-    //     { "url": "tool/scale.js" }
-    // ] },
-    // "tool-scaleFactor" : { "loader": "group", "tags": [
-    //     { "url": "tool/scaleFactor.js" }
-    // ] },
-    // "tool-coordinate" : { "loader": "group", "tags": [
-    //     { "url": "tool/coordinate.js" }
-    // ] },
-    // "tool-minimap" : { "loader": "group", "tags": [
-    //     { "url": "tool/minimap.js" }
-    // ] },
-    // "tool-markup" : { "loader": "group", "tags": [
-    //     { "url": "tool/markup.js" }
-    // ] },
-    // "tool-directions" : { "loader": "group", "tags": [
-    //     { "url": "tool/directions.js" }
-    // ] },
-    // "tool-pan" : { "loader": "group", "tags": [
-    //     { "url": "tool/pan.js" }
-    // ] },
-    // "tool-zoom" : { "loader": "group", "tags": [
-    //     { "url": "tool/zoom.js" }
-    // ] },
+        // tools
+
+        // "tool-measure" : { "loader": "group", "tags": [
+        //     { "url": "tool/measure.js" }
+        // ] },
+        // "tool-scale" : { "loader": "group", "tags": [
+        //     { "url": "tool/scale.js" }
+        // ] },
+        // "tool-scaleFactor" : { "loader": "group", "tags": [
+        //     { "url": "tool/scaleFactor.js" }
+        // ] },
+        // "tool-coordinate" : { "loader": "group", "tags": [
+        //     { "url": "tool/coordinate.js" }
+        // ] },
+        // "tool-minimap" : { "loader": "group", "tags": [
+        //     { "url": "tool/minimap.js" }
+        // ] },
+        // "tool-markup" : { "loader": "group", "tags": [
+        //     { "url": "tool/markup.js" }
+        // ] },
+        // "tool-directions" : { "loader": "group", "tags": [
+        //     { "url": "tool/directions.js" }
+        // ] },
+        // "tool-pan" : { "loader": "group", "tags": [
+        //     { "url": "tool/pan.js" }
+        // ] },
+        // "tool-zoom" : { "loader": "group", "tags": [
+        //     { "url": "tool/zoom.js" }
+        // ] },
     t.group( "tool-about" )
         .script( "tool/about.js" )
-    
+
     t.group( "tool-baseMaps" )
         .script( "tool/baseMaps.js" )
-    
+
     t.group( "tool-layers" )
         .script( "tool/layers.js" )
-    
+
     t.group( "tool-identify" )
         .script( "tool/identify.js" )
-    
+
     t.group( "tool-select" )
         .script( "tool/select.js" )
-    
+
 
     // leaflet
 
@@ -127,10 +129,10 @@ t.group( "surround" )
     // ] },
     t.group( "tool-identify-leaflet" )
         .script( "leaflet/tool/identify.js" )
-    
+
     t.group( "tool-select-leaflet" )
         .script( "leaflet/tool/select.js" )
-    
+
 
     t.script( "layer-leaflet", "leaflet/layer.js" )
 
@@ -165,4 +167,6 @@ t.group( "surround" )
 
     t.template( "select-panel", "resources/template/select-panel.html" )
 
-    process.stdout.write( JSON.stringify( t, null, '  ' ) )
+    return t
+}
+    // process.stdout.write( JSON.stringify( t, null, '  ' ) )

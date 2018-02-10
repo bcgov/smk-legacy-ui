@@ -1,0 +1,44 @@
+
+.leaflet-control-coordinates 
+{
+	cursor:pointer;
+}
+
+.leaflet-control-coordinates,
+.leaflet-control-coordinates .uiElement input 
+{
+	border: 2px solid #777;
+    line-height: 1.1;
+    padding: 2px 5px 1px;
+    font-size: 11px;
+    white-space: nowrap;
+    overflow: hidden;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    background: #fff;
+    background: rgba(255,255,255,.5);
+}
+
+.leaflet-control-coordinates .uiElement 
+{
+	margin:4px;
+}
+
+.leaflet-control-coordinates .uiElement .labelFirst 
+{
+	margin-right:4px;
+}
+
+.leaflet-control-coordinates .uiHidden
+{
+	display:none;
+}
+
+.leaflet-control-coordinates .uiElement.label 
+{
+	color:inherit;
+	font-weight: inherit;
+	font-size: inherit;
+	padding: 0;
+	display: inherit;
+}

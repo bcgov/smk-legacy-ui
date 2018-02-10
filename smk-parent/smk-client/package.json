@@ -1,0 +1,15 @@
+{
+  "name": "smk-client",
+  "title": "smk-client",
+  "version": "1.0.1",
+  "devDependencies": {
+    "connect-livereload": "^0.6.0",
+    "glob": "^7.1.2",
+    "grunt": "^1.0.1",
+    "grunt-contrib-clean": "^0.6.0",
+    "grunt-contrib-connect": "=1.0.0",
+    "grunt-contrib-copy": "^1.0.0",
+    "grunt-contrib-watch": "^1.0.0",
+    "load-grunt-tasks": "~0.6.0"
+  }
+}
