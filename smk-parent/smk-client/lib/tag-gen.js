@@ -3,6 +3,7 @@ var path = require('path')
 var glob = require('glob')
 
 var ts =  function () {}
+
 exports.TagSet = ts
 
 ts.prototype._add = function ( tag, loader, url, option ) {
@@ -76,18 +77,14 @@ var extTemplate = {
 tl.prototype.dir = function ( pattern, option ) {
     var self = this
 
-    glob( pattern, option, function ( err, files ) {
-        files.forEach( function ( f ) {
-            var ext = path.extname( f )
-            // var url = path.join( dir, f )
-
-            var loader = extTemplate[ ext ]
-            if ( loader )
-                self.push( { url: f, loader: loader } )
-        } )
+    var files = glob.sync( pattern, Object.assign( { nodir: true }, option ) )
+    files.forEach( function ( f ) {
+        var ext = path.extname( f ).substr( 1 )
+        var loader = extTemplate[ ext ]
+        // console.log( f, ext, loader )
+        if ( loader )
+            self.push( { url: f, loader: loader } )
     } )
-    // var files = fs.readdirSync( dir )
-
 
     return this
 }

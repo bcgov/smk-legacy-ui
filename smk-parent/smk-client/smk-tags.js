@@ -6,6 +6,8 @@
 exports.gen = function () {
     var tg = require( './lib/tag-gen' )
 
+    var baseDir = 'src/main/webapp'
+
     var t = new tg.TagSet()
 
     t.script( "jquery", "lib/jquery-1.11.2.js" )
@@ -20,11 +22,11 @@ exports.gen = function () {
     t.script( "feature-set", "feature-set.js" )
 
     t.sequence( "map-frame-styles" )
-        .script( "resources/css/smk-map-frame.css" )
-        .script( "resources/css/materialize.css" )
-        .script( "resources/css/fonts.css" )
+        .style( "resources/css/smk-map-frame.css" )
+        .style( "resources/css/materialize.css" )
+        .style( "resources/css/fonts.css" )
         .style( "https://fonts.googleapis.com/icon?family=Material+Icons" )
-        .script( "resources/css/dmf.css" )
+        .style( "resources/css/dmf.css" )
 
     t.template( "surround-header", "resources/template/header.html" )
 
@@ -62,52 +64,63 @@ exports.gen = function () {
         //     { "url": "tool/zoom.js" }
         // ] },
     t.group( "tool-about" )
-        .script( "tool/about.js" )
+        .dir( 'tool-about/**/*', { cwd: baseDir } )
+        // .script( "tool/about.js" )
 
     t.group( "tool-baseMaps" )
-        .script( "tool/baseMaps.js" )
+        .dir( 'tool-baseMaps/**/*', { cwd: baseDir } )
+        // .script( "tool/baseMaps.js" )
 
     t.group( "tool-layers" )
-        .script( "tool/layers.js" )
+        .dir( 'tool-layers/**/*', { cwd: baseDir } )
+        // .script( "tool/layers.js" )
 
     t.group( "tool-identify" )
-        .script( "tool/identify.js" )
+        .dir( 'tool-identify/**/*', { cwd: baseDir } )
+        // .script( "tool/identify.js" )
 
     t.group( "tool-select" )
-        .script( "tool/select.js" )
+        .dir( 'tool-select/**/*', { cwd: baseDir } )
+        // .script( "tool/select.js" )
 
 
     // leaflet
 
     t.group( "tool-measure-leaflet" )
-        .style( "resources/css/leaflet-measure.css" )
-        .script( "resources/js/leaflet-measure.min.js" )
-        .script( "leaflet/tool/measure.js" )
+        .dir( 'viewer-leaflet/tool-measure/**/*', { cwd: baseDir } )
+        // .style( "resources/css/leaflet-measure.css" )
+        // .script( "resources/js/leaflet-measure.min.js" )
+        // .script( "leaflet/tool/measure.js" )
 
     t.group( "tool-scale-leaflet" )
-        .style( "resources/css/L.Control.BetterScale.css" )
-        .script( "resources/js/L.Control.BetterScale.js" )
-        .script( "leaflet/tool/scale.js" )
+        .dir( 'viewer-leaflet/tool-scale/**/*', { cwd: baseDir } )
+        // .style( "resources/css/L.Control.BetterScale.css" )
+        // .script( "resources/js/L.Control.BetterScale.js" )
+        // .script( "leaflet/tool/scale.js" )
 
-    t.group( "tool-scaleFactor-leaflet" )
-        .style( "resources/css/leaflet.scalefactor.min.css" )
-        .script( "resources/js/leaflet.scalefactor.min.js" )
-        .script( "leaflet/tool/scaleFactor.js" )
+    // t.group( "tool-scaleFactor-leaflet" )
+    //     .dir( 'viewer-leaflet/tool-measure/**/*', { cwd: baseDir } )
+    //     .style( "resources/css/leaflet.scalefactor.min.css" )
+    //     .script( "resources/js/leaflet.scalefactor.min.js" )
+    //     .script( "leaflet/tool/scaleFactor.js" )
 
     t.group( "tool-coordinate-leaflet" )
-        .style( "resources/css/L.Control.Coordinates.css" )
-        .script( "resources/js/L.Control.Coordinates.js" )
-        .script( "leaflet/tool/coordinate.js" )
+        .dir( 'viewer-leaflet/tool-coordinate/**/*', { cwd: baseDir } )
+        // .style( "resources/css/L.Control.Coordinates.css" )
+        // .script( "resources/js/L.Control.Coordinates.js" )
+        // .script( "leaflet/tool/coordinate.js" )
 
     t.group( "tool-minimap-leaflet" )
-        .style( "resources/css/Control.MiniMap.min.css" )
-        .script( "resources/js/Control.MiniMap.min.js" )
-        .script( "leaflet/tool/minimap.js" )
+        .dir( 'viewer-leaflet/tool-minimap/**/*', { cwd: baseDir } )
+        // .style( "resources/css/Control.MiniMap.min.css" )
+        // .script( "resources/js/Control.MiniMap.min.js" )
+        // .script( "leaflet/tool/minimap.js" )
 
     t.group( "tool-markup-leaflet" )
+        .dir( 'viewer-leaflet/tool-markup/**/*', { cwd: baseDir } )
         .style( "https://unpkg.com/leaflet.pm@0.17.3/dist/leaflet.pm.css" )
         .script( "https://unpkg.com/leaflet.pm@0.17.3/dist/leaflet.pm.min.js" )
-        .script( "leaflet/tool/markup.js" )
+        // .script( "leaflet/tool/markup.js" )
 
     // "tool-directions-leaflet" : { "loader": "group", "tags": [
     //     { "url": "leaflet/tool/directions.js" }
@@ -128,16 +141,17 @@ exports.gen = function () {
     //     { "url": "leaflet/tool/layers.js" }
     // ] },
     t.group( "tool-identify-leaflet" )
-        .script( "leaflet/tool/identify.js" )
+        .dir( "viewer-leaflet/tool-identify/**/*", { cwd: baseDir } )
 
     t.group( "tool-select-leaflet" )
-        .script( "leaflet/tool/select.js" )
+        .dir( "viewer-leaflet/tool-select/**/*", { cwd: baseDir } )
+        // .script( "leaflet/tool/select.js" )
 
 
-    t.script( "layer-leaflet", "leaflet/layer.js" )
+    t.script( "layer-leaflet", "viewer-leaflet/layer-leaflet.js" )
 
     t.group( "viewer-leaflet" )
-        .script( "leaflet/viewer.js" )
+        .script( "viewer-leaflet/viewer-leaflet.js" )
         .tag( "layer-leaflet" )
 
     t.sequence( "leaflet" )

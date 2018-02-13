@@ -40,15 +40,15 @@
     "tags": [
       {
         "url": "resources/css/smk-map-frame.css",
-        "loader": "script"
+        "loader": "style"
       },
       {
         "url": "resources/css/materialize.css",
-        "loader": "script"
+        "loader": "style"
       },
       {
         "url": "resources/css/fonts.css",
-        "loader": "script"
+        "loader": "style"
       },
       {
         "url": "https://fonts.googleapis.com/icon?family=Material+Icons",
@@ -56,7 +56,7 @@
       },
       {
         "url": "resources/css/dmf.css",
-        "loader": "script"
+        "loader": "style"
       }
     ]
   },
@@ -78,7 +78,15 @@
     "loader": "group",
     "tags": [
       {
-        "url": "tool/about.js",
+        "url": "tool-about/style/smk-map-frame.css",
+        "loader": "style"
+      },
+      {
+        "url": "tool-about/template/about-panel.html",
+        "loader": "template"
+      },
+      {
+        "url": "tool-about/tool-about.js",
         "loader": "script"
       }
     ]
@@ -87,7 +95,15 @@
     "loader": "group",
     "tags": [
       {
-        "url": "tool/baseMaps.js",
+        "url": "tool-baseMaps/style/smk-map-frame.css",
+        "loader": "style"
+      },
+      {
+        "url": "tool-baseMaps/template/base-maps-panel.html",
+        "loader": "template"
+      },
+      {
+        "url": "tool-baseMaps/tool-baseMaps.js",
         "loader": "script"
       }
     ]
@@ -96,7 +112,15 @@
     "loader": "group",
     "tags": [
       {
-        "url": "tool/layers.js",
+        "url": "tool-layers/style/smk-map-frame.css",
+        "loader": "style"
+      },
+      {
+        "url": "tool-layers/template/layers-panel.html",
+        "loader": "template"
+      },
+      {
+        "url": "tool-layers/tool-layers.js",
         "loader": "script"
       }
     ]
@@ -105,7 +129,19 @@
     "loader": "group",
     "tags": [
       {
-        "url": "tool/identify.js",
+        "url": "tool-identify/style/smk-map-frame.css",
+        "loader": "style"
+      },
+      {
+        "url": "tool-identify/template/identify-panel.html",
+        "loader": "template"
+      },
+      {
+        "url": "tool-identify/template/identify-popup.html",
+        "loader": "template"
+      },
+      {
+        "url": "tool-identify/tool-identify.js",
         "loader": "script"
       }
     ]
@@ -114,7 +150,15 @@
     "loader": "group",
     "tags": [
       {
-        "url": "tool/select.js",
+        "url": "tool-select/style/smk-map-frame.css",
+        "loader": "style"
+      },
+      {
+        "url": "tool-select/template/select-panel.html",
+        "loader": "template"
+      },
+      {
+        "url": "tool-select/tool-select.js",
         "loader": "script"
       }
     ]
@@ -123,15 +167,15 @@
     "loader": "group",
     "tags": [
       {
-        "url": "resources/css/leaflet-measure.css",
+        "url": "viewer-leaflet/tool-measure/leaflet-measure.css",
         "loader": "style"
       },
       {
-        "url": "resources/js/leaflet-measure.min.js",
+        "url": "viewer-leaflet/tool-measure/leaflet-measure.min.js",
         "loader": "script"
       },
       {
-        "url": "leaflet/tool/measure.js",
+        "url": "viewer-leaflet/tool-measure/tool-measure.js",
         "loader": "script"
       }
     ]
@@ -140,32 +184,27 @@
     "loader": "group",
     "tags": [
       {
-        "url": "resources/css/L.Control.BetterScale.css",
+        "url": "viewer-leaflet/tool-scale/L.Control.BetterScale.css",
         "loader": "style"
       },
       {
-        "url": "resources/js/L.Control.BetterScale.js",
+        "url": "viewer-leaflet/tool-scale/L.Control.BetterScale.js",
         "loader": "script"
       },
       {
-        "url": "leaflet/tool/scale.js",
-        "loader": "script"
-      }
-    ]
-  },
-  "tool-scaleFactor-leaflet": {
-    "loader": "group",
-    "tags": [
-      {
-        "url": "resources/css/leaflet.scalefactor.min.css",
+        "url": "viewer-leaflet/tool-scale/leaflet.scalefactor.min.css",
         "loader": "style"
       },
       {
-        "url": "resources/js/leaflet.scalefactor.min.js",
+        "url": "viewer-leaflet/tool-scale/leaflet.scalefactor.min.js",
         "loader": "script"
       },
       {
-        "url": "leaflet/tool/scaleFactor.js",
+        "url": "viewer-leaflet/tool-scale/scaleFactor.js",
+        "loader": "script"
+      },
+      {
+        "url": "viewer-leaflet/tool-scale/tool-scale.js",
         "loader": "script"
       }
     ]
@@ -174,15 +213,15 @@
     "loader": "group",
     "tags": [
       {
-        "url": "resources/css/L.Control.Coordinates.css",
+        "url": "viewer-leaflet/tool-coordinate/L.Control.Coordinates.css",
         "loader": "style"
       },
       {
-        "url": "resources/js/L.Control.Coordinates.js",
+        "url": "viewer-leaflet/tool-coordinate/L.Control.Coordinates.js",
         "loader": "script"
       },
       {
-        "url": "leaflet/tool/coordinate.js",
+        "url": "viewer-leaflet/tool-coordinate/tool-coordinate.js",
         "loader": "script"
       }
     ]
@@ -191,15 +230,15 @@
     "loader": "group",
     "tags": [
       {
-        "url": "resources/css/Control.MiniMap.min.css",
-        "loader": "style"
-      },
-      {
-        "url": "resources/js/Control.MiniMap.min.js",
+        "url": "viewer-leaflet/tool-minimap/Control.MiniMap.min.js",
         "loader": "script"
       },
       {
-        "url": "leaflet/tool/minimap.js",
+        "url": "viewer-leaflet/tool-minimap/style/Control.MiniMap.min.css",
+        "loader": "style"
+      },
+      {
+        "url": "viewer-leaflet/tool-minimap/tool-minimap.js",
         "loader": "script"
       }
     ]
@@ -208,15 +247,15 @@
     "loader": "group",
     "tags": [
       {
+        "url": "viewer-leaflet/tool-markup/tool-markup.js",
+        "loader": "script"
+      },
+      {
         "url": "https://unpkg.com/leaflet.pm@0.17.3/dist/leaflet.pm.css",
         "loader": "style"
       },
       {
         "url": "https://unpkg.com/leaflet.pm@0.17.3/dist/leaflet.pm.min.js",
-        "loader": "script"
-      },
-      {
-        "url": "leaflet/tool/markup.js",
         "loader": "script"
       }
     ]
@@ -225,7 +264,7 @@
     "loader": "group",
     "tags": [
       {
-        "url": "leaflet/tool/identify.js",
+        "url": "viewer-leaflet/tool-identify/tool-identify.js",
         "loader": "script"
       }
     ]
@@ -234,20 +273,20 @@
     "loader": "group",
     "tags": [
       {
-        "url": "leaflet/tool/select.js",
+        "url": "viewer-leaflet/tool-select/tool-select.js",
         "loader": "script"
       }
     ]
   },
   "layer-leaflet": {
-    "url": "leaflet/layer.js",
+    "url": "viewer-leaflet/layer-leaflet.js",
     "loader": "script"
   },
   "viewer-leaflet": {
     "loader": "group",
     "tags": [
       {
-        "url": "leaflet/viewer.js",
+        "url": "viewer-leaflet/viewer-leaflet.js",
         "loader": "script"
       },
       "layer-leaflet"

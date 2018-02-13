@@ -86,32 +86,37 @@
     }
     else {
         var el = document.createElement( 'script' )
+        var includeBase = ( new URL( script.src.replace( '/smk-bootstrap.js', '' ), document.location ) ).toString()
 
         el.addEventListener( 'load', function( ev ) {
+            include.option( { baseUrl: new URL( includeBase, document.location ).toString() } )
             initializeSMK( arg )
         } )
         el.addEventListener( 'error', function( ev ) {
             throw new Error( 'failed to load script from ' + el.src )
         } )
-        el.setAttribute( 'src',        '../smk-client/lib/include.js' )
+        
+        el.setAttribute( 'src',        includeBase + '/lib/include.js' )
     // el.setAttribute( 'data-main',  '/service/lib/main.js' )
     // el.setAttribute( 'data-arg',   JSON.stringify( arg ) )
     // el.setAttribute( 'data-tags',  'tags.json' )
 
         document.getElementsByTagName( 'head' )[ 0 ].appendChild( el )
+
     }
 
     function initializeSMK( smkArg ) {
-        include.option( { baseUrl: new URL( '../smk-client/lib/', document.location ).toString() } )
 
         try {
             include.tag( 'smk-tags' )
         }
         catch ( e ) {
-            include.tag( 'smk-tags', { loader: 'tags', url: 'tags.json' } )
+            include.tag( 'smk-tags', { loader: 'tags', url: 'smk-tags.json' } )
         }
 
-        include( 'smk-tags' ).then( function () {
+        include( 'smk-tags' ).then( function ( inc ) {
+            console.log( 'tags', inc[ 'smk-tags' ] )
+
                 include( 'jquery', 'smk' ).then( function ( inc ) {
                     // inc.smk.MODULE.jQuery = $;
                     include.tag( 'jquery' ).exported = $
