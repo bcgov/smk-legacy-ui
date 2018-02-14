@@ -18,26 +18,7 @@ include.module( 'smk-map', [ 'smk', 'jquery', 'util', 'viewer', 'layer' ], funct
         $( this.$option.container )
             .addClass( 'smk-hidden' )
 
-        var tags = this.$option.configUrls.map( function ( url ) {
-            var tag = 'config-' + url
-            include.tag( tag, { loader: 'template', url: './' + url } )
-            return tag
-        } )
-
-        return include( tags ).then ( function ( inc ) {
-            var configs = []
-            tags.forEach( function ( tag ) {
-                configs.push( inc[ tag ] )
-            } )
-
-            if ( self.$option.config )
-                configs.push( self.$option.config )
-
-            if ( configs.length == 0 )
-                return SMK.UTIL.rejected( new Error( 'no config provided' ) )
-
-            return configs
-        } )
+        return loadConfigs()
             .then( parseConfigs )
             .then( initMapFrame )
             .then( initSurround )
@@ -47,9 +28,32 @@ include.module( 'smk-map', [ 'smk', 'jquery', 'util', 'viewer', 'layer' ], funct
             .then( initViewer )
             .then( initTools )
             .then( initSidebar )
-            .then( null, function ( e ) {
+            .catch( function ( e ) {
                 console.error( 'smk viewer #' + self.$option.containerId + ' failed to initialize:', e )
             } )
+
+        function loadConfigs() {
+            var tags = self.$option.configUrls.map( function ( url ) {
+                var tag = 'config-' + url
+                include.tag( tag, { loader: 'template', url: './' + url } )
+                return tag
+            } )
+
+            return include( tags ).then( function ( inc ) {
+                var configs = []
+                tags.forEach( function ( tag ) {
+                    configs.push( inc[ tag ] )
+                } )
+
+                if ( self.$option.config )
+                    configs.push( self.$option.config )
+
+                if ( configs.length == 0 )
+                    return SMK.UTIL.rejected( new Error( 'no config provided' ) )
+
+                return configs
+            } )
+        }
 
         function parseConfigs( configs ) {
             var config = {}
@@ -150,9 +154,6 @@ include.module( 'smk-map', [ 'smk', 'jquery', 'util', 'viewer', 'layer' ], funct
 
         function initSidebar() {
             return include( 'sidebar' )
-                .then( function () {
-                    self.$sidebar = new SMK.TYPE.SideBar()
-                } )
         }
 
         function showMap() {

@@ -38,120 +38,52 @@ exports.gen = function () {
     t.template( "sidebar-panels", "template/sidebar.html" )
     t.template( "sidebar-button", "template/sidebar-button.html" )
     t.template( "side-panel", "template/side-panel.html" )
-    
-        // tools
 
-        // "tool-measure" : { "loader": "group", "tags": [
-        //     { "url": "tool/measure.js" }
-        // ] },
-        // "tool-scale" : { "loader": "group", "tags": [
-        //     { "url": "tool/scale.js" }
-        // ] },
-        // "tool-scaleFactor" : { "loader": "group", "tags": [
-        //     { "url": "tool/scaleFactor.js" }
-        // ] },
-        // "tool-coordinate" : { "loader": "group", "tags": [
-        //     { "url": "tool/coordinate.js" }
-        // ] },
-        // "tool-minimap" : { "loader": "group", "tags": [
-        //     { "url": "tool/minimap.js" }
-        // ] },
-        // "tool-markup" : { "loader": "group", "tags": [
-        //     { "url": "tool/markup.js" }
-        // ] },
-        // "tool-directions" : { "loader": "group", "tags": [
-        //     { "url": "tool/directions.js" }
-        // ] },
-        // "tool-pan" : { "loader": "group", "tags": [
-        //     { "url": "tool/pan.js" }
-        // ] },
-        // "tool-zoom" : { "loader": "group", "tags": [
-        //     { "url": "tool/zoom.js" }
-        // ] },
     t.group( "tool-about" )
         .dir( 'tool-about/**/*', { cwd: baseDir } )
-        // .script( "tool/about.js" )
 
     t.group( "tool-baseMaps" )
         .dir( 'tool-baseMaps/**/*', { cwd: baseDir } )
-        // .script( "tool/baseMaps.js" )
 
     t.group( "tool-layers" )
         .dir( 'tool-layers/**/*', { cwd: baseDir } )
-        // .script( "tool/layers.js" )
 
     t.group( "tool-identify" )
         .dir( 'tool-identify/**/*', { cwd: baseDir } )
-        // .script( "tool/identify.js" )
 
     t.group( "tool-select" )
         .dir( 'tool-select/**/*', { cwd: baseDir } )
-        // .script( "tool/select.js" )
-
 
     // leaflet
 
+    t.group( "tool-pan-leaflet" )
+        .dir( 'viewer-leaflet/tool-pan/**/*', { cwd: baseDir } )
+
+    t.group( "tool-zoom-leaflet" )
+        .dir( 'viewer-leaflet/tool-zoom/**/*', { cwd: baseDir } )
+
     t.group( "tool-measure-leaflet" )
         .dir( 'viewer-leaflet/tool-measure/**/*', { cwd: baseDir } )
-        // .style( "resources/css/leaflet-measure.css" )
-        // .script( "resources/js/leaflet-measure.min.js" )
-        // .script( "leaflet/tool/measure.js" )
 
     t.group( "tool-scale-leaflet" )
         .dir( 'viewer-leaflet/tool-scale/**/*', { cwd: baseDir } )
-        // .style( "resources/css/L.Control.BetterScale.css" )
-        // .script( "resources/js/L.Control.BetterScale.js" )
-        // .script( "leaflet/tool/scale.js" )
-
-    // t.group( "tool-scaleFactor-leaflet" )
-    //     .dir( 'viewer-leaflet/tool-measure/**/*', { cwd: baseDir } )
-    //     .style( "resources/css/leaflet.scalefactor.min.css" )
-    //     .script( "resources/js/leaflet.scalefactor.min.js" )
-    //     .script( "leaflet/tool/scaleFactor.js" )
 
     t.group( "tool-coordinate-leaflet" )
         .dir( 'viewer-leaflet/tool-coordinate/**/*', { cwd: baseDir } )
-        // .style( "resources/css/L.Control.Coordinates.css" )
-        // .script( "resources/js/L.Control.Coordinates.js" )
-        // .script( "leaflet/tool/coordinate.js" )
 
     t.group( "tool-minimap-leaflet" )
         .dir( 'viewer-leaflet/tool-minimap/**/*', { cwd: baseDir } )
-        // .style( "resources/css/Control.MiniMap.min.css" )
-        // .script( "resources/js/Control.MiniMap.min.js" )
-        // .script( "leaflet/tool/minimap.js" )
 
     t.group( "tool-markup-leaflet" )
         .dir( 'viewer-leaflet/tool-markup/**/*', { cwd: baseDir } )
         .style( "https://unpkg.com/leaflet.pm@0.17.3/dist/leaflet.pm.css" )
         .script( "https://unpkg.com/leaflet.pm@0.17.3/dist/leaflet.pm.min.js" )
-        // .script( "leaflet/tool/markup.js" )
 
-    // "tool-directions-leaflet" : { "loader": "group", "tags": [
-    //     { "url": "leaflet/tool/directions.js" }
-    // ] },
-    // "tool-pan-leaflet" : { "loader": "group", "tags": [
-    //     { "url": "leaflet/tool/pan.js" }
-    // ] },
-    // "tool-zoom-leaflet" : { "loader": "group", "tags": [
-    //     { "url": "leaflet/tool/zoom.js" }
-    // ] },
-    // "tool-about-leaflet" : { "loader": "group", "tags": [
-    //     { "url": "leaflet/tool/about.js" }
-    // ] },
-    // "tool-baseMaps-leaflet" : { "loader": "group", "tags": [
-    //     { "url": "leaflet/tool/baseMaps.js" }
-    // ] },
-    // "tool-layers-leaflet" : { "loader": "group", "tags": [
-    //     { "url": "leaflet/tool/layers.js" }
-    // ] },
     t.group( "tool-identify-leaflet" )
         .dir( "viewer-leaflet/tool-identify/**/*", { cwd: baseDir } )
 
     t.group( "tool-select-leaflet" )
         .dir( "viewer-leaflet/tool-select/**/*", { cwd: baseDir } )
-        // .script( "leaflet/tool/select.js" )
-
 
     t.script( "layer-leaflet", "viewer-leaflet/layer-leaflet.js" )
 
@@ -170,18 +102,5 @@ exports.gen = function () {
         .script( "https://unpkg.com/terraformer-wkt-parser@1.1.2" )
         .script( "https://npmcdn.com/@turf/turf/turf.min.js" )
 
-
-    // t.template( "about-panel", "resources/template/about-panel.html" )
-
-    // t.template( "base-maps-panel", "resources/template/base-maps-panel.html" )
-
-    // t.template( "layers-panel", "resources/template/layers-panel.html" )
-
-    // t.template( "identify-panel", "resources/template/identify-panel.html" )
-    // t.template( "sidebar-identify", "resources/template/identify-popup.html" )
-
-    // t.template( "select-panel", "resources/template/select-panel.html" )
-
     return t
 }
-    // process.stdout.write( JSON.stringify( t, null, '  ' ) )

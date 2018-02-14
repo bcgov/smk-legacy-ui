@@ -137,7 +137,7 @@ ul.smk-sidebar-tools {
     font-size: 15px;
 }
 
-.smk-base-map-sample {
+/* .smk-base-map-sample {
     width: 100%;
     height: 80px;
 }
@@ -159,7 +159,7 @@ ul.smk-sidebar-tools {
 .smk-layers-panel input.smk-filter {
     margin-bottom: 0;
     border: 0;
-}
+} */
 
 .smk-sidebar .smk-spinner {
     display:    none;
@@ -178,7 +178,7 @@ ul.smk-sidebar-tools {
     display: block;
 }
 
-.smk-layers-panel .smk-all-visibility {
+/* .smk-layers-panel .smk-all-visibility {
     position: absolute;
     top: 25px;
     right: 25px;
@@ -216,7 +216,6 @@ ul.smk-sidebar-tools {
 
 .smk-layer .smk-layer-visibility {
     display: inline-block;
-    /* width: 20px; */
     vertical-align: top;
     cursor: pointer;
     opacity: .5;
@@ -362,7 +361,7 @@ ul.smk-sidebar-tools {
     border-top: 1px solid gray;
     margin-top: 10px;
     padding-top: 5px;
-}
+} */
 
 .smk-command {
     cursor: pointer;
@@ -391,7 +390,7 @@ ul.smk-sidebar-tools {
     margin-bottom: 1px;
 }
 
-.smk-identify-popup .smk-command {
+/* .smk-identify-popup .smk-command {
     margin-right: 10px;
-}
+} */
 

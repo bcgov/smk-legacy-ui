@@ -16,7 +16,14 @@ include.module( 'viewer-leaflet', [ 'viewer', 'leaflet' ], function () {
 
         var el = smk.addToContainer( '<div class="smk-viewer">' )
 
-        this.map = L.map( el )
+        this.map = L.map( el, {
+            dragging:       false,
+            zoomControl:    false,
+            boxZoom:        false,
+            doubleClickZoom:false
+        } )
+
+        this.map.scrollWheelZoom.disable()
 
         // var southWest = L.latLng(47.294133725, -113.291015625),
         //     northEast = L.latLng(61.1326289908, -141.064453125),

@@ -1,4 +1,4 @@
-include.module( 'tool-identify', [ 'smk', 'sidebar', 'identify-panel' ], function ( inc ) {
+include.module( 'tool-identify', [ 'smk', 'sidebar', 'tool-identify.panel-identify-html', 'tool-identify.popup-identify-html' ], function ( inc ) {
 
     return {
         order: 4,
@@ -64,7 +64,7 @@ include.module( 'tool-identify', [ 'smk', 'sidebar', 'identify-panel' ], functio
             } )
 
             Vue.component( 'identifyPanel', {
-                template: inc[ 'identify-panel' ],
+                template: inc[ 'tool-identify.panel-identify-html' ],
                 props: [ 'layers', 'busy', 'highlightId' ],
                 methods: {
                     isEmpty: function () {
@@ -73,44 +73,42 @@ include.module( 'tool-identify', [ 'smk', 'sidebar', 'identify-panel' ], functio
                 },
             } )
 
-            return include( 'sidebar-identify' ).then( function ( inc ) {
-                var el = smk.addToContainer( inc[ 'sidebar-identify' ] )
 
-                var model = {
-                    feature: null,
-                    layer: null
-                }
+            var el = smk.addToContainer( inc[ 'tool-identify.popup-identify-html' ] )
 
-                var vm = new Vue( {
-                    el: el,
-                    data: model,
-                    methods: {
-                        debug: function ( x ) {
-                            console.log( arguments )
-                            return x
-                        },
-                        zoomToFeature: function ( layer, feature ) {
-                            return smk.$viewer.zoomToFeature( layer, feature )
-                        },
-                        directionsToFeature: function ( layer, feature ) {
-                            return smk.$viewer.directionsToFeature( layer, feature )
-                        },
-                        selectFeature: function ( layer, feature ) {
-                            smk.$viewer.selected.add( layer.config.id, [ feature ] )
-                        }
+            var popupModel = {
+                feature: null,
+                layer: null
+            }
+
+            var vm = new Vue( {
+                el: el,
+                data: popupModel,
+                methods: {
+                    debug: function ( x ) {
+                        console.log( arguments )
+                        return x
+                    },
+                    zoomToFeature: function ( layer, feature ) {
+                        return smk.$viewer.zoomToFeature( layer, feature )
+                    },
+                    directionsToFeature: function ( layer, feature ) {
+                        return smk.$viewer.directionsToFeature( layer, feature )
+                    },
+                    selectFeature: function ( layer, feature ) {
+                        smk.$viewer.selected.add( layer.config.id, [ feature ] )
                     }
-                } )
-
-                smk.$viewer.identified.pickedFeature( function ( ev ) {
-                    if ( !ev.feature ) return
-
-                    model.feature = ev.feature
-                    model.layer = smk.$viewer.layerId[ ev.feature.layerId ]
-                } )
-
-                smk.$viewer.getIdentifyPopupEl = function () { return vm.$el }
+                }
             } )
 
+            smk.$viewer.identified.pickedFeature( function ( ev ) {
+                if ( !ev.feature ) return
+
+                popupModel.feature = ev.feature
+                popupModel.layer = smk.$viewer.layerId[ ev.feature.layerId ]
+            } )
+
+            smk.$viewer.getIdentifyPopupEl = function () { return vm.$el }
         }
     }
 

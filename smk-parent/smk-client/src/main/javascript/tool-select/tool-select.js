@@ -1,4 +1,4 @@
-include.module( 'tool-select', [ 'smk', 'sidebar', 'select-panel' ], function ( inc ) {
+include.module( 'tool-select', [ 'smk', 'sidebar', 'tool-select.panel-select-html' ], function ( inc ) {
 
     return {
         order: 5,
@@ -64,7 +64,7 @@ include.module( 'tool-select', [ 'smk', 'sidebar', 'select-panel' ], function ( 
             } )
 
             Vue.component( 'selectPanel', {
-                template: inc[ 'select-panel' ],
+                template: inc[ 'tool-select.panel-select-html' ],
                 props: [ 'layers', 'busy', 'highlightId' ],
                 methods: {
                     isEmpty: function () {
