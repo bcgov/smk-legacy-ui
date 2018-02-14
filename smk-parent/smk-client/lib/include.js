@@ -9,22 +9,17 @@
     }
 
     function includeTag( tag, attr ) {
-        // if ( typeof tag == 'string' ) {
-            if ( !attr ) {
-                if ( !TAG[ tag ] ) throw new Error( 'tag "' + tag + '" not defined' )
+        if ( !attr ) {
+            if ( !TAG[ tag ] ) throw new Error( 'tag "' + tag + '" not defined' )
 
-                return TAG[ tag ]
-            }
+            return TAG[ tag ]
+        }
 
-            if ( tag in TAG )
-                throw new Error( 'tag "' + tag + '" already defined' )
+        if ( tag in TAG )
+            throw new Error( 'tag "' + tag + '" already defined' )
 
-            TAG[ tag ] = attr
-            return attr
-        // }
-        // else {
-        //     Object.assign( TAG, tag )
-        // }
+        TAG[ tag ] = attr
+        return attr
     }
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -33,46 +28,6 @@
         if ( typeof option == 'string' ) return OPTION[ option ]
         Object.assign( OPTION, option )
     }
-
-    // var scripts = document.getElementsByTagName( 'script' );
-    // var script = scripts[ scripts.length - 1 ];
-    // var script = document.currentScript
-
-    // var main = script.attributes[ 'data-main' ]
-    // if ( main && !main.nodeValue )
-    //     throw new Error( 'no value for data-main attribute on ' + script )
-
-    // var mainUrl = main.nodeValue.trim()
-    // if ( !mainUrl )
-    //     throw new Error( 'no value for data-main attribute on ' + script )
-
-    // var baseUrl = new URL( mainUrl.replace( '(^|/)[^/]+$', '' ), document.location ).toString()
-
-    // var tags = script.attributes[ 'data-tags' ]
-    // if ( tags ) {
-    //     tags = tags.nodeValue
-    //     if ( tags )
-    //         includeTag( '$tags', {
-    //             url:    tags,
-    //             loader: 'template'
-    //         } )
-    // }
-
-    // var arg = script.attributes[ 'data-arg' ]
-    // if ( arg )
-    //     try {
-    //         arg = parseJSONC( arg.nodeValue )
-    //     }
-    //     catch ( e ) {
-    //         console.warn( 'data-arg parse failed', e )
-    //         arg = null
-    //     }
-
-    // includeTag( '$main', {
-    //     url:    mainUrl,
-    //     loader: 'script',
-    //     arg:    arg
-    // } )
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -195,9 +150,9 @@
         else throw new Error( 'Can\'t load template' )
     }
 
-    loader.sequence = function ( inc ) {
+    loader.sequence = function ( inc, tag ) {
         inc.tags.forEach( function ( t, i, a ) {
-            a[ i ] = _assignAnonTag( t )
+            a[ i ] = _assignAnonTag( t, tag )
         } )
 
         var promise = Promise.resolve()
@@ -217,13 +172,13 @@
         } )
     }
 
-    loader.group = function ( inc ) {
+    loader.group = function ( inc, tag ) {
         inc.tags.forEach( function ( t, i, a ) {
-            a[ i ] = _assignAnonTag( t )
+            a[ i ] = _assignAnonTag( t, tag )
         } )
 
-        var promises = inc.tags.map( function ( tag ) {
-            return Promise.resolve().then( function () { return _include( tag ) } )
+        var promises = inc.tags.map( function ( t ) {
+            return Promise.resolve().then( function () { return _include( t ) } )
         } )
 
         return Promise.all( promises )
@@ -251,20 +206,29 @@
         html: 'template'
     }
 
-    function _assignAnonTag( tag ) {
+    function _assignAnonTag( tag, base ) {
         if ( typeof tag == 'string' ) return tag
 
         var anon = tag
-        var anonTag = 'anon-' + hash( anon )
-        try {
-            var inc = includeTag( anonTag )
-            console.warn( 'tag "' + anonTag + '" already defined as', inc, ', will be used instead of', tag )
+        var newTag
+        if ( base && tag.url && !tag.external && !/[/][/]/.test( tag.url ) ) {
+            var m = tag.url.match( /[/]([^/]+)$/ )
+            newTag = base + '.' +  m[ 1 ].replace( /[.]/g, '-' ).toLowerCase()
+            // console.log( tag.url, m, newTag )
         }
-        catch ( e ) {
-            includeTag( anonTag, anon )
+        else {
+            newTag = 'anon-' + hash( anon )
         }
 
-        return anonTag
+        try {
+            var inc = includeTag( newTag )
+            console.warn( 'tag "' + newTag + '" already defined as', inc, ', will be used instead of', tag )
+        }
+        catch ( e ) {
+            includeTag( newTag, anon )
+        }
+
+        return newTag
     }
 
     function _include( tag ) {
@@ -279,7 +243,7 @@
 
         if ( !loader[ inc.loader ] ) throw new Error( 'tag "' + tag + '" has unknown loader "' + inc.loader + '"' )
 
-        return inc.include = loader[ inc.loader ].call( loader, inc )
+        return inc.include = loader[ inc.loader ].call( loader, inc, tag )
             .then( function ( res ) {
                 inc.loaded = res
 

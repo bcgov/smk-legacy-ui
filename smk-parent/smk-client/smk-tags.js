@@ -6,7 +6,7 @@
 exports.gen = function () {
     var tg = require( './lib/tag-gen' )
 
-    var baseDir = 'src/main/webapp'
+    var baseDir = 'src/main/javascript'
 
     var t = new tg.TagSet()
 
