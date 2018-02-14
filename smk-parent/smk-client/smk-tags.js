@@ -34,6 +34,11 @@ exports.gen = function () {
         .style( "resources/css/smk-standalone.css" )
         .tag( "surround-header" )
 
+    t.script( "sidebar", "sidebar.js" )
+    t.template( "sidebar-panels", "template/sidebar.html" )
+    t.template( "sidebar-button", "template/sidebar-button.html" )
+    t.template( "side-panel", "template/side-panel.html" )
+    
         // tools
 
         // "tool-measure" : { "loader": "group", "tags": [
@@ -165,21 +170,17 @@ exports.gen = function () {
         .script( "https://unpkg.com/terraformer-wkt-parser@1.1.2" )
         .script( "https://npmcdn.com/@turf/turf/turf.min.js" )
 
-    t.script( "sidebar", "sidebar.js" )
-    t.template( "sidebar-panels", "resources/template/sidebar.html" )
-    t.template( "sidebar-button", "resources/template/sidebar-button.html" )
-    t.template( "side-panel", "resources/template/side-panel.html" )
 
-    t.template( "about-panel", "resources/template/about-panel.html" )
+    // t.template( "about-panel", "resources/template/about-panel.html" )
 
-    t.template( "base-maps-panel", "resources/template/base-maps-panel.html" )
+    // t.template( "base-maps-panel", "resources/template/base-maps-panel.html" )
 
-    t.template( "layers-panel", "resources/template/layers-panel.html" )
+    // t.template( "layers-panel", "resources/template/layers-panel.html" )
 
-    t.template( "identify-panel", "resources/template/identify-panel.html" )
-    t.template( "sidebar-identify", "resources/template/identify-popup.html" )
+    // t.template( "identify-panel", "resources/template/identify-panel.html" )
+    // t.template( "sidebar-identify", "resources/template/identify-popup.html" )
 
-    t.template( "select-panel", "resources/template/select-panel.html" )
+    // t.template( "select-panel", "resources/template/select-panel.html" )
 
     return t
 }

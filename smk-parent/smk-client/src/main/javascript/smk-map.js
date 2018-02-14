@@ -149,23 +149,9 @@ include.module( 'smk-map', [ 'smk', 'jquery', 'util', 'viewer', 'layer' ], funct
         }
 
         function initSidebar() {
-            var sidebarTools = Object.keys( self.$tool )
-                .filter( function ( t ) {
-                    return !!self.$tool[ t ].sidebarOrder
-                } )
-                .map( function ( t ) {
-                    return self.$tool[ t ]
-                } )
-                .sort( function ( a, b ) {
-                    return a.sidebarOrder - b.sidebarOrder
-                } )
-
-            if ( sidebarTools.length == 0 ) return
-
             return include( 'sidebar' )
                 .then( function () {
                     self.$sidebar = new SMK.TYPE.SideBar()
-                    return self.$sidebar.initialize( self, sidebarTools )
                 } )
         }
 

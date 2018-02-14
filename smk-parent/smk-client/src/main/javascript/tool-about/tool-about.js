@@ -1,4 +1,4 @@
-include.module( 'tool-about', [ 'smk', 'sidebar', 'about-panel' ], function ( inc ) {
+include.module( 'tool-about', [ 'smk', 'sidebar', 'tool-about.panel-about-html' ], function ( inc ) {
 
     return {
         order: 1,
@@ -13,7 +13,7 @@ include.module( 'tool-about', [ 'smk', 'sidebar', 'about-panel' ], function ( in
             } )
 
             Vue.component( 'aboutPanel', {
-                template: inc[ 'about-panel' ],
+                template: inc[ 'tool-about.panel-about-html' ],
                 props: [ 'title', 'about' ]
             } )
         }

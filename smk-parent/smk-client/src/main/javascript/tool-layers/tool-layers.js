@@ -1,4 +1,4 @@
-include.module( 'tool-layers', [ 'smk', 'sidebar', 'layers-panel' ], function ( inc ) {
+include.module( 'tool-layers', [ 'smk', 'sidebar', 'tool-layers.panel-layers-html' ], function ( inc ) {
     return {
         order: 3,
         initialize: function ( smk, option ) {
@@ -55,7 +55,7 @@ include.module( 'tool-layers', [ 'smk', 'sidebar', 'layers-panel' ], function ( 
             } )
 
             Vue.component( 'layersPanel', {
-                template: inc[ 'layers-panel' ],
+                template: inc[ 'tool-layers.panel-layers-html' ],
                 props: [ 'layers', 'busy' ],
                 data: function () {
                     return {

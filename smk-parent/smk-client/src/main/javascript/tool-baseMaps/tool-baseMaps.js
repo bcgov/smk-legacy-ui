@@ -1,4 +1,4 @@
-include.module( 'tool-baseMaps', [ 'smk', 'sidebar', 'base-maps-panel' ], function ( inc ) {
+include.module( 'tool-baseMaps', [ 'smk', 'sidebar', 'tool-baseMaps.panel-base-maps-html' ], function ( inc ) {
 
     return {
         order: 2,
@@ -42,7 +42,7 @@ include.module( 'tool-baseMaps', [ 'smk', 'sidebar', 'base-maps-panel' ], functi
             model.zoom = v.zoom
 
             Vue.component( 'baseMapsPanel', {
-                template: inc[ 'base-maps-panel' ],
+                template: inc[ 'tool-baseMaps.panel-base-maps-html' ],
                 props: [ 'basemaps', 'center', 'zoom', 'current' ],
             } )
 
