@@ -3,11 +3,11 @@ module.exports = function( grunt ) {
     require( 'load-grunt-tasks' )( grunt )
 
     grunt.initConfig( {
+        package: grunt.file.readJSON( 'package.json' ),
 
-        package: grunt.file.readJSON('package.json'),
+        srcPath: 'src/main/javascript',
 
-        // deployPath: '/Users/ben/bin/apache-tomcat-7.0.84/webapps/smk-client',
-        deployPath: 'target',
+        buildPath: 'build',
 
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -17,7 +17,7 @@ module.exports = function( grunt ) {
                     protocol: 'http',
                     hostname: '*',
                     port: 8888,
-                    base: '<%= deployPath %>',
+                    base: '<%= buildPath %>',
                     livereload: true,
                     // open: 'http://localhost:8888/test',
                 }
@@ -29,23 +29,25 @@ module.exports = function( grunt ) {
         copy: {
             'src': {
                 expand: true,
-                cwd: 'src/main/webapp',
+                cwd: '<%= srcPath %>',
                 src: [ '**' ],
-                dest: '<%= deployPath %>'
+                dest: '<%= buildPath %>'
             },
 
             'test': {
                 expand: true,
                 cwd: 'src/main/test',
                 src: [ '**' ],
-                dest: '<%= deployPath %>/test'
+                dest: '<%= buildPath %>/test'
             },
 
             'include': {
                 expand: true,
                 src: 'lib/include.js',
-                dest: '<%= deployPath %>'
-            }
+                dest: '<%= buildPath %>'
+            },
+
+            'deploy': {}
         },
 
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -55,8 +57,8 @@ module.exports = function( grunt ) {
                 force: true
             },
 
-            'deploy': {
-                src: [ '<%= deployPath %>/**' ]
+            'build': {
+                src: [ '<%= buildPath %>/**' ]
             }
         },
 
@@ -65,49 +67,68 @@ module.exports = function( grunt ) {
         watch: {
             options: {
                 livereload: true,
+                spawn: false
                 // interrupt: true,
             },
 
             src: {
-                files: [ 'src/main/webapp/**', '!src/main/webapp/smk-tags.json' ],
-                tasks: [ 'deploy' ],
+                files: [ '<%= srcPath %>/**' ],
+                tasks: [ 'build' ],
             },
 
             test: {
                 files: [ 'src/main/test/**' ],
-                tasks: [ 'copy:test' ],
-            },            
-            
+                tasks: [ 'copy:test', 'copy:deploy' ],
+            },
+
             tags: {
                 files: [ 'smk-tags.js', 'lib/**' ],
-                tasks: [ 'gen-tags', 'copy:include' ]
+                tasks: [ 'gen-tags', 'copy:include', 'copy:deploy' ]
             }
         }
 
     } )
 
     grunt.registerTask( 'gen-tags', function () {
-        // delete require.cache[ require.resolve( './tag-gen' ) ]
-        require.cache={}
-        // grunt.log.writeln( require.resolve( './smk-tags' ) )
-        // grunt.log.writeln( require.cache[ require.resolve( './smk-tags' ) ] )
-        // delete require.cache[ require.resolve( './smk-tags' ) ]
-        // grunt.log.writeln( require.cache[ require.resolve( './smk-tags' ) ] )
+        // seems to be only way to clear require cache
+        for ( var key in require.cache )
+            delete require.cache[ key ]
 
         var tags = require( './smk-tags' )
-        grunt.file.write( 'src/main/webapp/smk-tags.json', JSON.stringify( tags.gen(), null, '  ' ) )
+        var out = grunt.template.process( '<%= buildPath %>/smk-tags.json' )
+        grunt.file.write( out, JSON.stringify( tags.gen(), null, '  ' ) )
+        grunt.log.writeln( 'wrote tags to ' + out )
     } )
 
-    grunt.registerTask( 'deploy', [
+    grunt.registerTask( 'deploy', 'set deploy dir', function ( dir ) {
+        grunt.config( 'deployPath', dir )
+        grunt.log.writeln( 'deployPath: ' + grunt.config( 'deployPath' ) )
+
+        grunt.config.merge( {
+            copy: {
+                'deploy': {
+                    expand: true,
+                    cwd: '<%= buildPath %>',
+                    src: '**',
+                    dest: '<%= deployPath %>'
+                }
+            }
+        } )
+
+        grunt.task.run( 'build', 'watch' )
+    } )
+
+    grunt.registerTask( 'build', [
+        'clean:build',
         'gen-tags',
-        'clean:deploy',
         'copy:src',
         'copy:include',
         'copy:test',
+        'copy:deploy'
     ] )
 
     grunt.registerTask( 'default', [
-        'deploy',
+        'build',
         'connect',
         'watch'
     ] )

@@ -86,7 +86,7 @@
     }
     else {
         var el = document.createElement( 'script' )
-        var includeBase = ( new URL( script.src.replace( '/smk-bootstrap.js', '' ), document.location ) ).toString()
+        var includeBase = ( new URL( script.src.replace( 'smk-bootstrap.js', '' ), document.location ) ).toString()
 
         el.addEventListener( 'load', function( ev ) {
             include.option( { baseUrl: new URL( includeBase, document.location ).toString() } )
@@ -95,7 +95,7 @@
         el.addEventListener( 'error', function( ev ) {
             throw new Error( 'failed to load script from ' + el.src )
         } )
-        
+
         el.setAttribute( 'src',        includeBase + '/lib/include.js' )
     // el.setAttribute( 'data-main',  '/service/lib/main.js' )
     // el.setAttribute( 'data-arg',   JSON.stringify( arg ) )

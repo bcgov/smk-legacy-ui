@@ -107,25 +107,25 @@
         else if ( inc.url ) {
             return new Promise( function ( res, rej ) {
                 var script = document.createElement( 'script' )
-    
+
                 if ( inc.integrity ) {
                     script.setAttribute( 'integrity', inc.integrity )
                     script.setAttribute( 'crossorigin', '' )
                 }
-    
+
                 script.addEventListener( 'load', function( ev ) {
                     res( script )
                 } )
-    
+
                 script.addEventListener( 'error', function( ev ) {
                     rej( new Error( 'failed to load script from ' + script.src ) )
                 } )
-    
+
                 script.setAttribute( 'src', self.$resolveUrl( inc.url ) )
-    
+
                 document.getElementsByTagName( 'head' )[ 0 ].appendChild( script );
                 // console.log( 'added element', inc )
-            } )    
+            } )
         }
         else throw new Error( 'Can\'t load script' )
     }
@@ -153,13 +153,13 @@
 
             if ( inc.load ) {
                 style.textContent = inc.load
-                // res( style )                
+                // res( style )
             }
             else if ( inc.url ) {
                 style.setAttribute( 'href', self.$resolveUrl( inc.url ) )
             }
             else {
-                rej( new Error( 'Can\'t load style' ) )                
+                rej( new Error( 'Can\'t load style' ) )
             }
 
             document.getElementsByTagName( 'head' )[ 0 ].appendChild( style );
