@@ -50,6 +50,7 @@
 						<div class="card white">
 							<div class="card-content black-text">
 								<p:wizard flowListener="#{CreateBean.onFlowProcess}">
+
 									<p:tab id="details" title="Identity">
 										<p:panel header="Configuration identity">
 											<p:messages autoUpdate="true" showDetail="true" closable="true"/>
@@ -101,6 +102,7 @@
 											</div>
 										</p:panel>
 									</p:tab>
+
 									<p:tab id="basemap" title="Base Maps">
 										<p:panel header="Base Maps">
 											<p:messages autoUpdate="true" showDetail="true" closable="true"/>
@@ -124,6 +126,7 @@
 											</div>
 										</p:panel>
 									</p:tab>
+
 									<p:tab id="layers" title="Layers">
 										<p:panel header="Layers">
 											<p:messages autoUpdate="true" showDetail="true" closable="true"/>
@@ -172,6 +175,7 @@
 											</div>
 										</p:panel>
 									</p:tab>
+
 									<p:tab id="tools" title="Tools">
 										<p:panel header="Tools">
 											<p:messages autoUpdate="true" showDetail="true" closable="true"/>
@@ -200,16 +204,32 @@
 											</p:outputPanel>
 										</p:panel>
 									</p:tab>
-									<!-- <p:tab id="homePage" title="Home Page">
-										<p:panel header="Home Page">
+
+									<p:tab id="surround" title="Surround">
+										<p:panel header="Surround">
 											<p:messages autoUpdate="true" showDetail="true" closable="true"/>
 											<div class="row">
-												<div class="col s12">
-													<p:textEditor id="aboutPageEditor" widgetVar="editorWidget" value="#{'CreateBean.resource.aboutPage'}" height="300" style="margin-bottom:10px"/>
+												<div class="col s12 input-field">
+													<p:fileUpload ajax="true"
+														update="@this"
+														mode="advanced"
+														fileLimit="1"
+														sizeLimit="52428800"
+														invalidSizeMessage="The selected file exceeds the limit of 50 MB"
+														fileUploadListener="#{CreateBean.uploadImage}"
+													/>
+												</div>
+											</div>
+											<div class="row">
+												<div class="col s12 input-field">
+													<p:outputPanel id="surroundImagePanel" rendered="#{ not empty CreateBean.surroundImageSrc }">
+														<img src="../smks-api/MapConfigurations/#{ CreateBean.resource.lmfId }/Attachments/#{ CreateBean.surroundImageSrc }" height="64" />
+													</p:outputPanel>
 												</div>
 											</div>
 										</p:panel>
-									</p:tab> -->
+									</p:tab>
+
 									<p:tab id="publish" title="Publish">
 										<p:panel header="Publish">
 											<p:messages autoUpdate="true" showDetail="true" closable="true"/>
@@ -231,6 +251,7 @@
 											</div>
 										</p:panel>
 									</p:tab>
+
 								</p:wizard>
 
 								<a class="waves-effect waves-light btn light-blue lighten-2" onclick="navigateToHome(); ">Cancel</a>

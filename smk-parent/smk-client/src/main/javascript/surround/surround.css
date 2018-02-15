@@ -15,22 +15,28 @@ body {
     top: 0;
     left: 0;
     right: 0;
-    height: 70px;
+    height: 70px
 }
 
 #smk-header-logo {
-    width: 167px;
+    display: inline-block;
+    width: 180px;
     height: 64px;
-    background-image:       url( '../images/bc_gov_logo_transparent.png' );
     background-position:    6px 6px;
     background-repeat:      no-repeat;
+    background-size:        auto 58px;
+}
+
+.default-header-image {
+    background-image:       url( 'bc_gov_logo_transparent.png' );
 }
 
 #smk-header-title {
-    position:       absolute;
-    top:            18px;
-    margin-left:    180px;
+    margin-left:    20px;
     font-size:      30px;
+    line-height: 64px;
+    vertical-align: bottom;
+    margin-left: 20px;
 }
 
 .smk-viewer {

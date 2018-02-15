@@ -607,6 +607,61 @@ public class CreateBean implements Serializable
 		}
     }
 
+	public void uploadImage(FileUploadEvent event)
+    {
+		try
+		{
+			UploadedFile uploadFile = event.getFile();
+
+			String uploadFilename = uploadFile.getFileName();
+			// importLayerTitle = uploadFilename;
+
+			String fileName, extension;
+
+			int dotPos = uploadFilename.indexOf('.');
+
+			if (dotPos != -1)
+			{
+				fileName = uploadFilename.substring(0, dotPos);
+				extension = uploadFilename.substring(dotPos);
+			}
+			else
+			{
+				fileName = uploadFilename;
+				extension = "";
+			}
+
+			// uploadContentType = uploadFile.getContentType();
+
+			File holdingFile = File.createTempFile(fileName + '-', extension);
+		    holdingFile.deleteOnExit();
+		    uploadFile.write(holdingFile.getAbsolutePath());
+
+		    InputStream finput = new FileInputStream(holdingFile);
+		    byte[] docRawBytes = new byte[(int)holdingFile.length()];
+
+		    finput.read(docRawBytes, 0, docRawBytes.length);
+		    finput.close();
+		    holdingFile.delete();
+
+		    // uploadFileAttachmentBytes = Base64.encodeBase64String(docRawBytes);
+
+		    Attachment importAttachment = new Attachment("surroundImage", Base64.encodeBase64String(docRawBytes), uploadFile.getContentType());
+
+		    resource.addInlineAttachment(importAttachment);
+
+			resource.getSurround().setImageSrc("surroundImage");
+	    }
+		catch(Exception e)
+		{
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error writing KML document:", e.getMessage()));
+			e.printStackTrace();
+		}
+
+		RequestContext.getCurrentInstance().update("createMashupForm:surroundImagePanel");
+		RequestContext.getCurrentInstance().execute("Materialize.updateTextFields();");
+    }
+
 	public void removeSelectedLayer()
 	{
 		TreeNode parent = selectedLayerNode.getParent();
@@ -1071,5 +1126,9 @@ public class CreateBean implements Serializable
 		// logger.debug( configureTool.getType() + ":" + configureTool.isConfigured() );
 		if ( configureTool == null ) return "disabled";
 		return configureTool.isConfigured() ? "" : "disabled";
+	}
+
+	public String getSurroundImageSrc() {
+		return resource.getSurround().getImageSrc();
 	}
 }

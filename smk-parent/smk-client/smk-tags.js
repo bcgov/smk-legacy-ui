@@ -1,8 +1,3 @@
-// var fs = require( 'fs' )
-
-// process.stdout.setEncoding( 'utf8' )
-// process.stdout.write( tags().stringify() )
-
 exports.gen = function () {
     var tg = require( './lib/tag-gen' )
 
@@ -28,11 +23,8 @@ exports.gen = function () {
         .style( "https://fonts.googleapis.com/icon?family=Material+Icons" )
         .style( "resources/css/dmf.css" )
 
-    t.template( "surround-header", "resources/template/header.html" )
-
     t.group( "surround" )
-        .style( "resources/css/smk-standalone.css" )
-        .tag( "surround-header" )
+        .dir( 'surround/**/*', { cwd: baseDir } )
 
     t.script( "sidebar", "sidebar.js" )
     t.template( "sidebar-panels", "template/sidebar.html" )

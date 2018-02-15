@@ -89,15 +89,8 @@ include.module( 'smk-map', [ 'smk', 'jquery', 'util', 'viewer', 'layer' ], funct
         function initSurround() {
             if ( !self.$option.standalone ) return
 
-            return include( 'surround' ).then( function ( inc ) {
-                $( self.$option.container )
-                    .toggleClass( 'smk-show-header' ) //, self.surround.showHeader )
-
-                var expanded = SMK.UTIL.templateReplace( inc.surround[ 'surround-header' ], function ( k ) {
-                    return eval( 'self.' + k )
-                } )
-
-                self.addToContainer( expanded, { id: 'smk-header' }, true )
+            return include( 'surround' ).then( function () {
+                self.$surround = new SMK.TYPE.Surround( self )
             } )
         }
 
