@@ -653,6 +653,25 @@
 							</div>
 						</c:if>
 
+						<c:if test="#{CreateBean.configureTool.type eq 'baseMaps'}">
+							<div class="row">
+								<div class="col s12 input-field">
+									<h:selectManyCheckbox value="#{ CreateBean.configureTool.choices }" layout="pageDirection">
+										<!-- f:selectItem itemValue="dataBCDefault" itemLabel="DataBC Default" />
+										<f:selectItem itemValue="dataBCRoads" itemLabel="DataBC Roads" / -->
+										<f:selectItem itemValue="Topographic" itemLabel="ESRI Topographic" />
+										<f:selectItem itemValue="Streets" itemLabel="ESRI Streets" />
+										<f:selectItem itemValue="Imagery" itemLabel="ESRI Imagery" />
+										<f:selectItem itemValue="Oceans" itemLabel="Oceans" />
+										<f:selectItem itemValue="NationalGeographic" itemLabel="National Geographic" />
+										<f:selectItem itemValue="DarkGray" itemLabel="Dark Grey" />
+										<f:selectItem itemValue="Gray" itemLabel="Light Grey" />
+										<!-- f:selectItem itemValue="osm" itemLabel="Open Street Map" / -->
+									</h:selectManyCheckbox>
+								</div>
+							</div>
+						</c:if>
+
 					</div>
 					<div class="modal-footer">
 						<a href="#!" onclick="configureToolDone(); $('#configureToolBox').modal('close');" class="modal-action modal-close waves-effect waves-green btn-flat">Done</a>

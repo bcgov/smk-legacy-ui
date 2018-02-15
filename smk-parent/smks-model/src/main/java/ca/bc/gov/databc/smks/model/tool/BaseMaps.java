@@ -9,6 +9,8 @@ import ca.bc.gov.databc.smks.model.Tool;
 @JsonInclude(Include.NON_NULL)
 public class BaseMaps extends Tool
 {
+	private String[] choices;
+
 	public BaseMaps() {}
 
 	protected BaseMaps( BaseMaps about ) {
@@ -22,6 +24,19 @@ public class BaseMaps extends Tool
 	public String getTitle() {
 		return "Base Maps Panel";
 	}
+
+    public String getDescription() {
+        return "Select the base maps available as choices.";
+    }
+
+    public boolean isConfigured() {
+        return true;
+    }
+
+	public String[] getChoices() {
+		return choices;
+	}
+	public void setChoices( String[] choices ) { this.choices = choices; }
 
 	public BaseMaps clone()
 	{

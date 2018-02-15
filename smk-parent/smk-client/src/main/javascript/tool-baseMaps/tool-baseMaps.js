@@ -1,9 +1,26 @@
 include.module( 'tool-baseMaps', [ 'smk', 'sidebar', 'tool-baseMaps.panel-base-maps-html' ], function ( inc ) {
 
+    var baseMapTitle = {
+        Topographic: 'Topographic',
+        Streets: 'Streets',
+        Imagery: 'Imagery',
+        Oceans: 'Oceans',
+        NationalGeographic: 'National Geographic',
+        DarkGray: 'Dark Gray',
+        Gray: 'Gray',
+    }
+
     return {
         order: 2,
         initialize: function ( smk, option ) {
             var sb = smk.getSidebar()
+
+            var choices = [ 'Topographic', 'Streets', 'Imagery', 'Oceans', 'NationalGeographic', 'DarkGray', 'Gray' ]
+            if ( option.choices && option.choices.length > 0 )
+                choices = option.choices
+
+            if ( !choices.includes( smk.viewer.baseMap ) )
+                choices.unshift( smk.viewer.baseMap )
 
             var model = sb.addPanel( 'baseMaps', {
                 button: { title: 'Base Maps', icon: 'map' },
@@ -11,15 +28,11 @@ include.module( 'tool-baseMaps', [ 'smk', 'sidebar', 'tool-baseMaps.panel-base-m
                     center:   null,
                     zoom:     null,
                     current:  smk.viewer.baseMap,
-                    basemaps: [
-                        { id: 'Topographic', title: 'Topographic' },
-                        { id: 'Streets', title: 'Streets' },
-                        { id: 'Imagery', title: 'Imagery' },
-                        { id: 'Oceans', title: 'Oceans' },
-                        { id: 'NationalGeographic', title: 'National Geographic' },
-                        { id: 'DarkGray', title: 'Dark Gray' },
-                        { id: 'Gray', title: 'Gray' }
-                    ]
+                    basemaps: choices.map( function ( c ) {
+                        return {
+                            id: c, title: baseMapTitle[ c ]
+                        }
+                    } )
                 },
                 startOpen: option.startOpen
             } )
