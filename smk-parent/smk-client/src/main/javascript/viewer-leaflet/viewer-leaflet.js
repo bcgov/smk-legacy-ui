@@ -95,15 +95,6 @@ include.module( 'viewer-leaflet', [ 'viewer', 'leaflet' ], function () {
         }
     }
 
-    var basemapHasLabels = {
-        'ShadedRelief': true,
-        'Oceans': true,
-        'Gray': true,
-        'DarkGray': true,
-        'Imagery': true,
-        'Terrain': true,
-    }
-
     ViewerLeaflet.prototype.setBasemap = function ( basemapName ) {
         if( this.currentBasemap ) {
             if ( this.currentBasemap.features )
@@ -113,10 +104,7 @@ include.module( 'viewer-leaflet', [ 'viewer', 'leaflet' ], function () {
                 this.map.removeLayer( this.currentBasemap.labels );
         }
 
-        this.currentBasemap = {
-            features: L.esri.basemapLayer( basemapName, { detectRetina: true } ),
-            labels: basemapHasLabels[ basemapName ] && L.esri.basemapLayer( basemapName + 'Labels' )
-        }
+        this.currentBasemap = this.createBasemapLayer( basemapName );
 
         this.map.addLayer( this.currentBasemap.features );
         this.currentBasemap.features.bringToBack();
@@ -214,6 +202,22 @@ include.module( 'viewer-leaflet', [ 'viewer', 'leaflet' ], function () {
             paddingTopLeft: L.point( 300, 100 ),
             animate: false
         } )
+    }
+
+    var basemapHasLabels = {
+        'ShadedRelief': true,
+        'Oceans': true,
+        'Gray': true,
+        'DarkGray': true,
+        'Imagery': true,
+        'Terrain': true,
+    }
+
+    ViewerLeaflet.prototype.createBasemapLayer = function ( basemapName ) {
+        return {
+            features: L.esri.basemapLayer( basemapName, { detectRetina: true } ),
+            labels: basemapHasLabels[ basemapName ] && L.esri.basemapLayer( basemapName + 'Labels' )
+        }
     }
 
 } )

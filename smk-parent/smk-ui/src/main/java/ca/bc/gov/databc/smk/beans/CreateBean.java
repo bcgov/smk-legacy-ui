@@ -221,7 +221,7 @@ public class CreateBean implements Serializable
 
 	public void onToolSelect( SelectEvent event ) {
 		configureTool = ( Tool )event.getObject();
-		logger.debug("select "+configureTool.getType());
+		// logger.debug("select "+configureTool.getType());
 		RequestContext.getCurrentInstance().update("createMashupForm:configureToolBoxButton" );
 		// RequestContext.getCurrentInstance().update("createMashupForm:toolsPicklist");
 	}
@@ -353,7 +353,7 @@ public class CreateBean implements Serializable
 	}
 
 	public void layerMessage( AjaxBehaviorEvent event ) {
-		logger.debug( event.toString() );
+		// logger.debug( event.toString() );
 	}
 
 	public TreeNode getCatalogLayers()

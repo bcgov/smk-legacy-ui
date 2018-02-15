@@ -40,11 +40,11 @@ public class About extends Tool
     }
 
 	public String getContent() {
-		logger.debug( "get " + content );
+		// logger.debug( "get " + content );
 		return content;
 	}
 	public void setContent(String content) {
-		logger.debug( "set " + content );
+		// logger.debug( "set " + content );
 		this.content = content;
 	}
 
