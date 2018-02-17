@@ -25,8 +25,10 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
         var self = this
 
         this.lmfId = smk.lmfId
+
         this.identified = new SMK.TYPE.FeatureSet()
         this.selected = new SMK.TYPE.FeatureSet()
+        this.searched = new SMK.TYPE.FeatureSet()
 
         this.layerIds = []
         this.layerId = {}

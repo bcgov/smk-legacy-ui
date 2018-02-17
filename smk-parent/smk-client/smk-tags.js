@@ -46,6 +46,9 @@ exports.gen = function () {
     t.group( "tool-select" )
         .dir( 'tool-select/**/*', { cwd: baseDir } )
 
+    t.group( "tool-search" )
+        .dir( 'tool-search/**/*', { cwd: baseDir } )
+
     // leaflet
 
     t.group( "tool-pan-leaflet" )
@@ -76,6 +79,9 @@ exports.gen = function () {
 
     t.group( "tool-select-leaflet" )
         .dir( "viewer-leaflet/tool-select/**/*", { cwd: baseDir } )
+
+    t.group( "tool-search-leaflet" )
+        .dir( "viewer-leaflet/tool-search/**/*", { cwd: baseDir } )
 
     t.script( "layer-leaflet", "viewer-leaflet/layer-leaflet.js" )
 

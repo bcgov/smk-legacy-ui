@@ -6,7 +6,7 @@ include.module( 'tool-identify', [ 'smk', 'sidebar', 'tool-identify.panel-identi
             var sb = smk.getSidebar()
 
             var model = sb.addPanel( 'identify', {
-                button: { title: 'Identify', icon: 'search' },
+                button: { title: 'Identify', icon: 'info_outline' },
                 panel: {
                     busy: false,
                     layers: [],

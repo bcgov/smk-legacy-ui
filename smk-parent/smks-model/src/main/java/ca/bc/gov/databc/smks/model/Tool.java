@@ -24,6 +24,7 @@ import ca.bc.gov.databc.smks.model.tool.BaseMaps;
 import ca.bc.gov.databc.smks.model.tool.Layers;
 import ca.bc.gov.databc.smks.model.tool.Identify;
 import ca.bc.gov.databc.smks.model.tool.Select;
+import ca.bc.gov.databc.smks.model.tool.Search;
 
 @JsonTypeInfo(
     use = JsonTypeInfo.Id.NAME,
@@ -45,7 +46,8 @@ import ca.bc.gov.databc.smks.model.tool.Select;
     @Type( name = "baseMaps",		value = BaseMaps.class ),
     @Type( name = "layers",			value = Layers.class ),
     @Type( name = "identify",		value = Identify.class ),
-    @Type( name = "select",			value = Select.class )
+    @Type( name = "select",			value = Select.class ),
+    @Type( name = "search",			value = Search.class )
 } )
 @JsonInclude(Include.NON_DEFAULT)
 public class Tool implements Cloneable
@@ -66,7 +68,8 @@ public class Tool implements Cloneable
         baseMaps( BaseMaps.class ),
         layers( Layers.class ),
         identify( Identify.class ),
-        select( Select.class );
+        select( Select.class ),
+        search( Search.class );
 
         private final Class<?> CLASS;
 
