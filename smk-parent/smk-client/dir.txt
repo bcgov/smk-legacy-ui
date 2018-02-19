@@ -1,0 +1,62 @@
+smk-client
+    gruntfile.js
+    lib
+        tag-gen.js
+        linker.js
+        include.js
+
+    src
+        main
+            webapp
+                smk-bootstrap.js -> smk-initialize.js
+                smk-map.js
+                smk-tags.json
+                viewer.js
+                layer.js
+                sidebar.js
+                event.js
+                feature-set.js
+                util.js
+
+                style
+                    res
+                        ..images, fonts..
+
+                template
+                    ..templates..
+
+                lib
+                    jquery
+                    vue
+                    (copy of include)
+
+                tool-<tool>
+                    tool-<tool>.js
+                    <lib-dep>.js
+                    style
+                        ..css..
+                        res
+                            ..images, fonts..
+                    template
+                        ..templates..
+
+                viewer-<viewer>
+                    viewer-<viewer>.js
+                    <lib-dep>.js
+                    style
+                        ..css..
+                        res
+                            ..images, fonts..
+                    template
+                        ..templates..
+
+                    tool-<tool>
+                        tool-<tool>.js
+                        <lib-dep>.js
+                        style
+                            ..css..
+                            res
+                                ..images, fonts..
+                        template
+                            ..templates..
+

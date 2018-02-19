@@ -1,0 +1,30 @@
+== {PUT} MapConfiguration/{id} - Update a LMF Map Configuration (not for publishing)
+
+Executing a PUT at the MapConfiguration endpoint with the LMF id and a body containing the required changes will udpate the Map Configuration.
+
+NOTE: The document must include the correct "_rev" and "_id" system values. If these are missing, the update will fail. You can get the latest values by fetching the current resource from {GET} /MapConfigurations/{id} prior to updating
+WARNING: It is not possible to set the "Published" flag to true via this endpoint. Attempting to do so will throw an exception.
+
+Example of curl command:
+
+include::{snippets}/mapconfig-upd/curl-request.adoc[]
+
+Path Parameters:
+
+include::{snippets}/mapconfig-upd/path-parameters.adoc[]
+
+Example of http request:
+
+include::{snippets}/mapconfig-upd/request-body.adoc[]
+
+Request Body:
+
+include::{snippets}/mapconfig-upd/http-request.adoc[]
+
+Example of http response:
+
+include::{snippets}/mapconfig-upd/http-response.adoc[]
+
+Response body:
+
+include::{snippets}/mapconfig-upd/response-body.adoc[]

@@ -1,0 +1,7 @@
+<div class="header nrpp-blue-dark">
+    <span id="smk-header-logo"
+        v-bind:style="{ 'background-image': imageSrc && url( '../smks-api/MapConfigurations/' + lmfId + '/Attachments/' + imageSrc ) }"
+        v-bind:class="{ 'default-header-image': !imageSrc }">
+    </span>
+    <span id="smk-header-title" class="white-text">{{ title }}</span>
+</div>
