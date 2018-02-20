@@ -15,7 +15,19 @@
     z-index: 1;
 }
 
-.smk-sidebar {
+.smk-overlay {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    right: 5px;
+    bottom: 5px;
+    z-index: 2;
+    border-radius: 5px;
+    border: 1px solid black;
+    pointer-events: none;
+}
+
+/* .smk-sidebar {
     position: absolute;
     top: 5px;
     left: 5px;
@@ -135,7 +147,7 @@ ul.smk-sidebar-tools {
     margin-top: 0;
     margin-bottom: 2px;
     font-size: 15px;
-}
+} */
 
 /* .smk-base-map-sample {
     width: 100%;

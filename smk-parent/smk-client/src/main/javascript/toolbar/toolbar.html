@@ -1,12 +1,20 @@
-<div class="smk-toolbar" v-bind:class="{ expanded: currentTool != null }">
-    <div v-for="tool in tools">
-        <component class="smk-tool" v-bind:is="tool.component" v-bind="tool"></component>
+<div class="smk-toolbar">
+    <div v-for="tool in tools" class="smk-tool">
+
+        <component
+            v-if="tool.component"
+            v-bind:is="tool.component"
+            v-bind="tool"
+        ></component>
+
+        <button
+            v-if="!tool.component"
+            v-bind:title="tool.title"
+            v-bind:class="{ 'smk-tool-active': tool.isActivated(), 'smk-tool-visible': tool.isVisible(), 'smk-tool-enabled': tool.isEnabled() }"
+            v-on:click="tool.onClick()"
+        ><i class="material-icons">{{ tool.icon }}</i>
+        </button>
+
     </div>
-    <!-- <ul class="smk-toolbar-tools"> -->
-        <!-- <li v-for="tool in tools"> -->
-            <!-- <panel-tool v-bind="tool" v-bind:active="currentTool == tool.id"></panel-tool> -->
-            <!-- <panel-tool v-bind="tool" v-on:activate-tool="activateTool" v-bind:active="currentTool == tool.id"></panel-tool> -->
-        <!-- </li> -->
-    <!-- </ul> -->
-    <!-- <component class="smk-toolbar-panel" v-bind:is="currentTool && currentTool + 'Panel'" v-bind="panel[ currentTool ]"></component> -->
 </div>
+

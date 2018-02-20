@@ -116,11 +116,12 @@ include.module( 'smk-map', [ 'smk', 'jquery', 'util', 'viewer', 'layer' ], funct
                         return include( tag )
                     } )
                     .then( function ( inc ) {
-                        self.$tool[ t.type ] = inc[ tag ]
-                        self.tools[ t.type ] = t
+                        // self.tools[ t.type ] = t
+                        self.$tool[ t.type ] = new inc[ tag ]( t )
+                        // self.tools[ t.type ] = t
                     } )
-                    .catch( function () {
-                        console.warn( 'tool "' + t.type + '" has no implementation' )
+                    .catch( function ( e ) {
+                        console.warn( 'tool "' + t.type + '" failed to create:', e )
                     } )
             } ) )
         }
@@ -132,14 +133,23 @@ include.module( 'smk-map', [ 'smk', 'jquery', 'util', 'viewer', 'layer' ], funct
             return SMK.UTIL.waitAll( ts.map( function ( t ) {
                 return SMK.UTIL.resolved()
                     .then( function () {
-                        return self.$tool[ t ].initialize( self, self.tools[ t ] )
-                    } )
-                    .then( function () {
-                        console.log( 'tool "' + t + '" initialized' )
+                        return self.$tool[ t ].initialize( self )
+                        // return self.$tool[ t ].initialize( self, self.tools[ t ] )
                     } )
                     .catch( function ( e ) {
                         console.warn( 'tool "' + t + '" failed to initialize:', e )
                     } )
+                    .then( function ( tool ) {
+                        console.log( 'tool "' + t + '" initialized' )
+                    } )
+                    // .then( function ( tool ) {
+                    //     return self.getToolbar().then( function ( toolbar ) {
+                    //         toolbar.add( tool )
+                    //     } )
+                    // } )
+                    // .catch( function ( e ) {
+                    //     console.warn( 'tool "' + t + '" failed to add:', e )
+                    // } )
             } ) )
         }
 
@@ -169,6 +179,13 @@ include.module( 'smk-map', [ 'smk', 'jquery', 'util', 'viewer', 'layer' ], funct
 
     //     return this.$sidebar = new SMK.TYPE.Sidebar( this )
     // }
+
+    SmkMap.prototype.addToOverlay = function ( html ) {
+        if ( !this.$overlay )
+            this.$overlay = this.addToContainer( '<div class="smk-overlay">' )
+
+        return $( html ).appendTo( this.$overlay ).get( 0 )
+    }
 
     SmkMap.prototype.getToolbar = function () {
         var self = this

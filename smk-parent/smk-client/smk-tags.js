@@ -14,6 +14,7 @@ exports.gen = function () {
     t.script( "smk-map", "smk-map.js" )
     t.script( "viewer", "viewer.js" )
     t.script( "layer", "layer.js" )
+    t.script( "tool", "tool.js" )
     t.script( "feature-set", "feature-set.js" )
 
     t.sequence( "map-frame-styles" )
@@ -26,11 +27,17 @@ exports.gen = function () {
     t.group( "surround" )
         .dir( 'surround/**/*', { cwd: baseDir } )
 
-    t.group( 'tool-bar' )
-        .script( "sidebar.js" )
-        .template( "sidebar-panels", "template/sidebar.html" )
-        .template( "sidebar-button", "template/sidebar-button.html" )
-        .template( "side-panel", "template/side-panel.html" )
+    t.group( 'toolbar' )
+        .dir( 'toolbar/**/*', { cwd: baseDir } )
+
+    t.group( 'sidepanel' )
+        .dir( 'sidepanel/**/*', { cwd: baseDir } )
+
+    // t.group( 'tool-bar' )
+    //     .script( "sidebar.js" )
+    //     .template( "sidebar-panels", "template/sidebar.html" )
+    //     .template( "sidebar-button", "template/sidebar-button.html" )
+    //     .template( "side-panel", "template/side-panel.html" )
 
     t.group( "tool-about" )
         .dir( 'tool-about/**/*', { cwd: baseDir } )
