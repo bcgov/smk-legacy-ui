@@ -26,10 +26,11 @@ exports.gen = function () {
     t.group( "surround" )
         .dir( 'surround/**/*', { cwd: baseDir } )
 
-    t.script( "sidebar", "sidebar.js" )
-    t.template( "sidebar-panels", "template/sidebar.html" )
-    t.template( "sidebar-button", "template/sidebar-button.html" )
-    t.template( "side-panel", "template/side-panel.html" )
+    t.group( 'tool-bar' )
+        .script( "sidebar.js" )
+        .template( "sidebar-panels", "template/sidebar.html" )
+        .template( "sidebar-button", "template/sidebar-button.html" )
+        .template( "side-panel", "template/side-panel.html" )
 
     t.group( "tool-about" )
         .dir( 'tool-about/**/*', { cwd: baseDir } )

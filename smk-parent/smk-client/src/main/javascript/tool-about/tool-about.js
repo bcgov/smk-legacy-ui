@@ -19,4 +19,12 @@ include.module( 'tool-about', [ 'smk', 'sidebar', 'tool-about.panel-about-html' 
         }
     }
 
+    function AboutTool( option ) {
+        Tool.prototype.constructor.call( option )
+    }
+
+    SMK.TYPE.AboutTool = AboutTool
+
+    $.extend( AboutTool.prototype, Tool.prototype )
+
 } )
