@@ -1,5 +1,6 @@
-<div class="smk-sidebar" v-bind:class="{ expanded: currentTool != null }">
-    <component class="smk-sidebar-panel"
+<div class="smk-sidepanel" v-bind:class="{ expanded: currentTool != null }">
+    <!-- {{ currentTool }} -->
+    <component class="smk-panel"
         v-bind:is="currentTool && panel[ currentTool ].panel"
         v-bind="panel[ currentTool ]"
     ></component>

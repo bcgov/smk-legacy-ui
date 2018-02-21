@@ -58,14 +58,16 @@ include.module( 'sidepanel', [ 'vue', 'sidepanel.sidepanel-html', 'sidepanel.pan
     }
 
     Sidepanel.prototype.add = function ( tool ) {
+        var self = this
         // arg.button.id = id
         // this.model.panels.push( tool )
-        this.model.panel[ tool.type ] = tool
+        this.vm.$set( this.model.panel, tool.type, tool )
+        // this.model.panel[ tool.type ] = tool
 
         tool.changedActive( function () {
             // if ( !tool.isActive() ) return
 
-            self.activateTool( tool.type, tool.isActive() )
+            self.activateTool( tool.type, tool.isActivated() )
         } )
         // Vue.set( this.vm.panel, id, arg.panel )
 

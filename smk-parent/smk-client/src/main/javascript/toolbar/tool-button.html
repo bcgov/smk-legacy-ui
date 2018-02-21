@@ -1,0 +1,8 @@
+<div>
+    <button
+        v-on:click="$$emit( 'click' )"
+        v-bind:title="tool.title"
+        v-bind:class="{ 'smk-tool-active': tool.activated, 'smk-tool-visible': tool.visible, 'smk-tool-enabled': tool.enabled }"
+    ><i class="material-icons">{{ tool.icon }}</i>
+    </button>
+</div>

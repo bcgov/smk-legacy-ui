@@ -13,8 +13,8 @@ include.module( 'tool', [ 'smk', 'jquery', 'event' ], function () {
         $.extend( this, {
             type: 'unknown',
             order: 1,
-            visible: false,
-            enabled: false,
+            visible: true,
+            enabled: true,
             activated: false,
         }, option )
     }
@@ -42,6 +42,20 @@ include.module( 'tool', [ 'smk', 'jquery', 'event' ], function () {
                         console.log( 'panel "' + self.type + '" added' )
                     } )
             } )
+    }
+
+    Tool.prototype.getView = function ( props ) {
+        var self = this
+
+        var view = {}
+        props.forEach( function ( p ) {
+            Object.defineProperty( view, p, { get: function () { return self[ p ] } } )
+        } )
+        return { tool: view }
+    }
+
+    Tool.prototype.getToolbarView = function () {
+        return this.getView( [ 'type', 'title', 'icon', 'component', 'visible', 'enabled', 'activated' ] )
     }
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //

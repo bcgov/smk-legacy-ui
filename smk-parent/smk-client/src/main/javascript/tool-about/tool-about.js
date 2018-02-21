@@ -31,7 +31,8 @@ include.module( 'tool-about', [ 'smk', 'tool', 'tool-about.panel-about-html' ], 
             title: 'About',
             icon: 'menu',
             button: true,
-            panel: 'aboutPanel'
+            panel: 'aboutPanel',
+            component: 'tool-button'
         }, option ) )
     }
 
@@ -49,7 +50,7 @@ include.module( 'tool-about', [ 'smk', 'tool', 'tool-about.panel-about-html' ], 
     // }
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
-    Tool.prototype.onClick = function () {
+    AboutTool.prototype.onClick = function () {
         if ( !this.isVisible() || !this.isEnabled() ) return
 
         this.active( !this.isActivated() )

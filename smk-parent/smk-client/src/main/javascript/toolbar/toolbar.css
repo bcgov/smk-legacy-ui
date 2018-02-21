@@ -73,10 +73,10 @@
     background-color: white;
     border-radius: 5px;
     box-shadow: 0 1px 5px rgba(0, 0, 0, 0.65);
+    pointer-events: auto;
 }
 
 .smk-tool {
-    pointer-events: auto;
     display: inline-block;
 }
 

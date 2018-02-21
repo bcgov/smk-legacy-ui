@@ -1,20 +1,14 @@
 <div class="smk-toolbar">
-    <div v-for="tool in tools" class="smk-tool">
+    <!-- <div v-for="tool in tools" class="smk-tool"> -->
 
-        <component
-            v-if="tool.component"
+        <component class="smk-tool"
+            v-for="tool in tools" 
             v-bind:is="tool.component"
-            v-bind="tool"
+            v-bind="tool.getToolbarView()"
         ></component>
 
-        <button
-            v-if="!tool.component"
-            v-bind:title="tool.title"
-            v-bind:class="{ 'smk-tool-active': tool.isActivated(), 'smk-tool-visible': tool.isVisible(), 'smk-tool-enabled': tool.isEnabled() }"
-            v-on:click="tool.onClick()"
-        ><i class="material-icons">{{ tool.icon }}</i>
-        </button>
+        <!-- v-on:click="tool.onClick()" -->
 
-    </div>
+    <!-- </div> -->
 </div>
 
