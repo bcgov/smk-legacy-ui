@@ -132,7 +132,7 @@
                             $$emit: function ( event, arg ) {
                                 if ( this.$options._componentTag )
                                     event = this.$options._componentTag + '.' + event
-                                    
+
                                 this.$root.$emit( event, arg )
                             }
                         }

@@ -1,4 +1,4 @@
-include.module( 'tool-about', [ 'smk', 'tool', 'tool-about.panel-about-html' ], function ( inc ) {
+include.module( 'tool-about', [ 'smk', 'tool', 'tool-about.panel-about-html', 'widgets' ], function ( inc ) {
 
     // return {
     //     order: 1,
@@ -19,7 +19,13 @@ include.module( 'tool-about', [ 'smk', 'tool', 'tool-about.panel-about-html' ], 
     //     }
     // }
 
-    Vue.component( 'aboutPanel', {
+    Vue.component( 'about-widget', {
+        extends: inc.widgets.toolButton,
+        // template: inc[ 'tool-about.panel-about-html' ],
+        // props: [ 'title', 'about' ]
+    } )
+
+    Vue.component( 'about-panel', {
         template: inc[ 'tool-about.panel-about-html' ],
         props: [ 'title', 'about' ]
     } )
@@ -29,10 +35,11 @@ include.module( 'tool-about', [ 'smk', 'tool', 'tool-about.panel-about-html' ], 
         SMK.TYPE.Tool.prototype.constructor.call( this, $.extend( {
             // id: 'about',
             title: 'About',
-            icon: 'menu',
-            button: true,
-            panel: 'aboutPanel',
-            component: 'tool-button'
+            widget: { icon: 'menu', component: 'about-widget' },
+            // icon: 'menu',
+            // button: true,
+            panel: { component: 'about-panel' },
+            toolbarProperties: SMK.TYPE.Tool.prototype.toolbarProperties.concat( 'about' )
         }, option ) )
     }
 
@@ -41,13 +48,16 @@ include.module( 'tool-about', [ 'smk', 'tool', 'tool-about.panel-about-html' ], 
     $.extend( AboutTool.prototype, SMK.TYPE.Tool.prototype )
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
-    // AboutTool.prototype.initialize = function ( smk ) {
-    //     return SMK.TYPE.Tool.prototype.initialize.apply( this, arguments )
+    AboutTool.prototype.initialize = function ( smk ) {
+        return SMK.TYPE.Tool.prototype.initialize.apply( this, arguments )
+            .then( function () {
 
-    //     // return smk.getSidepanel().then( function ( panel ) {
-    //     //     panel.add( self )
-    //     // } )
-    // }
+            } )
+
+        // return smk.getSidepanel().then( function ( panel ) {
+        //     panel.add( self )
+        // } )
+    }
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
     AboutTool.prototype.onClick = function () {

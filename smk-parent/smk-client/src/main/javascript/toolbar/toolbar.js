@@ -1,9 +1,9 @@
-include.module( 'toolbar', [ 'vue', 'toolbar.toolbar-html', 'toolbar.tool-button-html' ], function ( inc ) {
+include.module( 'toolbar', [ 'vue', 'toolbar.toolbar-html' ], function ( inc ) {
 
-    Vue.component( 'tool-button', {
-        props: [ 'tool' ],
-        template: inc[ 'toolbar.tool-button-html' ]
-    } )
+    // Vue.component( 'tool-button', {
+    //     props: [ 'tool' ],
+    //     template: inc[ 'toolbar.tool-button-html' ]
+    // } )
 
     function Toolbar( smk ) {
         var self = this
@@ -21,11 +21,21 @@ include.module( 'toolbar', [ 'vue', 'toolbar.toolbar-html', 'toolbar.tool-button
             el: el,
             data: this.model,
             methods: {
-                debug: function ( x ) { console.log( arguments ); return x }
+                debug: function ( x ) { console.log( arguments ); return x },
+                // $$emit: function ( event, arg ) {
+                //     // if ( this.$options._componentTag )
+                //     //     event = this.$options._componentTag + '.' + event
+
+                //     this.$root.$emit( event, arg )
+                // }
             },
             // updated: function () {
             //     console.log( this )
             // }
+        } )
+
+        this.vm.$on( 'click', function ( ev ) {
+            console.log( ev )
         } )
 
         // this.vm.$on( 'activate-tool', function ( ev ) {

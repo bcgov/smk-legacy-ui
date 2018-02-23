@@ -1,7 +1,7 @@
 <div class="smk-sidepanel" v-bind:class="{ expanded: currentTool != null }">
     <!-- {{ currentTool }} -->
     <component class="smk-panel"
-        v-bind:is="currentTool && panel[ currentTool ].panel"
-        v-bind="panel[ currentTool ]"
+        v-bind:is="currentTool && panel[ currentTool ].panel.component"
+        v-bind="currentTool && panel[ currentTool ].getView( panel[ currentTool ].panelProperties )"
     ></component>
 </div>

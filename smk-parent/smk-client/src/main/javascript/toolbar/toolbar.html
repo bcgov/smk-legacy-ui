@@ -2,9 +2,10 @@
     <!-- <div v-for="tool in tools" class="smk-tool"> -->
 
         <component class="smk-tool"
-            v-for="tool in tools" 
-            v-bind:is="tool.component"
-            v-bind="tool.getToolbarView()"
+            v-for="tool in tools"
+            :key="tool.type"
+            v-bind:is="tool.widget.component"
+            v-bind="debug(tool).getView( tool.toolbarProperties )"
         ></component>
 
         <!-- v-on:click="tool.onClick()" -->

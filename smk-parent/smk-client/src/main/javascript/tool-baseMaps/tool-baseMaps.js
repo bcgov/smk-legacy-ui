@@ -10,6 +10,33 @@ include.module( 'tool-baseMaps', [ 'smk', 'sidebar', 'tool-baseMaps.panel-base-m
         Gray: 'Gray',
     }
 
+    Vue.component( 'baseMapsPanel', {
+        template: inc[ 'tool-baseMaps.panel-base-maps-html' ],
+        props: [ 'basemaps', 'center', 'zoom', 'current' ],
+    } )
+    // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+    //
+    function BaseMapsTool( option ) {
+        SMK.TYPE.Tool.prototype.constructor.call( this, $.extend( {
+            // id: 'about',
+            title: 'Base Maps',
+            icon: 'map',
+            button: true,
+            panel: 'baseMapsPanel',
+            component: 'tool-button'
+        }, option ) )
+    }
+
+    SMK.TYPE.BaseMapsTool = BaseMapsTool
+
+    $.extend( BaseMapsTool.prototype, SMK.TYPE.Tool.prototype )
+    // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+    //
+    BaseMapsTool.prototype.initialize = function ( smk ) {
+
+        return SMK.TYPE.Tool.prototype.initialize.apply( this, arguments )
+    }
+
     return {
         order: 2,
         initialize: function ( smk, option ) {

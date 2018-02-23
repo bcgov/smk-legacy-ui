@@ -1,0 +1,111 @@
+/* .smk-map-frame {
+    position: relative;
+}
+
+.smk-map-frame.smk-hidden {
+    visibility: hidden;
+}
+
+.smk-viewer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1;
+} */
+
+/* .smk-overlay {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    width: 40px;
+    bottom: 5px;
+    z-index: 2;
+    border-radius: 5px;
+} */
+
+/* .smk-map-frame .smk-viewer .leaflet-left {
+    left: 50px;
+}
+
+.smk-map-frame .smk-viewer {
+    cursor: default;
+}
+
+.smk-map-frame .smk-viewer.leaflet-drag-target {
+    cursor: move;
+}
+
+.smk-map-frame.smk-panel-expanded .smk-viewer .leaflet-left {
+    left: 310px;
+}
+
+.smk-sidebar.expanded {
+    width: 300px;
+}
+
+.smk-sidebar .smk-sidebar-panel {
+    display: none;
+    position: absolute;
+    top: 5px;
+    left: 38px;
+    right: 0;
+    bottom: 5px;
+    padding-left: 5px;
+    background-color: white;
+    border-radius: 5px;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.65);
+}
+
+.smk-sidebar.expanded .smk-sidebar-panel {
+    display: flex;
+} */
+
+.smk-toolbar  {
+    position: absolute;
+    top: 0;
+    left: 0;
+    /* width: 40px; */
+
+    /* bottom: 0; */
+    z-index: 1;
+    background-color: white;
+    border-radius: 5px;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.65);
+    pointer-events: auto;
+}
+
+.smk-tool {
+    display: inline-block;
+}
+
+
+.smk-sidebar-tools .smk-tool-active {
+    background-color: palegreen;
+}
+
+ul.smk-sidebar-tools {
+    margin: 0;
+}
+
+.smk-sidebar-tools  button {
+    background-color: white;
+    border: 1px solid transparent;
+    padding: 0;
+    margin-left: 5px;
+    margin-top: 5px;
+    width: 30px;
+    height: 30px;
+    border-radius: 5px;
+}
+
+.smk-sidebar-tools  button:hover {
+    border: 1px solid black;
+}
+
+.smk-sidebar-tools  button:focus {
+    background-color: palegreen;
+    border: 1px solid black;
+}
+

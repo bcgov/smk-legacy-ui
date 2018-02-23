@@ -33,6 +33,9 @@ exports.gen = function () {
     t.group( 'sidepanel' )
         .dir( 'sidepanel/**/*', { cwd: baseDir } )
 
+    t.group( 'widgets' )
+        .dir( 'widgets/**/*', { cwd: baseDir } )
+
     // t.group( 'tool-bar' )
     //     .script( "sidebar.js" )
     //     .template( "sidebar-panels", "template/sidebar.html" )

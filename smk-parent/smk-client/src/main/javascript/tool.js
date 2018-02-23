@@ -11,13 +11,25 @@ include.module( 'tool', [ 'smk', 'jquery', 'event' ], function () {
         ToolEvent.prototype.constructor.call( this )
 
         $.extend( this, {
-            type: 'unknown',
-            order: 1,
-            visible: true,
-            enabled: true,
-            activated: false,
+            // type: 'unknown',
+            // order: 1,
+            // visible: true,
+            // enabled: true,
+            // activated: false,
+            // toolbarProperties: [ 'type', 'title', 'icon', 'component', 'visible', 'enabled', 'activated' ]
         }, option )
     }
+
+    Tool.prototype.type = 'unknown'
+    Tool.prototype.order = 1
+    Tool.prototype.title = null
+    Tool.prototype.widget = null
+    Tool.prototype.panel = null
+    Tool.prototype.visible = true
+    Tool.prototype.enabled = true
+    Tool.prototype.activated = false
+    Tool.prototype.toolbarProperties = [ 'type', 'title', 'visible', 'enabled', 'activated', 'widget' ]
+    Tool.prototype.panelProperties =   [ 'type', 'title', 'visible', 'enabled', 'activated', 'panel' ]
 
     SMK.TYPE.Tool = Tool
 
@@ -27,12 +39,13 @@ include.module( 'tool', [ 'smk', 'jquery', 'event' ], function () {
     Tool.prototype.initialize = function ( smk ) {
         var self = this
 
-        return Promise.resolve()
+        return Promise.resolve( {} )
             .then( function () {
-                if ( self.button )
+                if ( self.widget )
                     return smk.getToolbar().then( function ( toolbar ) {
                         toolbar.add( self )
-                        console.log( 'button "' + self.type + '" added' )
+                        console.log( 'widget "' + self.type + '" added' )
+                        return { toolbar: toolbar }
                     } )
             } )
             .then( function () {
@@ -40,6 +53,7 @@ include.module( 'tool', [ 'smk', 'jquery', 'event' ], function () {
                     return smk.getSidepanel().then( function ( panel ) {
                         panel.add( self )
                         console.log( 'panel "' + self.type + '" added' )
+                        return panel
                     } )
             } )
     }
@@ -52,10 +66,6 @@ include.module( 'tool', [ 'smk', 'jquery', 'event' ], function () {
             Object.defineProperty( view, p, { get: function () { return self[ p ] } } )
         } )
         return { tool: view }
-    }
-
-    Tool.prototype.getToolbarView = function () {
-        return this.getView( [ 'type', 'title', 'icon', 'component', 'visible', 'enabled', 'activated' ] )
     }
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
@@ -113,3 +123,6 @@ include.module( 'tool', [ 'smk', 'jquery', 'event' ], function () {
 
     return Tool
 } )
+
+
+ HK0qHyU4xdFBpT
