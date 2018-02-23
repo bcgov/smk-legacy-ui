@@ -39,23 +39,38 @@ include.module( 'tool', [ 'smk', 'jquery', 'event' ], function () {
     Tool.prototype.initialize = function ( smk ) {
         var self = this
 
-        return Promise.resolve( {} )
-            .then( function () {
-                if ( self.widget )
-                    return smk.getToolbar().then( function ( toolbar ) {
-                        toolbar.add( self )
-                        console.log( 'widget "' + self.type + '" added' )
-                        return { toolbar: toolbar }
-                    } )
-            } )
-            .then( function () {
-                if ( self.panel )
-                    return smk.getSidepanel().then( function ( panel ) {
-                        panel.add( self )
-                        console.log( 'panel "' + self.type + '" added' )
-                        return panel
-                    } )
-            } )
+        var aux = {}
+        return SMK.UTIL.waitAll( [
+            smk.getToolbar().then( function ( toolbar ) { aux.toolbar = toolbar } ),
+            smk.getSidepanel().then( function ( panel ) { aux.panel = panel } )
+        ] )
+        .then( function () {
+            if ( self.widget )
+                aux.toolbar.add( self )
+
+            if ( self.panel )
+                aux.panel.add( self )
+
+            return aux
+        } )
+
+        // return Promise.resolve( {} )
+        //     .then( function () {
+        //         if ( self.widget )
+        //             return smk.getToolbar().then( function ( toolbar ) {
+        //                 toolbar.add( self )
+        //                 console.log( 'widget "' + self.type + '" added' )
+        //                 return { toolbar: toolbar }
+        //             } )
+        //     } )
+        //     .then( function () {
+        //         if ( self.panel )
+        //             return smk.getSidepanel().then( function ( panel ) {
+        //                 panel.add( self )
+        //                 console.log( 'panel "' + self.type + '" added' )
+        //                 return panel
+        //             } )
+        //     } )
     }
 
     Tool.prototype.getView = function ( props ) {

@@ -27,7 +27,7 @@ include.module( 'tool-about', [ 'smk', 'tool', 'tool-about.panel-about-html', 'w
 
     Vue.component( 'about-panel', {
         template: inc[ 'tool-about.panel-about-html' ],
-        props: [ 'title', 'about' ]
+        props: [ 'tool' ]
     } )
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
@@ -39,7 +39,7 @@ include.module( 'tool-about', [ 'smk', 'tool', 'tool-about.panel-about-html', 'w
             // icon: 'menu',
             // button: true,
             panel: { component: 'about-panel' },
-            toolbarProperties: SMK.TYPE.Tool.prototype.toolbarProperties.concat( 'about' )
+            panelProperties: SMK.TYPE.Tool.prototype.panelProperties.concat( 'content' )
         }, option ) )
     }
 
@@ -49,9 +49,16 @@ include.module( 'tool-about', [ 'smk', 'tool', 'tool-about.panel-about-html', 'w
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
     AboutTool.prototype.initialize = function ( smk ) {
-        return SMK.TYPE.Tool.prototype.initialize.apply( this, arguments )
-            .then( function () {
+        var self = this
 
+        return SMK.TYPE.Tool.prototype.initialize.apply( this, arguments )
+            .then( function ( aux ) {
+                aux.toolbar.vm.$on( 'about-widget.click', function () {
+                    if ( !self.isVisible() || !self.isEnabled() ) return
+
+                    self.active( !self.isActivated() )
+                    // console.log( arguments )
+                } )
             } )
 
         // return smk.getSidepanel().then( function ( panel ) {
@@ -60,11 +67,11 @@ include.module( 'tool-about', [ 'smk', 'tool', 'tool-about.panel-about-html', 'w
     }
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
-    AboutTool.prototype.onClick = function () {
-        if ( !this.isVisible() || !this.isEnabled() ) return
+    // AboutTool.prototype.onClick = function () {
+    //     if ( !this.isVisible() || !this.isEnabled() ) return
 
-        this.active( !this.isActivated() )
-    }
+    //     this.active( !this.isActivated() )
+    // }
 
     return AboutTool
 } )

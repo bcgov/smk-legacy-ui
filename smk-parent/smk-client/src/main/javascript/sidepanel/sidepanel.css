@@ -54,8 +54,8 @@
     position: relative;
     flex: 1 0;
     padding: 5px;
-    overflow-x: hidden;
-    overflow-y: scroll;
+    /* overflow-x: hidden; */
+    /* overflow-y: scroll; */
 }
 
 .smk-sidepanel .smk-panel h1 {
