@@ -13,9 +13,9 @@
         Click on map to identify features and then add them to the selection.
     </div>
 
-    <div v-for="layer in layers" v-if="layer" class="smk-selected-layer" v-on:mouseenter="setHoverFeatures( layer, layer.features, true )" v-on:mouseleave="setHoverFeatures( layer, layer.features, false )">
+    <div v-for="layer in tool.layers" v-if="layer" class="smk-selected-layer" v-on:mouseenter="setHoverFeatures( layer, layer.features, true )" v-on:mouseleave="setHoverFeatures( layer, layer.features, false )">
         <h2>{{ layer.title }}</h2>
-        <div v-for="feature in layer.features" class="smk-selected-feature" v-bind:class="{ 'smk-highlighted': feature.highlightId == highlightId }">
+        <div v-for="feature in layer.features" class="smk-selected-feature" v-bind:class="{ 'smk-highlighted': feature.highlightId == tool.highlightId }">
             <span v-on:click="setActiveFeature( layer, feature )">{{ feature.title }}</span>
         </div>
         <!-- <a class="smk-layer-metadata" v-if="layer.metadataUrl" v-bind:href="layer.metadataUrl" target="_metadata">Layer information</a> -->
