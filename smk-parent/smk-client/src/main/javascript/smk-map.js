@@ -109,12 +109,20 @@ include.module( 'smk-map', [ 'smk', 'jquery', 'util', 'viewer', 'layer' ], funct
             if ( !self.tools || self.tools.length == 0 ) return
 
             return SMK.UTIL.waitAll( self.tools.map( function ( t ) {
-                var tag = 'tool-' + t.type + '-' + self.viewer.type
+                var tag = 'tool-' + t.type
                 return include( tag )
-                    .catch( function () {
-                        tag = 'tool-' + t.type
-                        return include( tag )
+                    .then( function ( inc ) {
+                        // tag = 'tool-' + t.type + '-' + self.viewer.type
+                        return include( tag + '-' + self.viewer.type )
+                            .catch( function () {
+                                console.log( 'tool "' + t.type + '" has no ' + self.viewer.type + ' subclass' )
+                                // return include( tag )
+                            } )
+                            .then( function () { return inc } )
                     } )
+                    // .catch( function () {
+                    //     return include( tag )
+                    // } )
                     .then( function ( inc ) {
                         // self.tools[ t.type ] = t
                         self.$tool[ t.type ] = new inc[ tag ]( t )

@@ -1,4 +1,4 @@
-<side-panel class="smk-search-panel" v-bind:class="{ 'smk-busy': busy }">
+<side-panel class="smk-search-panel" v-bind:class="{ 'smk-busy': tool.busy }">
     <template slot="header">
         <h1>Search</h1>
         <div class="smk-spinner"></div>
@@ -23,11 +23,11 @@
 
     <div class="smk-search-result"
         v-if="!isEmpty()"
-        v-for="result in results"
+        v-for="result in tool.results"
         v-on:mouseenter="$$emit( 'hover', { result: result } )"
         v-on:mouseleave="$$emit( 'hover', { result: null } )"
         v-on:click="$$emit( 'pick', { result: result } )"
-        v-bind:class="{ 'smk-highlighted': result.id == highlightId }"
+        v-bind:class="{ 'smk-highlighted': result.id == tool.highlightId }"
     >
         <h2>{{ result.properties.fullAddress }}</h2>
         <!-- <div v-for="feature in result.features" class="smk-selected-feature" v-bind:class="{ 'smk-highlighted': feature.highlightId == highlightId }"> -->

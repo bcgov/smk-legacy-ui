@@ -47,6 +47,9 @@ include.module( 'sidepanel', [ 'vue', 'sidepanel.sidepanel-html', 'sidepanel.pan
         console.log( 'activate tool:', toolId )
 
         if ( active ) {
+            if ( this.model.currentTool )
+                this.model.panel[ this.model.currentTool ].active( false )
+
             this.model.currentTool = toolId
         }
         else {

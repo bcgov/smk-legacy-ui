@@ -48,17 +48,38 @@ exports.gen = function () {
     t.group( "tool-baseMaps" )
         .dir( 'tool-baseMaps/**/*', { cwd: baseDir } )
 
+    t.group( "tool-coordinate" )
+        .dir( 'tool-coordinate/**/*', { cwd: baseDir } )
+
     t.group( "tool-layers" )
         .dir( 'tool-layers/**/*', { cwd: baseDir } )
 
     t.group( "tool-identify" )
         .dir( 'tool-identify/**/*', { cwd: baseDir } )
 
-    t.group( "tool-select" )
-        .dir( 'tool-select/**/*', { cwd: baseDir } )
+    t.group( "tool-markup" )
+        .dir( 'tool-markup/**/*', { cwd: baseDir } )
+
+    t.group( "tool-measure" )
+        .dir( 'tool-measure/**/*', { cwd: baseDir } )
+
+    t.group( "tool-minimap" )
+        .dir( 'tool-minimap/**/*', { cwd: baseDir } )
+
+    t.group( "tool-pan" )
+        .dir( 'tool-pan/**/*', { cwd: baseDir } )
+
+    t.group( "tool-scale" )
+        .dir( 'tool-scale/**/*', { cwd: baseDir } )
 
     t.group( "tool-search" )
         .dir( 'tool-search/**/*', { cwd: baseDir } )
+
+    t.group( "tool-select" )
+        .dir( 'tool-select/**/*', { cwd: baseDir } )
+
+    t.group( "tool-zoom" )
+        .dir( 'tool-zoom/**/*', { cwd: baseDir } )
 
     // leaflet
 

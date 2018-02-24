@@ -1,4 +1,4 @@
-<side-panel class="smk-layers-panel" v-bind:class="{ 'smk-busy': busy }">
+<side-panel class="smk-layers-panel" v-bind:class="{ 'smk-busy': tool.busy }">
     <template slot="header">
         <h1>Layers</h1>
         <input v-model="filter" placeholder="Filter layers" class="smk-filter">
@@ -8,7 +8,7 @@
         <div class="smk-spinner"></div>
     </template>
 
-    <div v-for="layer in layers" class="smk-layer" v-bind:class="{ 'smk-layer-visible': layer.visible, 'smk-layer-expanded': layer.expanded }" v-show="matchesFilter( layer )">
+    <div v-for="layer in tool.layers" class="smk-layer" v-bind:class="{ 'smk-layer-visible': layer.visible, 'smk-layer-expanded': layer.expanded }" v-show="matchesFilter( layer )">
         <i v-on:click="$$emit( 'set-visible', { ids: [ layer.id ], visible: !layer.visible } )" class="smk-layer-visibility material-icons">{{ layer.visible ? 'visibility' : 'visibility_off' }}</i>
         <h2>{{ layer.title }}</h2>
         <i v-on:click="$$emit( 'set-expanded', { ids: [ layer.id ], expanded: !layer.expanded } )" class="smk-layer-expand material-icons">{{ layer.expanded ? 'arrow_drop_up' : 'arrow_drop_down' }}</i>

@@ -1,4 +1,4 @@
-<side-panel class="smk-identify-panel" v-bind:class="{ 'smk-busy': busy }">
+<side-panel class="smk-identify-panel" v-bind:class="{ 'smk-busy': tool.busy }">
     <template slot="header">
         <h1>Identify Results</h1>
         <div class="smk-spinner"></div>
@@ -13,9 +13,9 @@
         Click on map to identify features.
     </div>
 
-    <div v-for="layer in layers" v-if="layer && layer.features.length > 0" class="smk-identify-layer" v-on:mouseenter="$$emit( 'hover', { features: layer.features } )" v-on:mouseleave="$$emit( 'hover', { features: null } )">
+    <div v-for="layer in tool.layers" v-if="layer && layer.features.length > 0" class="smk-identify-layer" v-on:mouseenter="$$emit( 'hover', { features: layer.features } )" v-on:mouseleave="$$emit( 'hover', { features: null } )">
         <h2>{{ layer.title }}</h2>
-        <div v-for="feature in layer.features" class="smk-identify-feature" v-bind:class="{ 'smk-highlighted': feature.id == highlightId }">
+        <div v-for="feature in layer.features" class="smk-identify-feature" v-bind:class="{ 'smk-highlighted': feature.id == tool.highlightId }">
             <span v-on:click="$$emit( 'active', { feature: feature } )">{{ feature.title }}</span>
         </div>
         <a class="smk-layer-metadata" v-if="layer.metadataUrl" v-bind:href="layer.metadataUrl" target="_metadata">Layer information</a>

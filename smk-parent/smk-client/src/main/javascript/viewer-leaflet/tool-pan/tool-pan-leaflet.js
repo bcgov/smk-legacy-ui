@@ -1,31 +1,20 @@
-include.module( 'tool-pan-leaflet', [ 'smk', 'tool', 'leaflet' ], function () {
+include.module( 'tool-pan-leaflet', [ 'tool-pan', 'leaflet' ], function () {
 
-    // return {
-    //     order: 1,
-    //     initialize: function ( smk, option ) {
-    //         smk.$viewer.map.dragging.enable()
-    //     }
+    // function PanTool( option ) {
+    //     SMK.TYPE.Tool.prototype.constructor.call( this, $.extend( {
+    //     }, option ) )
     // }
 
-    function PanTool( option ) {
-        SMK.TYPE.Tool.prototype.constructor.call( this, $.extend( {
-            // id: 'pan',
-            order: 1
-        }, option ) )
-    }
+    // SMK.TYPE.PanTool = PanTool
 
-    SMK.TYPE.PanTool = PanTool
-
-    $.extend( PanTool.prototype, SMK.TYPE.Tool.prototype )
+    // $.extend( PanTool.prototype, SMK.TYPE.Tool.prototype )
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
-    PanTool.prototype.initialize = function ( smk ) {
+    SMK.TYPE.PanTool.prototype.afterInitialize = function ( smk ) {
         smk.$viewer.map.dragging.enable()
-
-        return SMK.TYPE.Tool.prototype.initialize.apply( this, arguments )
     }
 
-    return PanTool
+    // return PanTool
 
 } )
 

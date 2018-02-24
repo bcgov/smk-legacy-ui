@@ -10,14 +10,7 @@ include.module( 'tool', [ 'smk', 'jquery', 'event' ], function () {
     function Tool( option ) {
         ToolEvent.prototype.constructor.call( this )
 
-        $.extend( this, {
-            // type: 'unknown',
-            // order: 1,
-            // visible: true,
-            // enabled: true,
-            // activated: false,
-            // toolbarProperties: [ 'type', 'title', 'icon', 'component', 'visible', 'enabled', 'activated' ]
-        }, option )
+        $.extend( this, option )
     }
 
     Tool.prototype.type = 'unknown'
@@ -51,27 +44,11 @@ include.module( 'tool', [ 'smk', 'jquery', 'event' ], function () {
             if ( self.panel )
                 aux.panel.add( self )
 
-            return aux
+            return self.afterInitialize( smk, aux )
         } )
-
-        // return Promise.resolve( {} )
-        //     .then( function () {
-        //         if ( self.widget )
-        //             return smk.getToolbar().then( function ( toolbar ) {
-        //                 toolbar.add( self )
-        //                 console.log( 'widget "' + self.type + '" added' )
-        //                 return { toolbar: toolbar }
-        //             } )
-        //     } )
-        //     .then( function () {
-        //         if ( self.panel )
-        //             return smk.getSidepanel().then( function ( panel ) {
-        //                 panel.add( self )
-        //                 console.log( 'panel "' + self.type + '" added' )
-        //                 return panel
-        //             } )
-        //     } )
     }
+
+    Tool.prototype.afterInitialize = function ( smk, aux ) {}
 
     Tool.prototype.getView = function ( props ) {
         var self = this
@@ -131,13 +108,5 @@ include.module( 'tool', [ 'smk', 'jquery', 'event' ], function () {
     }
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
-    Tool.prototype.onClick = function () {
-        console.log( 'unhandled' )
-        // if ( !this.isVisible() || !this.isEnabled() ) return
-    }
-
     return Tool
 } )
-
-
- HK0qHyU4xdFBpT

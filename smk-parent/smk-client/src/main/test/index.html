@@ -24,7 +24,7 @@
                 "initialExtent": [ -139.1782, 47.6039, -110.3533, 60.5939 ],
                 "baseMap": "Topographic"
             },
-            
+
             "surround": {
                 "type": "default",
                 "title": "Standalone SMK Demo App"
@@ -43,23 +43,29 @@
                 // { "type": "minimap" },
                 // { "type": "markup" },
                 // { "type": "direction" },
-                // { "type": "pan" },
-                // { "type": "zoom",
+                { "type": "pan" },
+                { "type": "zoom",
+                    "mouseWheel": true,
+                    "doubleClick": true,
+                    "box": true,
+                    "control": true
+                },
                 //     "mouseWheel": false,
                 //     "box": true,
                 //     "control": true,
                 //     "doubleClick": true
                 // },
-                { 
+                {
                     "type": "about",
                     "content": "This application is a demonstration of Simple Mapping Kit (SMK).<p>It is a standalone web app."
                 },
                 { "type": "baseMaps" },
-                { "type": "layers" }
-                // { "type": "identify" },
-                // { "type": "select" }
-                // { "type": "sidebar", 
-                    
+                { "type": "layers" },
+                { "type": "search" },
+                { "type": "identify" },
+                { "type": "select" }
+                // { "type": "sidebar",
+
                 //     "container": "smk-sidebar",
                 //     "pane": {
                 //     }
