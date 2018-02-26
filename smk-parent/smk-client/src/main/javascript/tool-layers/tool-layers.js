@@ -40,28 +40,36 @@ include.module( 'tool-layers', [ 'smk', 'tool', 'widgets', 'tool-layers.panel-la
     //
     function LayersTool( option ) {
         SMK.TYPE.Tool.prototype.constructor.call( this, $.extend( {
-            order: 3,
+            order:  3,
             title:  'Layers',
             busy:   false,
             layers: [],
             widget: { icon: 'layers', component: 'layers-widget' },
             panel:  { component: 'layers-panel' },
-            panelProperties: SMK.TYPE.Tool.prototype.panelProperties.concat( 'layers', 'busy' )
         }, option ) )
     }
 
     SMK.TYPE.LayersTool = LayersTool
 
     $.extend( LayersTool.prototype, SMK.TYPE.Tool.prototype )
+
+    LayersTool.prototype.getPanel = function () {
+        var self = this
+        return Object.assign( SMK.TYPE.Tool.prototype.getPanel(), {
+            get layers() { return self.layers },
+            get busy() { return self.busy }
+        } )
+    }
+
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
     LayersTool.prototype.afterInitialize = function ( smk, aux ) {
         var self = this
 
         aux.toolbar.vm.$on( 'layers-widget.click', function () {
-            if ( !self.isVisible() || !self.isEnabled() ) return
+            if ( !self.visible || !self.enabled ) return
 
-            self.active( !self.isActivated() )
+            self.active = !self.active
         } )
 
         var layerModel = {}

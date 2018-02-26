@@ -2,6 +2,6 @@
     <!-- {{ currentTool }} -->
     <component class="smk-panel"
         v-bind:is="currentTool && panel[ currentTool ].panel.component"
-        v-bind="currentTool && panel[ currentTool ].getView( panel[ currentTool ].panelProperties )"
+        v-bind="currentTool && { tool: panel[ currentTool ].getPanel() }"
     ></component>
 </div>

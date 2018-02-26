@@ -45,7 +45,6 @@ include.module( 'tool-search', [ 'smk', 'tool', 'widgets', 'tool-search.widget-s
 
     Vue.component( 'search-panel', {
         template: inc[ 'tool-search.panel-search-html' ],
-        // props: [ 'results', 'busy', 'highlightId' ],
         props: [ 'tool' ],
         methods: {
             isEmpty: function () {
@@ -70,22 +69,31 @@ include.module( 'tool-search', [ 'smk', 'tool', 'widgets', 'tool-search.widget-s
             results:    [],
             busy:       false,
             highlightId: null,
-            panelProperties: SMK.TYPE.Tool.prototype.panelProperties.concat( 'results', 'busy', 'highlightId' )
         }, option ) )
     }
 
     SMK.TYPE.SearchTool = SearchTool
 
     $.extend( SearchTool.prototype, SMK.TYPE.Tool.prototype )
+
+    SearchTool.prototype.getPanel = function () {
+        var self = this
+        return Object.assign( SMK.TYPE.Tool.prototype.getPanel(), {
+            get results() { return self.results },
+            get highlightId() { return self.highlightId },
+            get busy() { return self.busy }
+        } )
+    }
+
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
     SearchTool.prototype.afterInitialize = function ( smk, aux ) {
         var self = this
 
         // aux.toolbar.vm.$on( 'search-widget.click', function () {
-        //     if ( !self.isVisible() || !self.isEnabled() ) return
+        //     if ( !self.visible || !self.enabled ) return
 
-        //     self.active( !self.isActivated() )
+        //     self.active = !self.active
         //     // console.log( arguments )
         // } )
 
@@ -106,7 +114,7 @@ include.module( 'tool-search', [ 'smk', 'tool', 'widgets', 'tool-search.widget-s
             self.busy = true
             doAddressSearch( ev.text )
                 .then( function ( features ) {
-                    self.active( true )
+                    self.active = true
                     smk.$viewer.searched.add( 'search', features, 'fullAddress' )
                     self.busy = false
                 } )

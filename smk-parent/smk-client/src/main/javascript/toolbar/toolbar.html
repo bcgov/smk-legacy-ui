@@ -5,7 +5,7 @@
             v-for="tool in tools"
             :key="tool.type"
             v-bind:is="tool.widget.component"
-            v-bind="debug(tool).getView( tool.toolbarProperties )"
+            v-bind="{ tool: tool.getWidget() }"
         ></component>
 
         <!-- v-on:click="tool.onClick()" -->

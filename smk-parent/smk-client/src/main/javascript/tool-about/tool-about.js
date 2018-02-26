@@ -2,8 +2,6 @@ include.module( 'tool-about', [ 'smk', 'tool', 'widgets', 'tool-about.panel-abou
 
     Vue.component( 'about-widget', {
         extends: inc.widgets.toolButton,
-        // template: inc[ 'tool-about.panel-about-html' ],
-        // props: [ 'title', 'about' ]
     } )
 
     Vue.component( 'about-panel', {
@@ -14,25 +12,33 @@ include.module( 'tool-about', [ 'smk', 'tool', 'widgets', 'tool-about.panel-abou
     //
     function AboutTool( option ) {
         SMK.TYPE.Tool.prototype.constructor.call( this, $.extend( {
-            title: 'About',
-            widget: { icon: 'menu', component: 'about-widget' },
-            panel: { component: 'about-panel' },
-            panelProperties: SMK.TYPE.Tool.prototype.panelProperties.concat( 'content' )
+            title:      'About',
+            content:    null,
+            widget:     { icon: 'menu', component: 'about-widget' },
+            panel:      { component: 'about-panel' },
         }, option ) )
     }
 
     SMK.TYPE.AboutTool = AboutTool
 
     $.extend( AboutTool.prototype, SMK.TYPE.Tool.prototype )
+
+    AboutTool.prototype.getPanel = function () {
+        var self = this
+        return Object.assign( SMK.TYPE.Tool.prototype.getPanel(), {
+            get content() { return self.content }
+        } )
+    }
+
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
     AboutTool.prototype.afterInitialize = function ( smk, aux ) {
         var self = this
 
         aux.toolbar.vm.$on( 'about-widget.click', function () {
-            if ( !self.isVisible() || !self.isEnabled() ) return
+            if ( !self.visible || !self.enabled ) return
 
-            self.active( !self.isActivated() )
+            self.active = !self.active
             // console.log( arguments )
         } )
     }

@@ -2,13 +2,17 @@ include.module( 'tool', [ 'smk', 'jquery', 'event' ], function () {
 
     var ToolEvent = SMK.TYPE.Event.define( [
         'changedVisible',
-        'changedEnable',
+        'changedEnabled',
         'changedActive'
     ] )
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
     function Tool( option ) {
         ToolEvent.prototype.constructor.call( this )
+
+        RW( this, 'visible', true, 'changedVisible' )
+        RW( this, 'enabled', true, 'changedEnabled' )
+        RW( this, 'active', false, 'changedActive' )
 
         $.extend( this, option )
     }
@@ -18,11 +22,6 @@ include.module( 'tool', [ 'smk', 'jquery', 'event' ], function () {
     Tool.prototype.title = null
     Tool.prototype.widget = null
     Tool.prototype.panel = null
-    Tool.prototype.visible = true
-    Tool.prototype.enabled = true
-    Tool.prototype.activated = false
-    Tool.prototype.toolbarProperties = [ 'type', 'title', 'visible', 'enabled', 'activated', 'widget' ]
-    Tool.prototype.panelProperties =   [ 'type', 'title', 'visible', 'enabled', 'activated', 'panel' ]
 
     SMK.TYPE.Tool = Tool
 
@@ -49,64 +48,48 @@ include.module( 'tool', [ 'smk', 'jquery', 'event' ], function () {
     }
 
     Tool.prototype.afterInitialize = function ( smk, aux ) {}
+    // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+    //
+    Tool.prototype.getToolView = function () {
+        var self = this;
+        return {
+            get type() { return self.type },
+            get title() { return self.title },
+            get visible() { return self.visible },
+            get enabled() { return self.enabled },
+            get active() { return self.active }
+        }
+    }
 
-    Tool.prototype.getView = function ( props ) {
-        var self = this
-
-        var view = {}
-        props.forEach( function ( p ) {
-            Object.defineProperty( view, p, { get: function () { return self[ p ] } } )
+    Tool.prototype.getWidget = function () {
+        var self = this;
+        return Object.assign( this.getToolView(), {
+            get widget() { return self.widget }
         } )
-        return { tool: view }
-    }
-    // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-    //
-    Tool.prototype.show = function ( show ) {
-        if ( !show == !this.visible ) return this
-
-        this.visible = show
-        this.changedVisible()
-
-        return this
     }
 
-    Tool.prototype.isVisible = function () {
-        return this.visible
-    }
-    // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-    //
-    Tool.prototype.enable = function ( enable ) {
-        if ( !enable == !this.enabled ) return this
-
-        this.enabled = enable
-        this.changedEnable()
-
-        if ( !this.enabled )
-            this.active( false )
-
-        return this
+    Tool.prototype.getPanel = function () {
+        var self = this;
+        return Object.assign( this.getToolView(), {
+            get panel() { return self.panel }
+        } )
     }
 
-    Tool.prototype.isEnabled = function () {
-        return this.enabled
-    }
-    // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-    //
-    Tool.prototype.active = function ( active ) {
-        if ( !active == !this.activated ) return this
-
-        if ( active && !this.isEnabled() ) return this
-
-        this.activated = active
-        this.changedActive()
-
-        return this
-    }
-
-    Tool.prototype.isActivated = function () {
-        return this.activated
-    }
-    // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-    //
     return Tool
+    // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+    //
+    function RW( obj, name, initial, event ) {
+        var val = initial
+        Object.defineProperty( obj, name, {
+            get: function () { return val },
+            set: function ( v ) {
+                if ( !v == !val ) return
+                val = v
+                if ( event ) obj[ event ].call( obj )
+                return obj
+            }
+        } )
+
+    }
+
 } )

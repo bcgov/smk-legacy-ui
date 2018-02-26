@@ -2,8 +2,6 @@ include.module( 'tool-identify', [ 'smk', 'tool', 'widgets', 'tool-identify.pane
 
     Vue.component( 'identify-widget', {
         extends: inc.widgets.toolButton,
-        // template: inc[ 'tool-about.panel-identify-html' ],
-        // props: [ 'title', 'about' ]
     } )
 
     Vue.component( 'identify-panel', {
@@ -26,22 +24,31 @@ include.module( 'tool-identify', [ 'smk', 'tool', 'widgets', 'tool-identify.pane
             highlightId: null,
             widget:     { icon: 'info_outline', component: 'identify-widget' },
             panel:      { component: 'identify-panel' },
-            panelProperties: SMK.TYPE.Tool.prototype.panelProperties.concat( 'busy', 'layers', 'highlightId' )
         }, option ) )
     }
 
     SMK.TYPE.IdentifyTool = IdentifyTool
 
     $.extend( IdentifyTool.prototype, SMK.TYPE.Tool.prototype )
+
+    IdentifyTool.prototype.getPanel = function () {
+        var self = this
+        return Object.assign( SMK.TYPE.Tool.prototype.getPanel(), {
+            get layers() { return self.layers },
+            get highlightId() { return self.highlightId },
+            get busy() { return self.busy }
+        } )
+    }
+
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
     IdentifyTool.prototype.afterInitialize = function ( smk, aux ) {
         var self = this
 
         aux.toolbar.vm.$on( 'identify-widget.click', function () {
-            if ( !self.isVisible() || !self.isEnabled() ) return
+            if ( !self.visible || !self.enabled ) return
 
-            self.active( !self.isActivated() )
+            self.active = !self.active
             // console.log( arguments )
         } )
 
@@ -78,7 +85,7 @@ include.module( 'tool-identify', [ 'smk', 'tool', 'widgets', 'tool-identify.pane
         } )
 
         smk.$viewer.identified.addedFeatures( function ( ev ) {
-            self.active( true )
+            self.active = true
             // sb.vm.$emit( 'activate-tool', { active: true, id: 'identify' } )
 
             var ly = smk.$viewer.layerId[ ev.layerId ]

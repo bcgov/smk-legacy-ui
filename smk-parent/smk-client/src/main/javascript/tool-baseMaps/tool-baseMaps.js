@@ -12,14 +12,11 @@ include.module( 'tool-baseMaps', [ 'smk', 'tool', 'widgets', 'tool-baseMaps.pane
 
     Vue.component( 'baseMaps-widget', {
         extends: inc.widgets.toolButton,
-        // template: inc[ 'tool-about.panel-about-html' ],
-        // props: [ 'title', 'about' ]
     } )
 
     Vue.component( 'baseMaps-panel', {
         template: inc[ 'tool-baseMaps.panel-base-maps-html' ],
         props: [ 'tool' ]
-        // props: [ 'basemaps', 'center', 'zoom', 'current' ],
     } )
 
     // leaflet specific
@@ -76,13 +73,23 @@ include.module( 'tool-baseMaps', [ 'smk', 'tool', 'widgets', 'tool-baseMaps.pane
             basemaps:   [],
             widget:     { icon: 'map', component: 'baseMaps-widget' },
             panel:      { component: 'baseMaps-panel' },
-            panelProperties: SMK.TYPE.Tool.prototype.panelProperties.concat( 'basemaps', 'center', 'zoom', 'current' )
         }, option ) )
     }
 
     SMK.TYPE.BaseMapsTool = BaseMapsTool
 
     $.extend( BaseMapsTool.prototype, SMK.TYPE.Tool.prototype )
+
+    BaseMapsTool.prototype.getPanel = function () {
+        var self = this
+        return Object.assign( SMK.TYPE.Tool.prototype.getPanel(), {
+            get basemaps() { return self.basemaps },
+            get center() { return self.center },
+            get zoom() { return self.zoom },
+            get current() { return self.current }
+        } )
+    }
+
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
     BaseMapsTool.prototype.afterInitialize = function ( smk, aux ) {
@@ -122,9 +129,10 @@ include.module( 'tool-baseMaps', [ 'smk', 'tool', 'widgets', 'tool-baseMaps.pane
         self.zoom = v.zoom
 
         aux.toolbar.vm.$on( 'baseMaps-widget.click', function () {
-            if ( !self.isVisible() || !self.isEnabled() ) return
+            if ( !self.visible || !self.enabled ) return
 
-            self.active( !self.isActivated() )
+            self.active = !self.active
+            // self.title = self.title + 'xxx'
             // console.log( arguments )
         } )
 

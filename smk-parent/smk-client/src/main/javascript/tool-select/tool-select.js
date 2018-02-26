@@ -24,22 +24,31 @@ include.module( 'tool-select', [ 'smk', 'tool', 'widgets', 'tool-select.panel-se
             highlightId: null,
             widget: { icon: 'select_all', component: 'select-widget' },
             panel: { component: 'select-panel' },
-            panelProperties: SMK.TYPE.Tool.prototype.panelProperties.concat( 'busy', 'layers', 'highlightId' )
         }, option ) )
     }
 
     SMK.TYPE.SelectTool = SelectTool
 
     $.extend( SelectTool.prototype, SMK.TYPE.Tool.prototype )
+
+    SelectTool.prototype.getPanel = function () {
+        var self = this
+        return Object.assign( SMK.TYPE.Tool.prototype.getPanel(), {
+            get layers() { return self.layers },
+            get highlightId() { return self.highlightId },
+            get busy() { return self.busy }
+        } )
+    }
+
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
     SelectTool.prototype.afterInitialize = function ( smk, aux ) {
         var self = this
 
         aux.toolbar.vm.$on( 'select-widget.click', function () {
-            if ( !self.isVisible() || !self.isEnabled() ) return
+            if ( !self.visible || !self.enabled ) return
 
-            self.active( !self.isActivated() )
+            self.active = !self.active
             // console.log( arguments )
         } )
 
@@ -67,8 +76,8 @@ include.module( 'tool-select', [ 'smk', 'tool', 'widgets', 'tool-select.panel-se
         // } )
 
         smk.$viewer.selected.addedFeatures( function ( ev ) {
-            self.active( true )
-            
+            self.active = true
+
             // sb.vm.$emit( 'activate-tool', { active: true, id: 'select' } )
 
             var ly = smk.$viewer.layerId[ ev.layerId ]
