@@ -23,7 +23,7 @@
     bottom: 5px;
     z-index: 2;
     border-radius: 5px;
-    border: 1px solid black;
+    /* border: 1px solid black; */
     pointer-events: none;
 }
 
