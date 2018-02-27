@@ -12,12 +12,12 @@ include.module( 'toolbar', [ 'vue', 'toolbar.toolbar-html' ], function ( inc ) {
         this.vm = new Vue( {
             el: el,
             data: this.model,
-            methods: {
-                debug: function ( x ) { console.log( arguments ); return x },
-            },
-            beforeUpdate: function () {
-                console.log( this )
-            }
+            // methods: {
+            //     debug: function ( x ) { console.log( arguments ); return x },
+            // },
+            // beforeUpdate: function () {
+            //     console.log( this )
+            // }
         } )
     }
 
@@ -27,10 +27,6 @@ include.module( 'toolbar', [ 'vue', 'toolbar.toolbar-html' ], function ( inc ) {
             widgetComponent: tool.widgetComponent,
             widget: tool.widget
         } )
-
-        tool.changedActive( function () {
-            console.log(tool)
-        })
     }
 
     SMK.TYPE.Toolbar = Toolbar

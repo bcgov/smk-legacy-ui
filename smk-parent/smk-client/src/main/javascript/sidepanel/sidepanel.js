@@ -17,23 +17,27 @@ include.module( 'sidepanel', [ 'vue', 'sidepanel.sidepanel-html', 'sidepanel.pan
             el: el,
             data: this.model
         } )
+
+        this.container = $( smk.$option.container )
     }
 
-    Sidepanel.prototype.activateTool = function ( toolId, active ) {
-        console.log( 'activate tool:', toolId )
+    Sidepanel.prototype.setActiveTool = function ( tool ) {
+        if ( this.activeTool )
+            this.activeTool.active = false
 
-        if ( active ) {
-            if ( this.model.activeTool )
-                this.model.tool[ this.model.activeTool ].active = false
+        this.activeTool = tool
 
-            this.model.activeTool = toolId
+        if ( this.activeTool ) {
+            this.activeTool.active = true
+            this.model.activeTool = this.activeTool.type
+            this.model.expanded = true
+            this.container.addClass( 'smk-panel-expanded' )
         }
         else {
             this.model.activeTool = null
+            this.model.expanded = false
+            this.container.removeClass( 'smk-panel-expanded' )
         }
-
-        this.model.expanded = !!active
-        // $( smk.$option.container ).toggleClass( 'smk-panel-expanded', ev.active )
     }
 
     Sidepanel.prototype.add = function ( tool ) {
@@ -45,11 +49,11 @@ include.module( 'sidepanel', [ 'vue', 'sidepanel.sidepanel-html', 'sidepanel.pan
         } )
 
         tool.changedActive( function () {
-            self.activateTool( tool.type, tool.active )
+            if ( tool.active )
+                self.setActiveTool( tool )
+            else
+                self.setActiveTool( null )
         } )
-
-        // if ( arg.startOpen )
-            // this.model.currentTool = id
     }
 
     SMK.TYPE.Sidepanel = Sidepanel

@@ -24,6 +24,7 @@ include.module( 'tool', [ 'smk', 'jquery', 'event' ], function () {
     SMK.TYPE.Tool = Tool
 
     $.extend( Tool.prototype, ToolEvent.prototype )
+    Tool.prototype.afterInitialize = []
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
     Tool.prototype.makeProp = function ( name, initial, event ) {
@@ -101,8 +102,6 @@ include.module( 'tool', [ 'smk', 'jquery', 'event' ], function () {
             } )
         } )
     }
-
-    Tool.prototype.afterInitialize = []
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
     return Tool

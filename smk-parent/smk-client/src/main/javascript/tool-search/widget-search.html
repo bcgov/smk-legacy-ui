@@ -2,11 +2,12 @@
     <input type="text" placeholder="Search keywords" class="smk-search browser-default"
         v-model.trim="search"
         v-on:keyup="$$emit( 'input-change', { text: search } )"
+        v-on:click="$$emit( 'click' )"
     >
-    <!-- <button
-        v-on:click="$$emit( 'click', { type: tool.type } )"
-        v-bind:title="tool.title"
-        v-bind:class="{ 'smk-tool-active': tool.activated, 'smk-tool-visible': tool.visible, 'smk-tool-enabled': tool.enabled }"
-    ><i class="material-icons">{{ tool.widget.icon }}</i>
-    </button> -->
+
+    <button
+        v-on:click="$$emit( 'click', { toggle: true } )"
+        v-bind:title="title"
+    ><i class="material-icons">{{ icon }}</i>
+    </button>
 </div>

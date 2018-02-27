@@ -124,8 +124,6 @@ include.module( 'tool-baseMaps', [ 'smk', 'tool', 'widgets', 'tool-baseMaps.pane
             if ( !self.visible || !self.enabled ) return
 
             self.active = !self.active
-            // self.title = self.title + 'xxx'
-            // console.log( arguments )
         } )
     } )
 

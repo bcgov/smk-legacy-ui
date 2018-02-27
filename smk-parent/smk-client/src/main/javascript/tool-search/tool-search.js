@@ -14,16 +14,14 @@ include.module( 'tool-search', [ 'smk', 'tool', 'widgets', 'tool-search.widget-s
             autoComplete:   true
         }
 
-        request = $.ajax( {
-            timeout:    10 * 1000,
-            dataType:   'jsonp',
-            url:        'https://apps.gov.bc.ca/pub/geocoder/addresses.geojsonp',
-            data:       query,
-        } )
-
         return SMK.UTIL.resolved()
             .then( function () {
-                return request
+                return request = $.ajax( {
+                    timeout:    10 * 1000,
+                    dataType:   'jsonp',
+                    url:        'https://apps.gov.bc.ca/pub/geocoder/addresses.geojsonp',
+                    data:       query,
+                } )
             } )
             .then( function ( data ) {
                 return $.map( data.features, function ( feature ) {
@@ -39,10 +37,15 @@ include.module( 'tool-search', [ 'smk', 'tool', 'widgets', 'tool-search.widget-s
 
     Vue.component( 'search-widget', {
         template: inc[ 'tool-search.widget-search-html' ],
-        props: [ 'tool' ],
+        props: [ 'title', 'visible', 'enabled', 'active', 'icon', 'type', 'initialSearch' ],
         data: function () {
             return {
                 search: null
+            }
+        },
+        watch: {
+            initialSearch: function () {
+                this.search = null
             }
         }
     } )
@@ -66,6 +69,7 @@ include.module( 'tool-search', [ 'smk', 'tool', 'widgets', 'tool-search.widget-s
     //
     function SearchTool( option ) {
         this.makePropWidget( 'icon', 'search' )
+        this.makePropWidget( 'initialSearch', 0 )
         this.makePropPanel( 'busy', false )
         this.makePropPanel( 'results', [] )
         this.makePropPanel( 'highlightId', null )
@@ -87,23 +91,14 @@ include.module( 'tool-search', [ 'smk', 'tool', 'widgets', 'tool-search.widget-s
     SearchTool.prototype.afterInitialize.push( function ( smk, aux ) {
         var self = this
 
-        // aux.toolbar.vm.$on( 'search-widget.click', function () {
-        //     if ( !self.visible || !self.enabled ) return
+        aux.toolbar.vm.$on( 'search-widget.click', function ( ev ) {
+            if ( !self.visible || !self.enabled ) return
 
-        //     self.active = !self.active
-        //     // console.log( arguments )
-        // } )
-
-        // var sb = smk.getSidebar()
-
-        // var model = sb.addPanel( 'search', {
-            // button: { title: 'Search', icon: 'search' },
-            // panel: {
-                // busy: false,
-                // results: [],
-                // highlightId: null
-            // }
-        // } )
+            if ( ev.toggle )
+                self.active = !self.active
+            else
+                self.active = true
+        } )
 
         aux.toolbar.vm.$on( 'search-widget.input-change', function ( ev ) {
             smk.$viewer.searched.clear()
@@ -116,9 +111,10 @@ include.module( 'tool-search', [ 'smk', 'tool', 'widgets', 'tool-search.widget-s
                     self.busy = false
                 } )
                 .catch( function ( e ) {
-                    console.warn( e )
+                    console.warn( 'search failure:', e )
                 } )
         } )
+
 
         aux.panel.vm.$on( 'search-panel.hover', function ( ev ) {
             smk.$viewer.searched.highlight( ev.result ? [ ev.result.id ] : [] )
@@ -130,6 +126,7 @@ include.module( 'tool-search', [ 'smk', 'tool', 'widgets', 'tool-search.widget-s
 
         aux.panel.vm.$on( 'search-panel.clear', function ( ev ) {
             smk.$viewer.searched.clear()
+            self.initialSearch += 1
         } )
 
 

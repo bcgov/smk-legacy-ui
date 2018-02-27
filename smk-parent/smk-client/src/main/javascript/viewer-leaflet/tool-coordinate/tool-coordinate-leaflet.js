@@ -1,4 +1,4 @@
-include.module( 'tool-coordinate-leaflet', [ 'smk', 'leaflet' ], function () {
+include.module( 'tool-coordinate-leaflet', [ 'leaflet', 'tool-coordinate' ], function () {
 
     SMK.TYPE.CoordinateTool.prototype.afterInitialize.push( function ( smk ) {
         L.control
@@ -11,6 +11,6 @@ include.module( 'tool-coordinate-leaflet', [ 'smk', 'leaflet' ], function () {
                 useLatLngOrder:     false
             } )
             .addTo( smk.$viewer.map )
-    } )    
+    } )
 
 } )

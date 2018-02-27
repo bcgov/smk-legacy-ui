@@ -2,16 +2,12 @@
     <template slot="header">
         <h1>Search</h1>
         <div class="smk-spinner"></div>
-        <input type="text" placeholder="Search keywords" class="smk-search browser-default" style="width: 100%"
-            v-model.trim="search"
-            v-on:keyup="$$emit( 'input-change', { text: search } )"
-        >
     </template>
 
     <template slot="commands">
         <span class="smk-command"
             v-bind:class="{ 'smk-disabled': isEmpty() }"
-            v-on:click="$$emit( 'clear' ); search=null"
+            v-on:click="$$emit( 'clear' )"
         >Clear results</span>
     </template>
 
@@ -30,9 +26,5 @@
         v-bind:class="{ 'smk-highlighted': result.id == highlightId }"
     >
         <h2>{{ result.properties.fullAddress }}</h2>
-        <!-- <div v-for="feature in result.features" class="smk-selected-feature" v-bind:class="{ 'smk-highlighted': feature.highlightId == highlightId }"> -->
-            <!-- <span v-on:click="setActiveFeature( result, feature )">{{ feature.title }}</span> -->
-        <!-- </div> -->
-        <!-- <a class="smk-layer-metadata" v-if="layer.metadataUrl" v-bind:href="layer.metadataUrl" target="_metadata">Layer information</a> -->
     </div>
 </side-panel>

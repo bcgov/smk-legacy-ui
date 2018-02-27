@@ -1,4 +1,4 @@
-include.module( 'tool-measure-leaflet', [ 'smk', 'leaflet' ], function () {
+include.module( 'tool-measure-leaflet', [ 'leaflet', 'tool-measure' ], function () {
 
     SMK.TYPE.MeasureTool.prototype.afterInitialize.push( function ( smk ) {
         L.control
@@ -12,7 +12,7 @@ include.module( 'tool-measure-leaflet', [ 'smk', 'leaflet' ], function () {
                 completedColor: '#036'
             } )
             .addTo( smk.$viewer.map )
-    } )    
+    } )
 
 } )
 

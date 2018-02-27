@@ -1,23 +1,7 @@
-include.module( 'tool-select-leaflet', [ 'smk', 'leaflet', 'tool-select' ], function ( inc ) {
+include.module( 'tool-select-leaflet', [ 'leaflet', 'tool-select' ], function ( inc ) {
 
     SMK.TYPE.SelectTool.prototype.afterInitialize.push( function ( smk ) {
         var vw = smk.$viewer
-
-        // vw.map.on( 'click', function ( ev ) {
-        //     var bbox = vw.map.getBounds().toBBoxString()
-        //     var size = vw.map.getSize()
-
-        //     vw.selectFeatures.call( vw, {
-        //         point:    ev.latlng,
-        //         bbox:     bbox,
-
-        //         position: ev.containerPoint,
-        //         size: {
-        //             width:  size.x,
-        //             height: size.y
-        //         }
-        //     } )
-        // } )
 
         vw.selectHighlights = L.layerGroup( { pane: 'markerPane' } ).addTo( vw.map )
 
@@ -100,6 +84,6 @@ include.module( 'tool-select-leaflet', [ 'smk', 'leaflet', 'tool-select' ], func
                     highlightLayer.resetStyle( ly )
                 } )
         }
-    } )    
+    } )
 
 } )

@@ -27,7 +27,6 @@ include.module( 'smk-map', [ 'smk', 'jquery', 'util', 'viewer', 'layer' ], funct
             .then( loadTools )
             .then( initViewer )
             .then( initTools )
-            // .then( initToolbar )
             .catch( function ( e ) {
                 console.error( 'smk viewer #' + self.$option.containerId + ' failed to initialize:', e )
             } )
@@ -112,21 +111,16 @@ include.module( 'smk-map', [ 'smk', 'jquery', 'util', 'viewer', 'layer' ], funct
                 var tag = 'tool-' + t.type
                 return include( tag )
                     .then( function ( inc ) {
-                        // tag = 'tool-' + t.type + '-' + self.viewer.type
                         return include( tag + '-' + self.viewer.type )
                             .catch( function () {
                                 console.log( 'tool "' + t.type + '" has no ' + self.viewer.type + ' subclass' )
-                                // return include( tag )
                             } )
-                            .then( function () { return inc } )
+                            .then( function () {
+                                return inc
+                            } )
                     } )
-                    // .catch( function () {
-                    //     return include( tag )
-                    // } )
                     .then( function ( inc ) {
-                        // self.tools[ t.type ] = t
                         self.$tool[ t.type ] = new inc[ tag ]( t )
-                        // self.tools[ t.type ] = t
                     } )
                     .catch( function ( e ) {
                         console.warn( 'tool "' + t.type + '" failed to create:', e )
@@ -142,7 +136,6 @@ include.module( 'smk-map', [ 'smk', 'jquery', 'util', 'viewer', 'layer' ], funct
                 return SMK.UTIL.resolved()
                     .then( function () {
                         return self.$tool[ t ].initialize( self )
-                        // return self.$tool[ t ].initialize( self, self.tools[ t ] )
                     } )
                     .catch( function ( e ) {
                         console.warn( 'tool "' + t + '" failed to initialize:', e )
@@ -150,20 +143,8 @@ include.module( 'smk-map', [ 'smk', 'jquery', 'util', 'viewer', 'layer' ], funct
                     .then( function ( tool ) {
                         console.log( 'tool "' + t + '" initialized' )
                     } )
-                    // .then( function ( tool ) {
-                    //     return self.getToolbar().then( function ( toolbar ) {
-                    //         toolbar.add( tool )
-                    //     } )
-                    // } )
-                    // .catch( function ( e ) {
-                    //     console.warn( 'tool "' + t + '" failed to add:', e )
-                    // } )
             } ) )
         }
-
-        // function initToolbar() {
-        //     return include( 'sidebar' )
-        // }
 
         function showMap() {
             $( self.$option.container )
@@ -181,12 +162,6 @@ include.module( 'smk-map', [ 'smk', 'jquery', 'util', 'viewer', 'layer' ], funct
     SmkMap.prototype.addToContainer = function ( html, attr, prepend ) {
         return $( html )[ prepend ? 'prependTo' : 'appendTo' ]( this.$option.container ).attr( attr || {} ).get( 0 )
     }
-
-    // SmkMap.prototype.getSidebar = function () {
-    //     if ( this.$sidebar ) return this.$sidebar
-
-    //     return this.$sidebar = new SMK.TYPE.Sidebar( this )
-    // }
 
     SmkMap.prototype.addToOverlay = function ( html ) {
         if ( !this.$overlay )

@@ -1,4 +1,4 @@
-include.module( 'tool-markup-leaflet', [ 'smk', 'leaflet' ], function () {
+include.module( 'tool-markup-leaflet', [ 'leaflet', 'tool-markup' ], function () {
 
     SMK.TYPE.MarkupTool.prototype.afterInitialize.push( function ( smk ) {
         smk.$viewer.map.pm.addControls( {
@@ -10,6 +10,6 @@ include.module( 'tool-markup-leaflet', [ 'smk', 'leaflet' ], function () {
             editPolygon: true,  // adds button to toggle global edit mode
             deleteLayer: true   // adds a button to delete layers
         } )
-    } )    
+    } )
 
 } )
