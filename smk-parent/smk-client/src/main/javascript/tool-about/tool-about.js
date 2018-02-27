@@ -6,30 +6,24 @@ include.module( 'tool-about', [ 'smk', 'tool', 'widgets', 'tool-about.panel-abou
 
     Vue.component( 'about-panel', {
         template: inc[ 'tool-about.panel-about-html' ],
-        props: [ 'tool' ]
+        props: [ 'title', 'content' ]
     } )
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
     function AboutTool( option ) {
+        this.makePropWidget( 'icon', 'menu' )
+        this.makePropPanel( 'content', null )
+
         SMK.TYPE.Tool.prototype.constructor.call( this, $.extend( {
-            title:      'About',
-            content:    null,
-            widget:     { icon: 'menu', component: 'about-widget' },
-            panel:      { component: 'about-panel' },
+            title:          'About',
+            widgetComponent:'about-widget',
+            panelComponent: 'about-panel',
         }, option ) )
     }
 
     SMK.TYPE.AboutTool = AboutTool
 
     $.extend( AboutTool.prototype, SMK.TYPE.Tool.prototype )
-
-    AboutTool.prototype.getPanel = function () {
-        var self = this
-        return Object.assign( SMK.TYPE.Tool.prototype.getPanel(), {
-            get content() { return self.content }
-        } )
-    }
-
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
     AboutTool.prototype.afterInitialize = function ( smk, aux ) {

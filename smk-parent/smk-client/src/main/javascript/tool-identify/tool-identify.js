@@ -6,40 +6,32 @@ include.module( 'tool-identify', [ 'smk', 'tool', 'widgets', 'tool-identify.pane
 
     Vue.component( 'identify-panel', {
         template: inc[ 'tool-identify.panel-identify-html' ],
-        props: [ 'tool' ],
+        props: [ 'busy', 'layers', 'highlightId' ],
         methods: {
             isEmpty: function () {
-                return !this.tool.layers || this.tool.layers.length == 0
+                return !this.layers || this.layers.length == 0
             }
         },
     } )
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
     function IdentifyTool( option ) {
+        this.makePropWidget( 'icon', 'info_outline' )
+        this.makePropPanel( 'busy', false )
+        this.makePropPanel( 'layers', [] )
+        this.makePropPanel( 'highlightId', null )
+
         SMK.TYPE.Tool.prototype.constructor.call( this, $.extend( {
-            order:      4,
-            title:      'Identify',
-            budy:       false,
-            layers:     [],
-            highlightId: null,
-            widget:     { icon: 'info_outline', component: 'identify-widget' },
-            panel:      { component: 'identify-panel' },
+            order:          4,
+            title:          'Identify',
+            widgetComponent:'identify-widget',
+            panelComponent: 'identify-panel',
         }, option ) )
     }
 
     SMK.TYPE.IdentifyTool = IdentifyTool
 
     $.extend( IdentifyTool.prototype, SMK.TYPE.Tool.prototype )
-
-    IdentifyTool.prototype.getPanel = function () {
-        var self = this
-        return Object.assign( SMK.TYPE.Tool.prototype.getPanel(), {
-            get layers() { return self.layers },
-            get highlightId() { return self.highlightId },
-            get busy() { return self.busy }
-        } )
-    }
-
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
     IdentifyTool.prototype.afterInitialize = function ( smk, aux ) {

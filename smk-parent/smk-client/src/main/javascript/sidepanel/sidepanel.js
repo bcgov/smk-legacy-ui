@@ -7,8 +7,8 @@ include.module( 'sidepanel', [ 'vue', 'sidepanel.sidepanel-html', 'sidepanel.pan
     function Sidepanel( smk ) {
         this.model = {
             expanded: false,
-            currentTool: null,
-            panel: {}
+            activeTool: null,
+            tool: {}
         }
 
         var el = smk.addToOverlay( inc[ 'sidepanel.sidepanel-html' ] )
@@ -23,13 +23,13 @@ include.module( 'sidepanel', [ 'vue', 'sidepanel.sidepanel-html', 'sidepanel.pan
         console.log( 'activate tool:', toolId )
 
         if ( active ) {
-            if ( this.model.currentTool )
-                this.model.panel[ this.model.currentTool ].active = false
+            if ( this.model.activeTool )
+                this.model.tool[ this.model.activeTool ].active = false
 
-            this.model.currentTool = toolId
+            this.model.activeTool = toolId
         }
         else {
-            this.model.currentTool = null
+            this.model.activeTool = null
         }
 
         this.model.expanded = !!active
@@ -39,7 +39,10 @@ include.module( 'sidepanel', [ 'vue', 'sidepanel.sidepanel-html', 'sidepanel.pan
     Sidepanel.prototype.add = function ( tool ) {
         var self = this
 
-        this.vm.$set( this.model.panel, tool.type, tool )
+        this.vm.$set( this.model.tool, tool.type, {
+            panelComponent: tool.panelComponent,
+            panel: tool.panel
+        } )
 
         tool.changedActive( function () {
             self.activateTool( tool.type, tool.active )

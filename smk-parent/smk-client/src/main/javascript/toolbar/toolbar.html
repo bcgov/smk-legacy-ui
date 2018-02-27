@@ -4,11 +4,12 @@
         <component class="smk-tool"
             v-for="tool in tools"
             :key="tool.type"
-            v-bind:is="tool.widget.component"
-            v-bind="{ tool: tool.getWidget() }"
+            v-bind:is="tool.widgetComponent"
+            v-bind="tool.widget"
         ></component>
 
         <!-- v-on:click="tool.onClick()" -->
+            <!-- v-bind="{ tool: tool.widget }" -->
 
     <!-- </div> -->
 </div>

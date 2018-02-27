@@ -10,22 +10,75 @@ include.module( 'tool', [ 'smk', 'jquery', 'event' ], function () {
     function Tool( option ) {
         ToolEvent.prototype.constructor.call( this )
 
-        RW( this, 'visible', true, 'changedVisible' )
-        RW( this, 'enabled', true, 'changedEnabled' )
-        RW( this, 'active', false, 'changedActive' )
+        this.makeProp( 'title', null )
+        this.makeProp( 'visible', true, 'changedVisible' )
+        this.makeProp( 'enabled', true, 'changedEnabled' )
+        this.makeProp( 'active', false, 'changedActive' )
 
         $.extend( this, option )
     }
 
     Tool.prototype.type = 'unknown'
     Tool.prototype.order = 1
-    Tool.prototype.title = null
-    Tool.prototype.widget = null
-    Tool.prototype.panel = null
 
     SMK.TYPE.Tool = Tool
 
     $.extend( Tool.prototype, ToolEvent.prototype )
+    // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+    //
+    Tool.prototype.makeProp = function ( name, initial, event ) {
+        var self = this
+
+        if ( !this.widget ) this.widget = {}
+        if ( !this.panel ) this.panel = {}
+
+        self.widget[ name ] = initial
+        self.panel[ name ] = initial
+        Object.defineProperty( self, name, {
+            get: function () { return self.widget[ name ] },
+            set: function ( v ) {
+                if ( v == self.widget[ name ] ) return
+                self.widget[ name ] = v
+                self.panel[ name ] = v
+                if ( event ) self[ event ].call( self )
+                return self
+            }
+        } )
+    }
+
+    Tool.prototype.makePropWidget = function ( name, initial, event ) {
+        var self = this
+
+        if ( !this.widget ) this.widget = {}
+
+        self.widget[ name ] = initial
+        Object.defineProperty( self, name, {
+            get: function () { return self.widget[ name ] },
+            set: function ( v ) {
+                if ( v == self.widget[ name ] ) return
+                self.widget[ name ] = v
+                if ( event ) self[ event ].call( self )
+                return self
+            }
+        } )
+    }
+
+    Tool.prototype.makePropPanel = function ( name, initial, event ) {
+        var self = this
+
+        if ( !this.panel ) this.panel = {}
+
+        self.panel[ name ] = initial
+        Object.defineProperty( self, name, {
+            get: function () { return self.panel[ name ] },
+            set: function ( v ) {
+                if ( v == self.panel[ name ] ) return
+                self.panel[ name ] = v
+                if ( event ) self[ event ].call( self )
+                return self
+            }
+        } )
+    }
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
     Tool.prototype.initialize = function ( smk ) {
@@ -37,10 +90,10 @@ include.module( 'tool', [ 'smk', 'jquery', 'event' ], function () {
             smk.getSidepanel().then( function ( panel ) { aux.panel = panel } )
         ] )
         .then( function () {
-            if ( self.widget )
+            if ( self.widgetComponent )
                 aux.toolbar.add( self )
 
-            if ( self.panel )
+            if ( self.panelComponent )
                 aux.panel.add( self )
 
             return self.afterInitialize( smk, aux )
@@ -50,46 +103,6 @@ include.module( 'tool', [ 'smk', 'jquery', 'event' ], function () {
     Tool.prototype.afterInitialize = function ( smk, aux ) {}
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
-    Tool.prototype.getToolView = function () {
-        var self = this;
-        return {
-            get type() { return self.type },
-            get title() { return self.title },
-            get visible() { return self.visible },
-            get enabled() { return self.enabled },
-            get active() { return self.active }
-        }
-    }
-
-    Tool.prototype.getWidget = function () {
-        var self = this;
-        return Object.assign( this.getToolView(), {
-            get widget() { return self.widget }
-        } )
-    }
-
-    Tool.prototype.getPanel = function () {
-        var self = this;
-        return Object.assign( this.getToolView(), {
-            get panel() { return self.panel }
-        } )
-    }
-
     return Tool
-    // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-    //
-    function RW( obj, name, initial, event ) {
-        var val = initial
-        Object.defineProperty( obj, name, {
-            get: function () { return val },
-            set: function ( v ) {
-                if ( !v == !val ) return
-                val = v
-                if ( event ) obj[ event ].call( obj )
-                return obj
-            }
-        } )
-
-    }
 
 } )

@@ -6,40 +6,32 @@ include.module( 'tool-select', [ 'smk', 'tool', 'widgets', 'tool-select.panel-se
 
     Vue.component( 'select-panel', {
         template: inc[ 'tool-select.panel-select-html' ],
-        props: [ 'tool' ],
+        props: [ 'busy', 'layers', 'highlightId' ],
         methods: {
             isEmpty: function () {
-                return !this.tool.layers || this.tool.layers.length == 0
+                return !this.layers || this.layers.length == 0
             }
         },
     } )
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
     function SelectTool( option ) {
+        this.makePropWidget( 'icon', 'select_all' )
+        this.makePropPanel( 'busy', false )
+        this.makePropPanel( 'layers', [] )
+        this.makePropPanel( 'highlightId', null )
+
         SMK.TYPE.Tool.prototype.constructor.call( this, $.extend( {
             order:      5,
             title:      'Selection',
-            busy:       false,
-            layers:     [],
-            highlightId: null,
-            widget: { icon: 'select_all', component: 'select-widget' },
-            panel: { component: 'select-panel' },
+            widgetComponent: 'select-widget',
+            panelComponent: 'select-panel',
         }, option ) )
     }
 
     SMK.TYPE.SelectTool = SelectTool
 
     $.extend( SelectTool.prototype, SMK.TYPE.Tool.prototype )
-
-    SelectTool.prototype.getPanel = function () {
-        var self = this
-        return Object.assign( SMK.TYPE.Tool.prototype.getPanel(), {
-            get layers() { return self.layers },
-            get highlightId() { return self.highlightId },
-            get busy() { return self.busy }
-        } )
-    }
-
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
     SelectTool.prototype.afterInitialize = function ( smk, aux ) {

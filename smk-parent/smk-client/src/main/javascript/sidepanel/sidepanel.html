@@ -1,7 +1,9 @@
-<div class="smk-sidepanel" v-bind:class="{ expanded: currentTool != null }">
-    <!-- {{ currentTool }} -->
+<div class="smk-sidepanel" v-bind:class="{ expanded: activeTool != null }">
+    <!-- {{ activeTool }} -->
+    <!-- {{ JSON.stringify( tool[ activeTool ].panel ) }} -->
     <component class="smk-panel"
-        v-bind:is="currentTool && panel[ currentTool ].panel.component"
-        v-bind="currentTool && { tool: panel[ currentTool ].getPanel() }"
+        v-if="activeTool && tool[ activeTool ]"
+        v-bind:is="tool[ activeTool ].panelComponent"
+        v-bind="tool[ activeTool ].panel"
     ></component>
 </div>

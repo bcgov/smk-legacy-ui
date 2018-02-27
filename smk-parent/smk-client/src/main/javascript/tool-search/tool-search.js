@@ -21,16 +21,20 @@ include.module( 'tool-search', [ 'smk', 'tool', 'widgets', 'tool-search.widget-s
             data:       query,
         } )
 
-        return request.then( function ( data ) {
-            return $.map( data.features, function ( feature ) {
-                if ( !feature.geometry.coordinates ) return;
-
-                // exclude whole province match
-                if ( feature.properties.fullAddress == 'BC' ) return;
-
-                return feature
+        return SMK.UTIL.resolved()
+            .then( function () {
+                return request
             } )
-        } )
+            .then( function ( data ) {
+                return $.map( data.features, function ( feature ) {
+                    if ( !feature.geometry.coordinates ) return;
+
+                    // exclude whole province match
+                    if ( feature.properties.fullAddress == 'BC' ) return;
+
+                    return feature
+                } )
+            } )
     }
 
     Vue.component( 'search-widget', {
@@ -45,10 +49,10 @@ include.module( 'tool-search', [ 'smk', 'tool', 'widgets', 'tool-search.widget-s
 
     Vue.component( 'search-panel', {
         template: inc[ 'tool-search.panel-search-html' ],
-        props: [ 'tool' ],
+        props: [ 'busy', 'results', 'highlightId' ],
         methods: {
             isEmpty: function () {
-                return !this.tool.results || this.tool.results.length == 0
+                return !this.results || this.results.length == 0
             }
         },
         data: function () {
@@ -61,30 +65,22 @@ include.module( 'tool-search', [ 'smk', 'tool', 'widgets', 'tool-search.widget-s
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
     function SearchTool( option ) {
+        this.makePropWidget( 'icon', 'search' )
+        this.makePropPanel( 'busy', false )
+        this.makePropPanel( 'results', [] )
+        this.makePropPanel( 'highlightId', null )
+
         SMK.TYPE.Tool.prototype.constructor.call( this, $.extend( {
             order:      2,
             title:      'Search',
-            widget:     { icon: 'search', component: 'search-widget' },
-            panel:      { component: 'search-panel' },
-            results:    [],
-            busy:       false,
-            highlightId: null,
+            widgetComponent: 'search-widget',
+            panelComponent: 'search-panel',
         }, option ) )
     }
 
     SMK.TYPE.SearchTool = SearchTool
 
     $.extend( SearchTool.prototype, SMK.TYPE.Tool.prototype )
-
-    SearchTool.prototype.getPanel = function () {
-        var self = this
-        return Object.assign( SMK.TYPE.Tool.prototype.getPanel(), {
-            get results() { return self.results },
-            get highlightId() { return self.highlightId },
-            get busy() { return self.busy }
-        } )
-    }
-
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
     SearchTool.prototype.afterInitialize = function ( smk, aux ) {

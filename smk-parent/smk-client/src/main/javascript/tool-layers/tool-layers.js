@@ -6,7 +6,7 @@ include.module( 'tool-layers', [ 'smk', 'tool', 'widgets', 'tool-layers.panel-la
 
     Vue.component( 'layers-panel', {
         template: inc[ 'tool-layers.panel-layers-html' ],
-        props: [ 'tool' ],
+        props: [ 'busy', 'layers' ],
         data: function () {
             return {
                 filter: null
@@ -14,7 +14,7 @@ include.module( 'tool-layers', [ 'smk', 'tool', 'widgets', 'tool-layers.panel-la
         },
         methods: {
             isAllVisible: function () {
-                return this.tool.layers.every( isVisible ) || ( this.tool.layers.some( isVisible ) ? null : false )
+                return this.layers.every( isVisible ) || ( this.layers.some( isVisible ) ? null : false )
 
                 function isVisible( ly ) { return ly.visible }
             },
@@ -24,7 +24,7 @@ include.module( 'tool-layers', [ 'smk', 'tool', 'widgets', 'tool-layers.panel-la
             },
 
             allLayerIds: function () {
-                return this.tool.layers.map( function ( l ) { return l.id } )
+                return this.layers.map( function ( l ) { return l.id } )
             },
         },
         computed: {
@@ -39,28 +39,21 @@ include.module( 'tool-layers', [ 'smk', 'tool', 'widgets', 'tool-layers.panel-la
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
     function LayersTool( option ) {
+        this.makePropWidget( 'icon', 'layers' )
+        this.makePropPanel( 'busy', false )
+        this.makePropPanel( 'layers', [] )
+
         SMK.TYPE.Tool.prototype.constructor.call( this, $.extend( {
-            order:  3,
-            title:  'Layers',
-            busy:   false,
-            layers: [],
-            widget: { icon: 'layers', component: 'layers-widget' },
-            panel:  { component: 'layers-panel' },
+            order:          3,
+            title:          'Layers',
+            widgetComponent:'layers-widget',
+            panelComponent: 'layers-panel',
         }, option ) )
     }
 
     SMK.TYPE.LayersTool = LayersTool
 
     $.extend( LayersTool.prototype, SMK.TYPE.Tool.prototype )
-
-    LayersTool.prototype.getPanel = function () {
-        var self = this
-        return Object.assign( SMK.TYPE.Tool.prototype.getPanel(), {
-            get layers() { return self.layers },
-            get busy() { return self.busy }
-        } )
-    }
-
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
     LayersTool.prototype.afterInitialize = function ( smk, aux ) {

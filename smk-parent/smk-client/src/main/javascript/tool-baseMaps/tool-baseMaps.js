@@ -16,7 +16,7 @@ include.module( 'tool-baseMaps', [ 'smk', 'tool', 'widgets', 'tool-baseMaps.pane
 
     Vue.component( 'baseMaps-panel', {
         template: inc[ 'tool-baseMaps.panel-base-maps-html' ],
-        props: [ 'tool' ]
+        props: [ 'center', 'zoom', 'current', 'basemaps', ]
     } )
 
     // leaflet specific
@@ -64,32 +64,23 @@ include.module( 'tool-baseMaps', [ 'smk', 'tool', 'widgets', 'tool-baseMaps.pane
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
     function BaseMapsTool( option ) {
+        this.makePropWidget( 'icon', 'map' )
+        this.makePropPanel( 'center', null )
+        this.makePropPanel( 'zoom', null )
+        this.makePropPanel( 'current', null )
+        this.makePropPanel( 'basemaps', [] )
+
         SMK.TYPE.Tool.prototype.constructor.call( this, $.extend( {
-            order:      3,
-            title:      'Base Maps',
-            center:     null,
-            zoom:       null,
-            current:    null,
-            basemaps:   [],
-            widget:     { icon: 'map', component: 'baseMaps-widget' },
-            panel:      { component: 'baseMaps-panel' },
+            order:          3,
+            title:          'Base Maps',
+            widgetComponent:'baseMaps-widget',
+            panelComponent: 'baseMaps-panel',
         }, option ) )
     }
 
     SMK.TYPE.BaseMapsTool = BaseMapsTool
 
     $.extend( BaseMapsTool.prototype, SMK.TYPE.Tool.prototype )
-
-    BaseMapsTool.prototype.getPanel = function () {
-        var self = this
-        return Object.assign( SMK.TYPE.Tool.prototype.getPanel(), {
-            get basemaps() { return self.basemaps },
-            get center() { return self.center },
-            get zoom() { return self.zoom },
-            get current() { return self.current }
-        } )
-    }
-
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
     BaseMapsTool.prototype.afterInitialize = function ( smk, aux ) {

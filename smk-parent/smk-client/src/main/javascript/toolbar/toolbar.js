@@ -22,7 +22,11 @@ include.module( 'toolbar', [ 'vue', 'toolbar.toolbar-html' ], function ( inc ) {
     }
 
     Toolbar.prototype.add = function ( tool ) {
-        this.model.tools.push( tool )
+        this.model.tools.push( {
+            type: tool.type,
+            widgetComponent: tool.widgetComponent,
+            widget: tool.widget
+        } )
 
         tool.changedActive( function () {
             console.log(tool)
