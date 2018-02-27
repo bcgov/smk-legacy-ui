@@ -8,6 +8,7 @@ include.module( 'tool-pan', [ 'smk', 'tool' ], function () {
     SMK.TYPE.PanTool = PanTool
 
     $.extend( PanTool.prototype, SMK.TYPE.Tool.prototype )
+    PanTool.prototype.afterInitialize = []
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
     return PanTool

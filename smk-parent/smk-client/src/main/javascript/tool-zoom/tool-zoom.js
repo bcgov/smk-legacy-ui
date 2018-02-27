@@ -8,6 +8,7 @@ include.module( 'tool-zoom', [ 'smk', 'tool' ], function () {
     SMK.TYPE.ZoomTool = ZoomTool
 
     $.extend( ZoomTool.prototype, SMK.TYPE.Tool.prototype )
+    ZoomTool.prototype.afterInitialize = []
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
     return ZoomTool

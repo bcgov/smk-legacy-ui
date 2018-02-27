@@ -32,9 +32,10 @@ include.module( 'tool-select', [ 'smk', 'tool', 'widgets', 'tool-select.panel-se
     SMK.TYPE.SelectTool = SelectTool
 
     $.extend( SelectTool.prototype, SMK.TYPE.Tool.prototype )
+    SelectTool.prototype.afterInitialize = []
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
-    SelectTool.prototype.afterInitialize = function ( smk, aux ) {
+    SelectTool.prototype.afterInitialize.push( function ( smk, aux ) {
         var self = this
 
         aux.toolbar.vm.$on( 'select-widget.click', function () {
@@ -94,8 +95,7 @@ include.module( 'tool-select', [ 'smk', 'tool', 'widgets', 'tool-select.panel-se
         smk.$viewer.selected.clearedFeatures( function ( ev ) {
             self.layers = []
         } )
-
-    }
+    } )
 
     return SelectTool
 } )

@@ -81,9 +81,10 @@ include.module( 'tool-search', [ 'smk', 'tool', 'widgets', 'tool-search.widget-s
     SMK.TYPE.SearchTool = SearchTool
 
     $.extend( SearchTool.prototype, SMK.TYPE.Tool.prototype )
+    SearchTool.prototype.afterInitialize = []
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
-    SearchTool.prototype.afterInitialize = function ( smk, aux ) {
+    SearchTool.prototype.afterInitialize.push( function ( smk, aux ) {
         var self = this
 
         // aux.toolbar.vm.$on( 'search-widget.click', function () {
@@ -149,9 +150,7 @@ include.module( 'tool-search', [ 'smk', 'tool', 'widgets', 'tool-search.widget-s
         smk.$viewer.searched.clearedFeatures( function ( ev ) {
             self.results = []
         } )
-
-
-    }
+    } )
 
     return SearchTool
 

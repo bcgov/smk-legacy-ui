@@ -3,7 +3,7 @@ include.module( 'tool', [ 'smk', 'jquery', 'event' ], function () {
     var ToolEvent = SMK.TYPE.Event.define( [
         'changedVisible',
         'changedEnabled',
-        'changedActive'
+        'changedActive',
     ] )
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
@@ -96,11 +96,13 @@ include.module( 'tool', [ 'smk', 'jquery', 'event' ], function () {
             if ( self.panelComponent )
                 aux.panel.add( self )
 
-            return self.afterInitialize( smk, aux )
+            return self.afterInitialize.forEach( function ( init ) {
+                init.call( self, smk, aux )
+            } )
         } )
     }
 
-    Tool.prototype.afterInitialize = function ( smk, aux ) {}
+    Tool.prototype.afterInitialize = []
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
     return Tool

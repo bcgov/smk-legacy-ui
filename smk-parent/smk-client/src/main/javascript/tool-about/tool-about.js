@@ -24,9 +24,11 @@ include.module( 'tool-about', [ 'smk', 'tool', 'widgets', 'tool-about.panel-abou
     SMK.TYPE.AboutTool = AboutTool
 
     $.extend( AboutTool.prototype, SMK.TYPE.Tool.prototype )
+    AboutTool.prototype.afterInitialize = []
+    
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
-    AboutTool.prototype.afterInitialize = function ( smk, aux ) {
+    AboutTool.prototype.afterInitialize.push( function ( smk, aux ) {
         var self = this
 
         aux.toolbar.vm.$on( 'about-widget.click', function () {
@@ -35,7 +37,7 @@ include.module( 'tool-about', [ 'smk', 'tool', 'widgets', 'tool-about.panel-abou
             self.active = !self.active
             // console.log( arguments )
         } )
-    }
+    } )
 
     return AboutTool
 } )

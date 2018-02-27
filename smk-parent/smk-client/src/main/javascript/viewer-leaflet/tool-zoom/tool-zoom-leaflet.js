@@ -1,16 +1,6 @@
 include.module( 'tool-zoom-leaflet', [ 'tool-zoom', 'leaflet' ], function () {
 
-    // function ZoomTool( option ) {
-    //     SMK.TYPE.Tool.prototype.constructor.call( this, $.extend( {
-    //     }, option ) )
-    // }
-
-    // SMK.TYPE.ZoomTool = ZoomTool
-
-    // $.extend( ZoomTool.prototype, SMK.TYPE.Tool.prototype )
-    // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-    //
-    SMK.TYPE.ZoomTool.prototype.afterInitialize = function ( smk ) {
+    SMK.TYPE.ZoomTool.prototype.afterInitialize.push( function ( smk ) {
         if ( this.mouseWheel ) {
             smk.$viewer.map.scrollWheelZoom.enable()
         }
@@ -26,9 +16,7 @@ include.module( 'tool-zoom-leaflet', [ 'tool-zoom', 'leaflet' ], function () {
         if ( this.control ) {
             L.control.zoom().addTo( smk.$viewer.map )
         }
-    }
-
-    // return ZoomTool
+    } )
 
 } )
 

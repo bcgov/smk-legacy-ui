@@ -32,9 +32,10 @@ include.module( 'tool-identify', [ 'smk', 'tool', 'widgets', 'tool-identify.pane
     SMK.TYPE.IdentifyTool = IdentifyTool
 
     $.extend( IdentifyTool.prototype, SMK.TYPE.Tool.prototype )
+    IdentifyTool.prototype.afterInitialize = []
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
-    IdentifyTool.prototype.afterInitialize = function ( smk, aux ) {
+    IdentifyTool.prototype.afterInitialize.push( function ( smk, aux ) {
         var self = this
 
         aux.toolbar.vm.$on( 'identify-widget.click', function () {
@@ -149,9 +150,7 @@ include.module( 'tool-identify', [ 'smk', 'tool', 'widgets', 'tool-identify.pane
         } )
 
         smk.$viewer.getIdentifyPopupEl = function () { return self.popupVm.$el }
-
-
-    }
+    } )
 
     return IdentifyTool
 } )

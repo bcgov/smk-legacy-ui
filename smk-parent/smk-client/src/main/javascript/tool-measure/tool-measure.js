@@ -8,6 +8,7 @@ include.module( 'tool-measure', [ 'smk', 'tool' ], function () {
     SMK.TYPE.MeasureTool = MeasureTool
 
     $.extend( MeasureTool.prototype, SMK.TYPE.Tool.prototype )
+    MeasureTool.prototype.afterInitialize = []
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
     return MeasureTool

@@ -81,9 +81,10 @@ include.module( 'tool-baseMaps', [ 'smk', 'tool', 'widgets', 'tool-baseMaps.pane
     SMK.TYPE.BaseMapsTool = BaseMapsTool
 
     $.extend( BaseMapsTool.prototype, SMK.TYPE.Tool.prototype )
+    BaseMapsTool.prototype.afterInitialize = []
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
-    BaseMapsTool.prototype.afterInitialize = function ( smk, aux ) {
+    BaseMapsTool.prototype.afterInitialize.push( function ( smk, aux ) {
         var self = this
 
         var choices = [ 'Topographic', 'Streets', 'Imagery', 'Oceans', 'NationalGeographic', 'DarkGray', 'Gray' ]
@@ -126,8 +127,7 @@ include.module( 'tool-baseMaps', [ 'smk', 'tool', 'widgets', 'tool-baseMaps.pane
             // self.title = self.title + 'xxx'
             // console.log( arguments )
         } )
-
-    }
+    } )
 
     return BaseMapsTool
 

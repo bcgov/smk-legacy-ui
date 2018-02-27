@@ -54,9 +54,10 @@ include.module( 'tool-layers', [ 'smk', 'tool', 'widgets', 'tool-layers.panel-la
     SMK.TYPE.LayersTool = LayersTool
 
     $.extend( LayersTool.prototype, SMK.TYPE.Tool.prototype )
+    LayersTool.prototype.afterInitialize = []
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
-    LayersTool.prototype.afterInitialize = function ( smk, aux ) {
+    LayersTool.prototype.afterInitialize.push( function ( smk, aux ) {
         var self = this
 
         aux.toolbar.vm.$on( 'layers-widget.click', function () {
@@ -107,7 +108,7 @@ include.module( 'tool-layers', [ 'smk', 'tool', 'widgets', 'tool-layers.panel-la
         smk.$viewer.finishedLoading( function ( ev ) {
             self.busy = false
         } )
-    }
+    } )
 
     return LayersTool
 } )

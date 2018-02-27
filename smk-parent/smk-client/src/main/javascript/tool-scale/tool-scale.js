@@ -8,6 +8,7 @@ include.module( 'tool-scale', [ 'smk', 'tool' ], function () {
     SMK.TYPE.ScaleTool = ScaleTool
 
     $.extend( ScaleTool.prototype, SMK.TYPE.Tool.prototype )
+    ScaleTool.prototype.afterInitialize = []
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
     return ScaleTool

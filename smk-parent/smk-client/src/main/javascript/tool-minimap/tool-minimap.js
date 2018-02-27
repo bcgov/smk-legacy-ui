@@ -8,6 +8,7 @@ include.module( 'tool-minimap', [ 'smk', 'tool' ], function () {
     SMK.TYPE.MinimapTool = MinimapTool
 
     $.extend( MinimapTool.prototype, SMK.TYPE.Tool.prototype )
+    MinimapTool.prototype.afterInitialize = []
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
     return MinimapTool

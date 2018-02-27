@@ -8,11 +8,7 @@ include.module( 'tool-search-leaflet', [ 'leaflet', 'tool-search' ], function ( 
         _OTHER_:        10000
     }
 
-    var base = SMK.TYPE.SearchTool.prototype.afterInitialize
-
-    SMK.TYPE.SearchTool.prototype.afterInitialize = function ( smk ) {
-        base.apply( this, arguments )
-
+    SMK.TYPE.SearchTool.prototype.afterInitialize.push( function ( smk ) {
         var vw = smk.$viewer
 
         vw.searchHighlights = L.layerGroup( { pane: 'markerPane' } ).addTo( vw.map )
@@ -90,7 +86,7 @@ include.module( 'tool-search-leaflet', [ 'leaflet', 'tool-search' ], function ( 
         function brightHighlight( highlightLayer, bright ) {
             highlightLayer.setOpacity( bright ? 1 : 0.3 )
         }
-    }
+    } )
 
     // return {
     //     order: 4,

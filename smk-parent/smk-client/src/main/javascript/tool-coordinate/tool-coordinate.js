@@ -8,6 +8,7 @@ include.module( 'tool-coordinate', [ 'smk', 'tool' ], function () {
     SMK.TYPE.CoordinateTool = CoordinateTool
 
     $.extend( CoordinateTool.prototype, SMK.TYPE.Tool.prototype )
+    CoordinateTool.prototype.afterInitialize = []
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
     return CoordinateTool
