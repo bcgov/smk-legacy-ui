@@ -22,9 +22,10 @@ include.module( 'tool-select', [ 'smk', 'tool', 'widgets', 'tool-select.panel-se
         this.makePropPanel( 'highlightId', null )
 
         SMK.TYPE.Tool.prototype.constructor.call( this, $.extend( {
-            order:      5,
-            title:      'Selection',
-            widgetComponent: 'select-widget',
+            order:          5,
+            position:       'menu',
+            title:          'Selection',
+            widgetComponent:'select-widget',
             panelComponent: 'select-panel',
         }, option ) )
     }

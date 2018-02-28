@@ -54,3 +54,7 @@
 .smk-commands {
     margin-bottom: 1px;
 }
+
+.smk-active, .smk-tool-active {
+    background-color: #d2d9e6;
+}

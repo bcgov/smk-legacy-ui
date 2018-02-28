@@ -56,29 +56,27 @@ include.module( 'tool-menu', [ 'smk', 'tool', 'widgets', 'tool-menu.panel-menu-h
             panel: tool.panel
         } )
 
+        if ( !this.activeTool ) {
+            this.activeTool = tool
+            this.activeToolType = tool.type
+            this.activeTool.active = true
+        }
+
         tool.changedActive( function () {
-            if ( tool.active )
-                self.setActiveTool( tool )
-            else
-                self.setActiveTool( null )
+            if ( !tool.active && tool.type == self.activeToolType ) {
+                tool.active = true
+                return
+            }
+
+            if ( !tool.active ) return
+            if ( self.activeToolType == tool.type ) return
+
+            self.activeToolType = tool.type
+            self.activeTool.active = false
+            self.activeTool = tool
         } )
     }
 
-    MenuTool.prototype.setActiveTool = function ( tool ) {
-        if ( this.activeTool )
-            this.activeTool.active = false
-
-        this.activeTool = tool
-
-        if ( this.activeTool ) {
-            this.activeTool.active = true
-            this.activeToolType = this.activeTool.type
-        }
-        else {
-            this.activeToolType = null
-        }
-    }
-    
     return MenuTool
 } )
 

@@ -45,6 +45,7 @@ include.module( 'tool-layers', [ 'smk', 'tool', 'widgets', 'tool-layers.panel-la
 
         SMK.TYPE.Tool.prototype.constructor.call( this, $.extend( {
             order:          3,
+            position:       'menu',
             title:          'Layers',
             widgetComponent:'layers-widget',
             panelComponent: 'layers-panel',

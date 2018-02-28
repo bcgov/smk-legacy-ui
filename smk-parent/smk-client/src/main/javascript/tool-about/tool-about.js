@@ -15,7 +15,7 @@ include.module( 'tool-about', [ 'smk', 'tool', 'widgets', 'tool-about.panel-abou
         this.makePropPanel( 'content', null )
 
         SMK.TYPE.Tool.prototype.constructor.call( this, $.extend( {
-            title:          'About',
+            // title:          'About',
             widgetComponent:'about-widget',
             panelComponent: 'about-panel',
             position:       'menu'

@@ -72,6 +72,7 @@ include.module( 'tool-baseMaps', [ 'smk', 'tool', 'widgets', 'tool-baseMaps.pane
 
         SMK.TYPE.Tool.prototype.constructor.call( this, $.extend( {
             order:          3,
+            position:       'menu',
             title:          'Base Maps',
             widgetComponent:'baseMaps-widget',
             panelComponent: 'baseMaps-panel',
