@@ -38,80 +38,80 @@ exports.gen = function () {
 
 
     t.group( "tool-menu" )
-        .dir( 'tool-menu/**/*', { cwd: baseDir } )
+        .dir( 'tool/menu/**/*', { cwd: baseDir } )
 
     t.group( "tool-about" )
-        .dir( 'tool-about/**/*', { cwd: baseDir } )
+        .dir( 'tool/about/**/*', { cwd: baseDir } )
 
     t.group( "tool-baseMaps" )
-        .dir( 'tool-baseMaps/**/*', { cwd: baseDir } )
+        .dir( 'tool/baseMaps/**/*', { cwd: baseDir } )
 
     t.group( "tool-coordinate" )
-        .dir( 'tool-coordinate/**/*', { cwd: baseDir } )
+        .dir( 'tool/coordinate/**/*', { cwd: baseDir } )
 
     t.group( "tool-layers" )
-        .dir( 'tool-layers/**/*', { cwd: baseDir } )
+        .dir( 'tool/layers/**/*', { cwd: baseDir } )
 
     t.group( "tool-identify" )
-        .dir( 'tool-identify/**/*', { cwd: baseDir } )
+        .dir( 'tool/identify/**/*', { cwd: baseDir } )
 
     t.group( "tool-markup" )
-        .dir( 'tool-markup/**/*', { cwd: baseDir } )
+        .dir( 'tool/markup/**/*', { cwd: baseDir } )
 
     t.group( "tool-measure" )
-        .dir( 'tool-measure/**/*', { cwd: baseDir } )
+        .dir( 'tool/measure/**/*', { cwd: baseDir } )
 
     t.group( "tool-minimap" )
-        .dir( 'tool-minimap/**/*', { cwd: baseDir } )
+        .dir( 'tool/minimap/**/*', { cwd: baseDir } )
 
     t.group( "tool-pan" )
-        .dir( 'tool-pan/**/*', { cwd: baseDir } )
+        .dir( 'tool/pan/**/*', { cwd: baseDir } )
 
     t.group( "tool-scale" )
-        .dir( 'tool-scale/**/*', { cwd: baseDir } )
+        .dir( 'tool/scale/**/*', { cwd: baseDir } )
 
     t.group( "tool-search" )
-        .dir( 'tool-search/**/*', { cwd: baseDir } )
+        .dir( 'tool/search/**/*', { cwd: baseDir } )
 
     t.group( "tool-select" )
-        .dir( 'tool-select/**/*', { cwd: baseDir } )
+        .dir( 'tool/select/**/*', { cwd: baseDir } )
 
     t.group( "tool-zoom" )
-        .dir( 'tool-zoom/**/*', { cwd: baseDir } )
+        .dir( 'tool/zoom/**/*', { cwd: baseDir } )
 
     // leaflet
 
     t.group( "tool-pan-leaflet" )
-        .dir( 'viewer-leaflet/tool-pan/**/*', { cwd: baseDir } )
+        .dir( 'viewer-leaflet/tool/pan/**/*', { cwd: baseDir } )
 
     t.group( "tool-zoom-leaflet" )
-        .dir( 'viewer-leaflet/tool-zoom/**/*', { cwd: baseDir } )
+        .dir( 'viewer-leaflet/tool/zoom/**/*', { cwd: baseDir } )
 
     t.group( "tool-measure-leaflet" )
-        .dir( 'viewer-leaflet/tool-measure/**/*', { cwd: baseDir } )
+        .dir( 'viewer-leaflet/tool/measure/**/*', { cwd: baseDir } )
 
     t.group( "tool-scale-leaflet" )
-        .dir( 'viewer-leaflet/tool-scale/**/*', { cwd: baseDir } )
+        .dir( 'viewer-leaflet/tool/scale/**/*', { cwd: baseDir } )
 
     t.group( "tool-coordinate-leaflet" )
-        .dir( 'viewer-leaflet/tool-coordinate/**/*', { cwd: baseDir } )
+        .dir( 'viewer-leaflet/tool/coordinate/**/*', { cwd: baseDir } )
 
     t.group( "tool-minimap-leaflet" )
-        .dir( 'viewer-leaflet/tool-minimap/**/*', { cwd: baseDir } )
+        .dir( 'viewer-leaflet/tool/minimap/**/*', { cwd: baseDir } )
 
     t.group( "tool-markup-leaflet" )
-        .dir( 'viewer-leaflet/tool-markup/**/*', { cwd: baseDir } )
+        .dir( 'viewer-leaflet/tool/markup/**/*', { cwd: baseDir } )
         .style( "https://unpkg.com/leaflet.pm@0.17.3/dist/leaflet.pm.css" )
         .script( "https://unpkg.com/leaflet.pm@0.17.3/dist/leaflet.pm.min.js" )
 
     t.group( "tool-identify-leaflet" )
-        .dir( "viewer-leaflet/tool-identify/**/*", { cwd: baseDir } )
+        .dir( "viewer-leaflet/tool/identify/**/*", { cwd: baseDir } )
 
     t.group( "tool-select-leaflet" )
-        .dir( "viewer-leaflet/tool-select/**/*", { cwd: baseDir } )
+        .dir( "viewer-leaflet/tool/select/**/*", { cwd: baseDir } )
 
     t.group( "tool-search-leaflet" )
-        .dir( "viewer-leaflet/tool-search/**/*", { cwd: baseDir } )
+        .dir( "viewer-leaflet/tool/search/**/*", { cwd: baseDir } )
 
     t.script( "layer-leaflet", "viewer-leaflet/layer-leaflet.js" )
 
