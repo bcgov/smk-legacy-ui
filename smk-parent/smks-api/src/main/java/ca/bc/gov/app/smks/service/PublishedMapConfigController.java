@@ -337,7 +337,7 @@ public class PublishedMapConfigController
 					File tempExportZip = new File(classLoader.getResource("smk-export-template.war").getFile());
 					InputStream targetStream = new FileInputStream(tempExportZip);
 					
-					File exportTemplateZip = File.createTempFile(UUID.randomUUID().toString() + "_export_temp", ".zip");
+					File exportTemplateZip = File.createTempFile(resource.getName() + "_export", ".zip");
 					logger.debug("    Copying zip to temp file '" + exportTemplateZip.getName() + "'...");
 					FileOutputStream os = new FileOutputStream(exportTemplateZip);
 				    IOUtils.copy(targetStream, os);
@@ -353,7 +353,7 @@ public class PublishedMapConfigController
 				    
 				    // create config json
 				    ObjectMapper mapper = new ObjectMapper();
-				    File mapConfigTempFile = File.createTempFile(resource.getId() + "_map_config", ".json");
+				    File mapConfigTempFile = File.createTempFile(resource.getName() + "_map_config", ".json");
 				    mapper.writeValue(mapConfigTempFile, resource);
 				    
 				    zipFile.addFile(mapConfigTempFile, params);
@@ -370,7 +370,7 @@ public class PublishedMapConfigController
 						{
 							InputStream dataStream = new ByteArrayInputStream(data);
 	
-							File attchFile = File.createTempFile(resource.getId() + "_" + key, ".attachment");
+							File attchFile = File.createTempFile(resource.getName() + "_" + key, ".attachment");
 							FileOutputStream attchFileStream = new FileOutputStream(attchFile);
 							IOUtils.copy(dataStream, attchFileStream);
 							
@@ -392,7 +392,7 @@ public class PublishedMapConfigController
 				    if(smkConfigDocumentNames.length() > 0) smkConfigDocumentNames = smkConfigDocumentNames.substring(0, smkConfigDocumentNames.length() - 2);
 				    
 				    // create index.html with refs to config and attachments, and insert
-				    File indexHtml = File.createTempFile(resource.getId() + "_index", "html");
+				    File indexHtml = File.createTempFile(resource.getName() + "_index", ".html");
 				    String indexCode = "<html><head><title>" + resource.getName() + "</title></head><body><div id=\"smk-map-frame\"></div><script src=\"lib/smk-bootstrap.js\" smk-standalone=\"true\" smk-config=\"" + smkConfigDocumentNames + "\"></script></body></html>";
 				    
 				    PrintWriter out = new PrintWriter(indexHtml);
