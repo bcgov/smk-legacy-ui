@@ -1,4 +1,4 @@
-include.module( 'menu', [ 'vue', 'menu.menu-sidepanel-html', 'menu.menu-toolbar-html' ], function ( inc ) {
+include.module( 'menu', [ 'vue' ], function ( inc ) {
 
     function Menu( smk ) {
         var self = this
