@@ -1,0 +1,56 @@
+.smk-map-frame {
+    position: relative;
+}
+
+.smk-map-frame.smk-hidden {
+    visibility: hidden;
+}
+
+.smk-viewer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1;
+}
+
+.smk-overlay {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    right: 5px;
+    bottom: 5px;
+    z-index: 2;
+    border-radius: 5px;
+    /* border: 1px solid black; */
+    pointer-events: none;
+}
+
+
+.smk-command {
+    cursor: pointer;
+    color: blue;
+    padding: 2px;
+    border: 1px solid transparent;
+    border-radius: 5px;
+    margin-left: -2px;
+    font-size: 12px;
+}
+
+.smk-command.smk-disabled {
+    color: lightgray;
+    font-style: italic;
+}
+
+.smk-command:hover {
+    border: 1px solid black;
+}
+
+.smk-command.smk-disabled:hover {
+    border: 1px solid transparent;
+}
+
+.smk-commands {
+    margin-bottom: 1px;
+}

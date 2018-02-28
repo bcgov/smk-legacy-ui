@@ -4,9 +4,9 @@
 	<packaging>jar</packaging>
 	<name>smks-model</name>
 	  <parent>
-	    <groupId>ca.bc.gov.databc</groupId>
+	    <groupId>ca.bc.gov.app</groupId>
 	    <artifactId>smk-parent</artifactId>
-	    <version>1.0.0</version>
+	    <version>1.0.x-SNAPSHOT</version>
 	  </parent>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -40,6 +40,28 @@
 		    <artifactId>org.ektorp</artifactId>
 		    <version>${ektorp.version}</version>
 		</dependency>
+
+        <dependency>
+		    <groupId>commons-logging</groupId>
+		    <artifactId>commons-logging</artifactId>
+		    <version>1.2</version>
+		</dependency>
+        <dependency>
+		    <groupId>log4j</groupId>
+		    <artifactId>log4j</artifactId>
+		    <version>1.2.9</version>
+		    <type>pom</type>
+		</dependency>
+		<dependency>
+		       <groupId>org.slf4j</groupId>
+		       <artifactId>slf4j-api</artifactId>
+		       <version>1.7.5</version>
+		   </dependency>
+		   <dependency>
+		       <groupId>org.slf4j</groupId>
+		       <artifactId>slf4j-log4j12</artifactId>
+		       <version>1.7.5</version>
+		   </dependency>
 
 	</dependencies>
 	<build>

@@ -4,9 +4,9 @@
 	<packaging>war</packaging>
 	<name>smks-api</name>
 	  <parent>
-	    <groupId>ca.bc.gov.databc</groupId>
+	    <groupId>ca.bc.gov.app</groupId>
 	    <artifactId>smk-parent</artifactId>
-	    <version>1.0.0</version>
+	    <version>1.0.x-SNAPSHOT</version>
 	  </parent>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -18,7 +18,7 @@
 
 	<dependencies>
 		<dependency>
-		    <groupId>ca.bc.gov.databc</groupId>
+		    <groupId>ca.bc.gov.app</groupId>
 			<artifactId>smks-model</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
@@ -115,10 +115,21 @@
 			<artifactId>spring-restdocs-asciidoctor</artifactId>
 			<version>2.0.0.RELEASE</version>
 		</dependency>
-
+ 		<!-- Zip4j -->
+		<dependency>
+		    <groupId>net.lingala.zip4j</groupId>
+		    <artifactId>zip4j</artifactId>
+		    <version>1.3.2</version>
+		</dependency>
+        <!-- commons-io -->
+		<dependency>
+		    <groupId>commons-io</groupId>
+		    <artifactId>commons-io</artifactId>
+		    <version>2.6</version>
+		</dependency>
 	</dependencies>
 	<build>
-		<finalName>smks</finalName>
+		<finalName>smks-api</finalName>
 		<plugins>
 		  <plugin>
 			<groupId>org.apache.maven.plugins</groupId>
@@ -152,7 +163,7 @@
 			</configuration>
 		  </plugin>
 
-		  <plugin>
+		  <!-- <plugin>
 			<groupId>org.asciidoctor</groupId>
 			<artifactId>asciidoctor-maven-plugin</artifactId>
 			<version>1.5.3</version>
@@ -176,7 +187,7 @@
 					<version>2.0.0.RELEASE</version>
 				</dependency>
 			</dependencies>
-		</plugin>
+		</plugin> -->
 		<plugin>
 			<artifactId>maven-resources-plugin</artifactId>
 			<version>2.7</version>

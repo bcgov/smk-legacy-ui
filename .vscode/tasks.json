@@ -4,25 +4,25 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "verify",
-            "type": "shell",
-            "command": "mvn -B verify",
-            "group": "build"
-        },
-        {
             "label": "compile",
             "type": "shell",
-            "command": "mvn compile",
+            "command": "mvn clean install -DskipTests",
             "group": "build",
             "options": {
                 "cwd": "smk-parent"
-            }
+            },
+            "problemMatcher":"$msCompile",
         },
         {
-            "label": "test",
+            "label": "deploy",
             "type": "shell",
-            "command": "mvn -B test",
-            "group": "test"
+            "command": "./deploy.sh",
+            "group": "build",
+            // "options": {
+            //     "cwd": "smk-parent"
+            // }
+            "problemMatcher":"$msCompile",
+            "dependsOn": "compile"
         }
     ]
 }
