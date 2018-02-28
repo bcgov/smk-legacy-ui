@@ -14,22 +14,31 @@ exports.gen = function () {
     t.script( "smk-map", "smk-map.js" )
     t.script( "viewer", "viewer.js" )
     t.script( "layer", "layer.js" )
+    t.script( "tool", "tool.js" )
     t.script( "feature-set", "feature-set.js" )
 
     t.sequence( "map-frame-styles" )
         .style( "resources/css/smk-map-frame.css" )
-        .style( "resources/css/materialize.css" )
-        .style( "resources/css/fonts.css" )
         .style( "https://fonts.googleapis.com/icon?family=Material+Icons" )
-        .style( "resources/css/dmf.css" )
 
     t.group( "surround" )
         .dir( 'surround/**/*', { cwd: baseDir } )
 
-    t.script( "sidebar", "sidebar.js" )
-    t.template( "sidebar-panels", "template/sidebar.html" )
-    t.template( "sidebar-button", "template/sidebar-button.html" )
-    t.template( "side-panel", "template/side-panel.html" )
+    t.group( 'toolbar' )
+        .dir( 'toolbar/**/*', { cwd: baseDir } )
+
+    t.group( 'sidepanel' )
+        .dir( 'sidepanel/**/*', { cwd: baseDir } )
+
+    t.group( 'widgets' )
+        .dir( 'widgets/**/*', { cwd: baseDir } )
+
+    t.group( "menu" )
+        .dir( 'menu/**/*', { cwd: baseDir } )
+
+
+    t.group( "tool-menu" )
+        .dir( 'tool-menu/**/*', { cwd: baseDir } )
 
     t.group( "tool-about" )
         .dir( 'tool-about/**/*', { cwd: baseDir } )
@@ -37,17 +46,38 @@ exports.gen = function () {
     t.group( "tool-baseMaps" )
         .dir( 'tool-baseMaps/**/*', { cwd: baseDir } )
 
+    t.group( "tool-coordinate" )
+        .dir( 'tool-coordinate/**/*', { cwd: baseDir } )
+
     t.group( "tool-layers" )
         .dir( 'tool-layers/**/*', { cwd: baseDir } )
 
     t.group( "tool-identify" )
         .dir( 'tool-identify/**/*', { cwd: baseDir } )
 
-    t.group( "tool-select" )
-        .dir( 'tool-select/**/*', { cwd: baseDir } )
+    t.group( "tool-markup" )
+        .dir( 'tool-markup/**/*', { cwd: baseDir } )
+
+    t.group( "tool-measure" )
+        .dir( 'tool-measure/**/*', { cwd: baseDir } )
+
+    t.group( "tool-minimap" )
+        .dir( 'tool-minimap/**/*', { cwd: baseDir } )
+
+    t.group( "tool-pan" )
+        .dir( 'tool-pan/**/*', { cwd: baseDir } )
+
+    t.group( "tool-scale" )
+        .dir( 'tool-scale/**/*', { cwd: baseDir } )
 
     t.group( "tool-search" )
         .dir( 'tool-search/**/*', { cwd: baseDir } )
+
+    t.group( "tool-select" )
+        .dir( 'tool-select/**/*', { cwd: baseDir } )
+
+    t.group( "tool-zoom" )
+        .dir( 'tool-zoom/**/*', { cwd: baseDir } )
 
     // leaflet
 
@@ -88,6 +118,7 @@ exports.gen = function () {
     t.group( "viewer-leaflet" )
         .script( "viewer-leaflet/viewer-leaflet.js" )
         .tag( "layer-leaflet" )
+        .style( "viewer-leaflet/viewer-leaflet.css" )
 
     t.sequence( "leaflet" )
         .script( "https://unpkg.com/leaflet@1.2.0/dist/leaflet.js", { "integrity": "sha512-lInM/apFSqyy1o6s89K4iQUKg6ppXEgsVxT35HbzUupEVRh2Eu9Wdl4tHj7dZO0s1uvplcYGmt3498TtHq+log==" } )

@@ -1,11 +1,8 @@
-include.module( 'tool-pan-leaflet', [ 'smk', 'leaflet' ], function () {
+include.module( 'tool-pan-leaflet', [ 'tool-pan', 'leaflet' ], function () {
 
-    return {
-        order: 1,
-        initialize: function ( smk, option ) {
-            smk.$viewer.map.dragging.enable()
-        }
-    }
+    SMK.TYPE.PanTool.prototype.afterInitialize.push( function ( smk ) {
+        smk.$viewer.map.dragging.enable()
+    } )
 
 } )
 

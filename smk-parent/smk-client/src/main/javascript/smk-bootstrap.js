@@ -130,7 +130,10 @@
                     Vue.mixin( {
                         methods: {
                             $$emit: function ( event, arg ) {
-                                this.$root.$emit( this.$options._componentTag + '.' + event, arg )
+                                if ( this.$options._componentTag )
+                                    event = this.$options._componentTag + '.' + event
+
+                                this.$root.$emit( event, arg )
                             }
                         }
                     } )

@@ -39,14 +39,12 @@
     font-weight: bold;
 }
 
-/* .smk-search-result .smk-identify-feature.smk-highlighted span::before {
-    content: '•';
-} */
-
-/* .smk-search-result .smk-identify-feature span {
-    margin-left: -10px;
+.smk-tool.smk-search input {
+    border: 0;
+    vertical-align: top;
+    height: 26px;
 }
 
-.smk-search-result .smk-identify-feature:hover {
-    color: blue;
-} */
+.smk-tool.smk-search input:focus {
+    outline: 0;
+}

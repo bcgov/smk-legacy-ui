@@ -27,7 +27,6 @@ include.module( 'smk-map', [ 'smk', 'jquery', 'util', 'viewer', 'layer' ], funct
             .then( loadTools )
             .then( initViewer )
             .then( initTools )
-            .then( initSidebar )
             .catch( function ( e ) {
                 console.error( 'smk viewer #' + self.$option.containerId + ' failed to initialize:', e )
             } )
@@ -104,25 +103,29 @@ include.module( 'smk-map', [ 'smk', 'jquery', 'util', 'viewer', 'layer' ], funct
         }
 
         function loadTools() {
-            if ( !self.tools ) return
-            // var toolIds = Object.keys( self.tools )
-            if ( self.tools.length == 0 ) return
-
             self.$tool = {}
 
+            if ( !self.tools || self.tools.length == 0 ) return
+
+            self.tools.push( { type: 'menu' } )
+
             return SMK.UTIL.waitAll( self.tools.map( function ( t ) {
-                var tag = 'tool-' + t.type + '-' + self.viewer.type
+                var tag = 'tool-' + t.type
                 return include( tag )
-                    .catch( function () {
-                        tag = 'tool-' + t.type
-                        return include( tag )
+                    .then( function ( inc ) {
+                        return include( tag + '-' + self.viewer.type )
+                            .catch( function () {
+                                console.log( 'tool "' + t.type + '" has no ' + self.viewer.type + ' subclass' )
+                            } )
+                            .then( function () {
+                                return inc
+                            } )
                     } )
                     .then( function ( inc ) {
-                        self.$tool[ t.type ] = inc[ tag ]
-                        self.tools[ t.type ] = t
+                        self.$tool[ t.type ] = new inc[ tag ]( t )
                     } )
-                    .catch( function () {
-                        console.warn( 'tool "' + t.type + '" has no implementation' )
+                    .catch( function ( e ) {
+                        console.warn( 'tool "' + t.type + '" failed to create:', e )
                     } )
             } ) )
         }
@@ -134,19 +137,15 @@ include.module( 'smk-map', [ 'smk', 'jquery', 'util', 'viewer', 'layer' ], funct
             return SMK.UTIL.waitAll( ts.map( function ( t ) {
                 return SMK.UTIL.resolved()
                     .then( function () {
-                        return self.$tool[ t ].initialize( self, self.tools[ t ] )
-                    } )
-                    .then( function () {
-                        console.log( 'tool "' + t + '" initialized' )
+                        return self.$tool[ t ].initialize( self )
                     } )
                     .catch( function ( e ) {
                         console.warn( 'tool "' + t + '" failed to initialize:', e )
                     } )
+                    .then( function ( tool ) {
+                        console.log( 'tool "' + t + '" initialized' )
+                    } )
             } ) )
-        }
-
-        function initSidebar() {
-            return include( 'sidebar' )
         }
 
         function showMap() {
@@ -166,10 +165,44 @@ include.module( 'smk-map', [ 'smk', 'jquery', 'util', 'viewer', 'layer' ], funct
         return $( html )[ prepend ? 'prependTo' : 'appendTo' ]( this.$option.container ).attr( attr || {} ).get( 0 )
     }
 
-    SmkMap.prototype.getSidebar = function () {
-        if ( this.$sidebar ) return this.$sidebar
+    SmkMap.prototype.addToOverlay = function ( html ) {
+        if ( !this.$overlay )
+            this.$overlay = this.addToContainer( '<div class="smk-overlay">' )
 
-        return this.$sidebar = new SMK.TYPE.Sidebar( this )
+        return $( html ).appendTo( this.$overlay ).get( 0 )
+    }
+
+    SmkMap.prototype.getToolbar = function () {
+        var self = this
+
+        if ( this.$toolbar ) return this.$toolbar
+
+        return this.$toolbar = include( 'toolbar' )
+            .then( function ( inc ) {
+                return new SMK.TYPE.Toolbar( self )
+            } )
+    }
+
+    SmkMap.prototype.getSidepanel = function () {
+        var self = this
+
+        if ( this.$sidepanel ) return this.$sidepanel
+
+        return this.$sidepanel = include( 'sidepanel' )
+            .then( function ( inc ) {
+                return new SMK.TYPE.Sidepanel( self )
+            } )
+    }
+
+    SmkMap.prototype.getMenu = function () {
+        var self = this
+
+        if ( this.$menu ) return this.$menu
+
+        return this.$menu = include( 'menu' )
+            .then( function ( inc ) {
+                return new SMK.TYPE.Menu( self )
+            } )
     }
 
 } )

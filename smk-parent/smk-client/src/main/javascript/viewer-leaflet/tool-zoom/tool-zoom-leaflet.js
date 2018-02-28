@@ -1,25 +1,22 @@
-include.module( 'tool-zoom-leaflet', [ 'smk', 'leaflet' ], function () {
+include.module( 'tool-zoom-leaflet', [ 'tool-zoom', 'leaflet' ], function () {
 
-    return {
-        order: 1,
-        initialize: function ( smk, option ) {
-            if ( option.mouseWheel ) {
-                smk.$viewer.map.scrollWheelZoom.enable()
-            }
-
-            if ( option.doubleClick ) {
-                smk.$viewer.map.doubleClickZoom.enable()
-            }
-
-            if ( option.box ) {
-                smk.$viewer.map.boxZoom.enable()
-            }
-
-            if ( option.control ) {
-                L.control.zoom().addTo( smk.$viewer.map )
-            }
+    SMK.TYPE.ZoomTool.prototype.afterInitialize.push( function ( smk ) {
+        if ( this.mouseWheel ) {
+            smk.$viewer.map.scrollWheelZoom.enable()
         }
-    }
+
+        if ( this.doubleClick ) {
+            smk.$viewer.map.doubleClickZoom.enable()
+        }
+
+        if ( this.box ) {
+            smk.$viewer.map.boxZoom.enable()
+        }
+
+        if ( this.control ) {
+            L.control.zoom().addTo( smk.$viewer.map )
+        }
+    } )
 
 } )
 

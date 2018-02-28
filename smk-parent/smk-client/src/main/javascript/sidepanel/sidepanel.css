@@ -1,0 +1,87 @@
+.smk-map-frame .smk-viewer {
+    cursor: default;
+}
+
+.smk-map-frame .smk-viewer.leaflet-drag-target {
+    cursor: move;
+}
+
+.smk-map-frame.smk-panel-expanded .smk-viewer .leaflet-left {
+    left: 310px;
+}
+
+.smk-sidepanel {
+    display: none;
+    position: absolute;
+    top: 40px;
+    left: 0;
+    bottom: 0;
+    background-color: white;
+    border-radius: 5px;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.65);
+    pointer-events: auto;
+}
+
+.smk-sidepanel.expanded {
+    display: block;
+    width: 300px;
+}
+
+.smk-sidepanel .smk-panel {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: stretch;
+    align-content: stretch;
+    height: 100%;
+}
+
+.smk-sidepanel .smk-panel .smk-header {
+    position: relative;
+    border-bottom: 1px solid gray;
+    margin-left: 1px;
+    margin-right: 1px;
+    margin-bottom: 5px;
+    padding-left: 5px;
+    padding-top: 5px;
+}
+
+.smk-sidepanel .smk-panel .smk-body {
+    position: relative;
+    flex: 1 0;
+    padding: 5px;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    height: 100%;
+}
+
+.smk-sidepanel .smk-panel h1 {
+    margin-top: 0;
+    padding-bottom: 5px;
+    margin-bottom: 0;
+    font-size: 30px;
+}
+
+.smk-sidepanel .smk-panel h2 {
+    margin-top: 0;
+    margin-bottom: 2px;
+    font-size: 15px;
+}
+
+.smk-sidepanel .smk-panel .smk-spinner {
+    display:    none;
+    position:   absolute;
+    top:        2px;
+    right:      1px;
+    width:                  24px;
+    height:                 24px;
+    background-image:       url( 'spinner.gif' );
+    background-repeat:      no-repeat;
+    background-position:    center center;
+    background-size:        24px 24px;
+}
+
+.smk-sidepanel .smk-panel.smk-busy .smk-spinner {
+    display: block;
+}
+
