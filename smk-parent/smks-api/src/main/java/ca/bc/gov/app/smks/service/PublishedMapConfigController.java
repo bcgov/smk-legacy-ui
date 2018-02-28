@@ -363,26 +363,29 @@ public class PublishedMapConfigController
 				    // copy all attachments
 				    for(String key : resource.getAttachments().keySet())
 					{
-						Attachment attch = resource.getAttachments().get(key);
+				    	AttachmentInputStream attch = couchDAO.getAttachment(resource, key);
+						byte[] data = IOUtils.toByteArray(attch);
 						
-						byte[] data = Base64.decodeBase64(attch.getDataBase64());
-						InputStream dataStream = new ByteArrayInputStream(data);
-
-						File attchFile = File.createTempFile(resource.getId() + "_" + attch.getId(), ".attachment");
-						FileOutputStream attchFileStream = new FileOutputStream(attchFile);
-						IOUtils.copy(dataStream, attchFileStream);
-						
-						dataStream.close();
-						dataStream = null;
-						attchFileStream.close();
-						attchFileStream = null;
-						
-						zipFile.addFile(attchFile, params);						
-						
-						smkConfigDocumentNames += attch.getId() + ",";
-						
-						attchFile.delete();
-						attchFile = null;
+						if(data != null)
+						{
+							InputStream dataStream = new ByteArrayInputStream(data);
+	
+							File attchFile = File.createTempFile(resource.getId() + "_" + key, ".attachment");
+							FileOutputStream attchFileStream = new FileOutputStream(attchFile);
+							IOUtils.copy(dataStream, attchFileStream);
+							
+							dataStream.close();
+							dataStream = null;
+							attchFileStream.close();
+							attchFileStream = null;
+							
+							zipFile.addFile(attchFile, params);						
+							
+							smkConfigDocumentNames += attchFile.getName() + ",";
+							
+							attchFile.delete();
+							attchFile = null;
+						}
 					}
 				    
 				    // trim out the trailing comma, if we have attachments
@@ -406,9 +409,6 @@ public class PublishedMapConfigController
 				    File exportableZip = zipFile.getFile();
 			        InputStream exportStream = new FileInputStream(exportableZip);
 				    
-			        exportStream.close();
-				    exportStream = null;
-				    
 					//add zip to published documente as an attachment file called "export"
 					
 					Attachment newAttachment = new Attachment(EXPORT_ATTACHMENT_NAME, Base64.encodeBase64String(IOUtils.toByteArray(exportStream)), "application/octet-stream");
@@ -421,6 +421,8 @@ public class PublishedMapConfigController
 				    attachment = couchDAO.getAttachment(resource, EXPORT_ATTACHMENT_NAME);
 				    
 				    // finish cleanup
+			        exportStream.close();
+				    exportStream = null;
 				    zipFile = null;
 				    indexHtml.delete();
 				    exportTemplateZip.delete();
