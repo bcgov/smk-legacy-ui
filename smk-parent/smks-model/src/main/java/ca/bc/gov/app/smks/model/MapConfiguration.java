@@ -59,14 +59,20 @@ public class MapConfiguration extends CouchDbDocument implements Cloneable
 		this.setSurround(mapConfiguration.getSurround().clone());
 		this.setViewer(mapConfiguration.getViewer().clone());
 
-		for(Tool tool : tools)
+		if(mapConfiguration.getTools() != null)
 		{
-			mapConfiguration.getTools().add(tool.clone());
+			for(Tool tool : mapConfiguration.getTools())
+			{
+				getTools().add(tool.clone());
+			}
 		}
 
-		for(Layer layer : layers)
+		if(mapConfiguration.getLayers() != null)
 		{
-			mapConfiguration.getLayers().add(layer.clone());
+			for(Layer layer : mapConfiguration.getLayers())
+			{
+				getLayers().add(layer.clone());
+			}
 		}
 	}
 
@@ -116,6 +122,7 @@ public class MapConfiguration extends CouchDbDocument implements Cloneable
 		if(layers == null) layers = new ArrayList<Layer>();
 		return layers;
 	}
+	
 	public void setLayers(List<Layer> layers)
 	{
 		this.layers = layers;

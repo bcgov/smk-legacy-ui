@@ -337,7 +337,7 @@ public class PublishedMapConfigController
 					File tempExportZip = new File(classLoader.getResource("smk-export-template.war").getFile());
 					InputStream targetStream = new FileInputStream(tempExportZip);
 					
-					File exportTemplateZip = File.createTempFile(UUID.randomUUID().toString() + "_export_temp", "zip");
+					File exportTemplateZip = File.createTempFile(UUID.randomUUID().toString() + "_export_temp", ".zip");
 					logger.debug("    Copying zip to temp file '" + exportTemplateZip.getName() + "'...");
 					FileOutputStream os = new FileOutputStream(exportTemplateZip);
 				    IOUtils.copy(targetStream, os);
@@ -353,7 +353,7 @@ public class PublishedMapConfigController
 				    
 				    // create config json
 				    ObjectMapper mapper = new ObjectMapper();
-				    File mapConfigTempFile = File.createTempFile(resource.getId() + "_map_config", "json");
+				    File mapConfigTempFile = File.createTempFile(resource.getId() + "_map_config", ".json");
 				    mapper.writeValue(mapConfigTempFile, resource);
 				    
 				    zipFile.addFile(mapConfigTempFile, params);
@@ -368,7 +368,7 @@ public class PublishedMapConfigController
 						byte[] data = Base64.decodeBase64(attch.getDataBase64());
 						InputStream dataStream = new ByteArrayInputStream(data);
 
-						File attchFile = File.createTempFile(resource.getId() + "_" + attch.getId(), "attachment");
+						File attchFile = File.createTempFile(resource.getId() + "_" + attch.getId(), ".attachment");
 						FileOutputStream attchFileStream = new FileOutputStream(attchFile);
 						IOUtils.copy(dataStream, attchFileStream);
 						
