@@ -38,7 +38,7 @@ include.module( 'tool-select', [ 'smk', 'tool', 'widgets', 'tool-select.panel-se
     SelectTool.prototype.afterInitialize.push( function ( smk, aux ) {
         var self = this
 
-        aux.toolbar.vm.$on( 'select-widget.click', function () {
+        aux.widget.vm.$on( 'select-widget.click', function () {
             if ( !self.visible || !self.enabled ) return
 
             self.active = !self.active

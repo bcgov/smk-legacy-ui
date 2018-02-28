@@ -60,7 +60,7 @@ include.module( 'tool-layers', [ 'smk', 'tool', 'widgets', 'tool-layers.panel-la
     LayersTool.prototype.afterInitialize.push( function ( smk, aux ) {
         var self = this
 
-        aux.toolbar.vm.$on( 'layers-widget.click', function () {
+        aux.widget.vm.$on( 'layers-widget.click', function () {
             if ( !self.visible || !self.enabled ) return
 
             self.active = !self.active

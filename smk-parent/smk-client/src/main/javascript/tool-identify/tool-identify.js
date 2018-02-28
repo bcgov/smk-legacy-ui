@@ -38,7 +38,7 @@ include.module( 'tool-identify', [ 'smk', 'tool', 'widgets', 'tool-identify.pane
     IdentifyTool.prototype.afterInitialize.push( function ( smk, aux ) {
         var self = this
 
-        aux.toolbar.vm.$on( 'identify-widget.click', function () {
+        aux.widget.vm.$on( 'identify-widget.click', function () {
             if ( !self.visible || !self.enabled ) return
 
             self.active = !self.active

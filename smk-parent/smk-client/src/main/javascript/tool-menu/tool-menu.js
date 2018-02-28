@@ -6,17 +6,18 @@ include.module( 'tool-menu', [ 'smk', 'tool', 'widgets', 'tool-menu.panel-menu-h
 
     Vue.component( 'menu-panel', {
         template: inc[ 'tool-menu.panel-menu-html' ],
-        props: [ 'title', 'widgets', 'panels' ]
+        props: [ 'title', 'visible', 'enabled', 'active', 'subWidgets', 'subPanels', 'activeToolType' ]
     } )
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
     function MenuTool( option ) {
         this.makePropWidget( 'icon', 'menu' )
-        this.makePropPanel( 'widgets', [] )
-        this.makePropPanel( 'panels', {} )
+        this.makePropPanel( 'subWidgets', [] )
+        this.makePropPanel( 'subPanels', {} )
+        this.makePropPanel( 'activeToolType', null )
 
         SMK.TYPE.Tool.prototype.constructor.call( this, $.extend( {
-            title:          'Menu',
+            title:          null,
             widgetComponent:'menu-widget',
             panelComponent: 'menu-panel',
         }, option ) )
@@ -42,13 +43,42 @@ include.module( 'tool-menu', [ 'smk', 'tool', 'widgets', 'tool-menu.panel-menu-h
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
     MenuTool.prototype.add = function ( tool ) {
-        this.widgets.push( {
+        var self = this
+
+        this.subWidgets.push( {
             type: tool.type,
             widgetComponent: tool.widgetComponent,
             widget: tool.widget
         } )
+
+        Vue.set( this.subPanels, tool.type, {
+            panelComponent: tool.panelComponent,
+            panel: tool.panel
+        } )
+
+        tool.changedActive( function () {
+            if ( tool.active )
+                self.setActiveTool( tool )
+            else
+                self.setActiveTool( null )
+        } )
     }
 
+    MenuTool.prototype.setActiveTool = function ( tool ) {
+        if ( this.activeTool )
+            this.activeTool.active = false
+
+        this.activeTool = tool
+
+        if ( this.activeTool ) {
+            this.activeTool.active = true
+            this.activeToolType = this.activeTool.type
+        }
+        else {
+            this.activeToolType = null
+        }
+    }
+    
     return MenuTool
 } )
 

@@ -11,7 +11,7 @@ include.module( 'tool-about', [ 'smk', 'tool', 'widgets', 'tool-about.panel-abou
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
     function AboutTool( option ) {
-        this.makePropWidget( 'icon', 'menu' )
+        this.makePropWidget( 'icon', 'help' )
         this.makePropPanel( 'content', null )
 
         SMK.TYPE.Tool.prototype.constructor.call( this, $.extend( {
@@ -31,7 +31,7 @@ include.module( 'tool-about', [ 'smk', 'tool', 'widgets', 'tool-about.panel-abou
     AboutTool.prototype.afterInitialize.push( function ( smk, aux ) {
         var self = this
 
-        aux.toolbar.vm.$on( 'about-widget.click', function () {
+        aux.widget.vm.$on( 'about-widget.click', function () {
             if ( !self.visible || !self.enabled ) return
 
             self.active = !self.active
