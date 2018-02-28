@@ -36,11 +36,18 @@ exports.gen = function () {
     t.group( 'widgets' )
         .dir( 'widgets/**/*', { cwd: baseDir } )
 
+    t.group( "menu" )
+        .dir( 'menu/**/*', { cwd: baseDir } )
+
     // t.group( 'tool-bar' )
     //     .script( "sidebar.js" )
     //     .template( "sidebar-panels", "template/sidebar.html" )
     //     .template( "sidebar-button", "template/sidebar-button.html" )
     //     .template( "side-panel", "template/side-panel.html" )
+
+
+    t.group( "tool-menu" )
+        .dir( 'tool-menu/**/*', { cwd: baseDir } )
 
     t.group( "tool-about" )
         .dir( 'tool-about/**/*', { cwd: baseDir } )

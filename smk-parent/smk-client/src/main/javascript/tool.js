@@ -20,6 +20,7 @@ include.module( 'tool', [ 'smk', 'jquery', 'event' ], function () {
 
     Tool.prototype.type = 'unknown'
     Tool.prototype.order = 1
+    Tool.prototype.position = 'toolbar'
 
     SMK.TYPE.Tool = Tool
 
@@ -88,14 +89,24 @@ include.module( 'tool', [ 'smk', 'jquery', 'event' ], function () {
         var aux = {}
         return SMK.UTIL.waitAll( [
             smk.getToolbar().then( function ( toolbar ) { aux.toolbar = toolbar } ),
-            smk.getSidepanel().then( function ( panel ) { aux.panel = panel } )
+            smk.getSidepanel().then( function ( panel ) { aux.panel = panel } ),
+            smk.getMenu().then( function ( menu ) { aux.menu = menu } ),
         ] )
         .then( function () {
-            if ( self.widgetComponent )
-                aux.toolbar.add( self )
+            switch ( self.position ) {
+            case 'toolbar':
+                if ( self.widgetComponent )
+                    aux.toolbar.add( self )
 
-            if ( self.panelComponent )
-                aux.panel.add( self )
+                if ( self.panelComponent )
+                    aux.panel.add( self )
+
+                break;
+
+            case 'menu':
+                aux.menu.add( self )
+                break;
+            }
 
             return self.afterInitialize.forEach( function ( init ) {
                 init.call( self, smk, aux )

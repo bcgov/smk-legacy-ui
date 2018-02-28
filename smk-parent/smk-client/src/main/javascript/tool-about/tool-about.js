@@ -18,6 +18,7 @@ include.module( 'tool-about', [ 'smk', 'tool', 'widgets', 'tool-about.panel-abou
             title:          'About',
             widgetComponent:'about-widget',
             panelComponent: 'about-panel',
+            position:       'menu'
         }, option ) )
     }
 

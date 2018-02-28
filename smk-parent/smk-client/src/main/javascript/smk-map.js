@@ -107,6 +107,8 @@ include.module( 'smk-map', [ 'smk', 'jquery', 'util', 'viewer', 'layer' ], funct
 
             if ( !self.tools || self.tools.length == 0 ) return
 
+            self.tools.push( { type: 'menu' } )
+
             return SMK.UTIL.waitAll( self.tools.map( function ( t ) {
                 var tag = 'tool-' + t.type
                 return include( tag )
@@ -189,6 +191,17 @@ include.module( 'smk-map', [ 'smk', 'jquery', 'util', 'viewer', 'layer' ], funct
         return this.$sidepanel = include( 'sidepanel' )
             .then( function ( inc ) {
                 return new SMK.TYPE.Sidepanel( self )
+            } )
+    }
+
+    SmkMap.prototype.getMenu = function () {
+        var self = this
+
+        if ( this.$menu ) return this.$menu
+
+        return this.$menu = include( 'menu' )
+            .then( function ( inc ) {
+                return new SMK.TYPE.Menu( self )
             } )
     }
 
