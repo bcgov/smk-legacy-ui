@@ -131,5 +131,50 @@ exports.gen = function () {
         .script( "https://unpkg.com/terraformer-wkt-parser@1.1.2" )
         .script( "https://npmcdn.com/@turf/turf/turf.min.js" )
 
+    // esri3d
+
+    t.group( "tool-pan-esri3d" )
+        .dir( 'viewer-esri3d/tool/pan/**/*', { cwd: baseDir } )
+
+    t.group( "tool-zoom-esri3d" )
+        .dir( 'viewer-esri3d/tool/zoom/**/*', { cwd: baseDir } )
+
+    t.group( "tool-measure-esri3d" )
+        .dir( 'viewer-esri3d/tool/measure/**/*', { cwd: baseDir } )
+
+    t.group( "tool-scale-esri3d" )
+        .dir( 'viewer-esri3d/tool/scale/**/*', { cwd: baseDir } )
+
+    t.group( "tool-coordinate-esri3d" )
+        .dir( 'viewer-esri3d/tool/coordinate/**/*', { cwd: baseDir } )
+
+    t.group( "tool-minimap-esri3d" )
+        .dir( 'viewer-esri3d/tool/minimap/**/*', { cwd: baseDir } )
+
+    t.group( "tool-markup-esri3d" )
+        .dir( 'viewer-esri3d/tool/markup/**/*', { cwd: baseDir } )
+
+    t.group( "tool-identify-esri3d" )
+        .dir( "viewer-esri3d/tool/identify/**/*", { cwd: baseDir } )
+
+    t.group( "tool-select-esri3d" )
+        .dir( "viewer-esri3d/tool/select/**/*", { cwd: baseDir } )
+
+    t.group( "tool-search-esri3d" )
+        .dir( "viewer-esri3d/tool/search/**/*", { cwd: baseDir } )
+
+    t.script( "layer-esri3d", "viewer-esri3d/layer-esri3d.js" )
+
+    t.script( "types-esri3d", "viewer-esri3d/types-esri3d.js" )
+
+    t.group( "viewer-esri3d" )
+        .script( "viewer-esri3d/viewer-esri3d.js" )
+        .tag( "layer-esri3d" )
+        .style( "viewer-esri3d/viewer-esri3d.css" )
+
+    t.sequence( "esri3d" )
+        .style( "https://js.arcgis.com/4.4/esri/css/main.css" )
+        .script( "https://js.arcgis.com/4.4/" )
+
     return t
 }
