@@ -173,8 +173,10 @@ exports.gen = function () {
         .style( "viewer-esri3d/viewer-esri3d.css" )
 
     t.sequence( "esri3d" )
-        .style( "https://js.arcgis.com/4.4/esri/css/main.css" )
-        .script( "https://js.arcgis.com/4.4/" )
+        .style( "https://js.arcgis.com/4.6/esri/css/main.css" )
+        .script( "https://js.arcgis.com/4.6/" )
+        // .style( "https://js.arcgis.com/4.4/esri/css/main.css" )
+        // .script( "https://js.arcgis.com/4.4/" )
 
     return t
 }

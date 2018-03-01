@@ -20,7 +20,7 @@ include.module( 'viewer-esri3d', [ 'viewer', 'esri3d', 'types-esri3d' ], functio
 
         var layerExtras = []
 
-        var map = new E.Map( {
+        this.map = new E.Map( {
             basemap: "topo",
             ground: "world-elevation"
         } )
@@ -35,19 +35,62 @@ include.module( 'viewer-esri3d', [ 'viewer', 'esri3d', 'types-esri3d' ], functio
         //         this.setBasemap( smk.viewer.baseMap )
         // }
 
-        var view = new E.viewsSceneView( {
+        this.view = new E.views.SceneView( {
             container: el,
-            map: map,
+            map: this.map,
             // zoom: 6,
             // center: [-124.65, 54.23]
-            extent: new E.geometryExtent( {
-                xmin: bx[ 1 ], 
-                ymin: bx[ 0 ], 
-                xmax: bx[ 3 ], 
-                ymax: bx[ 2 ]                
+            ui: new E.views.ui.DefaultUI( {
+                components: [ "attribution" ],
+                padding: {
+                    top: 5,
+                    left: 5,
+                    right: 5,
+                    bottom: 5
+                }
+            } ),
+            extent: new E.geometry.Extent( {
+                xmin: bx[ 0 ],
+                ymin: bx[ 1 ],
+                xmax: bx[ 2 ],
+                ymax: bx[ 3 ]
             } )
+
         } )
 
+        // disable panning
+        this.panHandler = {
+            drag: this.view.on( "drag", function( evt ) {
+                evt.stopPropagation()
+            } ),
+            keyDown: this.view.on( "key-down", function( evt ) {
+                if ( /Arrow/.test( evt.key ) )
+                    evt.stopPropagation()
+            } )
+        }
+
+        // disable zooming
+        this.zoomHandler = {
+            keyDown: this.view.on( "key-down", function( evt ) {
+                if ( /^([+-_=]|Shift)$/.test( evt.key ) )
+                    evt.stopPropagation()
+            } ),
+            mouseWheel: this.view.on( "mouse-wheel", function( evt ) {
+                evt.stopPropagation()
+            } ),
+            doubleClick1: this.view.on( "double-click", function( evt ) {
+                evt.stopPropagation()
+            } ),
+            doubleClick2: this.view.on( "double-click", [ "Control" ], function( evt ) {
+                evt.stopPropagation()
+            } ),
+            drag1: this.view.on( "drag", [ "Shift" ], function( evt ) {
+                evt.stopPropagation()
+            } ),
+            drag2: this.view.on( "drag", [ "Shift", "Control" ], function( evt ) {
+                evt.stopPropagation()
+            } ),
+        }
         // initViewActions(view);
 
         // init widgets

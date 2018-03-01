@@ -2,14 +2,18 @@ include.module( 'types-esri3d', [ 'smk', 'esri3d' ], function () {
 
     return new Promise( function ( res ) {
         var objs = [
-        // require( [
             "esri/config",
+
+            // base
             "esri/Map",
             "esri/views/SceneView",
-            "esri/geometry/SpatialReference",
-            "esri/geometry/geometryEngine",
+            "esri/views/ui/DefaultUI",
+            "esri/views/ui/UI",
 
             // widgets
+            "esri/widgets/NavigationToggle",
+            "esri/widgets/Compass",
+            "esri/widgets/Zoom",
             "esri/widgets/Expand",
             "esri/widgets/BasemapGallery",
             "esri/widgets/Legend",
@@ -17,66 +21,52 @@ include.module( 'types-esri3d', [ 'smk', 'esri3d' ], function () {
             "esri/widgets/LayerList",
             "esri/widgets/Search",
 
-            // layers and rendering
+            // layers
             "esri/layers/MapImageLayer",
             "esri/layers/WMSLayer",
+
+            // rendering
             "esri/renderers/SimpleRenderer",
             "esri/renderers/UniqueValueRenderer",
             "esri/renderers/ClassBreaksRenderer",
 
-            // Symbols & Geometry
+            // symbols
             "esri/Graphic",
             "esri/symbols/SimpleMarkerSymbol",
             "esri/symbols/SimpleLineSymbol",
             "esri/symbols/SimpleFillSymbol",
+
+            // geometry
             "esri/geometry/Point",
             "esri/geometry/Polyline",
             "esri/geometry/Polygon",
             "esri/geometry/Extent",
+            "esri/geometry/SpatialReference",
+            "esri/geometry/geometryEngine",
 
             // dojo stuff
             // "dojo/domReady!"
         ]
-        
+
         SMK.TYPE.Esri3d = {}
+
         require( objs, function () {
             var args = [].slice.call( arguments )
+
             objs.forEach( function ( o, i ) {
-                SMK.TYPE.Esri3d[ o.replace( 'esri/', '' ).replace( '/', '' ) ] = args[ i ]
+                var parts = o.replace( 'esri/', '' ).split( '/' )
+                var container = SMK.TYPE.Esri3d
+
+                for( var j = 0; j < parts.length - 1; j++ ) {
+                    if ( !( parts[ j ] in container ) )
+                        container[ parts[ j ] ] = {}
+                    container = container[ parts[ j ] ]
+                }
+
+                container[ parts[ parts.length - 1 ] ] = args[ i ]
             } )
-            res()            
+
+            res()
         } )
-        // ], function (   esriConfig, Map, SceneView, SpatialReference, geometryEngine,
-        //                 Expand, BasemapGallery, Legend, Home, LayerList, Search,
-        //                 MapImageLayer, WMSLayer, SimpleRenderer, UniqueValueRenderer, ClassBreaksRenderer,
-        //                 Graphic, SimpleMarkerSymbol, SimpleLineSymbol, SimpleFillSymbol, Point, Polyline, Polygon ) {
-
-        //     SMK.TYPE.Esri3d = {}
-        //     SMK.TYPE.Esri3d.esriConfig          = esriConfig
-        //     SMK.TYPE.Esri3d.Map                 = Map
-        //     SMK.TYPE.Esri3d.SceneView           = SceneView
-        //     SMK.TYPE.Esri3d.SpatialReference    = SpatialReference
-        //     SMK.TYPE.Esri3d.geometryEngine      = geometryEngine
-        //     SMK.TYPE.Esri3d.Expand              = Expand
-        //     SMK.TYPE.Esri3d.BasemapGallery      = BasemapGallery
-        //     SMK.TYPE.Esri3d.Legend              = Legend
-        //     SMK.TYPE.Esri3d.Home                = Home
-        //     SMK.TYPE.Esri3d.LayerList           = LayerList
-        //     SMK.TYPE.Esri3d.Search              = Search
-        //     SMK.TYPE.Esri3d.MapImageLayer       = MapImageLayer
-        //     SMK.TYPE.Esri3d.WMSLayer            = WMSLayer
-        //     SMK.TYPE.Esri3d.SimpleRenderer      = SimpleRenderer
-        //     SMK.TYPE.Esri3d.UniqueValueRenderer = UniqueValueRenderer
-        //     SMK.TYPE.Esri3d.ClassBreaksRenderer = ClassBreaksRenderer
-        //     SMK.TYPE.Esri3d.Graphic             = Graphic
-        //     SMK.TYPE.Esri3d.SimpleMarkerSymbol  = SimpleMarkerSymbol
-        //     SMK.TYPE.Esri3d.SimpleLineSymbol    = SimpleLineSymbol
-        //     SMK.TYPE.Esri3d.SimpleFillSymbol    = SimpleFillSymbol
-        //     SMK.TYPE.Esri3d.Point               = Point
-        //     SMK.TYPE.Esri3d.Polyline            = Polyline
-        //     SMK.TYPE.Esri3d.Polygon             = Polygon
-
-        //     res()
-        // } )
     } )
 } )
