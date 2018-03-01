@@ -16,7 +16,48 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
     SMK.TYPE.ViewerBase = ViewerBase
 
     $.extend( ViewerBase.prototype, ViewerEvent.prototype )
-
+    // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+    //
+    ViewerBase.prototype.basemap = {
+        Topographic: {
+            order: 1,
+            title: 'Topographic'
+        },
+        Streets: {
+            order: 2,
+            title: 'Streets'
+        },
+        Imagery: {
+            order: 3,
+            title: 'Imagery'
+        },
+        Oceans: {
+            order: 4,
+            title: 'Oceans'
+        },
+        NationalGeographic: {
+            order: 5,
+            title: 'National Geographic'
+        },
+        ShadedRelief: {
+            order: 6,
+            title: 'Shaded Relief'
+        },
+        DarkGray: {
+            order: 7,
+            title: 'Dark Gray'
+        },
+        Gray: {
+            order: 8,
+            title: 'Gray'
+        },
+        // Terrain: {
+        //     order: 9,
+        //     title: 'Terrain'
+        // },
+    }
+    // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+    //
     ViewerBase.prototype.destroy = function () {
         ViewerEvent.prototype.destroy()
     }
@@ -58,7 +99,8 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
         return self.setLayersVisible( self.layerIds.filter( function ( id ) { return self.layerId[ id ].config.isVisible } ), true )
             .catch( function () {} )
     }
-
+    // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+    //
     ViewerBase.prototype.createLayer = function ( id, layers, zIndex, create ) {
         var self = this
 

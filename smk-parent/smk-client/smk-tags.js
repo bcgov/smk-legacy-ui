@@ -119,11 +119,15 @@ exports.gen = function () {
         .script( "viewer-leaflet/viewer-leaflet.js" )
         .tag( "layer-leaflet" )
         .style( "viewer-leaflet/viewer-leaflet.css" )
+        .tag( "leaflet-extensions" )
 
     t.sequence( "leaflet" )
         .script( "https://unpkg.com/leaflet@1.2.0/dist/leaflet.js", { "integrity": "sha512-lInM/apFSqyy1o6s89K4iQUKg6ppXEgsVxT35HbzUupEVRh2Eu9Wdl4tHj7dZO0s1uvplcYGmt3498TtHq+log==" } )
         .style( "https://unpkg.com/leaflet@1.2.0/dist/leaflet.css", { "integrity": "sha512-M2wvCLH6DSRazYeZRIm1JnYyh22purTM+FDB5CsyxtQJYeKq83arPe5wgbNmcFXGqiSH2XR8dT/fJISVA1r/zQ==" } )
         .script( "https://unpkg.com/esri-leaflet@2.1.0/dist/esri-leaflet.js", { "integrity": "sha512-Tojl3UMd387f6DdAJlo+fKfJZiP55fYT+6Y58yKbHydnueOdSFOxrgLPuUxm7VW1szEt3hZVwv3V2sSUCuT35w==" } )
+
+    t.sequence( "leaflet-extensions" )
+        .tag( "leaflet" )
         .script( "resources/js/NonTiledLayer-src.js" )
         .script( "https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-omnivore/v0.3.1/leaflet-omnivore.min.js" )
         .script( "https://unpkg.com/terraformer@1.0.7" )

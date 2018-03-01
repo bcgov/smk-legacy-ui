@@ -1,14 +1,4 @@
-include.module( 'tool-baseMaps', [ 'smk', 'tool', 'widgets', 'tool-baseMaps.panel-base-maps-html' ], function ( inc ) {
-
-    var baseMapTitle = {
-        Topographic: 'Topographic',
-        Streets: 'Streets',
-        Imagery: 'Imagery',
-        Oceans: 'Oceans',
-        NationalGeographic: 'National Geographic',
-        DarkGray: 'Dark Gray',
-        Gray: 'Gray',
-    }
+include.module( 'tool-baseMaps', [ 'smk', 'tool', 'widgets', 'viewer', 'leaflet', 'tool-baseMaps.panel-base-maps-html' ], function ( inc ) {
 
     Vue.component( 'baseMaps-widget', {
         extends: inc.widgets.toolButton,
@@ -88,21 +78,20 @@ include.module( 'tool-baseMaps', [ 'smk', 'tool', 'widgets', 'tool-baseMaps.pane
     BaseMapsTool.prototype.afterInitialize.push( function ( smk, aux ) {
         var self = this
 
-        var choices = [ 'Topographic', 'Streets', 'Imagery', 'Oceans', 'NationalGeographic', 'DarkGray', 'Gray' ]
-        if ( this.choices && this.choices.length > 0 )
-            choices = this.choices
+        this.basemaps = Object.keys( smk.$viewer.basemap )
+            .map( function ( id ) {
+                return Object.assign( { id: id }, smk.$viewer.basemap[ id ] )
+            } )
+            .filter( function ( bm ) {
+                if ( !this.choices || this.choices.length == 0 ) return true
+                if ( this.choices.indexOf( bm.id ) > -1 ) return true
+                if ( smk.viewer.baseMap == bm.id ) return true
 
-        if ( !choices.includes( smk.viewer.baseMap ) )
-            choices.unshift( smk.viewer.baseMap )
+                return false
+            } )
+            .sort( function ( a, b ) { return a.order - b.order } )
 
         this.current = smk.viewer.baseMap
-
-        this.basemaps = choices.map( function ( c ) {
-            return {
-                id: c,
-                title: baseMapTitle[ c ]
-            }
-        } )
 
         aux.panel.vm.$on( 'baseMaps-panel.set-base-map', function ( ev ) {
             smk.$viewer.setBasemap( ev.id )

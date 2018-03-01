@@ -8,7 +8,8 @@ include.module( 'viewer-leaflet', [ 'viewer', 'leaflet' ], function () {
     SMK.TYPE.Viewer.leaflet = ViewerLeaflet
 
     $.extend( ViewerLeaflet.prototype, SMK.TYPE.ViewerBase.prototype )
-
+    // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+    //
     ViewerLeaflet.prototype.initialize = function ( smk ) {
         var self = this
 
@@ -87,34 +88,56 @@ include.module( 'viewer-leaflet', [ 'viewer', 'leaflet' ], function () {
 
         return promise
     }
-
+    // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+    //
     ViewerLeaflet.prototype.getView = function () {
         return {
             center: this.map.getCenter(),
             zoom: this.map.getZoom()
         }
     }
+    // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+    //
+    ViewerLeaflet.prototype.basemap.ShadedRelief.labels = [ 'ShadedReliefLabels' ]
+    ViewerLeaflet.prototype.basemap.Gray.labels = [ 'GrayLabels' ]
+    ViewerLeaflet.prototype.basemap.DarkGray.labels = [ 'DarkGrayLabels' ]
+    ViewerLeaflet.prototype.basemap.Imagery.labels = [ 'ImageryTransportation', 'ImageryLabels' ]
+    ViewerLeaflet.prototype.basemap.Oceans.labels = [ 'OceansLabels' ]
+    // ViewerLeaflet.prototype.basemap.Terrain.labels = [ 'TerrainLabels' ]
 
-    ViewerLeaflet.prototype.setBasemap = function ( basemapName ) {
+    ViewerLeaflet.prototype.setBasemap = function ( basemapId ) {
+        var self = this
+
         if( this.currentBasemap ) {
-            if ( this.currentBasemap.features )
-                this.map.removeLayer( this.currentBasemap.features );
-
-            if ( this.currentBasemap.labels )
-                this.map.removeLayer( this.currentBasemap.labels );
+            this.currentBasemap.forEach( function ( ly ) {
+                self.map.removeLayer( ly );
+            } )
         }
 
-        this.currentBasemap = this.createBasemapLayer( basemapName );
+        this.currentBasemap = this.createBasemapLayer( basemapId );
 
-        this.map.addLayer( this.currentBasemap.features );
-        this.currentBasemap.features.bringToBack();
+        this.map.addLayer( this.currentBasemap[ 0 ] );
+        this.currentBasemap[ 0 ].bringToBack();
 
-        if ( this.currentBasemap.labels )
-            this.map.addLayer( this.currentBasemap.labels );
+        for ( var i = 1; i < this.currentBasemap.length; i++ )
+            this.map.addLayer( this.currentBasemap[ i ] );
 
-        this.changedBaseMap( { baseMap: basemapName } )
+        this.changedBaseMap( { baseMap: basemapId } )
     }
 
+    ViewerLeaflet.prototype.createBasemapLayer = function ( basemapId ) {
+        var lys = []
+        lys.push( L.esri.basemapLayer( basemapId, { detectRetina: true } ) )
+
+        if ( this.basemap[ basemapId ].labels )
+            this.basemap[ basemapId ].labels.forEach( function ( id ) {
+                lys.push( L.esri.basemapLayer( id, { detectRetina: true } ) )
+            } )
+
+        return lys
+    }
+    // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+    //
     ViewerLeaflet.prototype.setLayersVisible = function ( layerIds, visible ) {
         var self = this
 
@@ -202,22 +225,6 @@ include.module( 'viewer-leaflet', [ 'viewer', 'leaflet' ], function () {
             paddingTopLeft: L.point( 300, 100 ),
             animate: false
         } )
-    }
-
-    var basemapHasLabels = {
-        'ShadedRelief': true,
-        'Oceans': true,
-        'Gray': true,
-        'DarkGray': true,
-        'Imagery': true,
-        'Terrain': true,
-    }
-
-    ViewerLeaflet.prototype.createBasemapLayer = function ( basemapName ) {
-        return {
-            features: L.esri.basemapLayer( basemapName, { detectRetina: true } ),
-            labels: basemapHasLabels[ basemapName ] && L.esri.basemapLayer( basemapName + 'Labels' )
-        }
     }
 
 } )
