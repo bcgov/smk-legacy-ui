@@ -25,11 +25,27 @@ include.module( 'viewer-esri3d', [ 'viewer', 'esri3d', 'types-esri3d' ], functio
             ground: "world-elevation"
         } )
 
-        var view = new E.SceneView( {
+                // if ( smk.viewer ) {
+        //     if ( smk.viewer.initialExtent ) {
+                var bx = smk.viewer.initialExtent
+        //         this.map.fitBounds( [ [ bx[ 1 ], bx[ 0 ] ], [ bx[ 3 ], bx[ 2 ] ] ] );
+        //     }
+
+        //     if ( smk.viewer.baseMap )
+        //         this.setBasemap( smk.viewer.baseMap )
+        // }
+
+        var view = new E.viewsSceneView( {
             container: el,
             map: map,
-            zoom: 6,
-            center: [-124.65, 54.23]
+            // zoom: 6,
+            // center: [-124.65, 54.23]
+            extent: new E.geometryExtent( {
+                xmin: bx[ 1 ], 
+                ymin: bx[ 0 ], 
+                xmax: bx[ 3 ], 
+                ymax: bx[ 2 ]                
+            } )
         } )
 
         // initViewActions(view);
