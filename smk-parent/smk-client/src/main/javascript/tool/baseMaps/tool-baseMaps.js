@@ -1,4 +1,5 @@
 include.module( 'tool-baseMaps', [ 'smk', 'tool', 'widgets', 'viewer', 'leaflet', 'tool-baseMaps.panel-base-maps-html' ], function ( inc ) {
+// include.module( 'tool-baseMaps', [ 'smk', 'tool', 'widgets', 'viewer', 'tool-baseMaps.panel-base-maps-html' ], function ( inc ) {
 
     Vue.component( 'baseMaps-widget', {
         extends: inc.widgets.toolButton,
@@ -107,8 +108,10 @@ include.module( 'tool-baseMaps', [ 'smk', 'tool', 'widgets', 'viewer', 'leaflet'
         } )
 
         var v = smk.$viewer.getView()
-        self.center = v.center
-        self.zoom = v.zoom
+        if ( v ) {
+            self.center = v.center
+            self.zoom = v.zoom
+        }
 
         aux.widget.vm.$on( 'baseMaps-widget.click', function () {
             if ( !self.visible || !self.enabled ) return

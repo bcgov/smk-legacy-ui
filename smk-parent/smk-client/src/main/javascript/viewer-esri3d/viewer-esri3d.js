@@ -8,7 +8,18 @@ include.module( 'viewer-esri3d', [ 'viewer', 'esri3d', 'types-esri3d' ], functio
     SMK.TYPE.Viewer.esri3d = ViewerEsri3d
 
     $.extend( ViewerEsri3d.prototype, SMK.TYPE.ViewerBase.prototype )
-
+    // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+    //
+    ViewerEsri3d.prototype.basemap.Topographic.esri3d = 'topo'
+    ViewerEsri3d.prototype.basemap.Streets.esri3d = 'streets'
+    ViewerEsri3d.prototype.basemap.Imagery.esri3d = 'satellite'
+    ViewerEsri3d.prototype.basemap.Oceans.esri3d = 'oceans'
+    ViewerEsri3d.prototype.basemap.NationalGeographic.esri3d = 'national-geographic'
+    ViewerEsri3d.prototype.basemap.ShadedRelief.esri3d = 'terrain'
+    ViewerEsri3d.prototype.basemap.DarkGray.esri3d = 'dark-gray'
+    ViewerEsri3d.prototype.basemap.Gray.esri3d = 'gray'
+    // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+    //
     ViewerEsri3d.prototype.initialize = function ( smk ) {
         var self = this
 
@@ -20,26 +31,24 @@ include.module( 'viewer-esri3d', [ 'viewer', 'esri3d', 'types-esri3d' ], functio
 
         var layerExtras = []
 
+        //         this.setBasemap( smk.viewer.baseMap )
+
         this.map = new E.Map( {
-            basemap: "topo",
+            // basemap: 'topo',
+            basemap: this.basemap[ smk.viewer.baseMap ].esri3d || 'topo',
             ground: "world-elevation"
         } )
 
-                // if ( smk.viewer ) {
-        //     if ( smk.viewer.initialExtent ) {
-                var bx = smk.viewer.initialExtent
+        var bx = smk.viewer.initialExtent
         //         this.map.fitBounds( [ [ bx[ 1 ], bx[ 0 ] ], [ bx[ 3 ], bx[ 2 ] ] ] );
         //     }
 
         //     if ( smk.viewer.baseMap )
-        //         this.setBasemap( smk.viewer.baseMap )
         // }
 
         this.view = new E.views.SceneView( {
             container: el,
             map: this.map,
-            // zoom: 6,
-            // center: [-124.65, 54.23]
             ui: new E.views.ui.DefaultUI( {
                 components: [ "attribution" ],
                 padding: {
@@ -91,6 +100,35 @@ include.module( 'viewer-esri3d', [ 'viewer', 'esri3d', 'types-esri3d' ], functio
                 evt.stopPropagation()
             } ),
         }
+
+        // Watch view's stationary property for becoming true.
+        E.core.watchUtils.whenTrue( this.view, "stationary", function() {
+            self.changedView( self.getView() )
+            // // Get the new center of the view only when view is stationary.
+            // if (view.center) {
+            // var info = "<br> <span> the view center changed. </span> x: " +
+            //     view.center.x.toFixed(2) + " y: " + view.center.y.toFixed(2);
+            // displayMessage(info);
+            // }
+
+            // // Get the new extent of the view only when view is stationary.
+            // if (view.extent) {
+            // var info = "<br> <span> the view extent changed: </span>" +
+            //     "<br> xmin:" + view.extent.xmin.toFixed(2) + " xmax: " +
+            //     view.extent.xmax.toFixed(
+            //     2) +
+            //     "<br> ymin:" + view.extent.ymin.toFixed(2) + " ymax: " +
+            //     view.extent.ymax.toFixed(
+            //     2);
+            // displayMessage(info);
+            // }
+        } )
+
+        this.changedView( this.getView() )
+
+
+
+
         // initViewActions(view);
 
         // init widgets
@@ -287,30 +325,33 @@ include.module( 'viewer-esri3d', [ 'viewer', 'esri3d', 'types-esri3d' ], functio
     }
 
     ViewerEsri3d.prototype.getView = function () {
+        if ( !this.view.center ) return
         return {
-            center: this.map.getCenter(),
-            zoom: this.map.getZoom()
+            center: { lat: this.view.center.latitude, lng: this.view.center.longitude },
+            zoom: this.view.zoom
         }
     }
 
-    ViewerEsri3d.prototype.setBasemap = function ( basemapName ) {
-        if( this.currentBasemap ) {
-            if ( this.currentBasemap.features )
-                this.map.removeLayer( this.currentBasemap.features );
+    ViewerEsri3d.prototype.setBasemap = function ( basemapId ) {
+        this.map.basemap = this.basemap[ basemapId ].esri3d
 
-            if ( this.currentBasemap.labels )
-                this.map.removeLayer( this.currentBasemap.labels );
-        }
+        // if( this.currentBasemap ) {
+        //     if ( this.currentBasemap.features )
+        //         this.map.removeLayer( this.currentBasemap.features );
 
-        this.currentBasemap = this.createBasemapLayer( basemapName );
+        //     if ( this.currentBasemap.labels )
+        //         this.map.removeLayer( this.currentBasemap.labels );
+        // }
 
-        this.map.addLayer( this.currentBasemap.features );
-        this.currentBasemap.features.bringToBack();
+        // this.currentBasemap = this.createBasemapLayer( basemapId );
 
-        if ( this.currentBasemap.labels )
-            this.map.addLayer( this.currentBasemap.labels );
+        // this.map.addLayer( this.currentBasemap.features );
+        // this.currentBasemap.features.bringToBack();
 
-        this.changedBaseMap( { baseMap: basemapName } )
+        // if ( this.currentBasemap.labels )
+        //     this.map.addLayer( this.currentBasemap.labels );
+
+        this.changedBaseMap( { baseMap: basemapId } )
     }
 
     ViewerEsri3d.prototype.setLayersVisible = function ( layerIds, visible ) {

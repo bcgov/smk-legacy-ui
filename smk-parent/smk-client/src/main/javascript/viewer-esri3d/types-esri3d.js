@@ -9,6 +9,7 @@ include.module( 'types-esri3d', [ 'smk', 'esri3d' ], function () {
             "esri/views/SceneView",
             "esri/views/ui/DefaultUI",
             "esri/views/ui/UI",
+            "esri/core/watchUtils",
 
             // widgets
             "esri/widgets/NavigationToggle",
