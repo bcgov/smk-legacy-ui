@@ -1,5 +1,7 @@
 include.module( 'viewer-esri3d', [ 'viewer', 'esri3d', 'types-esri3d' ], function () {
 
+    var E = SMK.TYPE.Esri3d
+
     function ViewerEsri3d() {
         SMK.TYPE.ViewerBase.prototype.constructor.apply( this, arguments )
     }
@@ -26,8 +28,6 @@ include.module( 'viewer-esri3d', [ 'viewer', 'esri3d', 'types-esri3d' ], functio
         var promise = SMK.TYPE.ViewerBase.prototype.initialize.apply( this, arguments )
 
         var el = smk.addToContainer( '<div class="smk-viewer">' )
-
-        var E = SMK.TYPE.Esri3d
 
         var layerExtras = []
 
@@ -408,9 +408,10 @@ include.module( 'viewer-esri3d', [ 'viewer', 'esri3d', 'types-esri3d' ], functio
             var p = self.createLayer( cid, lys.map( function ( m ) { return m } ), layerCount - i )
                 .then( function ( ly ) {
                     // console.log( 'visible',cid )
-                    ly.off( self.loadEvent )
-                    ly.on( self.loadEvent )
-                    self.map.addLayer( ly )
+                    // ly.off( self.loadEvent )
+                    // ly.on( self.loadEvent )
+        			// self.map.layers.add( ly );
+        			self.map.add( ly )
                     self.visibleLayer[ cid ] = ly
                     return ly
                 } )

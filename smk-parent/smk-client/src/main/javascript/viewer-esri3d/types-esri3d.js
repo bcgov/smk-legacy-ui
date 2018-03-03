@@ -2,51 +2,51 @@ include.module( 'types-esri3d', [ 'smk', 'esri3d' ], function () {
 
     return new Promise( function ( res ) {
         var objs = [
-            "esri/config",
+            'esri/config',
 
             // base
-            "esri/Map",
-            "esri/views/SceneView",
-            "esri/views/ui/DefaultUI",
-            "esri/views/ui/UI",
-            "esri/core/watchUtils",
+            'esri/Map',
+            'esri/views/SceneView',
+            'esri/views/ui/DefaultUI',
+            'esri/views/ui/UI',
+            'esri/core/watchUtils',
 
             // widgets
-            "esri/widgets/NavigationToggle",
-            "esri/widgets/Compass",
-            "esri/widgets/Zoom",
-            "esri/widgets/Expand",
-            "esri/widgets/BasemapGallery",
-            "esri/widgets/Legend",
-            "esri/widgets/Home",
-            "esri/widgets/LayerList",
-            "esri/widgets/Search",
+            'esri/widgets/NavigationToggle',
+            'esri/widgets/Compass',
+            'esri/widgets/Zoom',
+            'esri/widgets/Expand',
+            'esri/widgets/BasemapGallery',
+            'esri/widgets/Legend',
+            'esri/widgets/Home',
+            'esri/widgets/LayerList',
+            'esri/widgets/Search',
 
             // layers
-            "esri/layers/MapImageLayer",
-            "esri/layers/WMSLayer",
+            'esri/layers/MapImageLayer',
+            'esri/layers/WMSLayer',
 
             // rendering
-            "esri/renderers/SimpleRenderer",
-            "esri/renderers/UniqueValueRenderer",
-            "esri/renderers/ClassBreaksRenderer",
+            'esri/renderers/SimpleRenderer',
+            'esri/renderers/UniqueValueRenderer',
+            'esri/renderers/ClassBreaksRenderer',
 
             // symbols
-            "esri/Graphic",
-            "esri/symbols/SimpleMarkerSymbol",
-            "esri/symbols/SimpleLineSymbol",
-            "esri/symbols/SimpleFillSymbol",
+            'esri/Graphic',
+            'esri/symbols/SimpleMarkerSymbol',
+            'esri/symbols/SimpleLineSymbol',
+            'esri/symbols/SimpleFillSymbol',
 
             // geometry
-            "esri/geometry/Point",
-            "esri/geometry/Polyline",
-            "esri/geometry/Polygon",
-            "esri/geometry/Extent",
-            "esri/geometry/SpatialReference",
-            "esri/geometry/geometryEngine",
+            'esri/geometry/Point',
+            'esri/geometry/Polyline',
+            'esri/geometry/Polygon',
+            'esri/geometry/Extent',
+            'esri/geometry/SpatialReference',
+            'esri/geometry/geometryEngine',
 
             // dojo stuff
-            // "dojo/domReady!"
+            // 'dojo/domReady!'
         ]
 
         SMK.TYPE.Esri3d = {}
@@ -67,7 +67,7 @@ include.module( 'types-esri3d', [ 'smk', 'esri3d' ], function () {
                 container[ parts[ parts.length - 1 ] ] = args[ i ]
             } )
 
-            res()
+            res( SMK.TYPE.Esri3d )
         } )
     } )
 } )
