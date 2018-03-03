@@ -23,6 +23,21 @@
     <!-- Quill for text editor -->
     <script src="https://cdn.quilljs.com/1.3.5/quill.js"></script>
     <link href="https://cdn.quilljs.com/1.3.5/quill.snow.css" rel="stylesheet">
+    <!-- Tree manager for layer viewers -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.fancytree/2.28.0/jquery.fancytree-all-deps.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/jquery.fancytree/2.28.0/skin-lion/ui.fancytree.min.css"  rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/jquery.fancytree/2.28.0/skin-lion/vline-rtl.gif"  rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/jquery.fancytree/2.28.0/skin-lion/vline.gif"  rel="stylesheet">
+    <!-- tree css override -->
+    <style type="text/css">
+		ul.fancytree-container 
+		{
+		  width: 100%;
+		  height: 70%;
+		  overflow: auto;
+		  position: relative;
+		}
+		</style>
   </head>
   <body>
   	<div id="app">
@@ -220,6 +235,68 @@
 				<div class="card white">
 					<div class="card-content black-text" style="height: calc(100vh - 200px); overflow: auto;">
 						<form id="layersForm">
+							<div class="row">
+								<div class="col s6">
+									<ul class="collapsible" data-collapsible="accordion">
+										<li>
+								    		<div class="collapsible-header active"><i class="material-icons">home</i>DataBC Layer Catalog</div>
+								    		<div class="collapsible-body">
+								    			<div class="row" >
+								    				<div id="catalog-tree"></div>
+								      			</div>
+								      			<div class="row" >
+								      				<a href="#" onclick="addSelectedDataBCLayer();" class="blue-text">Add Selected Layers</a>
+								      			</div>
+									  		</div>
+								    	</li>
+								    	<li>
+								    		<div class="collapsible-header"><i class="material-icons">home</i>WMS Service</div>
+								    		<div class="collapsible-body">
+								    			<div class="row" >
+								    				<div class="col s12 input-field">
+														<input id="wmsUrl" type="text" class="validate active">
+						          						<label for="wmsUrl">WMS URL</label>
+													</div>
+								    			</div>
+								    			<div class="row" >
+								    				<div id="catalog-tree"></div>
+								      			</div>
+								      			<div class="row" >
+								      				<a href="#" onclick="addSelectedDataBCLayer();" class="blue-text">Add Selected Layers</a>
+								      			</div>
+									  		</div>
+								    	</li>
+								    	<li>
+								    		<div class="collapsible-header"><i class="material-icons">home</i>KML</div>
+								    		<div class="collapsible-body">
+								    			<div class="row" >
+								      			</div>
+									  		</div>
+								    	</li>
+								    	<li>
+								    		<div class="collapsible-header"><i class="material-icons">home</i>GeoJSON</div>
+								    		<div class="collapsible-body">
+								    			<div class="row" >
+								      			</div>
+									  		</div>
+								    	</li>
+									</ul>
+								</div>
+								<div class="col s6">
+									<div id="layerData" class="z-depth-2" style="height: 100%; width: 100%; padding: 20px;">
+										<div class="row" >
+											<h5>Active Layers</h5>
+										</div>
+										<div class="row" >
+						    				<div id="layer-tree"></div>
+						      			</div>
+						      			<div class="row" >
+						      				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="editSelectedLayer();" style="width: 200px;"><i class="material-icons left">mode_edit</i>Edit</a>
+						      				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="removeSelectedLayer();" style="width: 200px;"><i class="material-icons left">delete_forever</i>Remove</a>
+						      			</div>
+									</div>
+								</div>
+							</div>
 						</form>
 					</div>
 				</div>
@@ -245,7 +322,7 @@
 									</p>
 									<p><h5>Map Information</h5></p>
 									<p>
-										<input type="checkbox" id="coordinates" onclick="setToolActivation('coordinates')"/>
+										<input type="checkbox" id="coordinates" onclick="setToolActivation('coordinate')"/>
 										<label class="black-text" for="coordinates">Coordinates</label>
 									</p>
 									<p>
@@ -262,7 +339,7 @@
 									</p>
 									<p><h5>Drawing Tools</h5></p>
 									<p>
-										<input type="checkbox" id="measurement" onclick="setToolActivation('measurement')">
+										<input type="checkbox" id="measurement" onclick="setToolActivation('measure')">
 										<label class="black-text" for="measurement">Measurement</label>
 									</p>
 									<p>
@@ -291,7 +368,7 @@
 										<label class="black-text" for="identifyPanel">Identify Panel</label>
 									</p>
 									<p>
-										<input type="checkbox" id="selectionPanel" onclick="setToolActivation('selection')"/>
+										<input type="checkbox" id="selectionPanel" onclick="setToolActivation('select')"/>
 										<label class="black-text" for="selectionPanel">Selection Panel</label>
 									</p>
 									<p>
@@ -302,6 +379,15 @@
 								<div class="col s9">
 									<div id="toolEditContainer">
 										<ul class="collapsible" data-collapsible="accordion">
+											<li id="aboutPanelOptions" style="display: none;">
+										      <div class="collapsible-header"><i class="material-icons">home</i>About Panel Options</div>
+										      <div class="collapsible-body">
+										      	<div class="row" >
+										      		<div id="about-toolbar"></div>
+										      		<div id="about-content" style="height: 75%"></div>
+										      	</div>
+											  </div>
+										    </li>
 										    <li id="zoomOptions" style="display: none;">
 										      <div class="collapsible-header"><i class="material-icons">zoom_out_map</i>Zooming Tool Options</div>
 										      <div class="collapsible-body">
@@ -387,15 +473,6 @@
 														<input name="minimapGroup" type="radio" onclick="setMinimapBasemap('Terrain')" id="TerrainMini" value="Terrain" />
 														<label class="black-text" for="TerrainMini">Terrain</label>
 													</p>
-										      	</div>
-											  </div>
-										    </li>
-										    <li id="aboutPanelOptions" style="display: none;">
-										      <div class="collapsible-header"><i class="material-icons">home</i>About Panel Options</div>
-										      <div class="collapsible-body">
-										      	<div class="row" style="height: 100%;">
-										      		<div id="about-toolbar"></div>
-										      		<div id="about-content"></div>
 										      	</div>
 											  </div>
 										    </li>
@@ -629,7 +706,7 @@
 			    	else if(tool.type == "about" && tool.enabled == true) 
 		    		{
 			    		$("#aboutPanelOptions").show();
-			    		setupQuillEditor();
+			    		setupQuillEditor(tool);
 		    		}
 			    	else if(tool.type == "about" && tool.enabled == false) $("#aboutPanelOptions").hide();
 			    	else if(tool.type == "baseMaps" && tool.enabled == true)
@@ -657,27 +734,27 @@
            	});
 		}
 		
-		function setupQuillEditor()
+		function setupQuillEditor(tool)
 		{
+			$("#about-toolbar").empty();
+			$("#about-content").empty();
+			$(".ql-toolbar").remove();
+			
 			var toolbarOptions = [
 			                      ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
 			                      ['blockquote', 'code-block'],
-
 			                      [{ 'header': 1 }, { 'header': 2 }],               // custom button values
 			                      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
 			                      [{ 'script': 'sub'}, { 'script': 'super' }],      // superscript/subscript
 			                      [{ 'indent': '-1'}, { 'indent': '+1' }],          // outdent/indent
 			                      [{ 'direction': 'rtl' }],                         // text direction
-
 			                      [{ 'size': ['small', false, 'large', 'huge'] }],  // custom dropdown
 			                      [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-
 			                      [{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
 			                      [{ 'font': [] }],
 			                      [{ 'align': [] }],
-
 			                      ['clean'],                                        // remove formatting button
-			                      ['image', 'video']
+			                      ['image', 'video']								// embedd options
 			                    ];
 			
 			aboutEditor = new Quill('#about-content', 
@@ -688,6 +765,12 @@
 			  	},
 			  	theme: 'snow'
 			});
+			aboutEditor.on('text-change', function(delta, oldDelta, source) 
+			{
+				tool.content = document.querySelector(".ql-editor").innerHTML;
+			});
+			
+			document.querySelector(".ql-editor").innerHTML = tool.content;
 		}
 		
 		function setBasemapSelector(basemap)
@@ -832,7 +915,7 @@
 				    		if(tool.enabled) 
 			    			{
 				    			$("#aboutPanelOptions").show();
-				    			setupQuillEditor();
+				    			setupQuillEditor(tool);
 			    			}
 			    		}
 				    	else if(tool.type == "baseMaps")
@@ -867,6 +950,23 @@
 		        	$('ul.tabs').tabs('select_tab', 'identity');
 		        	$('.collapsible').collapsible();
 		        	
+		        	// reset the layer tree
+		        	var layerSource = [];
+		        	data.layers.forEach(function(lyr) 
+                	{
+		        		var lyrNode = {
+										title: lyr.title, 
+										folder: false, 
+										expanded: false, 
+										data: lyr, 
+										children: []
+									};
+		        		layerSource.push(lyrNode);
+                		
+                		var tree = $('#layer-tree').fancytree('getTree');
+    	        		tree.reload(layerSource);
+                	});
+		        	
 		        	$(document).ready(function() 
 		        	{
 		        	    Materialize.updateTextFields();
@@ -874,7 +974,7 @@
 		        	 // init basemap viewer		
 		        	 	var ne = L.latLng(data.viewer.initialExtent[3], data.viewer.initialExtent[2]);
 						var sw = L.latLng(data.viewer.initialExtent[1], data.viewer.initialExtent[0]);
-						var bounds = L.latLngBounds(ne, sw);   
+						var bounds = L.latLngBounds(sw, ne);   
 						var centroid = bounds.getCenter();
 						var zoom = basemapViewerMap.getBoundsZoom(bounds, true);
 						
@@ -1015,6 +1115,10 @@
     			
 				basemapViewerMap.invalidateSize();		    			
         	    setBasemap(data.viewer.baseMap);
+        	    
+        	    // reset the layer tree
+    			var tree = $('#layer-tree').fancytree('getTree');
+        		tree.reload([]);
         	});
 		}
 		
@@ -1179,6 +1283,169 @@
 			basemapViewerMap.addLayer(L.esri.basemapLayer(id));
 		}
 		
+		function editSelectedLayer()
+		{
+			var nodes = $("#layer-tree").fancytree('getTree').getSelectedNodes();
+			
+			nodes.forEach(function(node) 
+           	{
+				// display edit panel with node object
+           	});
+		}
+		
+		function removeSelectedLayer()
+		{
+			var nodes = $("#layer-tree").fancytree('getTree').getSelectedNodes();
+			
+			nodes.forEach(function(node) 
+           	{
+				var tree = $('#layer-tree').fancytree('getTree');
+	        	var layerSource = tree.getRootNode().children;
+	        	
+	        	var containsNode = (layerSource.indexOf(node) > -1);
+				if(containsNode)
+				{
+					var nodeIndex = layerSource.indexOf(node);
+					if (nodeIndex !== -1) layerSource.splice(nodeIndex, 1);
+				}
+	        	
+	    		tree.reload(layerSource);
+	    		
+	    		data.layers.forEach(function(lyr) 
+   	           	{
+	    			if(lyr.id == node.data.id)
+    				{
+	    				var contains = (data.layers.indexOf(lyr) > -1);
+						if(contains)
+						{
+							var index = data.layers.indexOf(lyr);
+							if (index !== -1) data.layers.splice(index, 1);
+						}
+    				}
+   	           	});
+           	});
+		}
+		
+		function addSelectedDataBCLayer()
+		{
+			var nodes = $("#catalog-tree").fancytree('getTree').getSelectedNodes();
+			
+			nodes.forEach(function(node) 
+           	{
+				loadSelectedDataBCCatalogLayers(node);
+           	});
+			// if folder, load all child nodes
+			// if file, get complete and add
+		}
+		
+		function loadSelectedDataBCCatalogLayers(node)
+		{
+			if(node.folder == false)
+       		{
+       			getCompleteCatalogItem(node.data.mpcmId);
+       		}
+		}
+		
+		function getCompleteCatalogItem(mpcmId)
+		{
+			if(mpcmId != 0)
+			{
+				$.ajax
+    			({
+    				url: serviceUrl + 'LayerLibrary/' + mpcmId,
+                    type: 'get',
+                    dataType: 'json',
+                    contentType:'application/json',
+                    crossDomain: true,
+                    withCredentials: true,
+                    success: function (catalogCompleteItem) 
+                    {
+                    	if(data.layers == null) data.layers = [];
+                    	data.layers.push(catalogCompleteItem);
+                    	
+                    	var lyrNode = {
+								title: catalogCompleteItem.title, 
+								folder: false, 
+								expanded: false, 
+								data: catalogCompleteItem, 
+								children: []
+							};
+                    	
+                    	var tree = $('#layer-tree').fancytree('getTree');
+                    	var layerSource = tree.getRootNode().children;
+                    	layerSource.push(lyrNode);
+    	        		tree.reload(layerSource);
+                    },
+                    error: function (status) 
+                    {
+                        // error handler
+                        Materialize.toast('Error MPCM Layer ' + catalogItem.mpcmId, 4000);
+                    }
+    			});
+			}
+		}
+		
+		function createTreeItem(catalogItem)
+		{
+			var item = {
+							title: catalogItem.label, 
+							folder: catalogItem.mpcmId == 0, 
+							expanded: false, 
+							data: catalogItem, 
+							children: []
+						};
+			
+			for (var subItem in catalogItem.sublayers)
+			{
+				item.children.push(createTreeItem(catalogItem.sublayers[subItem]));
+			}
+			
+			return item
+		}
+		
+		function loadCatalogLayers()
+		{
+			// setup catalog layers
+			var catalogTreeSource = [];
+			
+			$("#catalog-tree").fancytree({
+			    checkbox: true,
+			    selectMode: 3,
+			    source: catalogTreeSource,
+			    activate: function(event, data)
+			    {
+			    },
+			    select: function(event, data)
+			    {
+			    }
+			  });
+			
+			$.ajax
+			({
+				url: serviceUrl + 'LayerLibrary/',
+                type: 'get',
+                dataType: 'json',
+                contentType:'application/json',
+                crossDomain: true,
+                withCredentials: true,
+                success: function (data) 
+                {
+                	data.forEach(function(catalogItem) 
+                	{
+                		catalogTreeSource.push(createTreeItem(catalogItem));
+                		
+                		var tree = $('#catalog-tree').fancytree('getTree');
+                		tree.reload(catalogTreeSource);
+                	});
+                },
+                error: function (status) 
+                {
+                    // error handler
+                    Materialize.toast('Error loading DataBC Layer catalog. Please try again later', 4000);
+                }
+			});
+		}
+		
 		function loadConfigs()
 		{
 			// trigger the ajax load
@@ -1272,7 +1539,24 @@
    			// hide editor
 			$("#editor-content").hide();
 			
+   			// init the layer tree
+   			// setup catalog layers
+			var layerTreeSource = [];
+			
+			$("#layer-tree").fancytree({
+			    checkbox: true,
+			    selectMode: 1,
+			    source: [],
+			    activate: function(event, data)
+			    {
+			    },
+			    select: function(event, data)
+			    {
+			    }
+			  });
+   			
 			loadConfigs();
+			loadCatalogLayers();
 		});
 		
 		function uuid() 
