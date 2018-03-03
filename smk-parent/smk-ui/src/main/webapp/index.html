@@ -1,0 +1,1287 @@
+<html>
+  <head>
+    <title>Configurations - SMK</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" crossorigin=""></script>
+   	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css">
+   	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+   	<link rel="stylesheet" type="text/css" href="resources/css/dmf.css" />
+   	<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
+	<!-- Leaflet -->
+	<link rel="stylesheet"
+		  href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css"
+		  integrity="sha512-M2wvCLH6DSRazYeZRIm1JnYyh22purTM+FDB5CsyxtQJYeKq83arPe5wgbNmcFXGqiSH2XR8dT/fJISVA1r/zQ=="
+		  crossorigin=""/>
+	<script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js"
+		    integrity="sha512-lInM/apFSqyy1o6s89K4iQUKg6ppXEgsVxT35HbzUupEVRh2Eu9Wdl4tHj7dZO0s1uvplcYGmt3498TtHq+log=="
+		    crossorigin=""></script>
+	<!-- ESRI Leaflet -->
+	<script src="https://unpkg.com/esri-leaflet@2.1.3/dist/esri-leaflet.js"
+		    integrity="sha512-pijLQd2FbV/7+Jwa86Mk3ACxnasfIMzJRrIlVQsuPKPCfUBCDMDUoLiBQRg7dAQY6D1rkmCcR8286hVTn/wlIg=="
+		    crossorigin=""></script>
+    <link rel="stylesheet" href="https://js.arcgis.com/4.4/esri/css/main.css" />
+    <!-- Quill for text editor -->
+    <script src="https://cdn.quilljs.com/1.3.5/quill.js"></script>
+    <link href="https://cdn.quilljs.com/1.3.5/quill.snow.css" rel="stylesheet">
+  </head>
+  <body>
+  	<div id="app">
+	   	<!-- Header section -->
+	 	<div id="header" class="header nrpp-blue-dark">
+		  <image src="resources/images/bc_gov_logo_transparent.png" style="padding: 6px;" />
+		  <span class="white-text" style="font-size: 30px; top: 18px; position: absolute; margin-left: 15px;">Simple Map Kit Configuration Utility</span>
+		</div>
+		<!-- Background map image -->
+		<div id="map" style="width: 100%; height: calc(100vh - 110px); position: absolute; z-index: -10;" ></div>
+		<div style="width: 100%; height: calc(100vh - 110px); position: absolute; background: rgba(0, 0, 0, 0.3);" ></div>
+		<!-- Main app panels -->
+		<!-- Content -->
+	    <div id="menu-content" class="container" style="margin-top: 14px; min-width: 800px;">
+		  <div class="row">
+		    <div class="col s12">
+			  <div class="card white">
+			    <div class="card-content black-text">
+				  <div class="row" style="padding: 0px; margin-bottom: 0px;">
+					<div class="col s12">
+						<h3>Welcome to the Simple Map Kit</h3>
+					</div>
+				  </div>
+				  <div class="row" style="padding: 0px;">
+					<div class="col s12">
+						<p>The Simple Map Kit allows you to create custom linkable and embedable
+						maps using data mashed up from DataBC's catalog, GeoServer and other external sources.
+						To view your map or create a new one, check the "My Maps" tab below. To discover
+						other maps, check out "All Maps". To learn more about SMK, check the about tab.</p>
+					</div>
+				  </div>
+				</div>
+			  </div>
+			</div>
+		  </div>
+		  <div class="row">
+	        <div id="myMashups" class="col s12">
+		      <div class="card white">
+	            <div class="card-content black-text" style="height: calc(100vh - 450px); overflow: auto;">
+	            <div id="loadingBar">
+	            	<div class="row">
+	            		<div class="col s12">
+	            			<p>Loading...</p>
+	            		</div>
+	            	</div>
+	            	<div class="row">
+	            		<div class="col s12">
+		            		<div  class="progress">
+		      		  			<div class="indeterminate"></div>
+		  					</div>
+		  				</div>
+		  			</div>
+	  			</div>
+	  			<div id="appsTablePanel" style="display: none;">
+		          <p>Click on a maps name to preview. To edit the working copy of an application, click "edit" in the actions.</p>
+		            <div>
+	                  <table class="bordered highlight responsive-table" id="appsTable">
+	                    <thead>
+	                      <tr>
+	                        <th>Name</th>
+	                        <th>Viewer</th>
+	                        <th>Version</th>
+	                        <th></th>
+	                        <th></th>
+	                        <th></th>
+	                        <th></th>
+	                      </tr>
+	                    </thead>
+	                    <tbody>
+	                    </tbody>
+	                  </table>
+				    </div>
+				   	</div>
+			      </div>
+			      <div class="card-action">
+				    <a href="#" onclick="addNewMapConfig();" class="blue-text">Create a new Map</a>
+			     </div>
+		       </div>
+	         </div>
+	       </div>
+	    </div>
+	    <div id="editor-content" class="container" style="margin-top: 14px; min-width: 800px; display: block;">
+		  <div class="row">
+			<div class="col s12">
+			  <ul class="tabs navbar tabs-fixed-width nrpp-blue-dark">
+				<div class="indicator nrpp-yellow" style="z-index:1"></div>
+				<li class="tab col s3"><a class="active" href="#identity">Identity</a></li>
+				<li class="tab col s3"><a href="#basemap">Basemap</a></li>
+				<li class="tab col s3"><a href="#layers">Layers</a></li>
+				<li class="tab col s3"><a href="#tools">Tools</a></li>
+				<li class="tab col s3"><a href="#themes">Style &amp; Theme</a></li>
+			  </ul>
+			</div>
+			<div id="identity" class="col s12">
+				<div class="card white">
+					<div class="card-content black-text" style="height: calc(100vh - 200px); overflow: auto;">
+						<form id="identityForm">
+							<div class="row" style="margin-bottom: 0px;">
+								<div class="col s12 input-field">
+									<input id="mashupName" type="text" class="validate active" v-model="lmfId">
+	          						<label for="mashupName">ID</label>
+								</div>
+							</div>
+							<div class="row" style="margin-bottom: 0px;">
+								<div class="col s12 input-field">
+									<input id="mashupTitle" type="text" class="validate active" v-model="name">
+									<label for="mashupTitle">Title</label>
+								</div>
+							</div>
+							<div class="row" style="margin-top: 20px;">
+								<div class="col s12">
+									<p>What kind of map service do you want to use?</p>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col s12">
+								  <p>
+								     <input name="viewerGroup" type="radio" id="leafletViewer" value="leaflet" v-model="viewer.type" />
+								     <label for="leafletViewer">Leaflet</label>
+								  </p>
+	    						  <p>
+								     <input name="viewerGroup" type="radio" id="esri3dViewer" value="esri3d" v-model="viewer.type" disabled="disabled">
+								     <label for="esri3dViewer">ESRi ArcGIS 3D</label>
+								  </p>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+			<div id="basemap" class="col s12">
+				<div class="card white">
+					<div class="card-content black-text" style="height: calc(100vh - 200px); overflow: none;">
+						<form id="basemapForm">
+							<div class="row" style="padding: 0px;">
+								<div class="col s4">
+									<p>
+										<input name="basemapGroup" type="radio" onclick="setBasemap('Streets')" id="Streets" value="Streets" v-model="viewer.baseMap" />
+										<label class="black-text" for="Streets">Streets</label>
+									</p>
+									<p>
+										<input name="basemapGroup" type="radio" onclick="setBasemap('Topographic')" id="Topographic" value="Topographic" v-model="viewer.baseMap" />
+										<label class="black-text" for="Topographic">Topographic</label>
+									</p>
+									<p>
+										<input name="basemapGroup" type="radio" onclick="setBasemap('NationalGeographic')" id="NationalGeographic" value="NationalGeographic" v-model="viewer.baseMap" />
+										<label class="black-text" for="NationalGeographic">National Geographic</label>
+									</p>
+									<p>
+										<input name="basemapGroup" type="radio" onclick="setBasemap('Oceans')" id="Oceans" value="Oceans" v-model="viewer.baseMap" />
+										<label class="black-text" for="Oceans">Oceans</label>
+									</p>
+									<p>
+										<input name="basemapGroup" type="radio" onclick="setBasemap('Gray')" id="Gray" value="Gray" v-model="viewer.baseMap" />
+										<label class="black-text" for="Gray">Gray</label>
+									</p>
+									<p>
+										<input name="basemapGroup" type="radio" onclick="setBasemap('DarkGray')" id="DarkGray" value="DarkGray" v-model="viewer.baseMap" />
+										<label class="black-text" for="DarkGray">Dark Gray</label>
+									</p>
+									<p>
+										<input name="basemapGroup" type="radio" onclick="setBasemap('Imagery')" id="Imagery" value="Imagery" v-model="viewer.baseMap" />
+										<label class="black-text" for="Imagery">Imagery</label>
+									</p>
+									<p>
+										<input name="basemapGroup" type="radio" onclick="setBasemap('ImageryClarity')" id="ImageryClarity" value="ImageryClarity" v-model="viewer.baseMap" />
+										<label class="black-text" for="ImageryClarity">Advanced Imagery</label>
+									</p>
+									<p>
+										<input name="basemapGroup" type="radio" onclick="setBasemap('ShadedRelief')" id="ShadedRelief" value="ShadedRelief" v-model="viewer.baseMap" />
+										<label class="black-text" for="ShadedRelief">Shaded Relief</label>
+									</p>
+									<p>
+										<input name="basemapGroup" type="radio" onclick="setBasemap('Terrain')" id="Terrain" value="Terrain" v-model="viewer.baseMap" />
+										<label class="black-text" for="Terrain">Terrain</label>
+									</p>
+									<div style="height: 20px;"></div>
+									<p>
+										Select a basemap above to set your applications default basemap. Pan and zoom the map to the right to set the applications initial extent.
+									</p>
+									<!-- <div style="height: 20px;"></div>
+									<p class="z-depth-2">
+										Current extent: {{viewer.initialExtent[0]}}, {{viewer.initialExtent[1]}}, {{viewer.initialExtent[2]}}, {{viewer.initialExtent[3]}}
+									</p>-->
+								</div>
+								<div class="col s8">
+									<div id="basemapViewer" style="height: 100%; width: 100%;"></div>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+			<div id="layers" class="col s12">
+				<div class="card white">
+					<div class="card-content black-text" style="height: calc(100vh - 200px); overflow: auto;">
+						<form id="layersForm">
+						</form>
+					</div>
+				</div>
+			</div>
+			<div id="tools" class="col s12">
+				<div class="card white">
+					<div class="card-content black-text" style="height: calc(100vh - 200px); overflow: auto;">
+						<form id="toolsForm">
+							<div class="row" style="height: 100%; width: 100%; padding:0px; margin: 0px;">
+								<div class="col s3">
+									<p><h5>Map Control Tools</h5></p>
+									<p>
+										<input type="checkbox" id="panning" onclick="setToolActivation('pan')"/>
+										<label class="black-text" for="panning">Panning</label>
+									</p>
+									<p>
+										<input type="checkbox" id="zooming" onclick="setToolActivation('zoom')"/>
+										<label class="black-text" for="zooming">Zooming</label>
+									</p>
+									<p>
+										<input type="checkbox" id="directions" onclick="setToolActivation('directions')"/>
+										<label class="black-text" for="directions">Directions</label>
+									</p>
+									<p><h5>Map Information</h5></p>
+									<p>
+										<input type="checkbox" id="coordinates" onclick="setToolActivation('coordinates')"/>
+										<label class="black-text" for="coordinates">Coordinates</label>
+									</p>
+									<p>
+										<input type="checkbox" id="scale" onclick="setToolActivation('scale')"/>
+										<label class="black-text" for="scale">Scale</label>
+									</p>
+									<p>
+										<input type="checkbox" id="minimap" onclick="setToolActivation('minimap')"/>
+										<label class="black-text" for="minimap">Mini Map</label>
+									</p>
+									<p>
+										<input type="checkbox" id="attribution" onclick="setToolActivation('attribution')"/>
+										<label class="black-text" for="attribution">Attribution Label</label>
+									</p>
+									<p><h5>Drawing Tools</h5></p>
+									<p>
+										<input type="checkbox" id="measurement" onclick="setToolActivation('measurement')">
+										<label class="black-text" for="measurement">Measurement</label>
+									</p>
+									<p>
+										<input type="checkbox" id="markup" onclick="setToolActivation('markup')"/>
+										<label class="black-text" for="markup">markup</label>
+									</p>
+									<p><h5>Menu Options</h5></p>
+									<p>
+										<input type="checkbox" id="sidebar" onclick="setToolActivation('sidebar')"/>
+										<label class="black-text" for="sidebar">Sidebar</label>
+									</p>
+									<p>
+										<input type="checkbox" id="aboutPanel" onclick="setToolActivation('about')"/>
+										<label class="black-text" for="aboutPanel">About Panel</label>
+									</p>
+									<p>
+										<input type="checkbox" id="basemapPanel" onclick="setToolActivation('baseMaps')"/>
+										<label class="black-text" for="basemapPanel">Base Maps Panel</label>
+									</p>
+									<p>
+										<input type="checkbox" id="layerPanel" onclick="setToolActivation('layers')"/>
+										<label class="black-text" for="layerPanel">Layer Panel</label>
+									</p>
+									<p>
+										<input type="checkbox" id="identifyPanel" onclick="setToolActivation('identify')"/>
+										<label class="black-text" for="identifyPanel">Identify Panel</label>
+									</p>
+									<p>
+										<input type="checkbox" id="selectionPanel" onclick="setToolActivation('selection')"/>
+										<label class="black-text" for="selectionPanel">Selection Panel</label>
+									</p>
+									<p>
+										<input type="checkbox" id="searchPanel" onclick="setToolActivation('search')"/>
+										<label class="black-text" for="searchPanel">Search Panel</label>
+									</p>
+								</div>
+								<div class="col s9">
+									<div id="toolEditContainer">
+										<ul class="collapsible" data-collapsible="accordion">
+										    <li id="zoomOptions" style="display: none;">
+										      <div class="collapsible-header"><i class="material-icons">zoom_out_map</i>Zooming Tool Options</div>
+										      <div class="collapsible-body">
+										      	<div class="row">
+										      		<p>
+														<input type="checkbox" id="zoomControl" onclick="toggleZoomOption('control')"/>
+														<label class="black-text" for="zoomControl">Zoom control visible on map</label>
+													</p>
+													<p>
+														<input type="checkbox" id="zoomBox" onclick="toggleZoomOption('box')"/>
+														<label class="black-text" for="zoomBox">Zoom with Box</label>
+													</p>
+													<p>
+														<input type="checkbox" id="zoomDoubleClick" onclick="toggleZoomOption('doubleClick')"/>
+														<label class="black-text" for="zoomDoubleClick">Zoom in by double-click</label>
+													</p>
+													<p>
+														<input type="checkbox" id="zoomMouseWheel" onclick="toggleZoomOption('mouseWheel')"/>
+														<label class="black-text" for="zoomMouseWheel">Zoom with mouse wheel</label>
+													</p>
+												</div>
+											  </div>
+										    </li>
+										    <li id="scaleOptions" style="display: none;">
+										      <div class="collapsible-header"><i class="material-icons">my_location</i>Scale Tool Options</div>
+										      <div class="collapsible-body">
+										      	<div class="row">
+										      		<p>
+														<input type="checkbox" id="scaleBar" onclick="toggleScaleOption('bar')"/>
+														<label class="black-text" for="scaleBar">Show a scale bar on map</label>
+													</p>
+													<p>
+														<input type="checkbox" id="scaleFactor" onclick="toggleScaleOption('factor')"/>
+														<label class="black-text" for="scaleFactor">Show the scale factor on map</label>
+													</p>
+												</div>
+											  </div>
+										    </li>
+										    <li id="minimapOptions" style="display: none;">
+										      <div class="collapsible-header"><i class="material-icons">satellite</i>Mini Map Options</div>
+										      <div class="collapsible-body">
+										      	<div class="row">
+										      		<p>
+										      			Select which basemap to use on the mini map
+										      		</p>
+										      		<p>
+														<input name="minimapGroup" type="radio" onclick="setMinimapBasemap('Streets')" id="StreetsMini" value="Streets" />
+														<label class="black-text" for="StreetsMini">Streets</label>
+													</p>
+													<p>
+														<input name="minimapGroup" type="radio" onclick="setMinimapBasemap('Topographic')" id="TopographicMini" value="Topographic" />
+														<label class="black-text" for="TopographicMini">Topographic</label>
+													</p>
+													<p>
+														<input name="minimapGroup" type="radio" onclick="setMinimapBasemap('NationalGeographic')" id="NationalGeographicMini" value="NationalGeographic" />
+														<label class="black-text" for="NationalGeographicMini">National Geographic</label>
+													</p>
+													<p>
+														<input name="minimapGroup" type="radio" onclick="setMinimapBasemap('Oceans')" id="OceansMini" value="Oceans" />
+														<label class="black-text" for="OceansMini">Oceans</label>
+													</p>
+													<p>
+														<input name="minimapGroup" type="radio" onclick="setMinimapBasemap('Gray')" id="GrayMini" value="Gray" />
+														<label class="black-text" for="GrayMini">Gray</label>
+													</p>
+													<p>
+														<input name="minimapGroup" type="radio" onclick="setMinimapBasemap('DarkGray')" id="DarkGrayMini" value="DarkGray" />
+														<label class="black-text" for="DarkGrayMini">Dark Gray</label>
+													</p>
+													<p>
+														<input name="minimapGroup" type="radio" onclick="setMinimapBasemap('Imagery')" id="ImageryMini" value="Imagery" />
+														<label class="black-text" for="ImageryMini">Imagery</label>
+													</p>
+													<p>
+														<input name="minimapGroup" type="radio" onclick="setMinimapBasemap('ImageryClarity')" id="ImageryClarityMini" value="ImageryClarity" />
+														<label class="black-text" for="ImageryClarityMini">Advanced Imagery</label>
+													</p>
+													<p>
+														<input name="minimapGroup" type="radio" onclick="setMinimapBasemap('ShadedRelief')" id="ShadedReliefMini" value="ShadedRelief" />
+														<label class="black-text" for="ShadedReliefMini">Shaded Relief</label>
+													</p>
+													<p>
+														<input name="minimapGroup" type="radio" onclick="setMinimapBasemap('Terrain')" id="TerrainMini" value="Terrain" />
+														<label class="black-text" for="TerrainMini">Terrain</label>
+													</p>
+										      	</div>
+											  </div>
+										    </li>
+										    <li id="aboutPanelOptions" style="display: none;">
+										      <div class="collapsible-header"><i class="material-icons">home</i>About Panel Options</div>
+										      <div class="collapsible-body">
+										      	<div class="row" style="height: 100%;">
+										      		<div id="about-toolbar"></div>
+										      		<div id="about-content"></div>
+										      	</div>
+											  </div>
+										    </li>
+										    <li id="basemapPanelOptions" style="display: none;">
+										      <div class="collapsible-header"><i class="material-icons">map</i>Base Maps Panel Options</div>
+										      <div class="collapsible-body">
+										      		<p>
+										      			Select which basemaps to make available in the Basemap selector
+										      		</p>
+										      		<p>
+														<input type="checkbox" onclick="setBasemapSelector('Streets')" id="StreetsBml" value="Streets" />
+														<label class="black-text" for="StreetsBml">Streets</label>
+													</p>
+													<p>
+														<input type="checkbox" onclick="setBasemapSelector('Topographic')" id="TopographicBml" value="Topographic" />
+														<label class="black-text" for="TopographicBml">Topographic</label>
+													</p>
+													<p>
+														<input type="checkbox" onclick="setBasemapSelector('NationalGeographic')" id="NationalGeographicBml" value="NationalGeographic" />
+														<label class="black-text" for="NationalGeographicBml">National Geographic</label>
+													</p>
+													<p>
+														<input type="checkbox" onclick="setBasemapSelector('Oceans')" id="OceansBml" value="Oceans" />
+														<label class="black-text" for="OceansBml">Oceans</label>
+													</p>
+													<p>
+														<input type="checkbox" onclick="setBasemapSelector('Gray')" id="GrayBml" value="Gray" />
+														<label class="black-text" for="GrayBml">Gray</label>
+													</p>
+													<p>
+														<input type="checkbox" onclick="setBasemapSelector('DarkGray')" id="DarkGrayBml" value="DarkGray" />
+														<label class="black-text" for="DarkGrayBml">Dark Gray</label>
+													</p>
+													<p>
+														<input type="checkbox" onclick="setBasemapSelector('Imagery')" id="ImageryBml" value="Imagery" />
+														<label class="black-text" for="ImageryBml">Imagery</label>
+													</p>
+													<p>
+														<input type="checkbox" onclick="setBasemapSelector('ImageryClarity')" id="ImageryClarityBml" value="ImageryClarity" />
+														<label class="black-text" for="ImageryClarityBml">Advanced Imagery</label>
+													</p>
+													<p>
+														<input type="checkbox" onclick="setBasemapSelector('ShadedRelief')" id="ShadedReliefBml" value="ShadedRelief" />
+														<label class="black-text" for="ShadedReliefBml">Shaded Relief</label>
+													</p>
+													<p>
+														<input type="checkbox" onclick="setBasemapSelector('Terrain')" id="TerrainBml" value="Terrain" />
+														<label class="black-text" for="TerrainBml">Terrain</label>
+													</p>
+											  </div>
+										    </li>
+										  </ul>
+									</div>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+			<div id="themes" class="col s12">
+				<div class="card white">
+					<div class="card-content black-text" style="height: calc(100vh - 200px); overflow: auto;">
+						<form id="themesForm">
+						</form>
+					</div>
+				</div>
+			</div>
+		  </div>
+		  	<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="saveMapConfig();" style="position: fixed; bottom: 110px; left: 14px; width: 150px;"><i class="material-icons left">save</i>Save</a>
+		  	<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="closeEditPanel();" style="position: fixed; bottom: 44px; left: 14px; width: 150px;"><i class="material-icons left">cancel</i>Close</a>
+	    </div>
+		<!-- Footer -->
+		<div id="footer" class="footer nrpp-blue-dark">
+		</div>
+	</div>
+	<script type="text/javascript">
+		var serviceUrl = "http://localhost:8080/smks/";
+		var basemapViewerMap;
+		var aboutEditor;
+		
+		var data = {
+			    lmfId: "",
+			    lmfRevision: 1,
+			    name: "",
+			    createdBy: "",
+			    published: false,
+			    surround: {
+			        type: "default",
+			        title: ""
+			    },
+			    viewer: {
+			        type: "leaflet",
+			        initialExtent: [
+			            -139.1782,
+			            47.6039,
+			            -110.3533,
+			            60.5939
+			        ],
+			        baseMap: "Imagery"
+			    },
+			    tools: [
+			        	{
+					      "type": "coordinate",
+					      "enabled": true
+					    },
+					    {
+					      "type": "attribution",
+					      "enabled": true
+					    },
+					    {
+					      "type": "sidebar",
+					      "enabled": true
+					    },
+					    {
+					      "type": "layers",
+					      "enabled": true
+					    },
+					    {
+					      "type": "identify",
+					      "enabled": true
+					    },
+					    {
+					      "type": "pan",
+					      "enabled": true
+					    },
+					    {
+					      "type": "zoom",
+					      "enabled": true,
+					      "mouseWheel": true,
+					      "doubleClick": true,
+					      "box": true,
+					      "control": true
+					    },
+					    {
+					      "type": "measure",
+					      "enabled": false
+					    },
+					    {
+					      "type": "markup",
+					      "enabled": false
+					    },
+					    {
+					      "type": "scale",
+					      "enabled": true,
+					      "showFactor": true,
+					      "showBar": true
+					    },
+					    {
+					      "type": "minimap",
+					      "enabled": true,
+					      "baseMap": "Topographic"
+					    },
+					    {
+					      "type": "directions",
+					      "enabled": true
+					    },
+					    {
+					      "type": "about",
+					      "enabled": true,
+					      "content": ""
+					    },
+					    {
+					      "type": "baseMaps",
+					      "enabled": true,
+					      "choices": [
+					        "Topographic",
+					        "Streets",
+					        "Imagery",
+					        "Oceans",
+					        "NationalGeographic",
+					        "DarkGray",
+					        "Gray"
+					      ]
+					    },
+					    {
+					      "type": "select",
+					      "enabled": false
+					    },
+					    {
+					      "type": "search",
+					      "enabled": true
+					    }
+			    ],
+			    layers: [],
+			    _id: null,
+			    _rev: null
+			};
+		
+		var mapConfigs = [];
+		var selectedMapConfig;
+		
+		function setToolActivation(toolType)
+		{
+			data.tools.forEach(function(tool) 
+           	{
+				if(tool.type == toolType)
+				{
+					tool.enabled = !tool.enabled;
+					 
+					if(tool.type == "zoom" && tool.enabled == true)
+					{
+						$("#zoomOptions").show();
+						$("#zoomControl").prop('checked', tool.control);
+						$("#zoomBox").prop('checked', tool.box);
+						$("#zoomDoubleClick").prop('checked', tool.doubleClick);
+						$("#zoomMouseWheel").prop('checked', tool.mouseWheel);
+					}
+					else if(tool.type == "zoom" && tool.enabled == false) $("#zoomOptions").hide();
+			    	else if(tool.type == "scale" && tool.enabled == true)
+		    		{
+			    		$("#scaleOptions").show();
+			    		$("#scaleFactor").prop('checked', tool.showFactor);
+						$("#scaleBar").prop('checked', tool.showBar);
+		    		}
+			    	else if(tool.type == "scale" && tool.enabled == false) $("#scaleOptions").hide();
+			    	else if(tool.type == "minimap" && tool.enabled == true)
+		    		{
+			    		$("#minimapOptions").show();
+			    		$("#StreetsMini").prop('checked', tool.baseMap == "Streets");
+			    		$("#TopographicMini").prop('checked', tool.baseMap == "Topographic");
+			    		$("#NationalGeographicMini").prop('checked', tool.baseMap == "NationalGeographic");
+			    		$("#OceansMini").prop('checked', tool.baseMap == "Oceans");
+			    		$("#GrayMini").prop('checked', tool.baseMap == "Gray");
+			    		$("#DarkGrayMini").prop('checked', tool.baseMap == "DarkGray");
+			    		$("#ImageryMini").prop('checked', tool.baseMap == "Imagery");
+			    		$("#ImageryClarityMini").prop('checked', tool.baseMap == "ImageryClarity");
+			    		$("#ShadedReliefMini").prop('checked', tool.baseMap == "ShadedRelief");
+			    		$("#TerrainMini").prop('checked', tool.baseMap == "Terrain");
+		    		}
+			    	else if(tool.type == "minimap" && tool.enabled == false) $("#minimapOptions").hide();
+			    	else if(tool.type == "about" && tool.enabled == true) 
+		    		{
+			    		$("#aboutPanelOptions").show();
+			    		setupQuillEditor();
+		    		}
+			    	else if(tool.type == "about" && tool.enabled == false) $("#aboutPanelOptions").hide();
+			    	else if(tool.type == "baseMaps" && tool.enabled == true)
+		    		{
+			    		$("#basemapPanelOptions").show();
+			    		tool.choices.forEach(function(choice) 
+	    	           	{
+				    		$("#StreetsBml").prop('checked', tool.choices.indexOf("Streets") > -1);
+				    		$("#TopographicBml").prop('checked', tool.choices.indexOf("Topographic") > -1);
+				    		$("#NationalGeographicBml").prop('checked', tool.choices.indexOf("NationalGeographic") > -1);
+				    		$("#OceansBml").prop('checked', tool.choices.indexOf("Oceans") > -1);
+				    		$("#GrayBml").prop('checked', tool.choices.indexOf("Gray") > -1);
+				    		$("#DarkGrayBml").prop('checked', tool.choices.indexOf("DarkGray") > -1);
+				    		$("#ImageryBml").prop('checked', tool.choices.indexOf("Imagery") > -1);
+				    		$("#ImageryClarityBml").prop('checked', tool.choices.indexOf("ImageryClarity") > -1);
+				    		$("#ShadedReliefBml").prop('checked', tool.choices.indexOf("ShadedRelief") > -1);
+				    		$("#TerrainBml").prop('checked', tool.choices.indexOf("Terrain") > -1);
+	    	           	});
+		    		}
+			    	else if(tool.type == "baseMaps" && tool.enabled == false) $("#basemapPanelOptions").hide();
+					
+					if(tool.enabled == true) Materialize.toast('Activated ' + tool.type + " tool!", 4000);
+					else Materialize.toast('Deactivated ' + tool.type + " tool!", 4000);
+				}
+           	});
+		}
+		
+		function setupQuillEditor()
+		{
+			var toolbarOptions = [
+			                      ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
+			                      ['blockquote', 'code-block'],
+
+			                      [{ 'header': 1 }, { 'header': 2 }],               // custom button values
+			                      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+			                      [{ 'script': 'sub'}, { 'script': 'super' }],      // superscript/subscript
+			                      [{ 'indent': '-1'}, { 'indent': '+1' }],          // outdent/indent
+			                      [{ 'direction': 'rtl' }],                         // text direction
+
+			                      [{ 'size': ['small', false, 'large', 'huge'] }],  // custom dropdown
+			                      [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+
+			                      [{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
+			                      [{ 'font': [] }],
+			                      [{ 'align': [] }],
+
+			                      ['clean'],                                        // remove formatting button
+			                      ['image', 'video']
+			                    ];
+			
+			aboutEditor = new Quill('#about-content', 
+			{
+				modules: 
+				{
+			    	toolbar: toolbarOptions
+			  	},
+			  	theme: 'snow'
+			});
+		}
+		
+		function setBasemapSelector(basemap)
+		{
+			data.tools.forEach(function(tool) 
+           	{
+				if(tool.type == "baseMaps")
+				{
+					var contains = (tool.choices.indexOf(basemap) > -1);
+					if(contains)
+					{
+						var index = tool.choices.indexOf(basemap);
+						if (index !== -1) tool.choices.splice(index, 1);
+					}
+					else tool.choices.push(basemap);
+				}
+           	});
+		}
+		
+		function toggleScaleOption(scaleOption)
+		{
+			data.tools.forEach(function(tool) 
+           	{
+				if(tool.type == "scale")
+				{
+					if(zoomOption == "factor") tool.showFactor = !tool.showFactor;
+					else if(zoomOption == "bar") tool.showBar = !tool.showBar;
+				}
+           	});
+		}
+		
+		function toggleZoomOption(zoomOption)
+		{
+			data.tools.forEach(function(tool) 
+           	{
+				if(tool.type == "zoom")
+				{
+					if(zoomOption == "control") tool.control = !tool.control;
+					else if(zoomOption == "box") tool.box = !tool.box;
+					else if(zoomOption == "doubleClick") tool.doubleClick = !tool.doubleClick;
+					else if(zoomOption == "mouseWheel") tool.mouseWheel = !tool.mouseWheel;
+				}
+           	});
+		}
+		
+		function setMinimapBasemap(id)
+		{
+			data.tools.forEach(function(tool) 
+           	{
+				if(tool.type == "minimap")
+				{
+					tool.baseMap = id;
+				}
+           	});
+		}
+		
+		function closeEditPanel()
+		{
+			$("#editor-content").hide("fast");
+			$("#menu-content").show("fast");
+			$("#appsTable > tbody").html("");
+			
+			$("#loadingBar").show();
+        	$("#appsTablePanel").hide();
+			loadConfigs();
+		}
+		
+		function editMapConfig(mapConfigId)
+		{
+			mapConfigs.forEach(function(mapConfig)
+			{
+				if(mapConfig.lmfId == mapConfigId)
+				{
+					selectedMapConfig = mapConfig;
+					
+					data.lmfId = mapConfig.lmfId;
+					data.name = mapConfig.name;
+					data.lmfRevision = mapConfig.lmfRevision;
+					data.createdBy = mapConfig.createdBy;
+					data.published = mapConfig.published;
+					data.surround = mapConfig.surround;
+				    data.viewer = mapConfig.viewer;
+				    data.tools = mapConfig.tools;
+				    data.layers = mapConfig.layers;
+				    data._id = mapConfig._id;
+				    data._rev = mapConfig._rev;
+				    
+				    //set tool activations
+				    data.tools.forEach(function(tool) 
+                	{
+				    	if(tool.type == "coordinate") $("#coordinates").prop('checked', tool.enabled);
+				    	else if(tool.type == "attribution") $("#attribution").prop('checked', tool.enabled);
+				    	else if(tool.type == "sidebar") $("#sidebar").prop('checked', tool.enabled);
+				    	else if(tool.type == "layers") $("#layerPanel").prop('checked', tool.enabled);
+				    	else if(tool.type == "identify") $("#identifyPanel").prop('checked', tool.enabled);
+				    	else if(tool.type == "pan") $("#panning").prop('checked', tool.enabled);
+				    	else if(tool.type == "zoom")
+			    		{
+				    		$("#zooming").prop('checked', tool.enabled);
+				    		if(tool.enabled) 
+			    			{
+				    			$("#zoomOptions").show();
+				    			$("#zoomControl").prop('checked', tool.control);
+								$("#zoomBox").prop('checked', tool.box);
+								$("#zoomDoubleClick").prop('checked', tool.doubleClick);
+								$("#zoomMouseWheel").prop('checked', tool.mouseWheel);
+			    			}
+			    		}
+				    	else if(tool.type == "measure") $("#measurement").prop('checked', tool.enabled);
+				    	else if(tool.type == "markup") $("#markup").prop('checked', tool.enabled);
+				    	else if(tool.type == "scale")
+			    		{
+				    		$("#scale").prop('checked', tool.enabled);
+				    		if(tool.enabled) 
+			    			{
+				    			$("#scaleOptions").show();
+				    			$("#scaleFactor").prop('checked', tool.showFactor);
+								$("#scaleBar").prop('checked', tool.showBar);
+			    			}
+				    	}
+				    	else if(tool.type == "minimap")
+			    		{
+				    		$("#minimap").prop('checked', tool.enabled);
+				    		if(tool.enabled) 
+			    			{
+				    			$("#minimapOptions").show();
+				    			$("#StreetsMini").prop('checked', tool.baseMap == "Streets");
+					    		$("#TopographicMini").prop('checked', tool.baseMap == "Topographic");
+					    		$("#NationalGeographicMini").prop('checked', tool.baseMap == "NationalGeographic");
+					    		$("#OceansMini").prop('checked', tool.baseMap == "Oceans");
+					    		$("#GrayMini").prop('checked', tool.baseMap == "Gray");
+					    		$("#DarkGrayMini").prop('checked', tool.baseMap == "DarkGray");
+					    		$("#ImageryMini").prop('checked', tool.baseMap == "Imagery");
+					    		$("#ImageryClarityMini").prop('checked', tool.baseMap == "ImageryClarity");
+					    		$("#ShadedReliefMini").prop('checked', tool.baseMap == "ShadedRelief");
+					    		$("#TerrainMini").prop('checked', tool.baseMap == "Terrain")
+			    			}
+			    		}
+				    	else if(tool.type == "about")
+			    		{
+				    		$("#aboutPanel").prop('checked', tool.enabled);
+				    		if(tool.enabled) 
+			    			{
+				    			$("#aboutPanelOptions").show();
+				    			setupQuillEditor();
+			    			}
+			    		}
+				    	else if(tool.type == "baseMaps")
+			    		{
+				    		$("#basemapPanel").prop('checked', tool.enabled);
+				    		if(tool.enabled) 
+			    			{
+				    			$("#basemapPanelOptions").show();
+				    			tool.choices.forEach(function(choice) 
+			    	           	{
+						    		$("#StreetsBml").prop('checked', tool.choices.indexOf("Streets") > -1);
+						    		$("#TopographicBml").prop('checked', tool.choices.indexOf("Topographic") > -1);
+						    		$("#NationalGeographicBml").prop('checked', tool.choices.indexOf("NationalGeographic") > -1);
+						    		$("#OceansBml").prop('checked', tool.choices.indexOf("Oceans") > -1);
+						    		$("#GrayBml").prop('checked', tool.choices.indexOf("Gray") > -1);
+						    		$("#DarkGrayBml").prop('checked', tool.choices.indexOf("DarkGray") > -1);
+						    		$("#ImageryBml").prop('checked', tool.choices.indexOf("Imagery") > -1);
+						    		$("#ImageryClarityBml").prop('checked', tool.choices.indexOf("ImageryClarity") > -1);
+						    		$("#ShadedReliefBml").prop('checked', tool.choices.indexOf("ShadedRelief") > -1);
+						    		$("#TerrainBml").prop('checked', tool.choices.indexOf("Terrain") > -1);
+			    	           	});
+			    			}
+			    		}
+				    	else if(tool.type == "select") $("#selectPanel").prop('checked', tool.enabled);
+				    	else if(tool.type == "search") $("#searchPanel").prop('checked', tool.enabled);
+                	});
+				    
+					$("#menu-content").hide("fast");
+		        	$("#editor-content").show("fast");
+		        	
+		        	$('ul.tabs').tabs();
+		        	$('ul.tabs').tabs('select_tab', 'identity');
+		        	$('.collapsible').collapsible();
+		        	
+		        	$(document).ready(function() 
+		        	{
+		        	    Materialize.updateTextFields();
+		        	    
+		        	 // init basemap viewer		
+		        	 	var ne = L.latLng(data.viewer.initialExtent[3], data.viewer.initialExtent[2]);
+						var sw = L.latLng(data.viewer.initialExtent[1], data.viewer.initialExtent[0]);
+						var bounds = L.latLngBounds(ne, sw);   
+						var centroid = bounds.getCenter();
+						var zoom = basemapViewerMap.getBoundsZoom(bounds, true);
+						
+						//basemapViewerMap.setView(bounds.getCenter(), zoom);
+						basemapViewerMap.fitBounds(bounds);
+		    			
+						basemapViewerMap.invalidateSize();		    			
+		        	    setBasemap(data.viewer.baseMap);
+		        	});
+				}
+			});
+		}
+		
+		function addNewMapConfig()
+		{
+			data.lmfId = "";
+			data.name = "";
+			data.lmfRevision = 1;
+			data.createdBy = "";
+			data.published = false;
+			data.surround = { type: "default", title: "" };
+		    data.viewer = {
+					        type: "leaflet",
+					        initialExtent: [
+					            -139.1782,
+					            47.6039,
+					            -110.3533,
+					            60.5939
+					        ],
+					        baseMap: "Imagery"
+						};
+		    data.layers = [];
+		    data._id = null;
+		    data._rev = null;
+		    data.tools = [
+				        {
+					      "type": "coordinate",
+					      "enabled": true
+					    },
+					    {
+					      "type": "attribution",
+					      "enabled": true
+					    },
+					    {
+					      "type": "sidebar",
+					      "enabled": true
+					    },
+					    {
+					      "type": "layers",
+					      "enabled": true
+					    },
+					    {
+					      "type": "identify",
+					      "enabled": true
+					    },
+					    {
+					      "type": "pan",
+					      "enabled": true
+					    },
+					    {
+					      "type": "zoom",
+					      "enabled": true,
+					      "mouseWheel": true,
+					      "doubleClick": true,
+					      "box": true,
+					      "control": true
+					    },
+					    {
+					      "type": "measure",
+					      "enabled": false
+					    },
+					    {
+					      "type": "markup",
+					      "enabled": false
+					    },
+					    {
+					      "type": "scale",
+					      "enabled": true,
+					      "showFactor": true,
+					      "showBar": true
+					    },
+					    {
+					      "type": "minimap",
+					      "enabled": true,
+					      "baseMap": "Topographic"
+					    },
+					    {
+					      "type": "directions",
+					      "enabled": true
+					    },
+					    {
+					      "type": "about",
+					      "enabled": true,
+					      "content": ""
+					    },
+					    {
+					      "type": "baseMaps",
+					      "enabled": true,
+					      "choices": [
+					        "Topographic",
+					        "Streets",
+					        "Imagery",
+					        "Oceans",
+					        "NationalGeographic",
+					        "DarkGray",
+					        "Gray"
+					      ]
+					    },
+					    {
+					      "type": "select",
+					      "enabled": false
+					    },
+					    {
+					      "type": "search",
+					      "enabled": true
+					    }
+				    ];
+			
+			$("#menu-content").hide("fast");
+        	$("#editor-content").show("fast");
+        	
+        	$('ul.tabs').tabs();
+        	$('ul.tabs').tabs('select_tab', 'identity');
+        	
+        	$(document).ready(function() 
+        	{
+        	    Materialize.updateTextFields();
+        	    
+        	 // init basemap viewer		
+        	 	var ne = L.latLng(data.viewer.initialExtent[3], data.viewer.initialExtent[2]);
+				var sw = L.latLng(data.viewer.initialExtent[1], data.viewer.initialExtent[0]);
+				var bounds = L.latLngBounds(ne, sw);   
+				var centroid = bounds.getCenter();
+				var zoom = basemapViewerMap.getBoundsZoom(bounds, true);
+				
+				//basemapViewerMap.setView(bounds.getCenter(), zoom);
+				basemapViewerMap.fitBounds(bounds);
+    			
+				basemapViewerMap.invalidateSize();		    			
+        	    setBasemap(data.viewer.baseMap);
+        	});
+		}
+		
+		function saveMapConfig()
+		{
+			var requestType = "put";
+			var requestUrl = "MapConfigurations/" + data.lmfId;
+			
+			if(data._id == null)
+			{
+				requestType = "post";
+				requestUrl = "MapConfigurations/";
+				data._id = uuid();
+			}
+				
+			$.ajax
+			({
+				url: serviceUrl + requestUrl,
+                type: requestType,
+                dataType: 'json',
+                data: JSON.stringify(data),
+                contentType:'application/json',
+                crossDomain: true,
+                withCredentials: true,
+                success: function (result) 
+                {
+                	Materialize.toast('Successfully saved application ' + data.lmfId, 4000);
+                	closeEditPanel();
+                },
+                error: function (status) 
+                {
+                    // error handler
+                    Materialize.toast('Error saving application ' + data.lmfId, 4000);
+                }
+			});
+		}
+		
+		function publishMapConfig(mapConfigId)
+		{
+			mapConfigs.forEach(function(mapConfig)
+			{
+				if(mapConfig.lmfId == mapConfigId)
+				{
+					$("#loadingBar").show();
+                	$("#appsTablePanel").hide();
+                	
+					$.ajax
+        			({
+        				url: serviceUrl + 'MapConfigurations/Published/' + mapConfigId,
+                        type: 'post',
+                        crossDomain: true,
+                        withCredentials: true,
+                        success: function (data) 
+                        {
+                        	Materialize.toast('Successfully published ' + mapConfigId, 4000);
+                        	loadConfigs();
+                        	$("#loadingBar").hide();
+                        	$("#appsTablePanel").show();
+                        },
+                        error: function (status) 
+                        {
+                        	Materialize.toast('Error publishing ' + mapConfigId, 4000);
+                        	$("#loadingBar").hide();
+                        	$("#appsTablePanel").show();
+                        }
+        			});
+				}
+			});
+		}
+		
+		function exportMapConfig(mapConfigId)
+		{
+			mapConfigs.forEach(function(mapConfig)
+			{
+				if(mapConfig.lmfId == mapConfigId)
+				{
+					$("#loadingBar").show();
+                	$("#appsTablePanel").hide();
+					window.location = serviceUrl + "MapConfigurations/Published/" + mapConfigId + "/Export/"
+					$("#loadingBar").hide();
+                	$("#appsTablePanel").show();
+				}
+			});
+		}
+		
+		function deleteMapConfig(mapConfigId)
+		{
+			if (confirm('Are you sure you want to delete the application? This cannot be undone...')) 
+        	{
+				$("#appsTablePanel").hide();
+				$("#loadingBar").show();
+				
+				mapConfigs.forEach(function(mapConfig)
+				{
+					if(mapConfig.lmfId == mapConfigId)
+					{
+						$.ajax
+	        			({
+	        				url: serviceUrl + 'MapConfigurations/' + mapConfigId,
+	                        type: 'delete',
+	                        dataType: 'json',
+	                        contentType:'application/json',
+	                        crossDomain: true,
+	                        withCredentials: true,
+	                        success: function (data) 
+	                        {
+	                        	Materialize.toast(mapConfigId + ' has been successfully deleted.', 4000);
+	                        	$("#" + mapConfigId).remove();
+	                        	
+	                        	$("#loadingBar").hide();
+	                        	$("#appsTablePanel").show();
+	                        },
+	                        error: function (status) 
+	                        {
+	                        	if (confirm('Could not delete ' + mapConfigId + '. There is an active published version. Would you like to unpublish and delete?')) 
+	                        	{
+	                        		$.ajax
+	                    			({
+	                    				url: serviceUrl + 'MapConfigurations/Published/' + mapConfigId,
+	                                    type: 'delete',
+	                                    dataType: 'json',
+	                                    contentType:'application/json',
+	                                    crossDomain: true,
+	                                    withCredentials: true,
+	                                    success: function (data) 
+	                                    {
+	                                    	Materialize.toast(mapConfigId + ' has been un-published.', 4000);
+	                                    	deleteMapConfig(mapConfigId);
+	                                    },
+	                                    error: function (status) 
+	                                    {
+	                                        Materialize.toast('Could not delete ' + mapConfigId, 4000);
+	                                        $("#loadingBar").hide();
+	        	                        	$("#appsTablePanel").show();
+	                                    }
+	                    			});
+	                        	} 
+	                        }
+	        			});
+					}
+				});
+        	}
+		}
+		
+		function previewMapConfig(mapConfigId)
+		{
+			mapConfigs.forEach(function(mapConfig)
+			{
+				if(mapConfig.lmfId == mapConfigId)
+				{
+				}
+			});
+		}
+		
+		function setBasemap(id)
+		{
+			basemapViewerMap.eachLayer(function (layer) 
+			{
+				basemapViewerMap.removeLayer(layer);
+			});
+			
+			basemapViewerMap.addLayer(L.esri.basemapLayer(id));
+		}
+		
+		function loadConfigs()
+		{
+			// trigger the ajax load
+			$.ajax
+			({
+				url: serviceUrl + 'MapConfigurations/',
+                type: 'get',
+                dataType: 'json',
+                contentType:'application/json',
+                crossDomain: true,
+                withCredentials: true,
+                success: function (data) 
+                {
+                	// finished building table
+                	$("#loadingBar").hide();
+                	$("#appsTablePanel").show();
+                	
+                	data.forEach(function(appConfigStub) 
+                	{
+                		$.ajax
+            			({
+            				url: serviceUrl + 'MapConfigurations/' + appConfigStub.id,
+                            type: 'get',
+                            dataType: 'json',
+                            contentType:'application/json',
+                            crossDomain: true,
+                            withCredentials: true,
+                            success: function (appConfig) 
+                            {                            	
+                            	mapConfigs.push(appConfig);
+                        		$("#appsTable > tbody:last-child").append("<tr id='" + appConfig.lmfId + "\'><td><a href='#' onclick='previewMapConfig(\"" + appConfig.lmfId + "\");' class='blue-text'>" + appConfig.name + "</a></td><td>" + appConfig.viewer.type + "</td><td>" + appConfig.lmfRevision + "." + (parseInt(appConfig._rev.split('-')[0]) - 1) + "</td><td><a href='#' onclick='editMapConfig(\"" + appConfig.lmfId + "\");' class='blue-text'>Edit</a></td><td><a href='#' onclick='publishMapConfig(\"" + appConfig.lmfId + "\");' class='blue-text'>Publish</a></td><td><a href='" + serviceUrl + "MapConfigurations/Published/" + appConfig.lmfId + "/Export/' download='export_client.war' class='blue-text'>Export</a></td><td><a href='#' onclick='deleteMapConfig(\"" + appConfig.lmfId + "\");' class='blue-text'>Delete</a></td></tr>");
+                            },
+                            error: function (status) 
+                            {
+                                // error handler
+                                Materialize.toast('Error loading application ' + appConfigStub.id, 4000);
+                            }
+            			});
+                	});
+                },
+                error: function (status) 
+                {
+                    // error handler
+                    Materialize.toast('Error loading applications. Please try again later', 4000);
+                }
+			});
+		}
+		
+		$(document).ready(function()
+	   	{
+			
+			// init vue
+			var app = new Vue(
+			{
+			  el: '#app',
+			  data: data
+			});
+			
+			var bmLayers = [];
+			bmLayers.push(L.esri.basemapLayer("Streets"));
+			bmLayers.push(L.esri.basemapLayer("Topographic"));
+			bmLayers.push(L.esri.basemapLayer("NationalGeographic"));
+			bmLayers.push(L.esri.basemapLayer("ImageryClarity"));
+			
+			// init background map
+	    	var map = L.map('map', { zoomControl: false });
+	    	map.touchZoom.disable();
+			map.doubleClickZoom.disable();
+			map.scrollWheelZoom.disable();
+			map.boxZoom.disable();
+			map.keyboard.disable();
+	    	var bm = bmLayers[Math.floor((Math.random() * bmLayers.length - 1) + 1)];
+			map.addLayer(bm);
+			
+			var rndLat = Math.random() * (60 - 48.3) + 47.294;
+			var rndLon = (Math.random() * (124 - 111.291) + 114) * -1;
+			var rndZoom = Math.floor(Math.random() * (11 - 6) + 6);
+
+			map.setView(new L.latLng(rndLat, rndLon), rndZoom, { animate: true, duration: 60 } );
+			
+			// set basemap
+			basemapViewerMap = L.map('basemapViewer');
+   			basemapViewerMap.on('moveend', function() 
+   			{
+   				data.viewer.initialExtent[0] = basemapViewerMap.getBounds().getWest();
+   				data.viewer.initialExtent[1] = basemapViewerMap.getBounds().getNorth();
+   				data.viewer.initialExtent[2] = basemapViewerMap.getBounds().getEast();
+   				data.viewer.initialExtent[3] = basemapViewerMap.getBounds().getSouth();
+   			});
+			
+   			// hide editor
+			$("#editor-content").hide();
+			
+			loadConfigs();
+		});
+		
+		function uuid() 
+		{
+			  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+			    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+			    return v.toString(16);
+			  });
+			}
+	</script>
+  </body>
+</html>

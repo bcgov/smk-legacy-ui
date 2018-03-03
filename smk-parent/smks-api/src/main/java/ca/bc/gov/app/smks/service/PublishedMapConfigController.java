@@ -8,7 +8,6 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
@@ -97,18 +96,6 @@ public class PublishedMapConfigController
 			{
 				if(resource.isPublished()) throw new Exception("The latest version of this map configuration has already been published");
 
-				// "un" publish the previous version, if it exists
-				MapConfiguration existinPublishedResource = couchDAO.getPublishedConfig(id);
-				if(existinPublishedResource != null)
-				{
-					existinPublishedResource.setPublished(false);
-					couchDAO.updateResource(existinPublishedResource);
-				}
-
-				// set the publish flag and commit
-				resource.setPublished(true);
-				couchDAO.updateResource(resource);
-
 				// clone the document, and create a new version for the edit state. You can't edit published documents
 				MapConfiguration clone = resource.clone();
 				clone.setLmfRevision(resource.getLmfRevision() + 1);
@@ -132,6 +119,18 @@ public class PublishedMapConfigController
 
 				}
 
+				// "un" publish the previous version, if it exists
+				MapConfiguration existinPublishedResource = couchDAO.getPublishedConfig(id);
+				if(existinPublishedResource != null)
+				{
+					existinPublishedResource.setPublished(false);
+					couchDAO.updateResource(existinPublishedResource);
+				}
+				
+				// set the publish flag on the current resource commit
+				resource.setPublished(true);
+				couchDAO.updateResource(resource);
+				// create the cloned new editable version
 				couchDAO.createResource(clone);
 
 				logger.debug("    Success!");
@@ -337,7 +336,7 @@ public class PublishedMapConfigController
 					File tempExportZip = new File(classLoader.getResource("smk-export-template.war").getFile());
 					InputStream targetStream = new FileInputStream(tempExportZip);
 					
-					File exportTemplateZip = File.createTempFile(resource.getName() + "_export", ".zip");
+					File exportTemplateZip = File.createTempFile(resource.getName() + "_export", ".war");
 					logger.debug("    Copying zip to temp file '" + exportTemplateZip.getName() + "'...");
 					FileOutputStream os = new FileOutputStream(exportTemplateZip);
 				    IOUtils.copy(targetStream, os);
@@ -355,45 +354,48 @@ public class PublishedMapConfigController
 				    ObjectMapper mapper = new ObjectMapper();
 				    File mapConfigTempFile = File.createTempFile(resource.getName() + "_map_config", ".json");
 				    mapper.writeValue(mapConfigTempFile, resource);
+				    String configString = mapper.writeValueAsString(resource);
 				    
 				    zipFile.addFile(mapConfigTempFile, params);
 				    
 				    String smkConfigDocumentNames = mapConfigTempFile.getName() + ",";
 				    
 				    // copy all attachments
-				    for(String key : resource.getAttachments().keySet())
-					{
-				    	AttachmentInputStream attch = couchDAO.getAttachment(resource, key);
-						byte[] data = IOUtils.toByteArray(attch);
-						
-						if(data != null)
+				    if(resource.getAttachments() != null)
+				    {
+					    for(String key : resource.getAttachments().keySet())
 						{
-							InputStream dataStream = new ByteArrayInputStream(data);
-	
-							File attchFile = File.createTempFile(resource.getName() + "_" + key, ".attachment");
-							FileOutputStream attchFileStream = new FileOutputStream(attchFile);
-							IOUtils.copy(dataStream, attchFileStream);
+					    	AttachmentInputStream attch = couchDAO.getAttachment(resource, key);
+							byte[] data = IOUtils.toByteArray(attch);
 							
-							dataStream.close();
-							dataStream = null;
-							attchFileStream.close();
-							attchFileStream = null;
-							
-							zipFile.addFile(attchFile, params);						
-							
-							smkConfigDocumentNames += attchFile.getName() + ",";
-							
-							attchFile.delete();
-							attchFile = null;
+							if(data != null)
+							{
+								InputStream dataStream = new ByteArrayInputStream(data);
+		
+								File attchFile = File.createTempFile(resource.getName() + "_" + key, ".attachment");
+								FileOutputStream attchFileStream = new FileOutputStream(attchFile);
+								IOUtils.copy(dataStream, attchFileStream);
+								
+								dataStream.close();
+								dataStream = null;
+								attchFileStream.close();
+								attchFileStream = null;
+								
+								zipFile.addFile(attchFile, params);						
+								
+								smkConfigDocumentNames += attchFile.getName() + ",";
+								
+								attchFile.delete();
+								attchFile = null;
+							}
 						}
-					}
-				    
+				    }
 				    // trim out the trailing comma, if we have attachments
-				    if(smkConfigDocumentNames.length() > 0) smkConfigDocumentNames = smkConfigDocumentNames.substring(0, smkConfigDocumentNames.length() - 2);
+				    if(smkConfigDocumentNames.length() > 0 && smkConfigDocumentNames.endsWith(",")) smkConfigDocumentNames = smkConfigDocumentNames.substring(0, smkConfigDocumentNames.length() - 1);
 				    
 				    // create index.html with refs to config and attachments, and insert
 				    File indexHtml = File.createTempFile(resource.getName() + "_index", ".html");
-				    String indexCode = "<html><head><title>" + resource.getName() + "</title></head><body><div id=\"smk-map-frame\"></div><script src=\"lib/smk-bootstrap.js\" smk-standalone=\"true\" smk-config=\"" + smkConfigDocumentNames + "\"></script></body></html>";
+				    String indexCode = "<html><head><title>" + resource.getName() + "</title></head><body><div id=\"smk-map-frame\"></div><script src=\"smk-bootstrap.js\" smk-standalone=\"true\" smk-config=\"" + smkConfigDocumentNames + "\">" + configString + "</script></body></html>";
 				    
 				    PrintWriter out = new PrintWriter(indexHtml);
 				    out.write(indexCode);
@@ -409,7 +411,7 @@ public class PublishedMapConfigController
 				    File exportableZip = zipFile.getFile();
 			        InputStream exportStream = new FileInputStream(exportableZip);
 				    
-					//add zip to published documente as an attachment file called "export"
+					//add zip to published document as an attachment file called "export"
 					
 					Attachment newAttachment = new Attachment(EXPORT_ATTACHMENT_NAME, Base64.encodeBase64String(IOUtils.toByteArray(exportStream)), "application/octet-stream");
 				    resource.addInlineAttachment(newAttachment);

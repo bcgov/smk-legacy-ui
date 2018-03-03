@@ -11,7 +11,6 @@ import org.ektorp.Attachment;
 import org.ektorp.support.CouchDbDocument;
 
 @JsonIgnoreProperties({"id", "revision"})
-// @JsonInclude(Include.NON_NULL)
 @JsonInclude(Include.NON_DEFAULT)
 public class MapConfiguration extends CouchDbDocument implements Cloneable
 {
