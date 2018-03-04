@@ -1,9 +1,11 @@
 package ca.bc.gov.app.smks.dao;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -118,37 +120,38 @@ public class LayerCatalogDAO
                 Element folder = (Element) folders.item(i);
 
                 String name = folder.getElementsByTagName("folderName").item(0).getTextContent();
-
+            	if(!name.toLowerCase().contains("(internal access)") && !name.toLowerCase().contains(" - internal"))
                 //for each folder, create a root layer object. Add to a tree node. No parent
-
-            	MPCMInfoLayer layer = new MPCMInfoLayer();
-
-                // populate the rootLayer object with the folder details.
-                layer.setId(id);
-                layer.setLabel(name);
-
-                // finally, add the node and increment the itemId
-                parent.getSublayers().add(layer);
-                id++;
-
-                // Each root node folder may have layer and/or folders within
-                // we'll need to add each of them here.
-
-                Element subfolderElement = (Element)folder.getElementsByTagName("folders").item(0);
-
-                if(subfolderElement != null)
-                {
-                	NodeList subfoldersNodes = subfolderElement.getChildNodes();
-                	id = processFolders(subfoldersNodes, layer, id);
-                }
-
-                Element sublayerElement = (Element)folder.getElementsByTagName("layers").item(0);
-
-                if(sublayerElement != null)
-                {
-                	NodeList sublayerNodes = sublayerElement.getChildNodes();
-                	id = processLayers(sublayerNodes, layer, id);
-                }
+            	{
+	            	MPCMInfoLayer layer = new MPCMInfoLayer();
+	
+	                // populate the rootLayer object with the folder details.
+	                layer.setId(id);
+	                layer.setLabel(name);
+	
+	                // finally, add the node and increment the itemId
+	                parent.getSublayers().add(layer);
+	                id++;
+	
+	                // Each root node folder may have layer and/or folders within
+	                // we'll need to add each of them here.
+	
+	                Element subfolderElement = (Element)folder.getElementsByTagName("folders").item(0);
+	
+	                if(subfolderElement != null)
+	                {
+	                	NodeList subfoldersNodes = subfolderElement.getChildNodes();
+	                	id = processFolders(subfoldersNodes, layer, id);
+	                }
+	
+	                Element sublayerElement = (Element)folder.getElementsByTagName("layers").item(0);
+	
+	                if(sublayerElement != null)
+	                {
+	                	NodeList sublayerNodes = sublayerElement.getChildNodes();
+	                	id = processLayers(sublayerNodes, layer, id);
+	                }
+            	}
 	        }
 	    }
 
@@ -165,15 +168,21 @@ public class LayerCatalogDAO
 
             	MPCMInfoLayer layer = new MPCMInfoLayer();
 
-                // populate the rootLayer object with the folder details.
-                layer.setId(id);
-                layer.setMpcmId(new Integer(layerElement.getElementsByTagName("layerId").item(0).getTextContent()));
-                layer.setLabel(layerElement.getElementsByTagName("layerDisplayName").item(0).getTextContent());
-                layer.setLayerUrl(mpcmUri + layer.getMpcmId());
-
-                // finally, add the node and increment the itemId
-                parent.getSublayers().add(layer);
-                id++;
+            	// trim anything flagged as internal access.
+            	// temporary solution until MPCM rest service returns workspace properly
+            	String layerName = layerElement.getElementsByTagName("layerDisplayName").item(0).getTextContent();
+            	if(!layerName.toLowerCase().contains("(internal access)") && !layerName.toLowerCase().contains(" - internal"))
+            	{
+	                // populate the rootLayer object with the folder details.
+	                layer.setId(id);
+	                layer.setMpcmId(new Integer(layerElement.getElementsByTagName("layerId").item(0).getTextContent()));
+	                layer.setLabel(layerElement.getElementsByTagName("layerDisplayName").item(0).getTextContent());
+	                layer.setLayerUrl(mpcmUri + layer.getMpcmId());
+	
+	                // finally, add the node and increment the itemId
+	                parent.getSublayers().add(layer);
+	                id++;
+            	}
 	        }
 	    }
 
@@ -252,12 +261,13 @@ public class LayerCatalogDAO
 
 	                attribute.setName(el.getElementsByTagName("fieldName").item(0).getTextContent());
 	                attribute.setTitle(el.getElementsByTagName("fieldAlias").item(0).getTextContent());
-	                // attribute.setVisible(Boolean.parseBoolean(el.getElementsByTagName("visible").item(0).getTextContent()));
-
-	                // if(attribute.getVisible())
-	                // {
+	                attribute.setVisible(Boolean.parseBoolean(el.getElementsByTagName("visible").item(0).getTextContent()));
+	                attribute.setId(convertNameToId(attribute.getName()));
+	                
+	                if(attribute.getVisible())
+	                {
 	                	layer.getAttributes().add(attribute);
-	                // }
+	                }
 	            }
 	        }
 	    }
@@ -267,6 +277,99 @@ public class LayerCatalogDAO
 	    return layer;
 	}
 
+	public static String convertNameToId( String name ) {
+		return name.toLowerCase().replaceAll("[^0-9a-z]+", "-").replaceAll("^[-]+", "").replaceAll("[-]+$", "");
+    }
+	
+	public List<WMSInfoLayer> createWmsLayers(String url) throws SAXException, IOException, ParserConfigurationException
+	{
+		logger.debug(" >> createWmsLayers()");
+		
+		List<WMSInfoLayer> serviceLayers = new ArrayList<WMSInfoLayer>();
+		
+		URL wmsUrl = new URL(url);
+
+		logger.debug("Parsing XML result from " + wmsUrl);
+	    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        factory.setNamespaceAware(true);
+        Document doc = factory.newDocumentBuilder().parse(wmsUrl.openStream());
+
+        logger.debug("Successfully parsed xml doc. Looping through nodes...");
+        
+        NodeList layerNodes = doc.getElementsByTagName("Layer");
+
+	    if (layerNodes != null)
+	    {
+	        int length = layerNodes.getLength();
+	        // ignore the first reference. This is the parent layer, not the sublayer details that we want
+	        for (int i = 1; i < length; i++)
+	        {
+	            if (layerNodes.item(i).getNodeType() == Node.ELEMENT_NODE)
+	            {
+	                Element layerElement = (Element) layerNodes.item(i);
+
+	                String title = layerElement.getElementsByTagName("Title").item(0).getTextContent();
+	                String name = layerElement.getElementsByTagName("Name").item(0).getTextContent();
+
+	                WMSInfoLayer layer = new WMSInfoLayer();
+					layer.setTitle( title);
+					layer.setName( name);
+
+					serviceLayers.add(layer);
+
+	                NodeList layerStyles = layerElement.getElementsByTagName("Style");
+
+					List<WMSInfoStyle> styles = layer.getStyles();
+	                if (layerStyles != null)
+	    		    {
+	    		        for (int styleIndex = 0; styleIndex < layerStyles.getLength(); styleIndex++)
+	    		        {
+	    		        	Element styleElement = (Element) layerStyles.item(styleIndex);
+
+							WMSInfoStyle style = new WMSInfoStyle();
+							style.setName( styleElement.getElementsByTagName("Name").item(0).getTextContent());
+							style.setTitle( styleElement.getElementsByTagName("Title").item(0).getTextContent().replace("_", " "));
+
+							if ( !styles.contains( style ) )
+	    		        		styles.add(style);
+	    		        }
+
+						int titleIndex = 0;
+						String styleTitle = styles.get( 0 ).getTitle();
+						if ( styles.size() > 1 ) {
+							OUTER: while ( true ) {
+								if ( titleIndex >= styleTitle.length() ) break OUTER;
+
+								char c0 = styleTitle.charAt( titleIndex );
+								for ( int idx = 1; idx < styles.size(); idx++ ) {
+									String n = styles.get( idx ).getTitle();
+									if ( titleIndex >= n.length() ) break OUTER;
+
+									if ( c0 != n.charAt( titleIndex ) ) break OUTER;
+								}
+
+								titleIndex += 1;
+							}
+						}
+						// logger.debug( s0 + ", " + p );
+
+						if ( titleIndex > 0 )
+							for ( int j = 0; j < styles.size(); j++ ) {
+								WMSInfoStyle s = styles.get( j );
+								if ( titleIndex < ( s.getTitle().length() - 1 ) )
+									s.setTitle( "..." + s.getTitle().substring( titleIndex ) );
+								// logger.debug( s.getTitle() );
+							}
+	    		    }
+	            }
+	        }
+	    }
+        
+		logger.debug(" << createWmsLayers()");
+		
+		return serviceLayers;
+	}
+	
 	public WMSInfoLayer createWmsLayer(String id) throws SAXException, IOException, ParserConfigurationException
 	{
 		logger.debug(" >> createWmsLayer()");

@@ -2,6 +2,7 @@ package ca.bc.gov.app.smks.service;
 
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -31,6 +33,44 @@ public class LayerCatalogController
 	
 	@Autowired
 	private LayerCatalogDAO layerCatalogDao;
+	
+	@RequestMapping(value = "/wms/", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<?> getWmsConfigurations(@RequestParam(value="url", required=true) String url) 
+	{
+		logger.debug(" >> getWmsConfigurations()");
+		ResponseEntity<?> result = null;
+		
+		logger.debug("    Starting Get WMS Layer from provided URL...");
+		
+		if(url != null && url.length() > 0)
+		{
+			try 
+			{
+				List<WMSInfoLayer> layers = layerCatalogDao.createWmsLayers(url);
+				logger.debug("    Successfully fetched WMS Layers");
+				result = new ResponseEntity<List<WMSInfoLayer>>(layers, HttpStatus.OK);
+			}
+			catch (MalformedURLException e) 
+			{
+				logger.error("    ## Error querying WMS Server. URL is invalid: " + e.getMessage());
+				result = new ResponseEntity<String>("{ \"status\": \"ERROR\", \"message\": \"" + e.getMessage() + "\" }", HttpStatus.BAD_REQUEST);
+			}
+			catch (Exception e) 
+			{
+				logger.error("    ## Error querying WMS Server: " + e.getMessage());
+				result = new ResponseEntity<String>("{ \"status\": \"ERROR\", \"message\": \"" + e.getMessage() + "\" }", HttpStatus.BAD_REQUEST);
+			}
+		}
+		else
+		{
+			result = new ResponseEntity<String>("{ \"status\": \"ERROR\", \"message\": \"URL is invalid\" }", HttpStatus.BAD_REQUEST);
+		}
+		
+		logger.info("    Get WMS Layers completed. Response: " + result.getStatusCode().name());
+		logger.debug(" << getWmsConfigurations()");
+		return result;
+	}
 	
 	@RequestMapping(value = "/wms/{id}", method = RequestMethod.GET)
 	@ResponseBody

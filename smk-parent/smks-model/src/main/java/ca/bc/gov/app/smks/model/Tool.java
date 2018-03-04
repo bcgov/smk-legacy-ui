@@ -96,7 +96,10 @@ public class Tool implements Cloneable
         enabled = true;
     }
 
-    protected Tool( Tool tool ) {}
+    protected Tool( Tool tool ) 
+    {
+    	enabled = tool.enabled;
+    }
 
     @JsonIgnore
     public String getType() {

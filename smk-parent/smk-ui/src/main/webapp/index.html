@@ -5,7 +5,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" crossorigin=""></script>
    	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css">
    	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
-   	<link rel="stylesheet" type="text/css" href="resources/css/dmf.css" />
    	<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
 	<!-- Leaflet -->
 	<link rel="stylesheet"
@@ -28,6 +27,9 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/jquery.fancytree/2.28.0/skin-lion/ui.fancytree.min.css"  rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/jquery.fancytree/2.28.0/skin-lion/vline-rtl.gif"  rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/jquery.fancytree/2.28.0/skin-lion/vline.gif"  rel="stylesheet">
+    <!-- smk -->
+    <script src="resources/js/dmf.js"></script>
+    <link rel="stylesheet" type="text/css" href="resources/css/dmf.css" />
     <!-- tree css override -->
     <style type="text/css">
 		ul.fancytree-container 
@@ -74,9 +76,17 @@
 			</div>
 		  </div>
 		  <div class="row">
-	        <div id="myMashups" class="col s12">
+		  	<div class="col s12">
+		  	  <ul class="tabs navbar tabs-fixed-width nrpp-blue-dark">
+				<div class="indicator nrpp-yellow" style="z-index:1"></div>
+				<li class="tab col s3"><a class="active" href="#editCopyMaps">Maps</a></li>
+				<li class="tab col s3"><a href="#publishedMaps">Published Maps</a></li>
+				<li class="tab col s3"><a href="#about">About</a></li>
+			  </ul>
+			</div>
+	        <div id="editCopyMaps" class="col s12">
 		      <div class="card white">
-	            <div class="card-content black-text" style="height: calc(100vh - 450px); overflow: auto;">
+	            <div class="card-content black-text" style="height: calc(100vh - 510px); overflow: auto;">
 	            <div id="loadingBar">
 	            	<div class="row">
 	            		<div class="col s12">
@@ -103,7 +113,6 @@
 	                        <th></th>
 	                        <th></th>
 	                        <th></th>
-	                        <th></th>
 	                      </tr>
 	                    </thead>
 	                    <tbody>
@@ -117,6 +126,41 @@
 			     </div>
 		       </div>
 	         </div>
+	         <div id="publishedMaps" class="col s12">
+	           <div class="card white">
+	            <div class="card-content black-text" style="height: calc(100vh - 460px); overflow: auto;">
+	  			<div>
+		          <p>Click on a maps name to preview. To edit the working copy of an application, click "edit" in the actions.</p>
+		            <div>
+	                  <table class="bordered highlight responsive-table" id="publishedAppsTable">
+	                    <thead>
+	                      <tr>
+	                        <th>Name</th>
+	                        <th>Viewer</th>
+	                        <th>Version</th>
+	                        <th></th>
+	                        <th></th>
+	                      </tr>
+	                    </thead>
+	                    <tbody>
+	                    </tbody>
+	                  </table>
+				    </div>
+				   	</div>
+			      </div>
+		       </div>
+	         </div>
+	         <div id="about" class="col s12">
+	         	<div class="card white">
+	            	<div class="card-content black-text" style="height: calc(100vh - 460px); overflow: auto;">
+	  					<div>
+		          			<p>The Simple Map Kit is a Map Configuration application that allows you to create custom web mapping applications.</p>
+		          			<p>The same configurations can be used across multiple different viewers, including Leaflet, ArcGIS JS, OpenLayers, and more to come.</p>
+		          			<p>Map applications can be accessed directly from the SMK REST Service API, or applications can be exported and embedded in your own web application.</p>
+				   		</div>
+			      	</div>
+		       	</div>
+	         </div>
 	       </div>
 	    </div>
 	    <div id="editor-content" class="container" style="margin-top: 14px; min-width: 800px; display: block;">
@@ -125,7 +169,7 @@
 			  <ul class="tabs navbar tabs-fixed-width nrpp-blue-dark">
 				<div class="indicator nrpp-yellow" style="z-index:1"></div>
 				<li class="tab col s3"><a class="active" href="#identity">Identity</a></li>
-				<li class="tab col s3"><a href="#basemap">Basemap</a></li>
+				<li class="tab col s3"><a href="#basemap" onclick="resetBasemapView()">Basemap</a></li>
 				<li class="tab col s3"><a href="#layers">Layers</a></li>
 				<li class="tab col s3"><a href="#tools">Tools</a></li>
 				<li class="tab col s3"><a href="#themes">Style &amp; Theme</a></li>
@@ -149,7 +193,7 @@
 							</div>
 							<div class="row" style="margin-top: 20px;">
 								<div class="col s12">
-									<p>What kind of map service do you want to use?</p>
+									<p>What kind of map viewer do you want to use?</p>
 								</div>
 							</div>
 							<div class="row">
@@ -233,53 +277,210 @@
 			</div>
 			<div id="layers" class="col s12">
 				<div class="card white">
-					<div class="card-content black-text" style="height: calc(100vh - 200px); overflow: auto;">
+					<div class="card-content black-text" style="height: calc(100vh - 200px); overflow: none;">
 						<form id="layersForm">
-							<div class="row">
+							<div id="editLayerPanel" class="row" style="height: 100%; display: none;">
+								<div style="position: absolute; bottom: 20px; right: 20px; z-index: 1100;">
+									<!-- a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="finishLayerEdits(true);" style="width: 200px;"><i class="material-icons left">save</i>Keep Changes</a -->
+									<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="finishLayerEdits(true);" style="width: 150px;"><i class="material-icons left">cancel</i>Close</a>
+								</div>
+								<div style="height: 100%;">
+									<div id="layerEditDataBCPanel" class="col s6" style="display: none; overflow: auto; height: 100%;">
+										<div style="height: 100%; margin-left: 10px;">
+											<div class="row">
+												<h5>DataBC Catalog Layer</h5>
+											</div>
+											<div class="row">
+												<p>
+													<input type="checkbox" id="dbcVisible" />
+													<label class="black-text" for="dbcVisible">Visible</label>
+												</p>
+											</div>
+											<div class="row">
+												<div class="col s12 input-field">
+													<input id="dbcName" type="text">
+					          						<label for="dbcName">Title</label>
+												</div>
+											</div>
+											<div class="row">
+												<div class="col s12 input-field">
+													<input id="dbcAttribution" type="text">
+					          						<label for="dbcAttribution">Attribution</label>
+												</div>
+											</div>
+											<div class="row">
+												<div class="col s12 input-field">
+													<input id="dbcOpacity" type="text">
+					          						<label for="dbcOpacity">Opacity</label>
+												</div>
+											</div>
+											<div id="dbcAttributes">
+											</div>
+										</div>
+									</div>
+									<div id="layerEditWMSPanel" class="col s6" style="display: none; overflow: auto; height: 100%;">
+										<div style="height: 100%; margin-left: 10px;">
+											<div class="row">
+												<h5>WMS Service Layer</h5>
+											</div>
+											<div class="row">
+												<p>
+													<input type="checkbox" id="wmsVisible" />
+													<label class="black-text" for="wmsVisible">Visible</label>
+												</p>
+											</div>
+											<div class="row">
+												<div class="col s12 input-field">
+													<input id="wmsName" type="text">
+					          						<label for="wmsName">Title</label>
+												</div>
+											</div>
+											<div class="row">
+												<div class="col s12 input-field">
+													<input id="wmsAttribution" type="text">
+					          						<label for="wmsAttribution">Attribution</label>
+												</div>
+											</div>
+											<div class="row">
+												<div class="col s12 input-field">
+													<input id="wmsOpacity" type="text">
+					          						<label for="wmsOpacity">Opacity</label>
+												</div>
+											</div>
+											<div id="wmsAttributes">
+											</div>
+										</div>
+									</div>
+									<div id="layerEditVectorPanel" class="col s6" style="display: none; overflow: auto; height: 100%;">
+									</div>
+									<div class="col s6">
+										<div id="layerPreviewViewer" style="height: 100%; width: 100%;"></div>
+									</div>
+								</div>
+							</div>
+							<div id="layerAddPanel" class="row" style="display: block;">
 								<div class="col s6">
-									<ul class="collapsible" data-collapsible="accordion">
-										<li>
-								    		<div class="collapsible-header active"><i class="material-icons">home</i>DataBC Layer Catalog</div>
-								    		<div class="collapsible-body">
-								    			<div class="row" >
-								    				<div id="catalog-tree"></div>
-								      			</div>
-								      			<div class="row" >
-								      				<a href="#" onclick="addSelectedDataBCLayer();" class="blue-text">Add Selected Layers</a>
-								      			</div>
-									  		</div>
-								    	</li>
-								    	<li>
-								    		<div class="collapsible-header"><i class="material-icons">home</i>WMS Service</div>
-								    		<div class="collapsible-body">
-								    			<div class="row" >
-								    				<div class="col s12 input-field">
-														<input id="wmsUrl" type="text" class="validate active">
-						          						<label for="wmsUrl">WMS URL</label>
+									  <ul class="tabs navbar tabs-fixed-width nrpp-blue-dark">
+										<div class="indicator nrpp-yellow" style="z-index:1"></div>
+										<li class="tab col s3"><a class="active" href="#dbcCatalog">DataBC</a></li>
+										<li class="tab col s3"><a href="#wmsCatalog">WMS</a></li>
+										<li class="tab col s3"><a href="#kmlLoad">KML</a></li>
+										<li class="tab col s3"><a href="#jsonLoad">GeoJSON</a></li>
+									  </ul>
+										<div id="dbcCatalog" class="col s12">
+							    			<div class="row" >
+							    				<div id="catalog-tree"></div>
+							      			</div>
+							      			<div class="row" >
+							      				<a href="#" onclick="addSelectedDataBCLayer();" class="blue-text">Add Selected Layers</a>
+							      			</div>
+								    	</div>
+								    	<div id="wmsCatalog" class="col s12">
+							    			<div class="row" style="padding: 5px; margin: 0px;">
+							    				<div class="col s10 input-field">
+													<input id="wmsUrlField" type="text">
+					          						<label for="wmsUrlField">WMS URL</label>
+												</div>
+												<div class="col s2 input-field">
+													<input id="wmsVersionField" type="text">
+					          						<label for="wmsVersionField">Version</label>
+												</div>
+							    			</div>
+							    			<div class="row" style="padding: 0px; margin: 0px;">
+							    				<a href="#" onclick="loadWmsLayers();" class="blue-text">Load WMS layers</a>
+							    			</div>
+							    			<div id="wmsPanelLoading" class="row" style="display: none;">
+							    				<div class="preloader-wrapper big active">
+												    <div class="spinner-layer spinner-blue-only">
+												    	<div class="circle-clipper left">
+												        	<div class="circle"></div>
+												        </div><div class="gap-patch">
+												        	<div class="circle"></div>
+												        </div><div class="circle-clipper right">
+												        	<div class="circle"></div>
+												    	</div>
 													</div>
-								    			</div>
+												</div>
+							    			</div>
+							    			<div id="wmsPanel">
 								    			<div class="row" >
-								    				<div id="catalog-tree"></div>
+								    				<div id="wms-catalog-tree"></div>
 								      			</div>
 								      			<div class="row" >
-								      				<a href="#" onclick="addSelectedDataBCLayer();" class="blue-text">Add Selected Layers</a>
+								      				<a href="#" onclick="addSelectedWmsLayer();" class="blue-text">Add Selected Layers</a>
 								      			</div>
-									  		</div>
-								    	</li>
-								    	<li>
-								    		<div class="collapsible-header"><i class="material-icons">home</i>KML</div>
-								    		<div class="collapsible-body">
-								    			<div class="row" >
-								      			</div>
-									  		</div>
-								    	</li>
-								    	<li>
-								    		<div class="collapsible-header"><i class="material-icons">home</i>GeoJSON</div>
-								    		<div class="collapsible-body">
-								    			<div class="row" >
-								      			</div>
-									  		</div>
-								    	</li>
+							      			</div>
+								  		</div>
+								    	<div id="kmlLoad" class="col s12">
+								    		<div class="row">
+								    			<div class="file-field input-field">
+													<div class="btn">
+												    	<span>File</span>
+												        <input type="file">
+												    </div>
+												    <div class="file-path-wrapper">
+												        <input class="file-path validate" type="text">
+												      </div>
+												    </div>
+								    		</div>
+							    			<div class="row" >
+							    				<div class="col s8 input-field">
+													<input id="kmlName" type="text">
+					          						<label for="kmlName">Name</label>
+												</div>
+												<div class="col s4 input-field">
+													<input id="kmlOpacity" type="text">
+					          						<label for="kmlOpacity">Opacity</label>
+												</div>
+							      			</div>
+							      			<div class="row">
+							      				<div class="col s6">
+													<input type="checkbox" id="kmlClustering" />
+													<label class="black-text" for="kmlClustering">Cluster Points</label>
+												</div>
+												<div class="col s6">
+													<input type="checkbox" id="kmlHeatmapping" />
+													<label class="black-text" for="kmlHeatmapping">Heatmap Points</label>
+												</div>
+							      			</div>
+							      			<div class="row" >
+							    				<div class="col s4 input-field">
+													<input id="kmlStrokeWidth" type="text">
+					          						<label for="kmlStrokeWidth">Stroke Width</label>
+												</div>
+												<div class="col s4 input-field">
+													<input id="kmlStrokeStyle" type="text">
+					          						<label for="kmlStrokeStyle">Stroke Style</label>
+												</div>
+												<div class="col s4 input-field">
+													<input id="kmlStrokeOpacity" type="text">
+					          						<label for="kmlStrokeOpacity">Stroke Opacity</label>
+												</div>
+							      			</div>
+							      			<div class="row" >
+							    				<div class="col s4 input-field">
+													<input id="kmlStrokeColor" type="text">
+					          						<label for="kmlStrokeColor">Stroke Color</label>
+												</div>
+							      			</div>
+							      			<div class="row" >
+							    				<div class="col s4 input-field">
+													<input id="kmlFillColor" type="text">
+					          						<label for="kmlFillColor">Fill Color</label>
+												</div>
+												<div class="col s4 input-field">
+													<input id="kmlFillOpacity" type="text">
+					          						<label for="kmlFillOpacity">Fill Opacity</label>
+												</div>
+							      			</div>
+							      			<div class="row" >
+							      				<a href="#" onclick="uploadKmlLayer();" class="blue-text">Upload KML Layers</a>
+							      			</div>
+								    	</div>
+								    	<div id="jsonLoad" class="col s12">
+							    			<div class="row" >
+							      			</div>
+								    	</div>
 									</ul>
 								</div>
 								<div class="col s6">
@@ -291,8 +492,10 @@
 						    				<div id="layer-tree"></div>
 						      			</div>
 						      			<div class="row" >
-						      				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="editSelectedLayer();" style="width: 200px;"><i class="material-icons left">mode_edit</i>Edit</a>
-						      				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="removeSelectedLayer();" style="width: 200px;"><i class="material-icons left">delete_forever</i>Remove</a>
+						      				<a href="#" onclick="editSelectedLayer();" class="blue-text">Edit</a>
+						      				<a href="#" onclick="removeSelectedLayer();" class="blue-text">Remove</a>
+						      				<!-- a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="editSelectedLayer();" style="width: 200px;"><i class="material-icons left">mode_edit</i>Edit</a -->
+						      				<!-- a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="removeSelectedLayer();" style="width: 200px;"><i class="material-icons left">delete_forever</i>Remove</a-->
 						      			</div>
 									</div>
 								</div>
@@ -303,7 +506,7 @@
 			</div>
 			<div id="tools" class="col s12">
 				<div class="card white">
-					<div class="card-content black-text" style="height: calc(100vh - 200px); overflow: auto;">
+					<div class="card-content black-text" style="height: calc(100vh - 200px); overflow: none;">
 						<form id="toolsForm">
 							<div class="row" style="height: 100%; width: 100%; padding:0px; margin: 0px;">
 								<div class="col s3">
@@ -534,7 +737,7 @@
 			</div>
 			<div id="themes" class="col s12">
 				<div class="card white">
-					<div class="card-content black-text" style="height: calc(100vh - 200px); overflow: auto;">
+					<div class="card-content black-text" style="height: calc(100vh - 200px); overflow: none;">
 						<form id="themesForm">
 						</form>
 					</div>
@@ -549,1023 +752,6 @@
 		</div>
 	</div>
 	<script type="text/javascript">
-		var serviceUrl = "http://localhost:8080/smks/";
-		var basemapViewerMap;
-		var aboutEditor;
-		
-		var data = {
-			    lmfId: "",
-			    lmfRevision: 1,
-			    name: "",
-			    createdBy: "",
-			    published: false,
-			    surround: {
-			        type: "default",
-			        title: ""
-			    },
-			    viewer: {
-			        type: "leaflet",
-			        initialExtent: [
-			            -139.1782,
-			            47.6039,
-			            -110.3533,
-			            60.5939
-			        ],
-			        baseMap: "Imagery"
-			    },
-			    tools: [
-			        	{
-					      "type": "coordinate",
-					      "enabled": true
-					    },
-					    {
-					      "type": "attribution",
-					      "enabled": true
-					    },
-					    {
-					      "type": "sidebar",
-					      "enabled": true
-					    },
-					    {
-					      "type": "layers",
-					      "enabled": true
-					    },
-					    {
-					      "type": "identify",
-					      "enabled": true
-					    },
-					    {
-					      "type": "pan",
-					      "enabled": true
-					    },
-					    {
-					      "type": "zoom",
-					      "enabled": true,
-					      "mouseWheel": true,
-					      "doubleClick": true,
-					      "box": true,
-					      "control": true
-					    },
-					    {
-					      "type": "measure",
-					      "enabled": false
-					    },
-					    {
-					      "type": "markup",
-					      "enabled": false
-					    },
-					    {
-					      "type": "scale",
-					      "enabled": true,
-					      "showFactor": true,
-					      "showBar": true
-					    },
-					    {
-					      "type": "minimap",
-					      "enabled": true,
-					      "baseMap": "Topographic"
-					    },
-					    {
-					      "type": "directions",
-					      "enabled": true
-					    },
-					    {
-					      "type": "about",
-					      "enabled": true,
-					      "content": ""
-					    },
-					    {
-					      "type": "baseMaps",
-					      "enabled": true,
-					      "choices": [
-					        "Topographic",
-					        "Streets",
-					        "Imagery",
-					        "Oceans",
-					        "NationalGeographic",
-					        "DarkGray",
-					        "Gray"
-					      ]
-					    },
-					    {
-					      "type": "select",
-					      "enabled": false
-					    },
-					    {
-					      "type": "search",
-					      "enabled": true
-					    }
-			    ],
-			    layers: [],
-			    _id: null,
-			    _rev: null
-			};
-		
-		var mapConfigs = [];
-		var selectedMapConfig;
-		
-		function setToolActivation(toolType)
-		{
-			data.tools.forEach(function(tool) 
-           	{
-				if(tool.type == toolType)
-				{
-					tool.enabled = !tool.enabled;
-					 
-					if(tool.type == "zoom" && tool.enabled == true)
-					{
-						$("#zoomOptions").show();
-						$("#zoomControl").prop('checked', tool.control);
-						$("#zoomBox").prop('checked', tool.box);
-						$("#zoomDoubleClick").prop('checked', tool.doubleClick);
-						$("#zoomMouseWheel").prop('checked', tool.mouseWheel);
-					}
-					else if(tool.type == "zoom" && tool.enabled == false) $("#zoomOptions").hide();
-			    	else if(tool.type == "scale" && tool.enabled == true)
-		    		{
-			    		$("#scaleOptions").show();
-			    		$("#scaleFactor").prop('checked', tool.showFactor);
-						$("#scaleBar").prop('checked', tool.showBar);
-		    		}
-			    	else if(tool.type == "scale" && tool.enabled == false) $("#scaleOptions").hide();
-			    	else if(tool.type == "minimap" && tool.enabled == true)
-		    		{
-			    		$("#minimapOptions").show();
-			    		$("#StreetsMini").prop('checked', tool.baseMap == "Streets");
-			    		$("#TopographicMini").prop('checked', tool.baseMap == "Topographic");
-			    		$("#NationalGeographicMini").prop('checked', tool.baseMap == "NationalGeographic");
-			    		$("#OceansMini").prop('checked', tool.baseMap == "Oceans");
-			    		$("#GrayMini").prop('checked', tool.baseMap == "Gray");
-			    		$("#DarkGrayMini").prop('checked', tool.baseMap == "DarkGray");
-			    		$("#ImageryMini").prop('checked', tool.baseMap == "Imagery");
-			    		$("#ImageryClarityMini").prop('checked', tool.baseMap == "ImageryClarity");
-			    		$("#ShadedReliefMini").prop('checked', tool.baseMap == "ShadedRelief");
-			    		$("#TerrainMini").prop('checked', tool.baseMap == "Terrain");
-		    		}
-			    	else if(tool.type == "minimap" && tool.enabled == false) $("#minimapOptions").hide();
-			    	else if(tool.type == "about" && tool.enabled == true) 
-		    		{
-			    		$("#aboutPanelOptions").show();
-			    		setupQuillEditor(tool);
-		    		}
-			    	else if(tool.type == "about" && tool.enabled == false) $("#aboutPanelOptions").hide();
-			    	else if(tool.type == "baseMaps" && tool.enabled == true)
-		    		{
-			    		$("#basemapPanelOptions").show();
-			    		tool.choices.forEach(function(choice) 
-	    	           	{
-				    		$("#StreetsBml").prop('checked', tool.choices.indexOf("Streets") > -1);
-				    		$("#TopographicBml").prop('checked', tool.choices.indexOf("Topographic") > -1);
-				    		$("#NationalGeographicBml").prop('checked', tool.choices.indexOf("NationalGeographic") > -1);
-				    		$("#OceansBml").prop('checked', tool.choices.indexOf("Oceans") > -1);
-				    		$("#GrayBml").prop('checked', tool.choices.indexOf("Gray") > -1);
-				    		$("#DarkGrayBml").prop('checked', tool.choices.indexOf("DarkGray") > -1);
-				    		$("#ImageryBml").prop('checked', tool.choices.indexOf("Imagery") > -1);
-				    		$("#ImageryClarityBml").prop('checked', tool.choices.indexOf("ImageryClarity") > -1);
-				    		$("#ShadedReliefBml").prop('checked', tool.choices.indexOf("ShadedRelief") > -1);
-				    		$("#TerrainBml").prop('checked', tool.choices.indexOf("Terrain") > -1);
-	    	           	});
-		    		}
-			    	else if(tool.type == "baseMaps" && tool.enabled == false) $("#basemapPanelOptions").hide();
-					
-					if(tool.enabled == true) Materialize.toast('Activated ' + tool.type + " tool!", 4000);
-					else Materialize.toast('Deactivated ' + tool.type + " tool!", 4000);
-				}
-           	});
-		}
-		
-		function setupQuillEditor(tool)
-		{
-			$("#about-toolbar").empty();
-			$("#about-content").empty();
-			$(".ql-toolbar").remove();
-			
-			var toolbarOptions = [
-			                      ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
-			                      ['blockquote', 'code-block'],
-			                      [{ 'header': 1 }, { 'header': 2 }],               // custom button values
-			                      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-			                      [{ 'script': 'sub'}, { 'script': 'super' }],      // superscript/subscript
-			                      [{ 'indent': '-1'}, { 'indent': '+1' }],          // outdent/indent
-			                      [{ 'direction': 'rtl' }],                         // text direction
-			                      [{ 'size': ['small', false, 'large', 'huge'] }],  // custom dropdown
-			                      [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-			                      [{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
-			                      [{ 'font': [] }],
-			                      [{ 'align': [] }],
-			                      ['clean'],                                        // remove formatting button
-			                      ['image', 'video']								// embedd options
-			                    ];
-			
-			aboutEditor = new Quill('#about-content', 
-			{
-				modules: 
-				{
-			    	toolbar: toolbarOptions
-			  	},
-			  	theme: 'snow'
-			});
-			aboutEditor.on('text-change', function(delta, oldDelta, source) 
-			{
-				tool.content = document.querySelector(".ql-editor").innerHTML;
-			});
-			
-			document.querySelector(".ql-editor").innerHTML = tool.content;
-		}
-		
-		function setBasemapSelector(basemap)
-		{
-			data.tools.forEach(function(tool) 
-           	{
-				if(tool.type == "baseMaps")
-				{
-					var contains = (tool.choices.indexOf(basemap) > -1);
-					if(contains)
-					{
-						var index = tool.choices.indexOf(basemap);
-						if (index !== -1) tool.choices.splice(index, 1);
-					}
-					else tool.choices.push(basemap);
-				}
-           	});
-		}
-		
-		function toggleScaleOption(scaleOption)
-		{
-			data.tools.forEach(function(tool) 
-           	{
-				if(tool.type == "scale")
-				{
-					if(zoomOption == "factor") tool.showFactor = !tool.showFactor;
-					else if(zoomOption == "bar") tool.showBar = !tool.showBar;
-				}
-           	});
-		}
-		
-		function toggleZoomOption(zoomOption)
-		{
-			data.tools.forEach(function(tool) 
-           	{
-				if(tool.type == "zoom")
-				{
-					if(zoomOption == "control") tool.control = !tool.control;
-					else if(zoomOption == "box") tool.box = !tool.box;
-					else if(zoomOption == "doubleClick") tool.doubleClick = !tool.doubleClick;
-					else if(zoomOption == "mouseWheel") tool.mouseWheel = !tool.mouseWheel;
-				}
-           	});
-		}
-		
-		function setMinimapBasemap(id)
-		{
-			data.tools.forEach(function(tool) 
-           	{
-				if(tool.type == "minimap")
-				{
-					tool.baseMap = id;
-				}
-           	});
-		}
-		
-		function closeEditPanel()
-		{
-			$("#editor-content").hide("fast");
-			$("#menu-content").show("fast");
-			$("#appsTable > tbody").html("");
-			
-			$("#loadingBar").show();
-        	$("#appsTablePanel").hide();
-			loadConfigs();
-		}
-		
-		function editMapConfig(mapConfigId)
-		{
-			mapConfigs.forEach(function(mapConfig)
-			{
-				if(mapConfig.lmfId == mapConfigId)
-				{
-					selectedMapConfig = mapConfig;
-					
-					data.lmfId = mapConfig.lmfId;
-					data.name = mapConfig.name;
-					data.lmfRevision = mapConfig.lmfRevision;
-					data.createdBy = mapConfig.createdBy;
-					data.published = mapConfig.published;
-					data.surround = mapConfig.surround;
-				    data.viewer = mapConfig.viewer;
-				    data.tools = mapConfig.tools;
-				    data.layers = mapConfig.layers;
-				    data._id = mapConfig._id;
-				    data._rev = mapConfig._rev;
-				    
-				    //set tool activations
-				    data.tools.forEach(function(tool) 
-                	{
-				    	if(tool.type == "coordinate") $("#coordinates").prop('checked', tool.enabled);
-				    	else if(tool.type == "attribution") $("#attribution").prop('checked', tool.enabled);
-				    	else if(tool.type == "sidebar") $("#sidebar").prop('checked', tool.enabled);
-				    	else if(tool.type == "layers") $("#layerPanel").prop('checked', tool.enabled);
-				    	else if(tool.type == "identify") $("#identifyPanel").prop('checked', tool.enabled);
-				    	else if(tool.type == "pan") $("#panning").prop('checked', tool.enabled);
-				    	else if(tool.type == "zoom")
-			    		{
-				    		$("#zooming").prop('checked', tool.enabled);
-				    		if(tool.enabled) 
-			    			{
-				    			$("#zoomOptions").show();
-				    			$("#zoomControl").prop('checked', tool.control);
-								$("#zoomBox").prop('checked', tool.box);
-								$("#zoomDoubleClick").prop('checked', tool.doubleClick);
-								$("#zoomMouseWheel").prop('checked', tool.mouseWheel);
-			    			}
-			    		}
-				    	else if(tool.type == "measure") $("#measurement").prop('checked', tool.enabled);
-				    	else if(tool.type == "markup") $("#markup").prop('checked', tool.enabled);
-				    	else if(tool.type == "scale")
-			    		{
-				    		$("#scale").prop('checked', tool.enabled);
-				    		if(tool.enabled) 
-			    			{
-				    			$("#scaleOptions").show();
-				    			$("#scaleFactor").prop('checked', tool.showFactor);
-								$("#scaleBar").prop('checked', tool.showBar);
-			    			}
-				    	}
-				    	else if(tool.type == "minimap")
-			    		{
-				    		$("#minimap").prop('checked', tool.enabled);
-				    		if(tool.enabled) 
-			    			{
-				    			$("#minimapOptions").show();
-				    			$("#StreetsMini").prop('checked', tool.baseMap == "Streets");
-					    		$("#TopographicMini").prop('checked', tool.baseMap == "Topographic");
-					    		$("#NationalGeographicMini").prop('checked', tool.baseMap == "NationalGeographic");
-					    		$("#OceansMini").prop('checked', tool.baseMap == "Oceans");
-					    		$("#GrayMini").prop('checked', tool.baseMap == "Gray");
-					    		$("#DarkGrayMini").prop('checked', tool.baseMap == "DarkGray");
-					    		$("#ImageryMini").prop('checked', tool.baseMap == "Imagery");
-					    		$("#ImageryClarityMini").prop('checked', tool.baseMap == "ImageryClarity");
-					    		$("#ShadedReliefMini").prop('checked', tool.baseMap == "ShadedRelief");
-					    		$("#TerrainMini").prop('checked', tool.baseMap == "Terrain")
-			    			}
-			    		}
-				    	else if(tool.type == "about")
-			    		{
-				    		$("#aboutPanel").prop('checked', tool.enabled);
-				    		if(tool.enabled) 
-			    			{
-				    			$("#aboutPanelOptions").show();
-				    			setupQuillEditor(tool);
-			    			}
-			    		}
-				    	else if(tool.type == "baseMaps")
-			    		{
-				    		$("#basemapPanel").prop('checked', tool.enabled);
-				    		if(tool.enabled) 
-			    			{
-				    			$("#basemapPanelOptions").show();
-				    			tool.choices.forEach(function(choice) 
-			    	           	{
-						    		$("#StreetsBml").prop('checked', tool.choices.indexOf("Streets") > -1);
-						    		$("#TopographicBml").prop('checked', tool.choices.indexOf("Topographic") > -1);
-						    		$("#NationalGeographicBml").prop('checked', tool.choices.indexOf("NationalGeographic") > -1);
-						    		$("#OceansBml").prop('checked', tool.choices.indexOf("Oceans") > -1);
-						    		$("#GrayBml").prop('checked', tool.choices.indexOf("Gray") > -1);
-						    		$("#DarkGrayBml").prop('checked', tool.choices.indexOf("DarkGray") > -1);
-						    		$("#ImageryBml").prop('checked', tool.choices.indexOf("Imagery") > -1);
-						    		$("#ImageryClarityBml").prop('checked', tool.choices.indexOf("ImageryClarity") > -1);
-						    		$("#ShadedReliefBml").prop('checked', tool.choices.indexOf("ShadedRelief") > -1);
-						    		$("#TerrainBml").prop('checked', tool.choices.indexOf("Terrain") > -1);
-			    	           	});
-			    			}
-			    		}
-				    	else if(tool.type == "select") $("#selectPanel").prop('checked', tool.enabled);
-				    	else if(tool.type == "search") $("#searchPanel").prop('checked', tool.enabled);
-                	});
-				    
-					$("#menu-content").hide("fast");
-		        	$("#editor-content").show("fast");
-		        	
-		        	$('ul.tabs').tabs();
-		        	$('ul.tabs').tabs('select_tab', 'identity');
-		        	$('.collapsible').collapsible();
-		        	
-		        	// reset the layer tree
-		        	var layerSource = [];
-		        	data.layers.forEach(function(lyr) 
-                	{
-		        		var lyrNode = {
-										title: lyr.title, 
-										folder: false, 
-										expanded: false, 
-										data: lyr, 
-										children: []
-									};
-		        		layerSource.push(lyrNode);
-                		
-                		var tree = $('#layer-tree').fancytree('getTree');
-    	        		tree.reload(layerSource);
-                	});
-		        	
-		        	$(document).ready(function() 
-		        	{
-		        	    Materialize.updateTextFields();
-		        	    
-		        	 // init basemap viewer		
-		        	 	var ne = L.latLng(data.viewer.initialExtent[3], data.viewer.initialExtent[2]);
-						var sw = L.latLng(data.viewer.initialExtent[1], data.viewer.initialExtent[0]);
-						var bounds = L.latLngBounds(sw, ne);   
-						var centroid = bounds.getCenter();
-						var zoom = basemapViewerMap.getBoundsZoom(bounds, true);
-						
-						//basemapViewerMap.setView(bounds.getCenter(), zoom);
-						basemapViewerMap.fitBounds(bounds);
-		    			
-						basemapViewerMap.invalidateSize();		    			
-		        	    setBasemap(data.viewer.baseMap);
-		        	});
-				}
-			});
-		}
-		
-		function addNewMapConfig()
-		{
-			data.lmfId = "";
-			data.name = "";
-			data.lmfRevision = 1;
-			data.createdBy = "";
-			data.published = false;
-			data.surround = { type: "default", title: "" };
-		    data.viewer = {
-					        type: "leaflet",
-					        initialExtent: [
-					            -139.1782,
-					            47.6039,
-					            -110.3533,
-					            60.5939
-					        ],
-					        baseMap: "Imagery"
-						};
-		    data.layers = [];
-		    data._id = null;
-		    data._rev = null;
-		    data.tools = [
-				        {
-					      "type": "coordinate",
-					      "enabled": true
-					    },
-					    {
-					      "type": "attribution",
-					      "enabled": true
-					    },
-					    {
-					      "type": "sidebar",
-					      "enabled": true
-					    },
-					    {
-					      "type": "layers",
-					      "enabled": true
-					    },
-					    {
-					      "type": "identify",
-					      "enabled": true
-					    },
-					    {
-					      "type": "pan",
-					      "enabled": true
-					    },
-					    {
-					      "type": "zoom",
-					      "enabled": true,
-					      "mouseWheel": true,
-					      "doubleClick": true,
-					      "box": true,
-					      "control": true
-					    },
-					    {
-					      "type": "measure",
-					      "enabled": false
-					    },
-					    {
-					      "type": "markup",
-					      "enabled": false
-					    },
-					    {
-					      "type": "scale",
-					      "enabled": true,
-					      "showFactor": true,
-					      "showBar": true
-					    },
-					    {
-					      "type": "minimap",
-					      "enabled": true,
-					      "baseMap": "Topographic"
-					    },
-					    {
-					      "type": "directions",
-					      "enabled": true
-					    },
-					    {
-					      "type": "about",
-					      "enabled": true,
-					      "content": ""
-					    },
-					    {
-					      "type": "baseMaps",
-					      "enabled": true,
-					      "choices": [
-					        "Topographic",
-					        "Streets",
-					        "Imagery",
-					        "Oceans",
-					        "NationalGeographic",
-					        "DarkGray",
-					        "Gray"
-					      ]
-					    },
-					    {
-					      "type": "select",
-					      "enabled": false
-					    },
-					    {
-					      "type": "search",
-					      "enabled": true
-					    }
-				    ];
-			
-			$("#menu-content").hide("fast");
-        	$("#editor-content").show("fast");
-        	
-        	$('ul.tabs').tabs();
-        	$('ul.tabs').tabs('select_tab', 'identity');
-        	
-        	$(document).ready(function() 
-        	{
-        	    Materialize.updateTextFields();
-        	    
-        	 // init basemap viewer		
-        	 	var ne = L.latLng(data.viewer.initialExtent[3], data.viewer.initialExtent[2]);
-				var sw = L.latLng(data.viewer.initialExtent[1], data.viewer.initialExtent[0]);
-				var bounds = L.latLngBounds(ne, sw);   
-				var centroid = bounds.getCenter();
-				var zoom = basemapViewerMap.getBoundsZoom(bounds, true);
-				
-				//basemapViewerMap.setView(bounds.getCenter(), zoom);
-				basemapViewerMap.fitBounds(bounds);
-    			
-				basemapViewerMap.invalidateSize();		    			
-        	    setBasemap(data.viewer.baseMap);
-        	    
-        	    // reset the layer tree
-    			var tree = $('#layer-tree').fancytree('getTree');
-        		tree.reload([]);
-        	});
-		}
-		
-		function saveMapConfig()
-		{
-			var requestType = "put";
-			var requestUrl = "MapConfigurations/" + data.lmfId;
-			
-			if(data._id == null)
-			{
-				requestType = "post";
-				requestUrl = "MapConfigurations/";
-				data._id = uuid();
-			}
-				
-			$.ajax
-			({
-				url: serviceUrl + requestUrl,
-                type: requestType,
-                dataType: 'json',
-                data: JSON.stringify(data),
-                contentType:'application/json',
-                crossDomain: true,
-                withCredentials: true,
-                success: function (result) 
-                {
-                	Materialize.toast('Successfully saved application ' + data.lmfId, 4000);
-                	closeEditPanel();
-                },
-                error: function (status) 
-                {
-                    // error handler
-                    Materialize.toast('Error saving application ' + data.lmfId, 4000);
-                }
-			});
-		}
-		
-		function publishMapConfig(mapConfigId)
-		{
-			mapConfigs.forEach(function(mapConfig)
-			{
-				if(mapConfig.lmfId == mapConfigId)
-				{
-					$("#loadingBar").show();
-                	$("#appsTablePanel").hide();
-                	
-					$.ajax
-        			({
-        				url: serviceUrl + 'MapConfigurations/Published/' + mapConfigId,
-                        type: 'post',
-                        crossDomain: true,
-                        withCredentials: true,
-                        success: function (data) 
-                        {
-                        	Materialize.toast('Successfully published ' + mapConfigId, 4000);
-                        	loadConfigs();
-                        	$("#loadingBar").hide();
-                        	$("#appsTablePanel").show();
-                        },
-                        error: function (status) 
-                        {
-                        	Materialize.toast('Error publishing ' + mapConfigId, 4000);
-                        	$("#loadingBar").hide();
-                        	$("#appsTablePanel").show();
-                        }
-        			});
-				}
-			});
-		}
-		
-		function exportMapConfig(mapConfigId)
-		{
-			mapConfigs.forEach(function(mapConfig)
-			{
-				if(mapConfig.lmfId == mapConfigId)
-				{
-					$("#loadingBar").show();
-                	$("#appsTablePanel").hide();
-					window.location = serviceUrl + "MapConfigurations/Published/" + mapConfigId + "/Export/"
-					$("#loadingBar").hide();
-                	$("#appsTablePanel").show();
-				}
-			});
-		}
-		
-		function deleteMapConfig(mapConfigId)
-		{
-			if (confirm('Are you sure you want to delete the application? This cannot be undone...')) 
-        	{
-				$("#appsTablePanel").hide();
-				$("#loadingBar").show();
-				
-				mapConfigs.forEach(function(mapConfig)
-				{
-					if(mapConfig.lmfId == mapConfigId)
-					{
-						$.ajax
-	        			({
-	        				url: serviceUrl + 'MapConfigurations/' + mapConfigId,
-	                        type: 'delete',
-	                        dataType: 'json',
-	                        contentType:'application/json',
-	                        crossDomain: true,
-	                        withCredentials: true,
-	                        success: function (data) 
-	                        {
-	                        	Materialize.toast(mapConfigId + ' has been successfully deleted.', 4000);
-	                        	$("#" + mapConfigId).remove();
-	                        	
-	                        	$("#loadingBar").hide();
-	                        	$("#appsTablePanel").show();
-	                        },
-	                        error: function (status) 
-	                        {
-	                        	if (confirm('Could not delete ' + mapConfigId + '. There is an active published version. Would you like to unpublish and delete?')) 
-	                        	{
-	                        		$.ajax
-	                    			({
-	                    				url: serviceUrl + 'MapConfigurations/Published/' + mapConfigId,
-	                                    type: 'delete',
-	                                    dataType: 'json',
-	                                    contentType:'application/json',
-	                                    crossDomain: true,
-	                                    withCredentials: true,
-	                                    success: function (data) 
-	                                    {
-	                                    	Materialize.toast(mapConfigId + ' has been un-published.', 4000);
-	                                    	deleteMapConfig(mapConfigId);
-	                                    },
-	                                    error: function (status) 
-	                                    {
-	                                        Materialize.toast('Could not delete ' + mapConfigId, 4000);
-	                                        $("#loadingBar").hide();
-	        	                        	$("#appsTablePanel").show();
-	                                    }
-	                    			});
-	                        	} 
-	                        }
-	        			});
-					}
-				});
-        	}
-		}
-		
-		function previewMapConfig(mapConfigId)
-		{
-			mapConfigs.forEach(function(mapConfig)
-			{
-				if(mapConfig.lmfId == mapConfigId)
-				{
-				}
-			});
-		}
-		
-		function setBasemap(id)
-		{
-			basemapViewerMap.eachLayer(function (layer) 
-			{
-				basemapViewerMap.removeLayer(layer);
-			});
-			
-			basemapViewerMap.addLayer(L.esri.basemapLayer(id));
-		}
-		
-		function editSelectedLayer()
-		{
-			var nodes = $("#layer-tree").fancytree('getTree').getSelectedNodes();
-			
-			nodes.forEach(function(node) 
-           	{
-				// display edit panel with node object
-           	});
-		}
-		
-		function removeSelectedLayer()
-		{
-			var nodes = $("#layer-tree").fancytree('getTree').getSelectedNodes();
-			
-			nodes.forEach(function(node) 
-           	{
-				var tree = $('#layer-tree').fancytree('getTree');
-	        	var layerSource = tree.getRootNode().children;
-	        	
-	        	var containsNode = (layerSource.indexOf(node) > -1);
-				if(containsNode)
-				{
-					var nodeIndex = layerSource.indexOf(node);
-					if (nodeIndex !== -1) layerSource.splice(nodeIndex, 1);
-				}
-	        	
-	    		tree.reload(layerSource);
-	    		
-	    		data.layers.forEach(function(lyr) 
-   	           	{
-	    			if(lyr.id == node.data.id)
-    				{
-	    				var contains = (data.layers.indexOf(lyr) > -1);
-						if(contains)
-						{
-							var index = data.layers.indexOf(lyr);
-							if (index !== -1) data.layers.splice(index, 1);
-						}
-    				}
-   	           	});
-           	});
-		}
-		
-		function addSelectedDataBCLayer()
-		{
-			var nodes = $("#catalog-tree").fancytree('getTree').getSelectedNodes();
-			
-			nodes.forEach(function(node) 
-           	{
-				loadSelectedDataBCCatalogLayers(node);
-           	});
-			// if folder, load all child nodes
-			// if file, get complete and add
-		}
-		
-		function loadSelectedDataBCCatalogLayers(node)
-		{
-			if(node.folder == false)
-       		{
-       			getCompleteCatalogItem(node.data.mpcmId);
-       		}
-		}
-		
-		function getCompleteCatalogItem(mpcmId)
-		{
-			if(mpcmId != 0)
-			{
-				$.ajax
-    			({
-    				url: serviceUrl + 'LayerLibrary/' + mpcmId,
-                    type: 'get',
-                    dataType: 'json',
-                    contentType:'application/json',
-                    crossDomain: true,
-                    withCredentials: true,
-                    success: function (catalogCompleteItem) 
-                    {
-                    	if(data.layers == null) data.layers = [];
-                    	data.layers.push(catalogCompleteItem);
-                    	
-                    	var lyrNode = {
-								title: catalogCompleteItem.title, 
-								folder: false, 
-								expanded: false, 
-								data: catalogCompleteItem, 
-								children: []
-							};
-                    	
-                    	var tree = $('#layer-tree').fancytree('getTree');
-                    	var layerSource = tree.getRootNode().children;
-                    	layerSource.push(lyrNode);
-    	        		tree.reload(layerSource);
-                    },
-                    error: function (status) 
-                    {
-                        // error handler
-                        Materialize.toast('Error MPCM Layer ' + catalogItem.mpcmId, 4000);
-                    }
-    			});
-			}
-		}
-		
-		function createTreeItem(catalogItem)
-		{
-			var item = {
-							title: catalogItem.label, 
-							folder: catalogItem.mpcmId == 0, 
-							expanded: false, 
-							data: catalogItem, 
-							children: []
-						};
-			
-			for (var subItem in catalogItem.sublayers)
-			{
-				item.children.push(createTreeItem(catalogItem.sublayers[subItem]));
-			}
-			
-			return item
-		}
-		
-		function loadCatalogLayers()
-		{
-			// setup catalog layers
-			var catalogTreeSource = [];
-			
-			$("#catalog-tree").fancytree({
-			    checkbox: true,
-			    selectMode: 3,
-			    source: catalogTreeSource,
-			    activate: function(event, data)
-			    {
-			    },
-			    select: function(event, data)
-			    {
-			    }
-			  });
-			
-			$.ajax
-			({
-				url: serviceUrl + 'LayerLibrary/',
-                type: 'get',
-                dataType: 'json',
-                contentType:'application/json',
-                crossDomain: true,
-                withCredentials: true,
-                success: function (data) 
-                {
-                	data.forEach(function(catalogItem) 
-                	{
-                		catalogTreeSource.push(createTreeItem(catalogItem));
-                		
-                		var tree = $('#catalog-tree').fancytree('getTree');
-                		tree.reload(catalogTreeSource);
-                	});
-                },
-                error: function (status) 
-                {
-                    // error handler
-                    Materialize.toast('Error loading DataBC Layer catalog. Please try again later', 4000);
-                }
-			});
-		}
-		
-		function loadConfigs()
-		{
-			// trigger the ajax load
-			$.ajax
-			({
-				url: serviceUrl + 'MapConfigurations/',
-                type: 'get',
-                dataType: 'json',
-                contentType:'application/json',
-                crossDomain: true,
-                withCredentials: true,
-                success: function (data) 
-                {
-                	// finished building table
-                	$("#loadingBar").hide();
-                	$("#appsTablePanel").show();
-                	
-                	data.forEach(function(appConfigStub) 
-                	{
-                		$.ajax
-            			({
-            				url: serviceUrl + 'MapConfigurations/' + appConfigStub.id,
-                            type: 'get',
-                            dataType: 'json',
-                            contentType:'application/json',
-                            crossDomain: true,
-                            withCredentials: true,
-                            success: function (appConfig) 
-                            {                            	
-                            	mapConfigs.push(appConfig);
-                        		$("#appsTable > tbody:last-child").append("<tr id='" + appConfig.lmfId + "\'><td><a href='#' onclick='previewMapConfig(\"" + appConfig.lmfId + "\");' class='blue-text'>" + appConfig.name + "</a></td><td>" + appConfig.viewer.type + "</td><td>" + appConfig.lmfRevision + "." + (parseInt(appConfig._rev.split('-')[0]) - 1) + "</td><td><a href='#' onclick='editMapConfig(\"" + appConfig.lmfId + "\");' class='blue-text'>Edit</a></td><td><a href='#' onclick='publishMapConfig(\"" + appConfig.lmfId + "\");' class='blue-text'>Publish</a></td><td><a href='" + serviceUrl + "MapConfigurations/Published/" + appConfig.lmfId + "/Export/' download='export_client.war' class='blue-text'>Export</a></td><td><a href='#' onclick='deleteMapConfig(\"" + appConfig.lmfId + "\");' class='blue-text'>Delete</a></td></tr>");
-                            },
-                            error: function (status) 
-                            {
-                                // error handler
-                                Materialize.toast('Error loading application ' + appConfigStub.id, 4000);
-                            }
-            			});
-                	});
-                },
-                error: function (status) 
-                {
-                    // error handler
-                    Materialize.toast('Error loading applications. Please try again later', 4000);
-                }
-			});
-		}
-		
-		$(document).ready(function()
-	   	{
-			
-			// init vue
-			var app = new Vue(
-			{
-			  el: '#app',
-			  data: data
-			});
-			
-			var bmLayers = [];
-			bmLayers.push(L.esri.basemapLayer("Streets"));
-			bmLayers.push(L.esri.basemapLayer("Topographic"));
-			bmLayers.push(L.esri.basemapLayer("NationalGeographic"));
-			bmLayers.push(L.esri.basemapLayer("ImageryClarity"));
-			
-			// init background map
-	    	var map = L.map('map', { zoomControl: false });
-	    	map.touchZoom.disable();
-			map.doubleClickZoom.disable();
-			map.scrollWheelZoom.disable();
-			map.boxZoom.disable();
-			map.keyboard.disable();
-	    	var bm = bmLayers[Math.floor((Math.random() * bmLayers.length - 1) + 1)];
-			map.addLayer(bm);
-			
-			var rndLat = Math.random() * (60 - 48.3) + 47.294;
-			var rndLon = (Math.random() * (124 - 111.291) + 114) * -1;
-			var rndZoom = Math.floor(Math.random() * (11 - 6) + 6);
-
-			map.setView(new L.latLng(rndLat, rndLon), rndZoom, { animate: true, duration: 60 } );
-			
-			// set basemap
-			basemapViewerMap = L.map('basemapViewer');
-   			basemapViewerMap.on('moveend', function() 
-   			{
-   				data.viewer.initialExtent[0] = basemapViewerMap.getBounds().getWest();
-   				data.viewer.initialExtent[1] = basemapViewerMap.getBounds().getNorth();
-   				data.viewer.initialExtent[2] = basemapViewerMap.getBounds().getEast();
-   				data.viewer.initialExtent[3] = basemapViewerMap.getBounds().getSouth();
-   			});
-			
-   			// hide editor
-			$("#editor-content").hide();
-			
-   			// init the layer tree
-   			// setup catalog layers
-			var layerTreeSource = [];
-			
-			$("#layer-tree").fancytree({
-			    checkbox: true,
-			    selectMode: 1,
-			    source: [],
-			    activate: function(event, data)
-			    {
-			    },
-			    select: function(event, data)
-			    {
-			    }
-			  });
-   			
-			loadConfigs();
-			loadCatalogLayers();
-		});
-		
-		function uuid() 
-		{
-			  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-			    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-			    return v.toString(16);
-			  });
-			}
 	</script>
   </body>
 </html>

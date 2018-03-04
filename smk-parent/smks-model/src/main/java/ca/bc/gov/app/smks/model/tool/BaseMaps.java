@@ -16,6 +16,9 @@ public class BaseMaps extends Tool
 
 	protected BaseMaps( BaseMaps about ) {
 		super( about );
+		
+		if(about.choices == null) this.choices = new String[0];
+		else this.choices = about.choices.clone();
 	}
 
 	public String getType() {
@@ -42,7 +45,7 @@ public class BaseMaps extends Tool
 	public BaseMaps clone()
 	{
 		BaseMaps clone = new BaseMaps( this );
-
+		
 		return clone;
 	}
 
