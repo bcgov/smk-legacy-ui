@@ -352,6 +352,76 @@
 										</div>
 									</div>
 									<div id="layerEditVectorPanel" class="col s6" style="display: none; overflow: auto; height: 100%;">
+										<div class="row">
+											<h5>Vector Layer</h5>
+										</div>
+										<div class="row" >
+						    				<div class="col s12 input-field">
+												<input id="vectorName" type="text">
+				          						<label for="vectorName">Name</label>
+											</div>
+										</div>
+										<div class="row">
+											<div class="file-field input-field">
+												<div class="btn">
+													<span>Replace Data</span>
+													<input type="file" id="replaceVectorFileUpload">
+												</div>
+												<div class="file-path-wrapper">
+													<input class="file-path validate" type="text">
+												</div>
+											</div>
+										</div>
+										<div class="row" >
+											<div class="col s4">
+												<input type="checkbox" id="vectorVisible" />
+												<label class="black-text" for="vectorVisible">Visible</label>
+											</div>
+											<div class="col s4">
+												<input type="checkbox" id="vectorClustering" />
+												<label class="black-text" for="vectorClustering">Cluster Points</label>
+											</div>
+											<div class="col s4">
+												<input type="checkbox" id="vectorHeatmapping" />
+												<label class="black-text" for="vectorHeatmapping">Heatmap Points</label>
+											</div>
+						      			</div>
+						      			<div class="row">
+						      				<div class="col s4 input-field">
+												<input id="vectorOpacity" type="text">
+				          						<label for="vectorOpacity">Layer Opacity</label>
+											</div>
+											<div class="col s4 input-field">
+												<input id="vectorStrokeOpacity" type="text">
+				          						<label for="vectorStrokeOpacity">Stroke Opacity</label>
+											</div>
+											<div class="col s4 input-field">
+												<input id="vectorFillOpacity" type="text">
+				          						<label for="vectorFillOpacity">Fill Opacity</label>
+											</div>
+						      			</div>
+						      			<div class="row" >
+						    				<div class="col s4 input-field">
+												<input id="vectorStrokeWidth" type="text">
+				          						<label for="vectorStrokeWidth">Stroke Width</label>
+											</div>
+											<div class="col s4 input-field">
+												<input id="vectorStrokeStyle" type="text">
+				          						<label for="vectorStrokeStyle">Stroke Style</label>
+											</div>
+						      			</div>
+						      			<div class="row" >
+						    				<div class="col s4">
+						    					<label for="vectorStrokeColor" class="black-text">Stroke Color</label>
+												<input id="vectorStrokeColor" type="color">
+											</div>
+											<div class="col s4">
+						    					<label for="vectorFillColor" class="black-text">Fill Color</label>
+												<input id="vectorFillColor" type="color">
+											</div>
+						      			</div>
+						      			<div id="vectorAttributes">
+										</div>
 									</div>
 									<div class="col s6">
 										<div id="layerPreviewViewer" style="height: 100%; width: 100%;"></div>
@@ -360,12 +430,11 @@
 							</div>
 							<div id="layerAddPanel" class="row" style="display: block;">
 								<div class="col s6">
-									  <ul class="tabs navbar tabs-fixed-width nrpp-blue-dark">
+									  <ul id="layerTypeTabs" class="tabs navbar tabs-fixed-width nrpp-blue-dark">
 										<div class="indicator nrpp-yellow" style="z-index:1"></div>
 										<li class="tab col s3"><a class="active" href="#dbcCatalog">DataBC</a></li>
 										<li class="tab col s3"><a href="#wmsCatalog">WMS</a></li>
-										<li class="tab col s3"><a href="#kmlLoad">KML</a></li>
-										<li class="tab col s3"><a href="#jsonLoad">GeoJSON</a></li>
+										<li class="tab col s3"><a href="#kmlLoad">Vector</a></li>
 									  </ul>
 										<div id="dbcCatalog" class="col s12">
 							    			<div class="row" >
@@ -413,60 +482,53 @@
 								  		</div>
 								    	<div id="kmlLoad" class="col s12">
 								    		<div class="row">
-								    			<div class="file-field input-field">
-													<div class="btn">
-												    	<span>File</span>
-												        <input type="file">
-												    </div>
-												    <div class="file-path-wrapper">
-												        <input class="file-path validate" type="text">
-												      </div>
-												    </div>
+								    			<div class="col s6">
+									    			<div class="file-field input-field">
+														<div class="btn">
+													    	<span>File</span>
+													        <input type="file" id="vectorFileUpload">
+													    </div>
+													    <div class="file-path-wrapper">
+													        <input class="file-path validate" type="text">
+													      </div>
+													    </div>
+												</div>
+												<div class="col s6" style="margin-top: 15px;">
+													<select id="vectorType">
+												      <option value="" disabled selected>Choose vector type</option>
+												      <option value="kml">Kml</option>
+												      <option value="geojson">GeoJSON</option>
+												    </select>
+												</div>
 								    		</div>
 							    			<div class="row" >
-							    				<div class="col s8 input-field">
+							    				<div class="col s12 input-field">
 													<input id="kmlName" type="text">
 					          						<label for="kmlName">Name</label>
 												</div>
-												<div class="col s4 input-field">
-													<input id="kmlOpacity" type="text">
-					          						<label for="kmlOpacity">Opacity</label>
-												</div>
 							      			</div>
 							      			<div class="row">
-							      				<div class="col s6">
+							      				<div class="col s4">
+													<input type="checkbox" id="kmlIsVisible" />
+													<label class="black-text" for="kmlIsVisible">Visible</label>
+												</div>
+							      				<div class="col s4">
 													<input type="checkbox" id="kmlClustering" />
 													<label class="black-text" for="kmlClustering">Cluster Points</label>
 												</div>
-												<div class="col s6">
+												<div class="col s4">
 													<input type="checkbox" id="kmlHeatmapping" />
 													<label class="black-text" for="kmlHeatmapping">Heatmap Points</label>
 												</div>
 							      			</div>
 							      			<div class="row" >
-							    				<div class="col s4 input-field">
-													<input id="kmlStrokeWidth" type="text">
-					          						<label for="kmlStrokeWidth">Stroke Width</label>
-												</div>
 												<div class="col s4 input-field">
-													<input id="kmlStrokeStyle" type="text">
-					          						<label for="kmlStrokeStyle">Stroke Style</label>
+													<input id="kmlOpacity" type="text">
+					          						<label for="kmlOpacity">Layer Opacity</label>
 												</div>
 												<div class="col s4 input-field">
 													<input id="kmlStrokeOpacity" type="text">
 					          						<label for="kmlStrokeOpacity">Stroke Opacity</label>
-												</div>
-							      			</div>
-							      			<div class="row" >
-							    				<div class="col s4 input-field">
-													<input id="kmlStrokeColor" type="text">
-					          						<label for="kmlStrokeColor">Stroke Color</label>
-												</div>
-							      			</div>
-							      			<div class="row" >
-							    				<div class="col s4 input-field">
-													<input id="kmlFillColor" type="text">
-					          						<label for="kmlFillColor">Fill Color</label>
 												</div>
 												<div class="col s4 input-field">
 													<input id="kmlFillOpacity" type="text">
@@ -474,17 +536,33 @@
 												</div>
 							      			</div>
 							      			<div class="row" >
-							      				<a href="#" onclick="uploadKmlLayer();" class="blue-text">Upload KML Layers</a>
+							      				<div class="col s4 input-field">
+													<input id="kmlStrokeWidth" type="text">
+					          						<label for="kmlStrokeWidth">Stroke Width</label>
+												</div>
+												<div class="col s4 input-field">
+													<input id="kmlStrokeStyle" type="text">
+					          						<label for="kmlStrokeStyle">Stroke Style</label>
+												</div>
+											</div>
+											<div class="row" >
+							    				<div class="col s4">
+													<label for="kmlStrokeColor" class="black-text">Stroke Color</label>
+													<input id="kmlStrokeColor" type="color">
+												</div>
+												<div class="col s4">
+							    					<label for="kmlFillColor" class="black-text">Fill Color</label>
+													<input id="kmlFillColor" type="color">
+												</div>
 							      			</div>
-								    	</div>
-								    	<div id="jsonLoad" class="col s12">
-							    			<div class="row" >
+							      			<div class="row" >
+							      				<a href="#" onclick="uploadVectorLayer();" class="blue-text">Upload Vector Layer</a>
 							      			</div>
 								    	</div>
 									</ul>
 								</div>
 								<div class="col s6">
-									<div id="layerData" class="z-depth-2" style="height: 100%; width: 100%; padding: 20px;">
+									<div id="layerData" style="height: 100%; width: 100%; padding: 20px;">
 										<div class="row" >
 											<h5>Active Layers</h5>
 										</div>
@@ -492,8 +570,8 @@
 						    				<div id="layer-tree"></div>
 						      			</div>
 						      			<div class="row" >
-						      				<a href="#" onclick="editSelectedLayer();" class="blue-text">Edit</a>
-						      				<a href="#" onclick="removeSelectedLayer();" class="blue-text">Remove</a>
+						      				<a href="#" onclick="editSelectedLayer();" class="blue-text">Edit Selected Layer</a>
+						      				<a href="#" onclick="removeSelectedLayer();" class="blue-text" style="margin-left: 12px;">Remove Selected Layer</a>
 						      				<!-- a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="editSelectedLayer();" style="width: 200px;"><i class="material-icons left">mode_edit</i>Edit</a -->
 						      				<!-- a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="removeSelectedLayer();" style="width: 200px;"><i class="material-icons left">delete_forever</i>Remove</a-->
 						      			</div>
@@ -739,6 +817,27 @@
 				<div class="card white">
 					<div class="card-content black-text" style="height: calc(100vh - 200px); overflow: none;">
 						<form id="themesForm">
+							<div style="position: absolute; bottom: 20px; right: 20px; z-index: 1100;">
+								<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="uploadSurroundHeader();"><i class="material-icons left">backup</i>Keep Changes</a>
+							</div>
+							<div class="row">
+								<h5>Header Image</h5>
+							</div>
+							<div class="row">
+								<p>Upload a header image to replace the default header style.</p>
+								<p>Once you've selected a file, click "Keep Changes" to load the file. It will be saved to your map once you click the save button.</p>
+							</div>
+							<div class="row">
+								<div class="file-field input-field">
+									<div class="btn">
+										<span>File</span>
+										<input type="file" id="headerImageFileUpload">
+									</div>
+									<div class="file-path-wrapper">
+										<input class="file-path validate" type="text">
+									</div>
+								</div>
+							</div>
 						</form>
 					</div>
 				</div>

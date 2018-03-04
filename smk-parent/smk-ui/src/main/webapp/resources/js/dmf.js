@@ -267,6 +267,9 @@ function editMapConfig(mapConfigId)
         	basemapViewerMap.invalidateSize();	
         	layerPreviewViewer.invalidateSize();
         	
+        	unsavedAttachments = [];
+        	fileContents = null;
+        	
         	$(document).ready(function() 
         	{
         	    Materialize.updateTextFields();
@@ -369,7 +372,9 @@ function setupMapConfigToolsUI()
     
     $('ul.tabs').tabs();
 	$('ul.tabs').tabs('select_tab', 'identity');
+	$('#layerTypeTabs').tabs('select_tab', 'dbcCatalog');
 	$('.collapsible').collapsible();
+	$('select').material_select();
 }
 
 function addNewMapConfig()
@@ -485,6 +490,9 @@ function addNewMapConfig()
 	$('ul.tabs').tabs();
 	$('ul.tabs').tabs('select_tab', 'identity');
 	
+	unsavedAttachments = [];
+	fileContents = null;
+	
 	$(document).ready(function() 
 	{
 	    Materialize.updateTextFields();
@@ -536,6 +544,41 @@ function saveMapConfig()
         success: function (result) 
         {
         	Materialize.toast('Successfully saved application ' + data.lmfId, 4000);
+        	
+        	// now we need to complete any attachments before moving on.
+        	
+        	unsavedAttachments.forEach(function (attachment)
+        	{
+        		
+        		var documentData = new FormData();
+        		documentData.append('file', attachment.contents);
+        		
+        		var attchId;
+        		if(attachment.type == "header_upload") attchId = "surroundImage";
+        		else attchId = attachment.layer.id;
+        		
+        		$.ajax
+        		({
+        			url: serviceUrl + "MapConfigurations/" + data.lmfId + "/Attachments/?id=" + attchId,
+        	        type: "post",
+        	        data: documentData,
+        	        crossDomain: true,
+        	        withCredentials: true,
+        	        cache: false,
+        	        contentType: false,
+        	        processData: false,
+        	        success: function (result) 
+        	        {
+        	        	console.log("attachment " + attachment.layer.id + " uploaded!");
+        	        	loadConfigs();
+        	        },
+        	        error: function (status) 
+        	        {
+        	            Materialize.toast('Error uploading attachment ' + attachment.layer.title, 4000);
+        	        }
+        		});
+    		});
+
         	closeEditPanel();
         },
         error: function (status) 
@@ -747,6 +790,30 @@ function finishLayerEdits(save)
 		}
 		else // kml, geojson 
 		{
+			selectedLayerNode.data.isVisible = $("#vectorVisible").is(":checked");
+			selectedLayerNode.data.title = $("#vectorName").val();
+			selectedLayerNode.data.opacity = $("#vectorOpacity").val();
+			selectedLayerNode.data.useClustering = $("#vectorClustering").is(":checked");
+			selectedLayerNode.data.useHeatmapping = $("#vectorHeatmapping").is(":checked");
+			selectedLayerNode.data.style.strokeWidth = $("#vectorStrokeWidth").val();
+			selectedLayerNode.data.style.stylestrokeStyle = $("#vectorStrokeStyle").val();
+			selectedLayerNode.data.style.strokeColor = $("#vectorStrokeColor").val();
+			selectedLayerNode.data.style.strokeOpacity = $("#vectorStrokeOpacity").val();
+			selectedLayerNode.data.style.fillColor = $("#vectorFillColor").val();
+			selectedLayerNode.data.style.fillOpacity = $("#vectorFillOpacity").val();
+			
+			// add the attachment data to the cache for upload after save
+			if(fileContents != null)
+			{
+				unsavedAttachments.push(
+				{
+					type: "vector_upload",
+					layer: selectedLayerNode.data,
+					contents: fileContents
+				});
+			}
+			
+			document.getElementById("layersForm").reset();
 		}
 		
 		var root = $("#layer-tree").fancytree('getTree').getRootNode().children;
@@ -758,15 +825,19 @@ function finishLayerEdits(save)
 		{
 			if(lyr.id == selectedLayerNode.data.id)
 			{
-				var contains = (data.layers.indexOf(lyr) > -1);
-				if(contains)
+				var index = data.layers.indexOf(lyr);
+				if (index !== -1)
 				{
-					var index = data.layers.indexOf(lyr);
-					if (index !== -1)
-					{
-						data.layers.splice(index, 1);
-						data.layers.push(selectedLayerNode.data);
-					}
+					var layerData = selectedLayerNode.data;
+					
+					if(layerData.hasOwnProperty("li")) delete layerData["li"];
+					if(layerData.hasOwnProperty("parent")) delete layerData["parent"];
+					if(layerData.hasOwnProperty("span")) delete layerData["span"];
+					if(layerData.hasOwnProperty("tree")) delete layerData["tree"];
+					if(layerData.hasOwnProperty("ul")) delete layerData["ul"];
+					
+					data.layers.splice(index, 1);
+					data.layers.push(layerData);
 				}
 			}
       	});
@@ -780,7 +851,10 @@ function finishLayerEdits(save)
 	$("#layerEditVectorPanel").hide();
 	$("#layerAddPanel").show();
 	
+	document.getElementById("layersForm").reset();
+	
 	selectedLayerNode = null;
+	fileContents = null;
 }
 
 function editSelectedLayer()
@@ -867,6 +941,26 @@ function editSelectedLayer()
 		else 
 		{
 			$("#layerEditVectorPanel").show(); //kml, geojson
+			
+			$("#vectorVisible").prop('checked', node.data.isVisible);
+			$("#vectorName").val(node.data.title);
+			$("#vectorOpacity").val(node.data.opacity);
+			$("#vectorClustering").prop('checked', node.data.useClustering);
+			$("#vectorHeatmapping").prop('checked', node.data.useHeatmapping);
+			$("#vectorStrokeWidth").val(node.data.style.strokeWidth);
+			$("#vectorStrokeStyle").val(node.data.stylestrokeStyle);
+		    $("#vectorStrokeColor").val(node.data.style.strokeColor);
+		    $("#vectorStrokeOpacity").val(node.data.style.strokeOpacity);
+		    $("#vectorFillColor").val(node.data.style.fillColor);
+		    $("#vectorFillOpacity").val(node.data.style.fillOpacity);
+		    
+		    if(node.data.attributes == null) node.data.attributes = [];
+			node.data.attributes.forEach(function (attribute) 
+			{
+				$("#vectorAttributes").append('<div class="row"><div class="col s4"><p><input type="checkbox" id="' + attribute.id + '_visible" /><label class="black-text" for="' + attribute.id + '_visible">Visible</label></p></div><div class="col s8 input-field"><input id="' + attribute.id + '_label" type="text"><label for="' + attribute.id + '_label">Label</label></div></div>');
+				$("#" + attribute.id + "_visible").prop('checked', attribute.visible);
+				$("#" + attribute.id + "_label").val(attribute.title);
+			});
 		}
 		
 		Materialize.updateTextFields();
@@ -906,8 +1000,57 @@ function removeSelectedLayer()
    	});
 }
 
-function uploadKmlLayer()
+function uploadVectorLayer()
 {
+	// create kml doc
+	var layer = 
+	{
+		type: $("#vectorType").val(),
+		id: $("#kmlName").val().replace(/\s+/g, '-').toLowerCase(),
+	    title: $("#kmlName").val(),
+	    isVisible: $("#kmlIsVisible").is(":checked"),
+	    opacity: $("#kmlOpacity").val(),
+	    attributes: [],
+		useClustering: $("#kmlClustering").is(":checked"),
+		useHeatmapping: $("#kmlHeatmapping").is(":checked"),
+		style: 
+		{
+			strokeWidth: $("#kmlStrokeWidth").val(),
+			strokeStyle: $("#kmlStrokeStyle").val(),
+		    strokeColor: $("#kmlStrokeColor").val(),
+		    strokeOpacity: $("#kmlStrokeOpacity").val(),
+		    fillColor: $("#kmlFillColor").val(),
+		    fillOpacity: $("#kmlFillOpacity").val()
+		}
+	};
+	
+	// add to data
+	data.layers.push(layer);
+	
+	// add to layer tree
+	var lyrNode = 
+	{
+		title: layer.title, 
+		folder: false, 
+		expanded: false, 
+		data: layer, 
+		children: []
+	};
+	
+	var tree = $('#layer-tree').fancytree('getTree');
+	var layerSource = tree.getRootNode().children;
+	layerSource.push(lyrNode);
+	tree.reload(layerSource);
+	
+	// add the attachment data to the cache for upload after save
+	unsavedAttachments.push(
+	{
+		type: "vector_upload",
+		layer: layer,
+		contents: fileContents
+	});
+	
+	document.getElementById("layersForm").reset();
 }
 
 function addSelectedWmsLayer()
@@ -954,6 +1097,17 @@ function addSelectedWmsLayer()
 			tree.reload(layerSource);
 		}
    	});
+}
+
+function uploadSurroundHeader()
+{
+	unsavedAttachments.push(
+	{
+		type: "header_upload",
+		contents: fileContents
+	});
+	
+	document.getElementById("themesForm").reset();
 }
 
 function addSelectedDataBCLayer()
@@ -1239,7 +1393,6 @@ function loadConfigs()
                     },
                     error: function (status) 
                     {
-                        // error handler
                         Materialize.toast('Error loading published application ' + appConfigStub.id, 4000);
                     }
     			});
@@ -1247,7 +1400,6 @@ function loadConfigs()
         },
         error: function (status) 
         {
-            // error handler
             Materialize.toast('Error loading published applications. Please try again later', 4000);
         }
 	});
@@ -1333,7 +1485,43 @@ $(document).ready(function()
 	
 	loadConfigs();
 	loadCatalogLayers();
+	
+	//init the file upload components
+	document.getElementById('vectorFileUpload').addEventListener('change', readFile, false);
+	document.getElementById('headerImageFileUpload').addEventListener('change', readFile, false);
+	document.getElementById('replaceVectorFileUpload').addEventListener('change', readFile, false);
 });
+
+var fileContents;
+var unsavedAttachments = [];
+
+function readFile(e) 
+{
+	fileContents = null;
+	
+	var file = e.target.files[0];
+	
+	if (!file) 
+	{
+	    return;
+	}
+	
+	fileContents = file;
+}
+
+var fileString;
+function fileToString(file)
+{
+	fileString = null;
+	var reader = new FileReader();
+	
+	reader.onload = function(e) 
+	{
+		fileString = e.target.result;
+	};
+
+	reader.readAsText(file);
+}
 
 function uuid() 
 {
@@ -1342,21 +1530,4 @@ function uuid()
 		var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
 		return v.toString(16);
 	});
-}
-
-function censor(censor) 
-{
-    var i = 0;
-
-    return function(key, value) 
-    {
-        if(i !== 0 && typeof(censor) === 'object' && typeof(value) == 'object' && censor == value) return '[Circular]'; 
-
-        if(i >= 29) // seems to be a hard maximum of 30 serialized objects?
-            return '[Unknown]';
-
-        ++i; // so we know we aren't using the original object anymore
-
-        return value;  
-    }
 }

@@ -224,7 +224,25 @@ public class MapConfigController
 
 			if(request.isPublished()) throw new Exception("You cannot update the currently published Map Configuration. Please update the editable version.");
 
-			couchDAO.updateResource(request);
+			// seems to be blowing away the attachments?
+			MapConfiguration resource = couchDAO.getMapConfiguration(id);
+			
+			resource.setCreatedBy(request.getCreatedBy());
+			resource.setId(request.getId());
+			resource.setLayers(request.getLayers());
+			resource.setLmfId(request.getLmfId());
+			resource.setLmfRevision(request.getLmfRevision());
+			resource.setName(request.getName());
+			resource.setProject(request.getProject());
+			resource.setPublished(request.isPublished());
+			resource.setRevision(request.getRevision());
+			resource.setSurround(request.getSurround());
+			resource.setTools(request.getTools());
+			resource.setViewer(request.getViewer());
+			
+			// updating request directly appears to delete the entire attachment set?
+			// _attachment stubs are not being serialized for some reason.
+			couchDAO.updateResource(resource);
 			result = new ResponseEntity<String>("{ \"status\": \"Success!\" }", HttpStatus.OK);
 		}
 		catch (Exception e)

@@ -9,7 +9,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 import ca.bc.gov.app.smks.dao.CouchDAO;
 import ca.bc.gov.app.smks.dao.LayerCatalogDAO;
@@ -18,7 +20,7 @@ import ca.bc.gov.app.smks.dao.LayerCatalogDAO;
 @EnableWebMvc
 @ComponentScan(basePackages = "ca.bc.gov.app.smks")
 @PropertySource("classpath:application.properties")
-public class WebConfig
+public class WebConfig extends WebMvcConfigurerAdapter
 {
 	private static Log logger = LogFactory.getLog(WebConfig.class);
 
@@ -52,5 +54,11 @@ public class WebConfig
 		resolver.setMaxUploadSize(new Long(env.getProperty("attachment.max.size")));
 
 		return resolver;
+	}
+	
+	@Override
+	public void addCorsMappings(CorsRegistry registry) 
+	{
+		registry.addMapping("/**");
 	}
 }
