@@ -276,6 +276,8 @@ function editMapConfig(mapConfigId)
         	    
         	 // init basemap viewer			    			
         	    setBasemap(data.viewer.baseMap);
+        	    layerPreviewViewer.setView(new L.latLng(rndLat, rndLon), rndZoom, { animate: true, duration: 60 } );
+        	    layerPreviewViewer.fitBounds(basemapViewerMap.getBounds());
         	});
 		}
 	});
@@ -369,6 +371,11 @@ function setupMapConfigToolsUI()
     	else if(tool.type == "search") $("#searchPanel").prop('checked', tool.enabled);
     	else if(tool.type == "directions") $("#directions").prop('checked', tool.enabled);
 	});
+    
+    // clear out any layers
+    var layerSource = [];
+    var tree = $('#layer-tree').fancytree('getTree');
+	tree.reload(layerSource);
     
     $('ul.tabs').tabs();
 	$('ul.tabs').tabs('select_tab', 'identity');
@@ -509,6 +516,8 @@ function addNewMapConfig()
 		
 		basemapViewerMap.invalidateSize();		    			
 	    setBasemap(data.viewer.baseMap);
+	    
+	    layerPreviewViewer.fitBounds(bounds);
 	    
 	    // reset the layer tree
 		var tree = $('#layer-tree').fancytree('getTree');
@@ -707,6 +716,13 @@ function previewMapConfig(mapConfigId)
 	{
 		if(mapConfig.lmfId == mapConfigId)
 		{
+			var html = '<html><head><title>' + mapConfig.name + '</title><head><body><div id="smk-map-frame"></div><script src="http://localhost:8080/smk-client/smk-bootstrap.js" smk-standalone="true" smk-config="' + serviceUrl + 'MapConfigurations/' + mapConfigId + '">return ' + JSON.stringify(mapConfig) + '</script></body></html>';
+			
+			//var newWindow = window.open();
+			//newWindow.document.body.innerHTML = html;
+			
+			var newWindow2 = window.open();
+			newWindow2.document.write(html);
 		}
 	});
 }
@@ -717,6 +733,13 @@ function previewPublishedMapConfig(mapConfigId)
 	{
 		if(mapConfig.lmfId == mapConfigId)
 		{
+			var html = '<html><head><title>' + mapConfig.name + '</title><head><body><div id="smk-map-frame"></div><script src="http://localhost:8080/smk-client/smk-bootstrap.js" smk-standalone="true" smk-config="' + serviceUrl + 'MapConfigurations/' + mapConfigId + '">return ' + JSON.stringify(mapConfig) + '</script></body></html>';
+			
+			//var newWindow = window.open();
+			//newWindow.document.body.innerHTML = html;
+			
+			var newWindow2 = window.open();
+			newWindow2.document.write(html);
 		}
 	});
 }
@@ -1437,8 +1460,10 @@ $(document).ready(function()
 
 	map.setView(new L.latLng(rndLat, rndLon), rndZoom, { animate: true, duration: 60 } );
 	
+	// reset preview to basemap exent on config edit
 	layerPreviewViewer = L.map('layerPreviewViewer');
-	layerPreviewViewer.setView(new L.latLng(rndLat, rndLon), rndZoom);
+	layerPreviewViewer.setView(new L.latLng(rndLat, rndLon), rndZoom, { animate: true, duration: 60 } );
+	
 	// set basemap
 	basemapViewerMap = L.map('basemapViewer');
 		basemapViewerMap.on('moveend', function() 
