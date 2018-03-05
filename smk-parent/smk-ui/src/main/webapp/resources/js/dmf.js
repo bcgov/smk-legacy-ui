@@ -381,7 +381,7 @@ function setupMapConfigToolsUI()
 	$('ul.tabs').tabs('select_tab', 'identity');
 	$('#layerTypeTabs').tabs('select_tab', 'dbcCatalog');
 	$('.collapsible').collapsible();
-	$('select').material_select();
+	$('#vectorType').material_select();
 }
 
 function addNewMapConfig()
@@ -1349,7 +1349,6 @@ function loadConfigs()
 	mapConfigs = [];
 	publishedMapConfigs = [];
 	selectedMapConfig = null;
-	aboutEditor = null;
 	editMode = false;
 	
 	// trigger the ajax load for edit copy configs
