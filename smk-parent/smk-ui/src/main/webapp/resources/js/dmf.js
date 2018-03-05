@@ -367,7 +367,7 @@ function setupMapConfigToolsUI()
 	           	});
 			}
 		}
-    	else if(tool.type == "select") $("#selectPanel").prop('checked', tool.enabled);
+    	else if(tool.type == "select") $("#selectionPanel").prop('checked', tool.enabled);
     	else if(tool.type == "search") $("#searchPanel").prop('checked', tool.enabled);
     	else if(tool.type == "directions") $("#directions").prop('checked', tool.enabled);
 	});
@@ -716,7 +716,7 @@ function previewMapConfig(mapConfigId)
 	{
 		if(mapConfig.lmfId == mapConfigId)
 		{
-			var html = '<html><head><title>' + mapConfig.name + '</title><head><body><div id="smk-map-frame"></div><script src="http://localhost:8080/smk-client/smk-bootstrap.js" smk-standalone="true" smk-config="' + serviceUrl + 'MapConfigurations/' + mapConfigId + '">return ' + JSON.stringify(mapConfig) + '</script></body></html>';
+			var html = '<html><head><title>' + mapConfig.name + '</title><head><body><div id="smk-map-frame"></div><script src="http://localhost:8080/smk-client/smk-bootstrap.js" smk-standalone="true">return ' + JSON.stringify(mapConfig) + '</script></body></html>';
 			
 			//var newWindow = window.open();
 			//newWindow.document.body.innerHTML = html;
@@ -733,7 +733,7 @@ function previewPublishedMapConfig(mapConfigId)
 	{
 		if(mapConfig.lmfId == mapConfigId)
 		{
-			var html = '<html><head><title>' + mapConfig.name + '</title><head><body><div id="smk-map-frame"></div><script src="http://localhost:8080/smk-client/smk-bootstrap.js" smk-standalone="true" smk-config="' + serviceUrl + 'MapConfigurations/' + mapConfigId + '">return ' + JSON.stringify(mapConfig) + '</script></body></html>';
+			var html = '<html><head><title>' + mapConfig.name + '</title><head><body><div id="smk-map-frame"></div><script src="http://localhost:8080/smk-client/smk-bootstrap.js" smk-standalone="true">return ' + JSON.stringify(mapConfig) + '</script></body></html>';
 			
 			//var newWindow = window.open();
 			//newWindow.document.body.innerHTML = html;
