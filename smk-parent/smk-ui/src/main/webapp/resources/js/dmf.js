@@ -1095,17 +1095,24 @@ function addSelectedWmsLayer()
 		
 		if(node.folder == false)
 		{	
-			var wmsData = node.data.wms;
-			var wmsStyleData = node.data.style;
+			var wmsData = null;
+			var wmsStyleData = null;
+			
+			if(node.data.wms != null)
+			{
+				wmsData = node.data.wms;
+				wmsStyleData = node.data.style;
+			}
+			else wmsData = node.data;
 			
 			var wmsItem = {
 					type: "wms",
 					version: wmsVersion,
 					serviceUrl: wmsUrl,
 					layerName: wmsData.name,
-					styleName: wmsStyleData.name,
-					id: wmsData.name + "-" + wmsStyleData.name,
-					title: wmsData.title + " " + wmsStyleData.title,
+					styleName: wmsStyleData != null ? wmsStyleData.name : null,
+					id: wmsStyleData != null ? wmsData.name + "-" + wmsStyleData.name : wmsData.name,
+					title: wmsStyleData != null ? wmsData.title + " " + wmsStyleData.title : wmsData.title,
 					isVisible: true,
 					attribution: "",
 					metadataUrl: "",
@@ -1224,6 +1231,7 @@ function createWmsTreeItem(wmsItem)
 			title: wmsItem.title, 
 			folder: wmsItem.styles.length > 0, 
 			expanded: false,  
+			data: wmsItem,
 			children: []
 		};
 

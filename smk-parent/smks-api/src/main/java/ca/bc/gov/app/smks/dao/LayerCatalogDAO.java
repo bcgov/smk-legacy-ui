@@ -334,32 +334,35 @@ public class LayerCatalogDAO
 	    		        		styles.add(style);
 	    		        }
 
-						int titleIndex = 0;
-						String styleTitle = styles.get( 0 ).getTitle();
-						if ( styles.size() > 1 ) {
-							OUTER: while ( true ) {
-								if ( titleIndex >= styleTitle.length() ) break OUTER;
-
-								char c0 = styleTitle.charAt( titleIndex );
-								for ( int idx = 1; idx < styles.size(); idx++ ) {
-									String n = styles.get( idx ).getTitle();
-									if ( titleIndex >= n.length() ) break OUTER;
-
-									if ( c0 != n.charAt( titleIndex ) ) break OUTER;
+	    		        if(styles.size() > 0)
+	    		        {
+							int titleIndex = 0;
+							String styleTitle = styles.get( 0 ).getTitle();
+							if ( styles.size() > 1 ) {
+								OUTER: while ( true ) {
+									if ( titleIndex >= styleTitle.length() ) break OUTER;
+	
+									char c0 = styleTitle.charAt( titleIndex );
+									for ( int idx = 1; idx < styles.size(); idx++ ) {
+										String n = styles.get( idx ).getTitle();
+										if ( titleIndex >= n.length() ) break OUTER;
+	
+										if ( c0 != n.charAt( titleIndex ) ) break OUTER;
+									}
+	
+									titleIndex += 1;
 								}
-
-								titleIndex += 1;
 							}
-						}
-						// logger.debug( s0 + ", " + p );
-
-						if ( titleIndex > 0 )
-							for ( int j = 0; j < styles.size(); j++ ) {
-								WMSInfoStyle s = styles.get( j );
-								if ( titleIndex < ( s.getTitle().length() - 1 ) )
-									s.setTitle( "..." + s.getTitle().substring( titleIndex ) );
-								// logger.debug( s.getTitle() );
-							}
+							
+							// logger.debug( s0 + ", " + p );
+							if ( titleIndex > 0 )
+								for ( int j = 0; j < styles.size(); j++ ) {
+									WMSInfoStyle s = styles.get( j );
+									if ( titleIndex < ( s.getTitle().length() - 1 ) )
+										s.setTitle( "..." + s.getTitle().substring( titleIndex ) );
+									// logger.debug( s.getTitle() );
+								}
+	    		        }
 	    		    }
 	            }
 	        }
