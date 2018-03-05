@@ -13,7 +13,7 @@ var getQueryString = function ( field, url )
     return string ? string[1] : null;
 };
 
-var serviceUrl = "http://localhost:8080/smks/";
+var serviceUrl = "../smks/";
 var wmsUrl = "https://openmaps.gov.bc.ca/geo/pub/ows";
 var wmsPostfix = "?service=WMS&request=GetCapabilities";
 var wmsVersion = "1.3.0";
