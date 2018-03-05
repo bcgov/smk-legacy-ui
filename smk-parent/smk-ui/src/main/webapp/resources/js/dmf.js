@@ -710,13 +710,22 @@ function deleteMapConfig(mapConfigId)
 	}
 }
 
+function previewEdits()
+{
+	var html = '<html><head><title>' + data.name + '</title><head><body><div id="smk-map-frame"></div><script src="../smk-client/smk-bootstrap.js" smk-standalone="true">return ' + JSON.stringify(data) + '</script></body></html>';
+
+	var newWindow2 = window.open();
+	newWindow2.document.write(html);
+}
+
+
 function previewMapConfig(mapConfigId)
 {
 	mapConfigs.forEach(function(mapConfig)
 	{
 		if(mapConfig.lmfId == mapConfigId)
 		{
-			var html = '<html><head><title>' + mapConfig.name + '</title><head><body><div id="smk-map-frame"></div><script src="http://localhost:8080/smk-client/smk-bootstrap.js" smk-standalone="true">return ' + JSON.stringify(mapConfig) + '</script></body></html>';
+			var html = '<html><head><title>' + mapConfig.name + '</title><head><body><div id="smk-map-frame"></div><script src="../smk-client/smk-bootstrap.js" smk-standalone="true">return ' + JSON.stringify(mapConfig) + '</script></body></html>';
 			
 			//var newWindow = window.open();
 			//newWindow.document.body.innerHTML = html;
@@ -733,7 +742,7 @@ function previewPublishedMapConfig(mapConfigId)
 	{
 		if(mapConfig.lmfId == mapConfigId)
 		{
-			var html = '<html><head><title>' + mapConfig.name + '</title><head><body><div id="smk-map-frame"></div><script src="http://localhost:8080/smk-client/smk-bootstrap.js" smk-standalone="true">return ' + JSON.stringify(mapConfig) + '</script></body></html>';
+			var html = '<html><head><title>' + mapConfig.name + '</title><head><body><div id="smk-map-frame"></div><script src="../smk-client/smk-bootstrap.js" smk-standalone="true">return ' + JSON.stringify(mapConfig) + '</script></body></html>';
 			
 			//var newWindow = window.open();
 			//newWindow.document.body.innerHTML = html;

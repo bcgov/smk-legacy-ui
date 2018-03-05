@@ -395,7 +395,8 @@ public class PublishedMapConfigController
 				    
 				    // create index.html with refs to config and attachments, and insert
 				    File indexHtml = File.createTempFile(resource.getName() + "_index", ".html");
-				    String indexCode = "<html><head><title>" + resource.getName() + "</title></head><body><div id=\"smk-map-frame\"></div><script src=\"smk-bootstrap.js\" smk-standalone=\"true\" smk-config=\"" + smkConfigDocumentNames + "\">" + configString + "</script></body></html>";
+				                                                                                          
+				    String indexCode = "<html><head><title>" + resource.getName() + "</title></head><body><div id=\"smk-map-frame\"></div><script src=\"smk-bootstrap.js\" smk-standalone=\"true\">return " + configString + "</script></body></html>";
 				    
 				    PrintWriter out = new PrintWriter(indexHtml);
 				    out.write(indexCode);
