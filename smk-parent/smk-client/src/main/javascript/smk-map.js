@@ -99,7 +99,13 @@ include.module( 'smk-map', [ 'smk', 'jquery', 'util', 'viewer', 'layer' ], funct
 
         function initViewer() {
             self.$viewer = new SMK.TYPE.Viewer[ self.viewer.type ]()
-            return self.$viewer.initialize( self )
+            return SMK.UTIL.resolved()
+                .then( function () {
+                    return self.$viewer.initialize( self )
+                } )
+                .then( function () {
+                    return self.$viewer.initializeLayers( self )
+                } )
         }
 
         function loadTools() {

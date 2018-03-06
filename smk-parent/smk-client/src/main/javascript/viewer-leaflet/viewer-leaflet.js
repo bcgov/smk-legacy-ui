@@ -13,80 +13,56 @@ include.module( 'viewer-leaflet', [ 'viewer', 'leaflet' ], function () {
     ViewerLeaflet.prototype.initialize = function ( smk ) {
         var self = this
 
-        var promise = SMK.TYPE.ViewerBase.prototype.initialize.apply( this, arguments )
+        SMK.TYPE.ViewerBase.prototype.initialize.apply( this, arguments )
+
+        this.deadViewerLayer = {}
 
         var el = smk.addToContainer( '<div class="smk-viewer">' )
 
-        this.map = L.map( el, {
+        self.map = L.map( el, {
             dragging:       false,
             zoomControl:    false,
             boxZoom:        false,
             doubleClickZoom:false
         } )
 
-        this.map.scrollWheelZoom.disable()
-
-        // var southWest = L.latLng(47.294133725, -113.291015625),
-        //     northEast = L.latLng(61.1326289908, -141.064453125),
-        //     bounds = L.latLngBounds(southWest, northEast);
-        // this.map.fitBounds(bounds);
-
+        self.map.scrollWheelZoom.disable()
 
         if ( smk.viewer ) {
             if ( smk.viewer.initialExtent ) {
                 var bx = smk.viewer.initialExtent
-                this.map.fitBounds( [ [ bx[ 1 ], bx[ 0 ] ], [ bx[ 3 ], bx[ 2 ] ] ] );
+                self.map.fitBounds( [ [ bx[ 1 ], bx[ 0 ] ], [ bx[ 3 ], bx[ 2 ] ] ] );
             }
 
             if ( smk.viewer.baseMap )
-                this.setBasemap( smk.viewer.baseMap )
+                self.setBasemap( smk.viewer.baseMap )
         }
 
-        this.map.on( 'zoomstart', changedView )
-        this.map.on( 'movestart', changedView )
+        self.map.on( 'zoomstart', changedView )
+        self.map.on( 'movestart', changedView )
+        changedView()
 
-        this.changedView( this.getView() )
-
-        function changedView() {
-            self.changedView( self.getView() )
-
-            Object.keys( self.layerStatus ).forEach( function ( id ) { self.layerStatus[ id ] = 'load' } )
-
-            self.startedLoading()
-        }
-
-        this.loadEvent = {
-            load: function ( ev ) {
-                self.layerStatus[ ev.target._smk_id ] = 'ready'
-
-                // console.log( 'load', JSON.stringify( self.layerStatus, null, ' ' ) )
-
-                if ( Object.values( self.layerStatus ).every( function ( v ) { return v != 'load' } ) )
-                    self.finishedLoading()
-            }
-        }
-
-        this.finishedLoading( function () {
+        self.finishedLoading( function () {
             self.map.eachLayer( function ( ly ) {
                 if ( !ly._smk_id ) return
 
-                if ( self.layerStatus[ ly._smk_id ] == 'dead' ) {
+                if ( self.deadViewerLayer[ ly._smk_id ] ) {
                     self.map.removeLayer( ly )
-                    delete self.layerStatus[ ly._smk_id ]
                     delete self.visibleLayer[ ly._smk_id ]
                     // console.log( 'remove', ly._smk_id )
                 }
             } )
 
-            Object.keys( self.layerStatus ).forEach( function ( id ) {
-                if ( self.layerStatus[ id ] == 'dead' ) {
-                    delete self.layerStatus[ id ]
-                    delete self.visibleLayer[ id ]
-                }
+            Object.keys( self.deadViewerLayer ).forEach( function ( id ) {
+                delete self.deadViewerLayer[ id ]
+                delete self.visibleLayer[ id ]
+                // console.log( 'dead', id )
             } )
         } )
 
-        return promise
+        function changedView() {
+            self.changedView( self.getView() )
+        }
     }
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
@@ -146,11 +122,13 @@ include.module( 'viewer-leaflet', [ 'viewer', 'leaflet' ], function () {
 
         if ( layerIds.every( function ( id ) { return !self.layerId[ id ].visible == !visible } ) ) return
 
-        Object.keys( self.layerStatus ).forEach( function ( id ) {
-            self.layerStatus[ id ] = 'pending'
+        var pending = {}
+        self.layerIds.forEach( function ( id ) {
+            pending[ id ] = true
         } )
-
-        this.startedLoading()
+        Object.keys( self.visibleLayer ).forEach( function ( id ) {
+            pending[ id ] = true
+        } )
 
         layerIds.forEach( function ( id ) { self.layerId[ id ].visible = !!visible } )
 
@@ -166,7 +144,6 @@ include.module( 'viewer-leaflet', [ 'viewer', 'leaflet' ], function () {
             }
 
             if ( merged[ 0 ].canMergeWith( ly ) ) {
-            // if ( self.canMergeLayers( merged[ 0 ], ly ) ) {
                 merged.push( ly )
                 return
             }
@@ -181,19 +158,11 @@ include.module( 'viewer-leaflet', [ 'viewer', 'leaflet' ], function () {
         visibleLayers.forEach( function ( lys, i ) {
             var cid = lys.map( function ( ly ) { return ly.config.id } ).join( '--' )
 
-            if ( self.visibleLayer[ cid ] ) {
-                self.layerStatus[ cid ] = 'ready'
-                return
-            }
+            delete pending[ cid ]
+            if ( self.visibleLayer[ cid ] ) return
 
-            self.layerStatus[ cid ] = 'load'
-
-            // var p = self.createLayer( cid, lys.map( function ( m ) { return m } ), layerCount - i )
-            var p = self.createLayer( cid, lys.map( function ( m ) { return m } ), layerCount - i )
+            var p = self.createViewerLayer( cid, lys, layerCount - i )
                 .then( function ( ly ) {
-                    // console.log( 'visible',cid )
-                    ly.off( self.loadEvent )
-                    ly.on( self.loadEvent )
                     self.map.addLayer( ly )
                     self.visibleLayer[ cid ] = ly
                     return ly
@@ -202,22 +171,12 @@ include.module( 'viewer-leaflet', [ 'viewer', 'leaflet' ], function () {
             promises.push( p )
         } )
 
-        Object.keys( self.layerStatus ).forEach( function ( id ) {
-            if ( self.layerStatus[ id ] == 'pending' )
-                self.layerStatus[ id ] = 'dead'
-        } )
+        Object.assign( this.deadViewerLayer, pending )
 
         if ( promises.length == 0 )
             self.finishedLoading()
 
         return SMK.UTIL.waitAll( promises )
-    }
-
-    ViewerLeaflet.prototype.createLayer = function ( id, layers, zIndex ) {
-        return SMK.TYPE.ViewerBase.prototype.createLayer.call( this, id, layers, zIndex, function ( type ) {
-            if ( SMK.TYPE.Layer[ type ].leaflet.create )
-                return SMK.TYPE.Layer[ type ].leaflet.create.call( this, layers, zIndex )
-        } )
     }
 
     ViewerLeaflet.prototype.zoomToFeature = function ( layer, feature ) {

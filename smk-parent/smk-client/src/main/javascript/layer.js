@@ -1,15 +1,32 @@
-include.module( 'layer', [ 'smk', 'jquery', 'util' ], function () {
+include.module( 'layer', [ 'smk', 'jquery', 'util', 'event' ], function () {
 
     var LayerEvent = SMK.TYPE.Event.define( [
-        'finishedLoad',
+        'startedLoading',
+        'finishedLoading',
     ] )
 
     function Layer( config ) {
+        var self = this
+
         LayerEvent.prototype.constructor.call( this )
 
         $.extend( this, {
             config: config,
             visible: false,
+        } )
+
+        var loading = false
+        Object.defineProperty( this, 'loading', {
+            get: function () { return loading },
+            set: function ( v ) {
+                if ( !!v == loading ) return
+                // console.log( self.config.id, v )
+                loading = !!v
+                if ( v )
+                    self.startedLoading()
+                else
+                    self.finishedLoading()
+            }
         } )
     }
 

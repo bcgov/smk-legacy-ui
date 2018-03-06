@@ -43,6 +43,18 @@ include.module( 'layer-leaflet', [ 'smk', 'layer', 'util' ], function () {
             zIndex:         zIndex
         } )
 
+        layer.on( 'load', function ( ev ) {
+            layers.forEach( function ( ly ) {
+                ly.loading = false
+            } )
+        } )
+
+        layer.on( 'loading', function ( ev ) {
+            layers.forEach( function ( ly ) {
+                ly.loading = true
+            } )
+        } )
+
         return layer
     }
 
@@ -66,9 +78,16 @@ include.module( 'layer-leaflet', [ 'smk', 'layer', 'util' ], function () {
             layers:         layerNames,
             dynamicLayers:  dynamicLayers
         });
-        layer.on( 'load', function () {
+
+        layer.on( 'load', function ( ev ) {
             if ( layer._currentImage )
                 layer._currentImage.setZIndex( zIndex )
+
+            layers[ 0 ].loading = false
+        } )
+
+        layer.on( 'loading', function ( ev ) {
+            layers[ 0 ].loading = true
         } )
 
         return layer
@@ -104,17 +123,6 @@ include.module( 'layer-leaflet', [ 'smk', 'layer', 'util' ], function () {
             layers[ 0 ].config.CRS = 'EPSG4326'
 
         var kmlLayer = omnivore.kml( layers[ 0 ].config.dataUrl, null, jsonLayer )
-
-        var loadEvent = function () {
-            kmlLayer.fire( 'load' )
-        }
-        kmlLayer.on( {
-            add: loadEvent,
-        } )
-        self.map.on( {
-            zoomend: loadEvent,
-            moveend: loadEvent
-        } )
 
         kmlLayer.on( {
             add: function () {
@@ -154,17 +162,6 @@ include.module( 'layer-leaflet', [ 'smk', 'layer', 'util' ], function () {
             },
             renderer: L.svg(),
             interactive: false
-        } )
-
-        var loadEvent = function () {
-            layer.fire( 'load' )
-        }
-        layer.on( {
-            add: loadEvent,
-        } )
-        this.map.on( {
-            zoomend: loadEvent,
-            moveend: loadEvent
         } )
 
         layer.on( {

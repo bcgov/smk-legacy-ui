@@ -10,7 +10,23 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
     ] )
 
     function ViewerBase() {
+        var self = this
+
         ViewerEvent.prototype.constructor.call( this )
+
+        var loading = false
+        Object.defineProperty( this, 'loading', {
+            get: function () { return loading },
+            set: function ( v ) {
+                if ( !!v == loading ) return
+                // console.log( 'viewer', v )
+                loading = !!v
+                if ( v )
+                    self.startedLoading()
+                else
+                    self.finishedLoading()
+            }
+        } )
     }
 
     SMK.TYPE.ViewerBase = ViewerBase
@@ -66,6 +82,7 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
         var self = this
 
         this.lmfId = smk.lmfId
+        this.type = smk.viewer.type
 
         this.identified = new SMK.TYPE.FeatureSet()
         this.selected = new SMK.TYPE.FeatureSet()
@@ -77,10 +94,22 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
         this.layerIdPromise = {}
         this.layerStatus = {}
 
-        return self.initializeLayers( smk )
-            .then( function () {
-                return self
+        self.layerIds = smk.layers.map( function ( lyConfig, i ) {
+            var ly = self.layerId[ lyConfig.id ] = new SMK.TYPE.Layer[ lyConfig.type ][ smk.viewer.type ]( lyConfig )
+
+            ly.initialize()
+            ly.index = i
+
+            ly.startedLoading( function () {
+                self.loading = true
             } )
+
+            ly.finishedLoading( function () {
+                self.loading = self.anyLayersLoading()
+            } )
+
+            return lyConfig.id
+        } )
     }
 
     ViewerBase.prototype.initializeLayers = function ( smk ) {
@@ -88,20 +117,15 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
 
         if ( !smk.layers || smk.layers.length == 0 ) return SMK.UTIL.resolved()
 
-        self.layerIds = smk.layers.map( function ( ly, i ) {
-            self.layerId[ ly.id ] = new SMK.TYPE.Layer[ ly.type ][ smk.viewer.type ]( ly )
-            self.layerId[ ly.id ].initialize()
-            self.layerId[ ly.id ].index = i
-
-            return ly.id
-        } )
-
         return self.setLayersVisible( self.layerIds.filter( function ( id ) { return self.layerId[ id ].config.isVisible } ), true )
             .catch( function () {} )
     }
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
-    ViewerBase.prototype.createLayer = function ( id, layers, zIndex, create ) {
+    ViewerBase.prototype.setLayersVisible = function ( layerIds, visible ) {
+    }
+
+    ViewerBase.prototype.createViewerLayer = function ( id, layers, zIndex ) {
         var self = this
 
         if ( layers.length == 0 )
@@ -115,26 +139,32 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
         if ( this.layerIdPromise[ id ] )
             return this.layerIdPromise[ id ]
 
+        if ( !SMK.TYPE.Layer[ type ][ self.type ].create )
+            return SMK.UTIL.rejected( new Error( 'can\'t create viewer layer of type "' + type + '"' ) )
+
         return this.layerIdPromise[ id ] = SMK.UTIL.resolved()
             .then( function () {
                 try {
-                    return create.call( self, type )
+                    return SMK.TYPE.Layer[ type ][ self.type ].create.call( self, layers, zIndex )
                 }
                 catch ( e ) {
-                    console.warn( 'failed to create layer', layers, e )
+                    console.warn( 'failed to create viewer layer', layers, e )
                     return SMK.UTIL.rejected( e )
                 }
             } )
             .then( function ( ly ) {
-                ly._smk_type = type
-                ly._smk_id = id
-                return ly
+                return self.afterCreateViewerLayer( id, type, layers, ly )
             } )
     }
 
-    ViewerBase.prototype.setLayersVisible = function ( layerIds, visible ) {
-    }
+    ViewerBase.prototype.afterCreateViewerLayer = function ( id, type, layers, viewerLayer ) {
+        viewerLayer._smk_type = type
+        viewerLayer._smk_id = id
 
+        return viewerLayer
+    }
+    // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+    //
     ViewerBase.prototype.identifyFeatures = function ( arg ) {
         var self = this
 
@@ -171,6 +201,15 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
             .then( function () {
                 self.finishedIdentify()
             } )
+    }
+    // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+    //
+    ViewerBase.prototype.anyLayersLoading = function () {
+        var self = this
+
+        return this.layerIds.some( function ( id ) {
+            return self.layerId[ id ].loading
+        } )
     }
 
 } )
