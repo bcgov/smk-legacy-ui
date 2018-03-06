@@ -25,26 +25,18 @@ include.module( 'viewer-esri3d', [ 'viewer', 'esri3d', 'types-esri3d' ], functio
     ViewerEsri3d.prototype.initialize = function ( smk ) {
         var self = this
 
-        var promise = SMK.TYPE.ViewerBase.prototype.initialize.apply( this, arguments )
+        SMK.TYPE.ViewerBase.prototype.initialize.apply( this, arguments )
 
         var el = smk.addToContainer( '<div class="smk-viewer">' )
 
         var layerExtras = []
 
-        //         this.setBasemap( smk.viewer.baseMap )
-
         this.map = new E.Map( {
-            // basemap: 'topo',
             basemap: this.basemap[ smk.viewer.baseMap ].esri3d || 'topo',
             ground: "world-elevation"
         } )
 
         var bx = smk.viewer.initialExtent
-        //         this.map.fitBounds( [ [ bx[ 1 ], bx[ 0 ] ], [ bx[ 3 ], bx[ 2 ] ] ] );
-        //     }
-
-        //     if ( smk.viewer.baseMap )
-        // }
 
         this.view = new E.views.SceneView( {
             container: el,
@@ -104,28 +96,27 @@ include.module( 'viewer-esri3d', [ 'viewer', 'esri3d', 'types-esri3d' ], functio
         // Watch view's stationary property for becoming true.
         E.core.watchUtils.whenTrue( this.view, "stationary", function() {
             self.changedView( self.getView() )
-            // // Get the new center of the view only when view is stationary.
-            // if (view.center) {
-            // var info = "<br> <span> the view center changed. </span> x: " +
-            //     view.center.x.toFixed(2) + " y: " + view.center.y.toFixed(2);
-            // displayMessage(info);
-            // }
-
-            // // Get the new extent of the view only when view is stationary.
-            // if (view.extent) {
-            // var info = "<br> <span> the view extent changed: </span>" +
-            //     "<br> xmin:" + view.extent.xmin.toFixed(2) + " xmax: " +
-            //     view.extent.xmax.toFixed(
-            //     2) +
-            //     "<br> ymin:" + view.extent.ymin.toFixed(2) + " ymax: " +
-            //     view.extent.ymax.toFixed(
-            //     2);
-            // displayMessage(info);
-            // }
         } )
 
         this.changedView( this.getView() )
 
+        self.finishedLoading( function () {
+            self.map.layers.forEach( function ( ly ) {
+                if ( !ly._smk_id ) return
+
+                if ( self.deadViewerLayer[ ly._smk_id ] ) {
+                    self.map.layers.remove( ly )
+                    delete self.visibleLayer[ ly._smk_id ]
+                    // console.log( 'remove', ly._smk_id )
+                }
+            } )
+
+            Object.keys( self.deadViewerLayer ).forEach( function ( id ) {
+                delete self.deadViewerLayer[ id ]
+                delete self.visibleLayer[ id ]
+                // console.log( 'dead', id )
+            } )
+        } )
 
 
 
@@ -250,78 +241,6 @@ include.module( 'viewer-esri3d', [ 'viewer', 'esri3d', 'types-esri3d' ], functio
 
 
 
-        // var el = smk.addToContainer( '<div class="smk-viewer">' )
-
-        // this.map = L.map( el, {
-        //     dragging:       false,
-        //     zoomControl:    false,
-        //     boxZoom:        false,
-        //     doubleClickZoom:false
-        // } )
-
-        // this.map.scrollWheelZoom.disable()
-
-        // // var southWest = L.latLng(47.294133725, -113.291015625),
-        // //     northEast = L.latLng(61.1326289908, -141.064453125),
-        // //     bounds = L.latLngBounds(southWest, northEast);
-        // // this.map.fitBounds(bounds);
-
-
-        // if ( smk.viewer ) {
-        //     if ( smk.viewer.initialExtent ) {
-        //         var bx = smk.viewer.initialExtent
-        //         this.map.fitBounds( [ [ bx[ 1 ], bx[ 0 ] ], [ bx[ 3 ], bx[ 2 ] ] ] );
-        //     }
-
-        //     if ( smk.viewer.baseMap )
-        //         this.setBasemap( smk.viewer.baseMap )
-        // }
-
-        // this.map.on( 'zoomstart', changedView )
-        // this.map.on( 'movestart', changedView )
-
-        // this.changedView( this.getView() )
-
-        // function changedView() {
-        //     self.changedView( self.getView() )
-
-        //     Object.keys( self.layerStatus ).forEach( function ( id ) { self.layerStatus[ id ] = 'load' } )
-
-        //     self.startedLoading()
-        // }
-
-        // this.loadEvent = {
-        //     load: function ( ev ) {
-        //         self.layerStatus[ ev.target._smk_id ] = 'ready'
-
-        //         // console.log( 'load', JSON.stringify( self.layerStatus, null, ' ' ) )
-
-        //         if ( Object.values( self.layerStatus ).every( function ( v ) { return v != 'load' } ) )
-        //             self.finishedLoading()
-        //     }
-        // }
-
-        // this.finishedLoading( function () {
-        //     self.map.eachLayer( function ( ly ) {
-        //         if ( !ly._smk_id ) return
-
-        //         if ( self.layerStatus[ ly._smk_id ] == 'dead' ) {
-        //             self.map.removeLayer( ly )
-        //             delete self.layerStatus[ ly._smk_id ]
-        //             delete self.visibleLayer[ ly._smk_id ]
-        //             // console.log( 'remove', ly._smk_id )
-        //         }
-        //     } )
-
-        //     Object.keys( self.layerStatus ).forEach( function ( id ) {
-        //         if ( self.layerStatus[ id ] == 'dead' ) {
-        //             delete self.layerStatus[ id ]
-        //             delete self.visibleLayer[ id ]
-        //         }
-        //     } )
-        // } )
-
-        return promise
     }
 
     ViewerEsri3d.prototype.getView = function () {
@@ -335,106 +254,11 @@ include.module( 'viewer-esri3d', [ 'viewer', 'esri3d', 'types-esri3d' ], functio
     ViewerEsri3d.prototype.setBasemap = function ( basemapId ) {
         this.map.basemap = this.basemap[ basemapId ].esri3d
 
-        // if( this.currentBasemap ) {
-        //     if ( this.currentBasemap.features )
-        //         this.map.removeLayer( this.currentBasemap.features );
-
-        //     if ( this.currentBasemap.labels )
-        //         this.map.removeLayer( this.currentBasemap.labels );
-        // }
-
-        // this.currentBasemap = this.createBasemapLayer( basemapId );
-
-        // this.map.addLayer( this.currentBasemap.features );
-        // this.currentBasemap.features.bringToBack();
-
-        // if ( this.currentBasemap.labels )
-        //     this.map.addLayer( this.currentBasemap.labels );
-
         this.changedBaseMap( { baseMap: basemapId } )
     }
 
-    ViewerEsri3d.prototype.setLayersVisible = function ( layerIds, visible ) {
-        var self = this
-
-        var layerCount = this.layerIds.length
-        if ( layerCount == 0 ) return
-
-        if ( layerIds.every( function ( id ) { return !self.layerId[ id ].visible == !visible } ) ) return
-
-        Object.keys( self.layerStatus ).forEach( function ( id ) {
-            self.layerStatus[ id ] = 'pending'
-        } )
-
-        this.startedLoading()
-
-        layerIds.forEach( function ( id ) { self.layerId[ id ].visible = !!visible } )
-
-        var visibleLayers = []
-        var merged
-        this.layerIds.forEach( function ( id, i ) {
-            if ( !self.layerId[ id ].visible ) return
-
-            ly = self.layerId[ id ]
-            if ( !merged ) {
-                merged = [ ly ]
-                return
-            }
-
-            if ( merged[ 0 ].canMergeWith( ly ) ) {
-            // if ( self.canMergeLayers( merged[ 0 ], ly ) ) {
-                merged.push( ly )
-                return
-            }
-
-            visibleLayers.push( merged )
-            merged = [ ly ]
-        } )
-        if ( merged )
-            visibleLayers.push( merged )
-
-        var promises = []
-        visibleLayers.forEach( function ( lys, i ) {
-            var cid = lys.map( function ( ly ) { return ly.config.id } ).join( '--' )
-
-            if ( self.visibleLayer[ cid ] ) {
-                self.layerStatus[ cid ] = 'ready'
-                return
-            }
-
-            self.layerStatus[ cid ] = 'load'
-
-            // var p = self.createLayer( cid, lys.map( function ( m ) { return m } ), layerCount - i )
-            var p = self.createLayer( cid, lys.map( function ( m ) { return m } ), layerCount - i )
-                .then( function ( ly ) {
-                    // console.log( 'visible',cid )
-                    // ly.off( self.loadEvent )
-                    // ly.on( self.loadEvent )
-        			// self.map.layers.add( ly );
-        			self.map.add( ly )
-                    self.visibleLayer[ cid ] = ly
-                    return ly
-                } )
-
-            promises.push( p )
-        } )
-
-        Object.keys( self.layerStatus ).forEach( function ( id ) {
-            if ( self.layerStatus[ id ] == 'pending' )
-                self.layerStatus[ id ] = 'dead'
-        } )
-
-        if ( promises.length == 0 )
-            self.finishedLoading()
-
-        return SMK.UTIL.waitAll( promises )
-    }
-
-    ViewerEsri3d.prototype.createLayer = function ( id, layers, zIndex ) {
-        return SMK.TYPE.ViewerBase.prototype.createLayer.call( this, id, layers, zIndex, function ( type ) {
-            if ( SMK.TYPE.Layer[ type ].esri3d.create )
-                return SMK.TYPE.Layer[ type ].esri3d.create.call( this, layers, zIndex )
-        } )
+    ViewerEsri3d.prototype.addViewerLayer = function ( viewerLayer ) {
+        this.map.add( viewerLayer )
     }
 
     ViewerEsri3d.prototype.zoomToFeature = function ( layer, feature ) {

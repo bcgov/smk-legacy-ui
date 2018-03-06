@@ -50,7 +50,7 @@ include.module( 'layer-esri3d', [ 'smk', 'layer', 'util', 'types-esri3d' ], func
                 bbox:           [ extent.xmin, extent.ymin, extent.xmax, extent.ymax ].join( ',' )
             }
 
-            return this.serviceUrl + "?" + Object.keys( param ).map( function ( p ) {
+            return this.serviceUrl + '?' + Object.keys( param ).map( function ( p ) {
                 return p + '=' + encodeURIComponent( param[ p ] )
             } ).join( '&' )
         }
@@ -75,14 +75,11 @@ include.module( 'layer-esri3d', [ 'smk', 'layer', 'util', 'types-esri3d' ], func
             opacity:    opacity,
         } )
 
-        E.core.watchUtils.watch( layer, "loadStatus", function( n, o ) {
-            console.log( n, o )
-        } )
-
         layer.on( 'layerview-create', function ( ev ) {
-            console.log( arguments )
-            E.core.watchUtils.watch( ev.layerView, "updating", function( n, o ) {
-                console.log( ev.target._smk_id, n, o )
+            E.core.watchUtils.watch( ev.layerView, "updating", function( val ) {
+                layers.forEach( function ( ly ) {
+                    ly.loading = val
+                } )
             } )
         } )
 
