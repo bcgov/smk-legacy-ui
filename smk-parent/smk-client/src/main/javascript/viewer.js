@@ -83,6 +83,7 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
 
         this.lmfId = smk.lmfId
         this.type = smk.viewer.type
+        this.disconnected = smk.$option.disconnected
 
         this.identified = new SMK.TYPE.FeatureSet()
         this.selected = new SMK.TYPE.FeatureSet()
@@ -276,6 +277,14 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
         return this.layerIds.some( function ( id ) {
             return self.layerId[ id ].loading
         } )
+    }
+    // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+    //
+    ViewerBase.prototype.resolveAttachmentUrl = function ( attachmentId, type ) {
+        if ( this.disconnected )
+            return 'attachments/' + attachmentId + '.' + type
+        else
+            return '../smks-api/MapConfigurations/' + this.lmfId + '/Attachments/' + attachmentId
     }
 
 } )

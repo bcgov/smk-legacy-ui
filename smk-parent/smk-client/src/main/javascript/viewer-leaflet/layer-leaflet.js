@@ -116,8 +116,9 @@ include.module( 'layer-leaflet', [ 'smk', 'layer', 'util' ], function () {
             interactive: false
         } )
 
-        if ( !layers[ 0 ].config.dataUrl )
-            layers[ 0 ].config.dataUrl = '../smks-api/MapConfigurations/' + this.lmfId + '/Attachments/' + layers[ 0 ].config.id
+        if ( !layers[ 0 ].config.dataUrl ) {
+            layers[ 0 ].config.dataUrl = this.resolveAttachmentUrl( layers[ 0 ].config.id, layers[ 0 ].config.type )
+        }
 
         if ( !layers[ 0 ].config.CRS )
             layers[ 0 ].config.CRS = 'EPSG4326'
@@ -171,7 +172,7 @@ include.module( 'layer-leaflet', [ 'smk', 'layer', 'util' ], function () {
         } )
 
         if ( !layers[ 0 ].config.dataUrl )
-            layers[ 0 ].config.dataUrl = '../smks-api/MapConfigurations/' + this.lmfId + '/Attachments/' + layers[ 0 ].config.id
+            layers[ 0 ].config.dataUrl = this.resolveAttachmentUrl( layers[ 0 ].config.id, layers[ 0 ].config.type )
 
         if ( !layers[ 0 ].config.CRS )
             layers[ 0 ].config.CRS = 'EPSG4326'

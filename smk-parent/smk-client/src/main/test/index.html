@@ -7,7 +7,15 @@
 
         <!-- <script src="/service/lib/smk-bootstrap.js" smk-standalone smk-config="LAND-TENURES-1.json"> -->
         <!-- <script src="/service/lib/smk-bootstrap.js" smk-standalone smk-config="STATIC-DATA.json"> -->
-        <script src="../smk-bootstrap.js" smk-standalone smk-config="STATIC-DATA.json, LAND-TENURES-1.json, BCGW-ESRI.json, LAND-TENURES-2.json, BASE-LAYERS.json, WATER-MANAGEMENT.json">
+        <script>
+        var dojoConfig = {
+            has: {
+            "esri-promise-compatibility": 1
+            }
+        };
+        </script>
+        <script src="../smk-bootstrap.js" smk-disconnected smk-standalone smk-config="STATIC-DATA.json, LAND-TENURES-1.json, BCGW-ESRI.json, LAND-TENURES-2.json, BASE-LAYERS.json, WATER-MANAGEMENT.json">
+        // <script src="../smk-bootstrap.js" smk-standalone smk-config="LAND-TENURES-1.json, BCGW-ESRI.json, LAND-TENURES-2.json">
         return {
             // "_id": "1",
             // "_rev": "29-1442dc3c9b983dc90e19edb49915fa06",
@@ -20,10 +28,16 @@
             "published": false,
 
             "viewer": {
-                // "type": "leaflet",
-                "type": "esri3d",
+                "type": "leaflet",
+                // "type": "esri3d",
+
+                // province
                 "initialExtent": [ -139.1782, 47.6039, -110.3533, 60.5939 ],
-                "baseMap": "Topographic"
+
+                //kamloops
+                // "initialExtent": [ -120.52923981333151, 50.57821309403696, -120.23672882700342, 50.776409182217485 ],
+
+                "baseMap": "Streets"
             },
 
             "surround": {
@@ -41,7 +55,7 @@
                     "showFactor": true,
                     "showBar": true },
                 { "type": "coordinate" },
-                { "type": "minimap" },
+                { "type": "minimap", "baseMap": "Imagery" },
                 { "type": "markup" },
                 // { "type": "direction" },
                 { "type": "pan" },
@@ -56,7 +70,7 @@
                     "content": "This application is a demonstration of Simple Mapping Kit (SMK).<p>It is a standalone web app."
                 },
                 { "type": "baseMaps" },
-                { "type": "layers" },
+                { "type": "layers", "position": "toolbar" },
                 { "type": "search" },
                 { "type": "identify" },
                 { "type": "select" }

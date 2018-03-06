@@ -73,6 +73,7 @@
         containerId:    attr( 'smk-container', 'smk-map-frame' ),
         configUrls:     attr( 'smk-config', '' ).split( /\s*,\s*/ ).filter( function ( url ) { return !!url } ),
         standalone:     attr( 'smk-standalone', false ),
+        disconnected:   attr( 'smk-disconnected', false ),
         config:         scriptConfig,
     }
 
@@ -140,14 +141,7 @@
                 } )
 
                 include( 'smk', 'smk-map' ).then( function ( inc ) {
-
-                    return ( inc.smk.MAP[ smkArg.containerId ] = new inc.smk.TYPE.SmkMap( {
-                        containerId:    smkArg.containerId,
-                        config:         smkArg.config,
-                        configUrls:     smkArg.configUrls,
-                        standalone:     smkArg.standalone
-                    } ) ).initialize()
-
+                    return ( inc.smk.MAP[ smkArg.containerId ] = new inc.smk.TYPE.SmkMap( smkArg ) ).initialize()
                 } )
             } )
     }

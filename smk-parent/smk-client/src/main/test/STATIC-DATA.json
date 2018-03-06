@@ -6,7 +6,7 @@
             "title": "3 polygons, geojson",
             "isVisible": true,
             "CRS": "EPSG3857",
-            "dataUrl": "3-polygons[webmercator].geojson",
+            // "dataUrl": "3-polygons[webmercator].geojson",
             // "opacity": 0.65,
             "style": {
                 "strokeColor": "ff0000",
@@ -22,7 +22,7 @@
             "title": "3 polygons, kml",
             "isVisible": true,
             "CRS": "EPSG3857",
-            "dataUrl": "3-polygons[webmercator].kml",
+            // "dataUrl": "3-polygons[webmercator].kml",
             // "opacity": 0.65,
             "style": {
                 "strokeColor": "0000ff",
