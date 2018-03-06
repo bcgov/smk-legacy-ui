@@ -9,11 +9,11 @@
             "dataUrl": "3-polygons[webmercator].geojson",
             // "opacity": 0.65,
             "style": {
-                "strokeColor": "#ff0000",
+                "strokeColor": "ff0000",
                 "strokeWidth": 4,
                 "strokeOpacity": 0.8,
                 "fillOpacity": 0.6,
-                "fillColor": "#00ff00"
+                "fillColor": "00ff00"
             }
         },
         {
@@ -25,11 +25,11 @@
             "dataUrl": "3-polygons[webmercator].kml",
             // "opacity": 0.65,
             "style": {
-                "strokeColor": "#0000ff",
+                "strokeColor": "0000ff",
                 "strokeWidth": 8,
                 "strokeOpacity": 0.8,
                 "fillOpacity": 0.6,
-                "fillColor": "#00ff00"
+                "fillColor": "00ff00"
             }
         }
     ]
