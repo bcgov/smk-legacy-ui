@@ -114,71 +114,11 @@ include.module( 'viewer-leaflet', [ 'viewer', 'leaflet' ], function () {
     }
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
-    ViewerLeaflet.prototype.setLayersVisible = function ( layerIds, visible ) {
-        var self = this
-
-        var layerCount = this.layerIds.length
-        if ( layerCount == 0 ) return
-
-        if ( layerIds.every( function ( id ) { return !self.layerId[ id ].visible == !visible } ) ) return
-
-        var pending = {}
-        self.layerIds.forEach( function ( id ) {
-            pending[ id ] = true
-        } )
-        Object.keys( self.visibleLayer ).forEach( function ( id ) {
-            pending[ id ] = true
-        } )
-
-        layerIds.forEach( function ( id ) { self.layerId[ id ].visible = !!visible } )
-
-        var visibleLayers = []
-        var merged
-        this.layerIds.forEach( function ( id, i ) {
-            if ( !self.layerId[ id ].visible ) return
-
-            ly = self.layerId[ id ]
-            if ( !merged ) {
-                merged = [ ly ]
-                return
-            }
-
-            if ( merged[ 0 ].canMergeWith( ly ) ) {
-                merged.push( ly )
-                return
-            }
-
-            visibleLayers.push( merged )
-            merged = [ ly ]
-        } )
-        if ( merged )
-            visibleLayers.push( merged )
-
-        var promises = []
-        visibleLayers.forEach( function ( lys, i ) {
-            var cid = lys.map( function ( ly ) { return ly.config.id } ).join( '--' )
-
-            delete pending[ cid ]
-            if ( self.visibleLayer[ cid ] ) return
-
-            var p = self.createViewerLayer( cid, lys, layerCount - i )
-                .then( function ( ly ) {
-                    self.map.addLayer( ly )
-                    self.visibleLayer[ cid ] = ly
-                    return ly
-                } )
-
-            promises.push( p )
-        } )
-
-        Object.assign( this.deadViewerLayer, pending )
-
-        if ( promises.length == 0 )
-            self.finishedLoading()
-
-        return SMK.UTIL.waitAll( promises )
+    ViewerLeaflet.prototype.addViewerLayer = function ( viewerLayer ) {
+        this.map.addLayer( viewerLayer )
     }
-
+    // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+    //
     ViewerLeaflet.prototype.zoomToFeature = function ( layer, feature ) {
         this.map.fitBounds( feature.highlightLayer.getBounds(), {
             paddingTopLeft: L.point( 300, 100 ),

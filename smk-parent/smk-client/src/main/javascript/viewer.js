@@ -92,7 +92,8 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
         this.layerId = {}
         this.visibleLayer = {}
         this.layerIdPromise = {}
-        this.layerStatus = {}
+        // this.layerStatus = {}
+        this.deadViewerLayer = {}
 
         self.layerIds = smk.layers.map( function ( lyConfig, i ) {
             var ly = self.layerId[ lyConfig.id ] = new SMK.TYPE.Layer[ lyConfig.type ][ smk.viewer.type ]( lyConfig )
@@ -123,6 +124,71 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
     ViewerBase.prototype.setLayersVisible = function ( layerIds, visible ) {
+        var self = this
+
+        var layerCount = this.layerIds.length
+        if ( layerCount == 0 ) return
+
+        if ( layerIds.every( function ( id ) { return !self.layerId[ id ].visible == !visible } ) ) return
+
+        var pending = {}
+        self.layerIds.forEach( function ( id ) {
+            pending[ id ] = true
+        } )
+        Object.keys( self.visibleLayer ).forEach( function ( id ) {
+            pending[ id ] = true
+        } )
+
+        layerIds.forEach( function ( id ) { self.layerId[ id ].visible = !!visible } )
+
+        var visibleLayers = []
+        var merged
+        this.layerIds.forEach( function ( id, i ) {
+            if ( !self.layerId[ id ].visible ) return
+
+            ly = self.layerId[ id ]
+            if ( !merged ) {
+                merged = [ ly ]
+                return
+            }
+
+            if ( merged[ 0 ].canMergeWith( ly ) ) {
+                merged.push( ly )
+                return
+            }
+
+            visibleLayers.push( merged )
+            merged = [ ly ]
+        } )
+        if ( merged )
+            visibleLayers.push( merged )
+
+        var promises = []
+        visibleLayers.forEach( function ( lys, i ) {
+            var cid = lys.map( function ( ly ) { return ly.config.id } ).join( '--' )
+
+            delete pending[ cid ]
+            if ( self.visibleLayer[ cid ] ) return
+
+            var p = self.createViewerLayer( cid, lys, layerCount - i )
+                .then( function ( ly ) {
+                    self.addViewerLayer( ly )
+                    self.visibleLayer[ cid ] = ly
+                    return ly
+                } )
+
+            promises.push( p )
+        } )
+
+        Object.assign( this.deadViewerLayer, pending )
+
+        if ( promises.length == 0 )
+            self.finishedLoading()
+
+        return SMK.UTIL.waitAll( promises )
+    }
+
+    ViewerBase.prototype.addViewerLayer = function ( viewerLayer ) {
     }
 
     ViewerBase.prototype.createViewerLayer = function ( id, layers, zIndex ) {
