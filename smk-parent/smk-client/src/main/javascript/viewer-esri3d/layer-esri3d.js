@@ -24,29 +24,70 @@ include.module( 'layer-esri3d', [ 'smk', 'layer', 'util', 'types-esri3d' ], func
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+    var WMSLayer = E.layers.BaseDynamicLayer.createSubclass( {
+        properties: {
+            serviceUrl: null,
+            layerNames: [],
+            styleNames: [],
+            // imageMaxWidth: 1024,
+            // imageMaxHeight: 1024,
+        },
+
+        getImageUrl: function ( extent, width, height ) {
+            var epsg = extent.spatialReference.isWebMercator ? 3857 : extent.spatialReference.wkid
+
+            var param = {
+                service:        'WMS',
+                request:        'GetMap',
+                version:        '1.1.1',
+                layers:         this.layerNames.join( ',' ),
+                styles:         this.styleNames.join( ',' ),
+                format:         'image/png',
+                transparent:    'true',
+                srs:            'EPSG:' + epsg,
+                width:          width,
+                height:         height,
+                bbox:           [ extent.xmin, extent.ymin, extent.xmax, extent.ymax ].join( ',' )
+            }
+
+            return this.serviceUrl + "?" + Object.keys( param ).map( function ( p ) {
+                return p + '=' + encodeURIComponent( param[ p ] )
+            } ).join( '&' )
+        }
+    } )
+
     defineLayerType( 'wms' )
 
-    // SMK.TYPE.Layer[ 'wms' ].esri3d.create = function ( layers, zIndex ) {
-    //     var serviceUrl  = layers[ 0 ].config.serviceUrl
-    //     var layerNames  = layers.map( function ( c ) { return c.config.layerName } ).join( ',' )
-    //     var styleNames  = layers.map( function ( c ) { return c.config.styleName } ).join( ',' )
-    //     var version     = layers[ 0 ].config.version || '1.1.1'
-    //     var attribution = layers[ 0 ].config.attribution
-    //     var opacity     = layers[ 0 ].config.opacity
+    SMK.TYPE.Layer[ 'wms' ].esri3d.create = function ( layers, zIndex ) {
+        var serviceUrl  = layers[ 0 ].config.serviceUrl
+        // var version     = layers[ 0 ].config.version || '1.1.1'
+        // var attribution = layers[ 0 ].config.attribution
+        var opacity     = layers[ 0 ].config.opacity
 
-    //     var layer = L.nonTiledLayer.wms( serviceUrl, {
-    //         layers:         layerNames,
-    //         styles:         styleNames,
-    //         version:        version,
-    //         attribution:    attribution,
-    //         opacity:        opacity,
-    //         format:         'image/png',
-    //         transparent:    true,
-    //         zIndex:         zIndex
-    //     } )
+        var host = serviceUrl.replace( /^(\w+:)?[/][/]/, '' ).replace( /[/].*$/, '' )
+        if ( E.config.request.corsEnabledServers.indexOf( host ) == -1 )
+            E.config.request.corsEnabledServers.push( host );
 
-    //     return layer
-    // }
+        var layer = WMSLayer( {
+            serviceUrl: serviceUrl,
+            layerNames: layers.map( function ( c ) { return c.config.layerName } ),
+            styleNames: layers.map( function ( c ) { return c.config.styleName } ),
+            opacity:    opacity,
+        } )
+
+        E.core.watchUtils.watch( layer, "loadStatus", function( n, o ) {
+            console.log( n, o )
+        } )
+
+        layer.on( 'layerview-create', function ( ev ) {
+            console.log( arguments )
+            E.core.watchUtils.watch( ev.layerView, "updating", function( n, o ) {
+                console.log( ev.target._smk_id, n, o )
+            } )
+        } )
+
+        return layer
+    }
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -54,7 +95,6 @@ include.module( 'layer-esri3d', [ 'smk', 'layer', 'util', 'types-esri3d' ], func
 
     SMK.TYPE.Layer[ 'esri-dynamic' ].esri3d.create = function ( layers, zIndex ) {
         if ( layers.length != 1 ) throw new Error( 'only 1 config allowed' )
-
 
         var serviceUrl  = layers[ 0 ].config.serviceUrl
         var layerNames  = ( layers[ 0 ].config.layers || [] ).join( ',' )
