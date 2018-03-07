@@ -128,9 +128,9 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
         var self = this
 
         var layerCount = this.layerIds.length
-        if ( layerCount == 0 ) return
+        if ( layerCount == 0 ) return SMK.UTIL.resolved()
 
-        if ( layerIds.every( function ( id ) { return !self.layerId[ id ].visible == !visible } ) ) return
+        if ( layerIds.every( function ( id ) { return !self.layerId[ id ].visible == !visible } ) ) return SMK.UTIL.resolved()
 
         var pending = {}
         self.layerIds.forEach( function ( id ) {

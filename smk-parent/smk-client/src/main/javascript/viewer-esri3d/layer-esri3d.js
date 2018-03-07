@@ -210,80 +210,10 @@ include.module( 'layer-esri3d', [ 'smk', 'layer', 'util', 'types-esri3d' ], func
         .then( function ( doc ) {
             var geojson = toGeoJSON.kml( doc )
 
-            var features = Terraformer.ArcGIS.convert( geojson )
-
-            console.log( features )
-
-            return new E.layers.FeatureLayer( {
-                source:             features,
-                geometryType:       'polygon',
-                spatialReference:   { wkid: 4326 },
-                fields:             [ {
-                    name: 'name',
-                    alias: 'Name',
-                    type: 'string'
-                } ],
-                objectIdField:      'name',
-                renderer: {
-                    type: 'simple',
-                    symbol: {
-                        type: 'simple-fill',
-                        color: 'red'
-                    }
-                }
+            return new E.layers.GraphicsLayer( {
+                graphics: geoJsonToEsriGeometry( geojson, convertStyle( layers[ 0 ].config.style ) )
             } )
         } )
-        // var ly = new E.layers.KMLLayer( {
-            // url: layers[ 0 ].config.dataUrl
-        // } )
-
-        // return ly
-    //     var jsonLayer = L.geoJson( null, {
-    //         style: convertStyle( layers[ 0 ].config.style ),
-    //         coordsToLatLng: function ( xy ) {
-    //             // if ( !layers[ 0 ].config.CRS ) return xy
-    //             return L.CRS[ layers[ 0 ].config.CRS ].unproject( L.point( xy ) )
-    //         },
-    //         renderer: L.svg(),
-    //         interactive: false
-    //     } )
-
-    //     if ( !layers[ 0 ].config.dataUrl )
-    //         layers[ 0 ].config.dataUrl = '../smks-api/MapConfigurations/' + this.lmfId + '/Attachments/' + layers[ 0 ].config.id
-
-    //     if ( !layers[ 0 ].config.CRS )
-    //         layers[ 0 ].config.CRS = 'EPSG4326'
-
-    //     var kmlLayer = omnivore.kml( layers[ 0 ].config.dataUrl, null, jsonLayer )
-
-    //     var loadEvent = function () {
-    //         kmlLayer.fire( 'load' )
-    //     }
-    //     kmlLayer.on( {
-    //         add: loadEvent,
-    //     } )
-    //     self.map.on( {
-    //         zoomend: loadEvent,
-    //         moveend: loadEvent
-    //     } )
-
-    //     kmlLayer.on( {
-    //         add: function () {
-    //             kmlLayer.options.renderer._container.style.zIndex = zIndex
-    //         }
-    //     } )
-
-    //     return SMK.UTIL.makePromise( function ( res, rej ) {
-    //         kmlLayer.on( {
-    //             'ready': function () {
-    //                 console.log( 'loaded', layers[ 0 ].config.dataUrl )
-    //                 res( kmlLayer )
-    //             },
-    //             'error': function () {
-    //                 res()
-    //             }
-    //         } )
-    //     } )
     }
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -294,67 +224,115 @@ include.module( 'layer-esri3d', [ 'smk', 'layer', 'util', 'types-esri3d' ], func
 
     } )
 
-    // SMK.TYPE.Layer[ 'geojson' ].esri3d.create = function ( layers, zIndex ) {
-    //     if ( layers.length != 1 ) throw new Error( 'only 1 config allowed' )
+    SMK.TYPE.Layer[ 'geojson' ].esri3d.create = function ( layers, zIndex ) {
+        var self = this;
 
-    //     var layer = new L.geoJson( null, {
-    //         style: convertStyle( layers[ 0 ].config.style ),
-    //         coordsToLatLng: function ( xy ) {
-    //             // if ( !layers[ 0 ].config.CRS ) return xy
-    //             return L.CRS[ layers[ 0 ].config.CRS ].unproject( L.point( xy ) )
-    //         },
-    //         renderer: L.svg(),
-    //         interactive: false
-    //     } )
+        if ( layers.length != 1 ) throw new Error( 'only 1 config allowed' )
 
-    //     var loadEvent = function () {
-    //         layer.fire( 'load' )
-    //     }
-    //     layer.on( {
-    //         add: loadEvent,
-    //     } )
-    //     this.map.on( {
-    //         zoomend: loadEvent,
-    //         moveend: loadEvent
-    //     } )
+        if ( !layers[ 0 ].config.dataUrl )
+            layers[ 0 ].config.dataUrl = this.resolveAttachmentUrl( layers[ 0 ].config.id, layers[ 0 ].config.type )
 
-    //     layer.on( {
-    //         add: function () {
-    //             layer.options.renderer._container.style.zIndex = zIndex
-    //         }
-    //     } )
-
-    //     if ( !layers[ 0 ].config.dataUrl )
-    //         layers[ 0 ].config.dataUrl = '../smks-api/MapConfigurations/' + this.lmfId + '/Attachments/' + layers[ 0 ].config.id
-
-    //     if ( !layers[ 0 ].config.CRS )
-    //         layers[ 0 ].config.CRS = 'EPSG4326'
-
-    //     return $.get( layers[ 0 ].config.dataUrl, null, null, 'json' )
-    //         .then( function ( data ) {
-    //             console.log( 'loaded', layers[ 0 ].config.dataUrl )
-    //             layer.addData( data )
-    //             return layer
-    //         } )
-    // }
+        return SMK.UTIL.makePromise( function ( res, rej ) {
+            $.get( layers[ 0 ].config.dataUrl, null, null, 'json' ).then( function ( doc ) {
+                res( doc )
+            }, function () {
+                rej( 'request to ' + layers[ 0 ].config.dataUrl + ' failed' )
+            } )
+        } )
+        .then( function ( geojson ) {
+            return new E.layers.GraphicsLayer( {
+                graphics: geoJsonToEsriGeometry( geojson, convertStyle( layers[ 0 ].config.style ) )
+            } )
+        } )
+    }
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
     function convertStyle( styleConfig ) {
-        return {
-            // stroke:      true,
-            color:       '#' + styleConfig.strokeColor,
-            weight:      styleConfig.strokeWidth,
-            opacity:     styleConfig.strokeOpacity,
-            // lineCap:     styleConfig.,
-            // lineJoin:    styleConfig.,
-            // dashArray:   styleConfig.,
-            // dashOffset:  styleConfig.,
-            // fill:        styleConfig.,
-            fillColor:   '#' + styleConfig.fillColor,
-            fillOpacity: styleConfig.fillOpacity,
-            // fillRule:    styleConfig.,
+        var point = {
+            type: 'simple-marker',
+            color: color( styleConfig.fillColor, styleConfig.fillOpacity ),
+            size: styleConfig.strokeWidth,
+            style: 'circle'
         }
+
+        var line = {
+            type: 'simple-line',
+            color: color( styleConfig.strokeColor, styleConfig.strokeOpacity ),
+            width: styleConfig.strokeWidth,
+        }
+
+        var fill = {
+            type: 'simple-fill',
+            color: color( styleConfig.fillColor, styleConfig.fillOpacity ),
+            style: 'solid',
+        }
+
+        return {
+            point: Object.assign( point, { outline: line } ),
+            multipoint: Object.assign( point, { outline: line } ),
+            polyline: line,
+            polygon: Object.assign( fill, { outline: line } )
+        }
+
+        function color( c, a ) {
+            var c = new E.Color( c )
+            c.a = a
+            return c
+        }
+    }
+
+    function geoJsonToEsriGeometry( geojson, symbol ) {
+        var eg = geoJsonHandler[ geojson.type ]( geojson, symbol )
+        // console.log( geojson, eg )
+        return eg
+    }
+
+    var geoJsonHandler = {
+        Point: function ( obj ) {
+            return [ Object.assign( { type: 'point' }, Terraformer.ArcGIS.convert( obj ) ) ]
+        },
+
+        MultiPoint: function ( obj ) {
+            return [ Object.assign( { type: 'multipoint' }, Terraformer.ArcGIS.convert( obj ) ) ]
+        },
+
+        LineString: function ( obj ) {
+            return [ Object.assign( { type: 'polyline' }, Terraformer.ArcGIS.convert( obj ) ) ]
+        },
+
+        MultiLineString: function ( obj ) {
+            return [ Object.assign( { type: 'polyline' }, Terraformer.ArcGIS.convert( obj ) ) ]
+        },
+
+        Polygon: function ( obj ) {
+            return [ Object.assign( { type: 'polygon' }, Terraformer.ArcGIS.convert( obj ) ) ]
+        },
+
+        MultiPolygon: function ( obj ) {
+            return [ Object.assign( { type: 'polygon' }, Terraformer.ArcGIS.convert( obj ) ) ]
+        },
+
+        GeometryCollection: function ( obj, symbol ) {
+            return obj.geometries.map( function ( g ) {
+                return geoJsonHandler[ g.type ]( g, symbol )
+            } )
+            .reduce( function( acc, val ) { return acc.concat( val ) }, [] )
+        },
+
+        FeatureCollection:  function ( obj, symbol ) {
+            return obj.features.map( function ( f ) {
+                var geoms = geoJsonHandler[ f.geometry.type ]( f.geometry, symbol )
+                return geoms.map( function ( g ) {
+                    return {
+                        attributes: f.properties,
+                        geometry:   g,
+                        symbol:     symbol[ g.type ]
+                    }
+                } )
+            } )
+            .reduce( function( acc, val ) { return acc.concat( val ) }, [] )
+        },
     }
 
     function getVectorFeaturesAtPoint( arg, esri3dLayer ) {

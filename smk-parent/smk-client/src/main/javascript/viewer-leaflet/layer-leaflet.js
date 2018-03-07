@@ -190,7 +190,7 @@ include.module( 'layer-leaflet', [ 'smk', 'layer', 'util' ], function () {
     function convertStyle( styleConfig ) {
         return {
             // stroke:      true,
-            color:       '#' + styleConfig.strokeColor,
+            color:       styleConfig.strokeColor,
             weight:      styleConfig.strokeWidth,
             opacity:     styleConfig.strokeOpacity,
             // lineCap:     styleConfig.,
@@ -198,7 +198,7 @@ include.module( 'layer-leaflet', [ 'smk', 'layer', 'util' ], function () {
             // dashArray:   styleConfig.,
             // dashOffset:  styleConfig.,
             // fill:        styleConfig.,
-            fillColor:   '#' + styleConfig.fillColor,
+            fillColor:   styleConfig.fillColor,
             fillOpacity: styleConfig.fillOpacity,
             // fillRule:    styleConfig.,
         }

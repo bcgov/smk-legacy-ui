@@ -102,7 +102,7 @@ include.module( 'viewer-esri3d', [ 'viewer', 'esri3d', 'types-esri3d' ], functio
 
         self.finishedLoading( function () {
             self.map.layers.forEach( function ( ly ) {
-                if ( !ly._smk_id ) return
+                if ( !ly || !ly._smk_id ) return
 
                 if ( self.deadViewerLayer[ ly._smk_id ] ) {
                     self.map.layers.remove( ly )
@@ -245,9 +245,13 @@ include.module( 'viewer-esri3d', [ 'viewer', 'esri3d', 'types-esri3d' ], functio
 
     ViewerEsri3d.prototype.getView = function () {
         if ( !this.view.center ) return
+
+        var ex = E.geometry.support.webMercatorUtils.webMercatorToGeographic( this.view.extent )
+
         return {
             center: { lat: this.view.center.latitude, lng: this.view.center.longitude },
-            zoom: this.view.zoom
+            zoom: this.view.zoom,
+            extent: [ ex.xmin, ex.ymin, ex.xmax, ex.ymax ]
         }
     }
 

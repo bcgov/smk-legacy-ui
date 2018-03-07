@@ -26,7 +26,8 @@ include.module( 'types-esri3d', [ 'smk', 'esri3d' ], function () {
             'esri/layers/MapImageLayer',
             'esri/layers/WMSLayer',
             'esri/layers/BaseDynamicLayer',
-            'esri/layers/FeatureLayer',
+            // 'esri/layers/FeatureLayer',
+            'esri/layers/GraphicsLayer',
 
             // rendering
             'esri/renderers/SimpleRenderer',
@@ -35,6 +36,7 @@ include.module( 'types-esri3d', [ 'smk', 'esri3d' ], function () {
 
             // symbols
             'esri/Graphic',
+            'esri/Color',
             'esri/symbols/SimpleMarkerSymbol',
             'esri/symbols/SimpleLineSymbol',
             'esri/symbols/SimpleFillSymbol',
@@ -46,6 +48,7 @@ include.module( 'types-esri3d', [ 'smk', 'esri3d' ], function () {
             'esri/geometry/Extent',
             'esri/geometry/SpatialReference',
             'esri/geometry/geometryEngine',
+            'esri/geometry/support/webMercatorUtils'
 
             // dojo stuff
             // 'dojo/domReady!'
