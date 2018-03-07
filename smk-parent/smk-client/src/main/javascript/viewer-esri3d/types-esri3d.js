@@ -26,6 +26,7 @@ include.module( 'types-esri3d', [ 'smk', 'esri3d' ], function () {
             'esri/layers/MapImageLayer',
             'esri/layers/WMSLayer',
             'esri/layers/BaseDynamicLayer',
+            'esri/layers/FeatureLayer',
 
             // rendering
             'esri/renderers/SimpleRenderer',

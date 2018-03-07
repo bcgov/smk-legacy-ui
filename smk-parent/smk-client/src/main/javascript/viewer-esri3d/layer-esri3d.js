@@ -192,11 +192,52 @@ include.module( 'layer-esri3d', [ 'smk', 'layer', 'util', 'types-esri3d' ], func
 
     } )
 
-    // SMK.TYPE.Layer[ 'kml' ].esri3d.create = function ( layers, zIndex ) {
-    //     var self = this;
+    SMK.TYPE.Layer[ 'kml' ].esri3d.create = function ( layers, zIndex ) {
+        var self = this;
 
-    //     if ( layers.length != 1 ) throw new Error( 'only 1 config allowed' )
+        if ( layers.length != 1 ) throw new Error( 'only 1 config allowed' )
 
+        if ( !layers[ 0 ].config.dataUrl )
+            layers[ 0 ].config.dataUrl = this.resolveAttachmentUrl( layers[ 0 ].config.id, layers[ 0 ].config.type )
+
+        return SMK.UTIL.makePromise( function ( res, rej ) {
+            $.get( layers[ 0 ].config.dataUrl, null, null, 'xml' ).then( function ( doc ) {
+                res( doc )
+            }, function () {
+                rej( 'request to ' + layers[ 0 ].config.dataUrl + ' failed' )
+            } )
+        } )
+        .then( function ( doc ) {
+            var geojson = toGeoJSON.kml( doc )
+
+            var features = Terraformer.ArcGIS.convert( geojson )
+
+            console.log( features )
+
+            return new E.layers.FeatureLayer( {
+                source:             features,
+                geometryType:       'polygon',
+                spatialReference:   { wkid: 4326 },
+                fields:             [ {
+                    name: 'name',
+                    alias: 'Name',
+                    type: 'string'
+                } ],
+                objectIdField:      'name',
+                renderer: {
+                    type: 'simple',
+                    symbol: {
+                        type: 'simple-fill',
+                        color: 'red'
+                    }
+                }
+            } )
+        } )
+        // var ly = new E.layers.KMLLayer( {
+            // url: layers[ 0 ].config.dataUrl
+        // } )
+
+        // return ly
     //     var jsonLayer = L.geoJson( null, {
     //         style: convertStyle( layers[ 0 ].config.style ),
     //         coordsToLatLng: function ( xy ) {
@@ -243,7 +284,7 @@ include.module( 'layer-esri3d', [ 'smk', 'layer', 'util', 'types-esri3d' ], func
     //             }
     //         } )
     //     } )
-    // }
+    }
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
