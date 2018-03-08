@@ -7,7 +7,11 @@
 	<name>smk-client</name>
   	<packaging>war</packaging>
   	<parent>
+<<<<<<< HEAD
 		<groupId>ca.bc.gov.app</groupId>
+=======
+		<groupId>ca.bc.gov.databc</groupId>
+>>>>>>> master
 		<artifactId>smk-parent</artifactId>
 		<version>1.0.x-SNAPSHOT</version>
   	</parent>

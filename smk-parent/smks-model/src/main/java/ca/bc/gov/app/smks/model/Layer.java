@@ -4,6 +4,11 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
+<<<<<<< HEAD:smk-parent/smks-model/src/main/java/ca/bc/gov/app/smks/model/Layer.java
+=======
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+>>>>>>> master:smk-parent/smks-model/src/main/java/ca/bc/gov/databc/smks/model/Layer.java
 
 import ca.bc.gov.app.smks.model.layer.EsriDynamic;
 import ca.bc.gov.app.smks.model.layer.Folder;

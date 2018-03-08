@@ -1,4 +1,5 @@
 .smk-tool button {
+<<<<<<< HEAD
     background-color: white;
     border: 1px solid transparent;
     padding: 0;
@@ -18,3 +19,18 @@
 .smk-tool.smk-tool-active button:focus, .smk-tool.smk-tool-active button {
     background-color: palegreen;
 }
+=======
+    background-color: transparent;
+    border: 0;
+    padding: 0;
+    margin: 0;
+    outline: 0;
+    width: 26px;
+    height: 26px;
+}
+
+.smk-tool button:focus {
+    outline: 0;
+}
+
+>>>>>>> master
