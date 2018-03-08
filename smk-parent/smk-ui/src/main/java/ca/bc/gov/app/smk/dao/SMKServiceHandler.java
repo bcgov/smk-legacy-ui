@@ -18,6 +18,9 @@ import ca.bc.gov.app.smks.model.MapConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 // import ca.bc.gov.databc.smk.model.MapConfiguration;
 
 public class SMKServiceHandler

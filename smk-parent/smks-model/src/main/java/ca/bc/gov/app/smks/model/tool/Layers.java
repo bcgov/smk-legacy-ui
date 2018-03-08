@@ -2,6 +2,7 @@ package ca.bc.gov.app.smks.model.tool;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import ca.bc.gov.app.smks.model.Tool;
 
