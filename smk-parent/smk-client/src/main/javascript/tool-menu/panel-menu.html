@@ -1,14 +1,5 @@
 <side-panel class="smk-menu-panel">
     <h1 slot="header">{{ title }}
-<<<<<<< HEAD
-        <menu-toolbar
-            v-bind:tools="widgets"
-        >
-        </menu-toolbar>
-    </h1>
-
-    <!-- <div class="smk-menu-description" v-html="content"></div> -->
-=======
         <component class="smk-tool"
             v-for="tool in subWidgets"
             v-bind:class="{ 'smk-tool-active': tool.widget.active, 'smk-tool-visible': tool.widget.visible, 'smk-tool-enabled': tool.widget.enabled }"
@@ -23,6 +14,5 @@
         v-bind:is="subPanels[ activeToolType ].panelComponent"
         v-bind="subPanels[ activeToolType ].panel"
     ></component>
-    
->>>>>>> master
+
 </side-panel>

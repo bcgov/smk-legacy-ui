@@ -244,16 +244,6 @@
 
         if ( !loader[ inc.loader ] ) throw new Error( 'tag "' + tag + '" has unknown loader "' + inc.loader + '"' )
 
-<<<<<<< HEAD:smk-parent/smk-client/lib/include.js
-        return inc.include = loader[ inc.loader ].call( loader, inc, tag )
-            .then( function ( res ) {
-                inc.loaded = res
-
-                if ( !inc.module ) return res
-
-                return inc.module
-            } )
-=======
         return inc.include =
             ( new Promise( function ( res, rej ) {
                 loader[ inc.loader ].call( loader, inc, tag )
@@ -278,7 +268,6 @@
                     rej( new Error( 'timeout' ) )
                 }, OPTION.timeout )
             } ) )
->>>>>>> master:smk-parent/smk-client/lib/include.js
             .then( function ( res ) {
                 console.log( 'included ' + inc.loader + ' "' + tag + '"', inc.url || inc.tags )
                 return res

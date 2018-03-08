@@ -39,27 +39,6 @@
     font-weight: bold;
 }
 
-<<<<<<< HEAD
-.smk-tool input.smk-search {
-    border: 0;
-    vertical-align: text-bottom;
-    height: 26px;
-    margin-top: 1px;
-    margin-bottom: 2px;
-    padding-left: 2px;
-    border-radius: 3px;
-    border: 1px solid transparent;
-}
-
-.smk-tool input.smk-search:focus {
-    outline: 0;
-    border: 1px solid black;
-}
-
-.smk-tool input.smk-search:hover {
-    border: 1px solid black;
-}
-=======
 .smk-tool.smk-search input {
     border: 0;
     vertical-align: top;
@@ -69,4 +48,3 @@
 .smk-tool.smk-search input:focus {
     outline: 0;
 }
->>>>>>> master

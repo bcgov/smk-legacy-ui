@@ -11,10 +11,6 @@ import org.ektorp.Attachment;
 import org.ektorp.support.CouchDbDocument;
 
 @JsonIgnoreProperties({"id", "revision"})
-<<<<<<< HEAD:smk-parent/smks-model/src/main/java/ca/bc/gov/app/smks/model/MapConfiguration.java
-=======
-// @JsonInclude(Include.NON_NULL)
->>>>>>> master:smk-parent/smks-model/src/main/java/ca/bc/gov/databc/smks/model/MapConfiguration.java
 @JsonInclude(Include.NON_DEFAULT)
 public class MapConfiguration extends CouchDbDocument implements Cloneable
 {
@@ -62,11 +58,7 @@ public class MapConfiguration extends CouchDbDocument implements Cloneable
 		this.setSurround(mapConfiguration.getSurround().clone());
 		this.setViewer(mapConfiguration.getViewer().clone());
 
-<<<<<<< HEAD:smk-parent/smks-model/src/main/java/ca/bc/gov/app/smks/model/MapConfiguration.java
 		if(mapConfiguration.getTools() != null)
-=======
-		for(Tool tool : tools)
->>>>>>> master:smk-parent/smks-model/src/main/java/ca/bc/gov/databc/smks/model/MapConfiguration.java
 		{
 			for(Tool tool : mapConfiguration.getTools())
 			{
@@ -129,7 +121,7 @@ public class MapConfiguration extends CouchDbDocument implements Cloneable
 		if(layers == null) layers = new ArrayList<Layer>();
 		return layers;
 	}
-	
+
 	public void setLayers(List<Layer> layers)
 	{
 		this.layers = layers;
