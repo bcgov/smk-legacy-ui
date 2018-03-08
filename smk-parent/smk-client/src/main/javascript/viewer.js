@@ -96,22 +96,23 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
         // this.layerStatus = {}
         this.deadViewerLayer = {}
 
-        self.layerIds = smk.layers.map( function ( lyConfig, i ) {
-            var ly = self.layerId[ lyConfig.id ] = new SMK.TYPE.Layer[ lyConfig.type ][ smk.viewer.type ]( lyConfig )
+        if ( Array.isArray( smk.layers ) )
+            self.layerIds = smk.layers.map( function ( lyConfig, i ) {
+                var ly = self.layerId[ lyConfig.id ] = new SMK.TYPE.Layer[ lyConfig.type ][ smk.viewer.type ]( lyConfig )
 
-            ly.initialize()
-            ly.index = i
+                ly.initialize()
+                ly.index = i
 
-            ly.startedLoading( function () {
-                self.loading = true
+                ly.startedLoading( function () {
+                    self.loading = true
+                } )
+
+                ly.finishedLoading( function () {
+                    self.loading = self.anyLayersLoading()
+                } )
+
+                return lyConfig.id
             } )
-
-            ly.finishedLoading( function () {
-                self.loading = self.anyLayersLoading()
-            } )
-
-            return lyConfig.id
-        } )
     }
 
     ViewerBase.prototype.initializeLayers = function ( smk ) {
@@ -165,7 +166,7 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
             visibleLayers.push( merged )
 
         var promises = []
-        var maxZOrder = visibleLayers.length - 1 
+        var maxZOrder = visibleLayers.length - 1
         visibleLayers.forEach( function ( lys, i ) {
             var cid = lys.map( function ( ly ) { return ly.config.id } ).join( '--' )
 
