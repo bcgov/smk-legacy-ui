@@ -165,15 +165,20 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
             visibleLayers.push( merged )
 
         var promises = []
+        var maxZOrder = visibleLayers.length - 1 
         visibleLayers.forEach( function ( lys, i ) {
             var cid = lys.map( function ( ly ) { return ly.config.id } ).join( '--' )
 
             delete pending[ cid ]
-            if ( self.visibleLayer[ cid ] ) return
+            if ( self.visibleLayer[ cid ] ) {
+                self.positionViewerLayer( ly, maxZOrder - i )
+                return
+            }
 
-            var p = self.createViewerLayer( cid, lys, layerCount - i )
+            var p = self.createViewerLayer( cid, lys, maxZOrder - i )
                 .then( function ( ly ) {
                     self.addViewerLayer( ly )
+                    self.positionViewerLayer( ly, maxZOrder - i )
                     self.visibleLayer[ cid ] = ly
                     return ly
                 } )
@@ -190,6 +195,9 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
     }
 
     ViewerBase.prototype.addViewerLayer = function ( viewerLayer ) {
+    }
+
+    ViewerBase.prototype.positionViewerLayer = function ( viewerLayer, zOrder ) {
     }
 
     ViewerBase.prototype.createViewerLayer = function ( id, layers, zIndex ) {

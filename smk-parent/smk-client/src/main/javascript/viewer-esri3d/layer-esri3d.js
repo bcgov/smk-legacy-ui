@@ -144,6 +144,14 @@ include.module( 'layer-esri3d', [ 'smk', 'layer', 'util', 'types-esri3d' ], func
             opacity:    opacity,
         } )
 
+        layer.on( 'layerview-create', function ( ev ) {
+            E.core.watchUtils.watch( ev.layerView, "updating", function( val ) {
+                layers.forEach( function ( ly ) {
+                    ly.loading = val
+                } )
+            } )
+        } )
+        
         return layer
     }
 

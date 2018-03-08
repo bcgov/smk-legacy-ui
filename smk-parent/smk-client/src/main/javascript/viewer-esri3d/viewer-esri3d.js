@@ -265,6 +265,11 @@ include.module( 'viewer-esri3d', [ 'viewer', 'esri3d', 'types-esri3d' ], functio
         this.map.add( viewerLayer )
     }
 
+    ViewerEsri3d.prototype.positionViewerLayer = function ( viewerLayer, zOrder ) {
+        // console.log( viewerLayer._smk_id, zOrder )
+        this.map.reorder( viewerLayer, zOrder )
+    }
+
     ViewerEsri3d.prototype.zoomToFeature = function ( layer, feature ) {
         this.map.fitBounds( feature.highlightLayer.getBounds(), {
             paddingTopLeft: L.point( 300, 100 ),
