@@ -88,6 +88,40 @@ include.module( 'layer-esri3d', [ 'smk', 'layer', 'util', 'types-esri3d' ], func
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+    var DynamicMapLayer = E.layers.BaseDynamicLayer.createSubclass( {
+        properties: {
+            serviceUrl: null,
+            dynamicLayers: null,
+            // imageMaxWidth: 1024,
+            // imageMaxHeight: 1024,
+        },
+
+        getImageUrl: function ( extent, width, height ) {
+            var epsg = extent.spatialReference.isWebMercator ? 3857 : extent.spatialReference.wkid
+
+            var param = {
+                bbox:           [ extent.xmin, extent.ymin, extent.xmax, extent.ymax ].join( ',' ),
+                size:           width + ',' + height,
+                dpi:            96,
+                format:         'png24',
+                transparent:    true,
+                bboxSR:         epsg,
+                imageSR:        epsg,
+                dynamicLayers:  JSON.stringify( this.dynamicLayers ),
+                f:              'json'
+            }
+
+            var url = this.serviceUrl + '/export?' + Object.keys( param ).map( function ( p ) {
+                return p + '=' + encodeURIComponent( param[ p ] )
+            } ).join( '&' )
+
+            return E.request( url )
+                .then( function ( res ) {
+                    return res.data.href
+                } )
+        },
+    } )
+
     defineLayerType( 'esri-dynamic' )
 
     SMK.TYPE.Layer[ 'esri-dynamic' ].esri3d.create = function ( layers, zIndex ) {
@@ -104,84 +138,13 @@ include.module( 'layer-esri3d', [ 'smk', 'layer', 'util', 'types-esri3d' ], func
         if ( E.config.request.corsEnabledServers.indexOf( host ) == -1 )
             E.config.request.corsEnabledServers.push( host );
 
-		// if(!mpcmRootLayer)
-		// {
-
-        Object.assign( dynamicLayers[ 0 ], dynamicLayers[ 0 ].drawingInfo )
-        delete dynamicLayers[ 0 ].drawingInfo
-        delete dynamicLayers[ 0 ].transparency
-        dynamicLayers[ 0 ].opacity = 1
-        dynamicLayers[ 0 ].visible = true
-        dynamicLayers[ 0 ].renderer.symbol.type = 'picture-marker'
-         var mapImageLayer = new E.layers.MapImageLayer( {
-            url:        serviceUrl,
-            // title:      "DataBC Catalog",
-            // visible:    true,
-            sublayers:  dynamicLayers
+        var layer = DynamicMapLayer( {
+            serviceUrl: serviceUrl,
+            dynamicLayers: dynamicLayers,
+            opacity:    opacity,
         } )
 
-			// map.layers.add(mapImageLayer);
-		// }
-
-		// build the sublayer
-		// dynamicJson = dynamicJson[0];
-		// var renderer;
-		// if(dynamicJson.drawingInfo.renderer.type == "uniqueValue")
-		// {
-		// 	renderer = UniqueValueRenderer.fromJSON(dynamicJson.drawingInfo.renderer);
-		// }
-		// else if(dynamicJson.drawingInfo.renderer.type == "classBreaks")
-		// {
-		// 	renderer = ClassBreaksRenderer.fromJSON(dynamicJson.drawingInfo.renderer);
-		// }
-		// else renderer = SimpleRenderer.fromJSON(dynamicJson.drawingInfo.renderer)
-
-		// var popupParsed;
-		// if(popupTemplate && popupTemplate != "") popupParsed = JSON.parse(popupTemplate);
-
-		// var sl =
-		// {
-		// 	id: dynamicJson.id,
-	    //     title: title,
-	    //     opacity: opacity,
-	    //     definitionExpression: dynamicJson.definitionExpression,
-	    //     labelsVisible: dynamicJson.labelsVisible,
-	    //     renderer: renderer,
-	    //     source: dynamicJson.source,
-	    //     visible: visibility,
-	    //     labelingInfo: dynamicJson.labelingInfo,
-	    //     popupTemplate: popupParsed
-		// }
-
-		// layerExtras.push(
-		// {
-		// 	id: dynamicJson.id,
-		// 	metadata: metadataLink,
-		// 	minScale: minScale,
-		// 	maxScale: maxScale
-		// });
-
-		// add popup templates to sl: popupTemplate: popupTemplate. We can build the popup template
-		// in the java side and inject here... might make the process a little slower though?
-
-		// mapImageLayer.sublayers.push( dynamicLayers[ 0 ] )
-
-
-
-
-
-        // var layer = L.esri.dynamicMapLayer( {
-        //     url:            serviceUrl,
-        //     opacity:        opacity,
-        //     layers:         layerNames,
-        //     dynamicLayers:  dynamicLayers
-        // });
-        // layer.on( 'load', function () {
-        //     if ( layer._currentImage )
-        //         layer._currentImage.setZIndex( zIndex )
-        // } )
-
-        return mapImageLayer
+        return layer
     }
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

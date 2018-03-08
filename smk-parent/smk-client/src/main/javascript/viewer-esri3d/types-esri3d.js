@@ -3,6 +3,7 @@ include.module( 'types-esri3d', [ 'smk', 'esri3d' ], function () {
     return new Promise( function ( res ) {
         var objs = [
             'esri/config',
+            'esri/request',
 
             // base
             'esri/Map',
