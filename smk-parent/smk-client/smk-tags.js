@@ -38,80 +38,80 @@ exports.gen = function () {
 
 
     t.group( "tool-menu" )
-        .dir( 'tool-menu/**/*', { cwd: baseDir } )
+        .dir( 'tool/menu/**/*', { cwd: baseDir } )
 
     t.group( "tool-about" )
-        .dir( 'tool-about/**/*', { cwd: baseDir } )
+        .dir( 'tool/about/**/*', { cwd: baseDir } )
 
     t.group( "tool-baseMaps" )
-        .dir( 'tool-baseMaps/**/*', { cwd: baseDir } )
+        .dir( 'tool/baseMaps/**/*', { cwd: baseDir } )
 
     t.group( "tool-coordinate" )
-        .dir( 'tool-coordinate/**/*', { cwd: baseDir } )
+        .dir( 'tool/coordinate/**/*', { cwd: baseDir } )
 
     t.group( "tool-layers" )
-        .dir( 'tool-layers/**/*', { cwd: baseDir } )
+        .dir( 'tool/layers/**/*', { cwd: baseDir } )
 
     t.group( "tool-identify" )
-        .dir( 'tool-identify/**/*', { cwd: baseDir } )
+        .dir( 'tool/identify/**/*', { cwd: baseDir } )
 
     t.group( "tool-markup" )
-        .dir( 'tool-markup/**/*', { cwd: baseDir } )
+        .dir( 'tool/markup/**/*', { cwd: baseDir } )
 
     t.group( "tool-measure" )
-        .dir( 'tool-measure/**/*', { cwd: baseDir } )
+        .dir( 'tool/measure/**/*', { cwd: baseDir } )
 
     t.group( "tool-minimap" )
-        .dir( 'tool-minimap/**/*', { cwd: baseDir } )
+        .dir( 'tool/minimap/**/*', { cwd: baseDir } )
 
     t.group( "tool-pan" )
-        .dir( 'tool-pan/**/*', { cwd: baseDir } )
+        .dir( 'tool/pan/**/*', { cwd: baseDir } )
 
     t.group( "tool-scale" )
-        .dir( 'tool-scale/**/*', { cwd: baseDir } )
+        .dir( 'tool/scale/**/*', { cwd: baseDir } )
 
     t.group( "tool-search" )
-        .dir( 'tool-search/**/*', { cwd: baseDir } )
+        .dir( 'tool/search/**/*', { cwd: baseDir } )
 
     t.group( "tool-select" )
-        .dir( 'tool-select/**/*', { cwd: baseDir } )
+        .dir( 'tool/select/**/*', { cwd: baseDir } )
 
     t.group( "tool-zoom" )
-        .dir( 'tool-zoom/**/*', { cwd: baseDir } )
+        .dir( 'tool/zoom/**/*', { cwd: baseDir } )
 
     // leaflet
 
     t.group( "tool-pan-leaflet" )
-        .dir( 'viewer-leaflet/tool-pan/**/*', { cwd: baseDir } )
+        .dir( 'viewer-leaflet/tool/pan/**/*', { cwd: baseDir } )
 
     t.group( "tool-zoom-leaflet" )
-        .dir( 'viewer-leaflet/tool-zoom/**/*', { cwd: baseDir } )
+        .dir( 'viewer-leaflet/tool/zoom/**/*', { cwd: baseDir } )
 
     t.group( "tool-measure-leaflet" )
-        .dir( 'viewer-leaflet/tool-measure/**/*', { cwd: baseDir } )
+        .dir( 'viewer-leaflet/tool/measure/**/*', { cwd: baseDir } )
 
     t.group( "tool-scale-leaflet" )
-        .dir( 'viewer-leaflet/tool-scale/**/*', { cwd: baseDir } )
+        .dir( 'viewer-leaflet/tool/scale/**/*', { cwd: baseDir } )
 
     t.group( "tool-coordinate-leaflet" )
-        .dir( 'viewer-leaflet/tool-coordinate/**/*', { cwd: baseDir } )
+        .dir( 'viewer-leaflet/tool/coordinate/**/*', { cwd: baseDir } )
 
     t.group( "tool-minimap-leaflet" )
-        .dir( 'viewer-leaflet/tool-minimap/**/*', { cwd: baseDir } )
+        .dir( 'viewer-leaflet/tool/minimap/**/*', { cwd: baseDir } )
 
     t.group( "tool-markup-leaflet" )
-        .dir( 'viewer-leaflet/tool-markup/**/*', { cwd: baseDir } )
+        .dir( 'viewer-leaflet/tool/markup/**/*', { cwd: baseDir } )
         .style( "https://unpkg.com/leaflet.pm@0.17.3/dist/leaflet.pm.css" )
         .script( "https://unpkg.com/leaflet.pm@0.17.3/dist/leaflet.pm.min.js" )
 
     t.group( "tool-identify-leaflet" )
-        .dir( "viewer-leaflet/tool-identify/**/*", { cwd: baseDir } )
+        .dir( "viewer-leaflet/tool/identify/**/*", { cwd: baseDir } )
 
     t.group( "tool-select-leaflet" )
-        .dir( "viewer-leaflet/tool-select/**/*", { cwd: baseDir } )
+        .dir( "viewer-leaflet/tool/select/**/*", { cwd: baseDir } )
 
     t.group( "tool-search-leaflet" )
-        .dir( "viewer-leaflet/tool-search/**/*", { cwd: baseDir } )
+        .dir( "viewer-leaflet/tool/search/**/*", { cwd: baseDir } )
 
     t.script( "layer-leaflet", "viewer-leaflet/layer-leaflet.js" )
 
@@ -119,17 +119,73 @@ exports.gen = function () {
         .script( "viewer-leaflet/viewer-leaflet.js" )
         .tag( "layer-leaflet" )
         .style( "viewer-leaflet/viewer-leaflet.css" )
+        .tag( "leaflet-extensions" )
 
     t.sequence( "leaflet" )
         .script( "https://unpkg.com/leaflet@1.2.0/dist/leaflet.js", { "integrity": "sha512-lInM/apFSqyy1o6s89K4iQUKg6ppXEgsVxT35HbzUupEVRh2Eu9Wdl4tHj7dZO0s1uvplcYGmt3498TtHq+log==" } )
         .style( "https://unpkg.com/leaflet@1.2.0/dist/leaflet.css", { "integrity": "sha512-M2wvCLH6DSRazYeZRIm1JnYyh22purTM+FDB5CsyxtQJYeKq83arPe5wgbNmcFXGqiSH2XR8dT/fJISVA1r/zQ==" } )
         .script( "https://unpkg.com/esri-leaflet@2.1.0/dist/esri-leaflet.js", { "integrity": "sha512-Tojl3UMd387f6DdAJlo+fKfJZiP55fYT+6Y58yKbHydnueOdSFOxrgLPuUxm7VW1szEt3hZVwv3V2sSUCuT35w==" } )
+
+    t.sequence( "leaflet-extensions" )
+        .tag( "leaflet" )
         .script( "resources/js/NonTiledLayer-src.js" )
         .script( "https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-omnivore/v0.3.1/leaflet-omnivore.min.js" )
+        // .script( "https://unpkg.com/terraformer@1.0.7" )
+        // .script( "https://unpkg.com/terraformer-arcgis-parser@1.0.5" )
+        // .script( "https://unpkg.com/terraformer-wkt-parser@1.1.2" )
+        .script( "https://npmcdn.com/@turf/turf/turf.min.js" )
+
+    // esri3d
+
+    t.group( "tool-pan-esri3d" )
+        .dir( 'viewer-esri3d/tool/pan/**/*', { cwd: baseDir } )
+
+    t.group( "tool-zoom-esri3d" )
+        .dir( 'viewer-esri3d/tool/zoom/**/*', { cwd: baseDir } )
+
+    t.group( "tool-measure-esri3d" )
+        .dir( 'viewer-esri3d/tool/measure/**/*', { cwd: baseDir } )
+
+    t.group( "tool-scale-esri3d" )
+        .dir( 'viewer-esri3d/tool/scale/**/*', { cwd: baseDir } )
+
+    t.group( "tool-coordinate-esri3d" )
+        .dir( 'viewer-esri3d/tool/coordinate/**/*', { cwd: baseDir } )
+
+    t.group( "tool-minimap-esri3d" )
+        .dir( 'viewer-esri3d/tool/minimap/**/*', { cwd: baseDir } )
+
+    t.group( "tool-markup-esri3d" )
+        .dir( 'viewer-esri3d/tool/markup/**/*', { cwd: baseDir } )
+
+    t.group( "tool-identify-esri3d" )
+        .dir( "viewer-esri3d/tool/identify/**/*", { cwd: baseDir } )
+
+    t.group( "tool-select-esri3d" )
+        .dir( "viewer-esri3d/tool/select/**/*", { cwd: baseDir } )
+
+    t.group( "tool-search-esri3d" )
+        .dir( "viewer-esri3d/tool/search/**/*", { cwd: baseDir } )
+
+    t.script( "layer-esri3d", "viewer-esri3d/layer-esri3d.js" )
+
+    t.script( "types-esri3d", "viewer-esri3d/types-esri3d.js" )
+
+    t.group( "viewer-esri3d" )
+        .script( "viewer-esri3d/viewer-esri3d.js" )
+        .tag( "layer-esri3d" )
+        .style( "viewer-esri3d/viewer-esri3d.css" )
+
+    t.sequence( "esri3d" )
+        .tag( 'leaflet' )
+        .style( "https://js.arcgis.com/4.6/esri/css/main.css" )
+        .script( "https://js.arcgis.com/4.6/" )
+        .script( "resources/js/toGeoJSON.js" )
         .script( "https://unpkg.com/terraformer@1.0.7" )
         .script( "https://unpkg.com/terraformer-arcgis-parser@1.0.5" )
         .script( "https://unpkg.com/terraformer-wkt-parser@1.1.2" )
-        .script( "https://npmcdn.com/@turf/turf/turf.min.js" )
+        // .style( "https://js.arcgis.com/4.4/esri/css/main.css" )
+        // .script( "https://js.arcgis.com/4.4/" )
 
     return t
 }

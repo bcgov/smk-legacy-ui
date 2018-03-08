@@ -1,12 +1,38 @@
-include.module( 'layer', [ 'smk', 'jquery', 'util' ], function () {
+include.module( 'layer', [ 'smk', 'jquery', 'util', 'event' ], function () {
+
+    var LayerEvent = SMK.TYPE.Event.define( [
+        'startedLoading',
+        'finishedLoading',
+    ] )
 
     function Layer( config ) {
+        var self = this
+
+        LayerEvent.prototype.constructor.call( this )
+
         $.extend( this, {
             config: config,
             visible: false,
         } )
+
+        var loading = false
+        Object.defineProperty( this, 'loading', {
+            get: function () { return loading },
+            set: function ( v ) {
+                if ( !!v == loading ) return
+                // console.log( self.config.id, v )
+                loading = !!v
+                if ( v )
+                    self.startedLoading()
+                else
+                    self.finishedLoading()
+            }
+        } )
     }
 
+    $.extend( Layer.prototype, LayerEvent.prototype )
+    // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+    //
     Layer.prototype.initialize = function () {
         var self = this
 
@@ -37,9 +63,8 @@ include.module( 'layer', [ 'smk', 'jquery', 'util' ], function () {
     Layer.prototype.canMergeWith = function ( other ) {
         return false
     }
-
-    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
+    // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+    //
     SMK.TYPE.Layer = {}
 
     function defineLayerType( name, def ) {
