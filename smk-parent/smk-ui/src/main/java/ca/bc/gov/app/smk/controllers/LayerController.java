@@ -38,7 +38,7 @@ public class LayerController
 	{
 		ArrayList<TreeNode> catalogNodes = new ArrayList<TreeNode>();
 
-		URL mpcmUrl = new URL("https://mpcm-catalogue.api.gov.bc.ca/pub/mpcm/services/catalog/PROD");
+		URL mpcmUrl = new URL("https://mpcm-catalogue.api.gov.bc.ca/catalogV2/PROD");
 
 	    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         factory.setNamespaceAware(true);
@@ -152,7 +152,7 @@ public class LayerController
 
 		logger.debug("loading "+layer.getMpcmId());
 		//fetch the whole thing. We can use the data for a preview window
-		URL mpcmUrl = new URL("https://mpcm-catalogue.api.gov.bc.ca/pub/mpcm/services/catalog/PROD/" + layer.getMpcmId());
+		URL mpcmUrl = new URL("https://mpcm-catalogue.api.gov.bc.ca/catalogV2/PROD/" + layer.getMpcmId());
 
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		factory.setNamespaceAware(true);
