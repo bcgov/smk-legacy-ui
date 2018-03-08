@@ -2,7 +2,7 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <name>smk-parent</name>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>ca.bc.gov.databc</groupId>
+  <groupId>ca.bc.gov.app</groupId>
   <artifactId>smk-parent</artifactId>
   <version>1.0.x-SNAPSHOT</version>
   <packaging>pom</packaging>

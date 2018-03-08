@@ -45,7 +45,6 @@ include.module( 'tool-layers', [ 'smk', 'tool', 'widgets', 'tool-layers.panel-la
 
         SMK.TYPE.Tool.prototype.constructor.call( this, $.extend( {
             order:          3,
-            position:       'menu',
             title:          'Layers',
             widgetComponent:'layers-widget',
             panelComponent: 'layers-panel',
@@ -61,7 +60,7 @@ include.module( 'tool-layers', [ 'smk', 'tool', 'widgets', 'tool-layers.panel-la
     LayersTool.prototype.afterInitialize.push( function ( smk, aux ) {
         var self = this
 
-        aux.widget.vm.$on( 'layers-widget.click', function () {
+        aux.toolbar.vm.$on( 'layers-widget.click', function () {
             if ( !self.visible || !self.enabled ) return
 
             self.active = !self.active

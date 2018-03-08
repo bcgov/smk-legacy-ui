@@ -5,8 +5,7 @@
 
     var TAG = {}
     var OPTION = {
-        baseUrl: document.location,
-        timeout: 5000
+        baseUrl: document.location
     }
 
     function includeTag( tag, attr ) {
@@ -244,37 +243,21 @@
 
         if ( !loader[ inc.loader ] ) throw new Error( 'tag "' + tag + '" has unknown loader "' + inc.loader + '"' )
 
-        return inc.include =
-            ( new Promise( function ( res, rej ) {
-                loader[ inc.loader ].call( loader, inc, tag )
-                    .then( function ( res ) {
-                        inc.loaded = res
+        return inc.include = loader[ inc.loader ].call( loader, inc, tag )
+            .then( function ( res ) {
+                inc.loaded = res
 
-                        if ( !inc.module ) return res
+                if ( !inc.module ) return res
 
-                        return inc.module
-                    } )
-                    .then( function ( r ) {
-                        // console.log( '"' + tag + '" resolve' );
-                        res( r )
-                    } )
-                    .catch( function ( e ) {
-                        // console.warn(e)
-                        rej( e )
-                    } )
-
-                setTimeout( function () {
-                    // console.log( '"' + tag + '" timeout' );
-                    rej( new Error( 'timeout' ) )
-                }, OPTION.timeout )
-            } ) )
+                return inc.module
+            } )
             .then( function ( res ) {
                 console.log( 'included ' + inc.loader + ' "' + tag + '"', inc.url || inc.tags )
                 return res
             } )
             .catch( function ( e ) {
                 e.message += ', for tag "' + tag + '"'
-                // console.warn( e )
+                console.warn( e )
                 throw e
             } )
     }

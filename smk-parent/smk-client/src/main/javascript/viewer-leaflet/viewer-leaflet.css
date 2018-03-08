@@ -1,9 +1,0 @@
-.leaflet-popup-content-wrapper {
-	border-radius: 5px !important;
-}
-
-.leaflet-popup-content {
-    max-width: 500px;
-    width: 500px;
-    min-width: 200px;
-}

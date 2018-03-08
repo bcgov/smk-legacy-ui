@@ -32,12 +32,12 @@ include.module( 'event', [ 'vue', 'util' ], function () {
                 try {
                     this.eventDispatch.$emit.apply( this.eventDispatch, args )
                 }
-                catch ( err ) {
+                catch ( e ) {
                     if ( this.catchExceptions ) {
-                        console.warn( 'Exception caught in ' + n + ' event handler:', err )
+                        console.warn( 'Exception caught in %s event handler:\n%o', name, err )
                     }
                     else {
-                        err.message = 'Exception caught in ' + n + ' event handler: ' + err.message
+                        err.message = 'Exception caught in ' + name + ' event handler: ' + err.message
                         throw err
                     }
                 }

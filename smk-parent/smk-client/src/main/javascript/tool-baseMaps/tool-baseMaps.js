@@ -72,7 +72,6 @@ include.module( 'tool-baseMaps', [ 'smk', 'tool', 'widgets', 'tool-baseMaps.pane
 
         SMK.TYPE.Tool.prototype.constructor.call( this, $.extend( {
             order:          3,
-            position:       'menu',
             title:          'Base Maps',
             widgetComponent:'baseMaps-widget',
             panelComponent: 'baseMaps-panel',
@@ -121,7 +120,7 @@ include.module( 'tool-baseMaps', [ 'smk', 'tool', 'widgets', 'tool-baseMaps.pane
         self.center = v.center
         self.zoom = v.zoom
 
-        aux.widget.vm.$on( 'baseMaps-widget.click', function () {
+        aux.toolbar.vm.$on( 'baseMaps-widget.click', function () {
             if ( !self.visible || !self.enabled ) return
 
             self.active = !self.active

@@ -6,18 +6,17 @@ include.module( 'tool-menu', [ 'smk', 'tool', 'widgets', 'tool-menu.panel-menu-h
 
     Vue.component( 'menu-panel', {
         template: inc[ 'tool-menu.panel-menu-html' ],
-        props: [ 'title', 'visible', 'enabled', 'active', 'subWidgets', 'subPanels', 'activeToolType' ]
+        props: [ 'title', 'widgets', 'panels' ]
     } )
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
     function MenuTool( option ) {
         this.makePropWidget( 'icon', 'menu' )
-        this.makePropPanel( 'subWidgets', [] )
-        this.makePropPanel( 'subPanels', {} )
-        this.makePropPanel( 'activeToolType', null )
+        this.makePropPanel( 'widgets', [] )
+        this.makePropPanel( 'panels', {} )
 
         SMK.TYPE.Tool.prototype.constructor.call( this, $.extend( {
-            title:          null,
+            title:          'Menu',
             widgetComponent:'menu-widget',
             panelComponent: 'menu-panel',
         }, option ) )
@@ -43,37 +42,10 @@ include.module( 'tool-menu', [ 'smk', 'tool', 'widgets', 'tool-menu.panel-menu-h
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
     MenuTool.prototype.add = function ( tool ) {
-        var self = this
-
-        this.subWidgets.push( {
+        this.widgets.push( {
             type: tool.type,
             widgetComponent: tool.widgetComponent,
             widget: tool.widget
-        } )
-
-        Vue.set( this.subPanels, tool.type, {
-            panelComponent: tool.panelComponent,
-            panel: tool.panel
-        } )
-
-        if ( !this.activeTool ) {
-            this.activeTool = tool
-            this.activeToolType = tool.type
-            this.activeTool.active = true
-        }
-
-        tool.changedActive( function () {
-            if ( !tool.active && tool.type == self.activeToolType ) {
-                tool.active = true
-                return
-            }
-
-            if ( !tool.active ) return
-            if ( self.activeToolType == tool.type ) return
-
-            self.activeToolType = tool.type
-            self.activeTool.active = false
-            self.activeTool = tool
         } )
     }
 

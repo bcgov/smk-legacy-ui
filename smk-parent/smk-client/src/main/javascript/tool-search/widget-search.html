@@ -1,5 +1,5 @@
-<div class="smk-search">
-    <input type="text" placeholder="Search keywords"
+<div>
+    <input type="text" placeholder="Search keywords" class="smk-search browser-default"
         v-model.trim="search"
         v-on:keyup="$$emit( 'input-change', { text: search } )"
         v-on:click="$$emit( 'click' )"

@@ -101,12 +101,10 @@ include.module( 'tool', [ 'smk', 'jquery', 'event' ], function () {
                 if ( self.panelComponent )
                     aux.panel.add( self )
 
-                aux.widget = aux.toolbar
                 break;
 
             case 'menu':
                 aux.menu.add( self )
-                aux.widget = aux.panel
                 break;
             }
 

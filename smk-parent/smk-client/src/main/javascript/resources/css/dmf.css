@@ -1,0 +1,352 @@
+/* Base container styles */
+.nrpp-blue-dark
+{
+	background-color: #036 !important;
+}
+
+.nrpp-blue-light
+{
+	background-color: #38598a !important;
+}
+
+.nrpp-yellow
+{
+	background-color: #fcba19 !important;
+}
+
+.header
+{
+	height: 80px; 
+	width: 100%;
+	border-bottom: 2px solid #fcba19;
+}
+
+.footer
+{
+	border-top: 2px solid #fcba19;
+	height: 20px;
+	position: fixed;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	padding: 1rem;
+	background-color: #efefef;
+	text-align: center;
+}
+
+/* Materialize Overrides */
+
+.tab a.active 
+{
+	color: white !important;
+	background-color: #38598a !important;
+}
+
+.tabs .tab a:hover 
+{
+  color: white !important;
+}
+
+.tabs .tab a 
+{
+  color: white !important;
+}
+
+/* primefaces overrides */
+.ui-wizard-step-title.ui-state-default.ui-corner-all
+{
+	background: none;
+    border-radius: 2px;
+    border: 1px solid #003366;
+    color: black;
+    text-shadow: none;
+    font-weight: normal;
+    font-size: 18px;
+}
+
+.ui-wizard-step-title.ui-state-default.ui-state-highlight.ui-corner-all
+{
+	background: whitesmoke;
+    border-radius: 2px;
+    border: 1px solid #003366;
+    color: black;
+    text-shadow: none;
+    font-weight: normal;
+    font-size: 18px;
+}
+
+.ui-panel.ui-widget.ui-widget-content.ui-corner-all
+{
+}
+
+.ui-panel-titlebar.ui-widget-header.ui-helper-clearfix.ui-corner-all
+{
+	background: none;
+    border: none;
+    border-bottom: 1px solid #9e9e9e;
+    border-radius: 0px;
+}
+
+.ui-button.ui-widget.ui-state-default.ui-corner-all.ui-button-text-icon-left.ui-wizard-nav-back
+{
+	background: none;
+    font-weight: normal;
+}
+
+.ui-button.ui-widget.ui-state-default.ui-corner-all.ui-button-text-icon-left.ui-wizard-nav-back.ui-state-hover
+{
+	background: none;
+    font-weight: normal;
+}
+
+.ui-button.ui-widget.ui-state-default.ui-corner-all.ui-button-text-icon-left.ui-wizard-nav-next
+{
+	background: none;
+    font-weight: normal;
+}
+
+.ui-button.ui-widget.ui-state-default.ui-corner-all.ui-button-text-icon-left.ui-wizard-nav-next.ui-state-hover
+{
+	background: none;
+    font-weight: normal;
+}
+
+/* Modal Content/Box */
+.spinner-modal 
+{
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 5000; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+.spinner-modal-content 
+{
+    /*background-color: #fefefe;*/
+    margin: 15% auto; /* 15% from the top and centered */
+    /*padding: 1px;*/
+    border: 1px solid #44608d;
+    border-top-left-radius: 7px;
+    border-top-right-radius: 7px;
+    border-bottom-right-radius: 0px;
+    border-bottom-left-radius: 0px;
+    width: 400px; /* Could be more or less, depending on screen size */
+    /*box-shadow: 3px 3px 10px #333;*/
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+    -webkit-animation-name: animatetop;
+    -webkit-animation-duration: 0.4s;
+    animation-name: animateModalTop;
+    animation-duration: 0.4s
+}
+
+.spinner-modal-content-form
+{
+    /*background-color: #fefefe;*/
+    margin: 15% auto; /* 15% from the top and centered */
+    /*padding: 1px;*/
+    border: 1px solid #44608d;
+    border-top-left-radius: 7px;
+    border-top-right-radius: 7px;
+    border-bottom-right-radius: 0px;
+    border-bottom-left-radius: 0px;
+    width: 95%;
+    /*box-shadow: 3px 3px 10px #333;*/
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+    -webkit-animation-name: animatetop;
+    -webkit-animation-duration: 0.4s;
+    animation-name: animateModalTop;
+    animation-duration: 0.4s	
+}
+
+/* The Close Button */
+.spinner-modal-close 
+{
+    color: white;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.spinner-modal-close:hover,
+.spinner-modal-close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.spinner-modal-header {
+    padding: 2px 16px;
+    background-color: #44608d;
+    color: white;
+    border-top-left-radius: 7px;
+    border-top-right-radius: 7px;
+    border-bottom-right-radius: 0px;
+    border-bottom-left-radius: 0px;
+}
+
+/* Modal Body */
+.spinner-modal-body {
+	padding: 2px 16px;
+	background-color: white;
+}
+
+/* Modal Footer */
+.spinner-modal-footer {
+    padding: 2px 16px;
+    background-color: white;
+    height: 40px;
+}
+
+/* Add Animation */
+@-webkit-keyframes animateModalTop {
+    from {top: -300px; opacity: 0} 
+    to {top: 0; opacity: 1}
+}
+
+@keyframes animateModalTop {
+    from {top: -300px; opacity: 0}
+    to {top: 0; opacity: 1}
+}
+
+/********************** spinner *********************/
+.sk-folding-cube {
+  margin: 20px auto;
+  width: 40px;
+  height: 40px;
+  position: relative;
+  -webkit-transform: rotateZ(45deg);
+          transform: rotateZ(45deg);
+}
+
+.sk-folding-cube .sk-cube {
+  float: left;
+  width: 50%;
+  height: 50%;
+  position: relative;
+  -webkit-transform: scale(1.1);
+      -ms-transform: scale(1.1);
+          transform: scale(1.1); 
+}
+.sk-folding-cube .sk-cube:before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #333;
+  -webkit-animation: sk-foldCubeAngle 2.4s infinite linear both;
+          animation: sk-foldCubeAngle 2.4s infinite linear both;
+  -webkit-transform-origin: 100% 100%;
+      -ms-transform-origin: 100% 100%;
+          transform-origin: 100% 100%;
+}
+.sk-folding-cube .sk-cube2 {
+  -webkit-transform: scale(1.1) rotateZ(90deg);
+          transform: scale(1.1) rotateZ(90deg);
+}
+.sk-folding-cube .sk-cube3 {
+  -webkit-transform: scale(1.1) rotateZ(180deg);
+          transform: scale(1.1) rotateZ(180deg);
+}
+.sk-folding-cube .sk-cube4 {
+  -webkit-transform: scale(1.1) rotateZ(270deg);
+          transform: scale(1.1) rotateZ(270deg);
+}
+.sk-folding-cube .sk-cube2:before {
+  -webkit-animation-delay: 0.3s;
+          animation-delay: 0.3s;
+}
+.sk-folding-cube .sk-cube3:before {
+  -webkit-animation-delay: 0.6s;
+          animation-delay: 0.6s; 
+}
+.sk-folding-cube .sk-cube4:before {
+  -webkit-animation-delay: 0.9s;
+          animation-delay: 0.9s;
+}
+@-webkit-keyframes sk-foldCubeAngle {
+  0%, 10% {
+    -webkit-transform: perspective(140px) rotateX(-180deg);
+            transform: perspective(140px) rotateX(-180deg);
+    opacity: 0; 
+  } 25%, 75% {
+    -webkit-transform: perspective(140px) rotateX(0deg);
+            transform: perspective(140px) rotateX(0deg);
+    opacity: 1; 
+  } 90%, 100% {
+    -webkit-transform: perspective(140px) rotateY(180deg);
+            transform: perspective(140px) rotateY(180deg);
+    opacity: 0; 
+  } 
+}
+
+@keyframes sk-foldCubeAngle {
+  0%, 10% {
+    -webkit-transform: perspective(140px) rotateX(-180deg);
+            transform: perspective(140px) rotateX(-180deg);
+    opacity: 0; 
+  } 25%, 75% {
+    -webkit-transform: perspective(140px) rotateX(0deg);
+            transform: perspective(140px) rotateX(0deg);
+    opacity: 1; 
+  } 90%, 100% {
+    -webkit-transform: perspective(140px) rotateY(180deg);
+            transform: perspective(140px) rotateY(180deg);
+    opacity: 0; 
+  }
+}
+
+.leaflet-popup-content-wrapper
+{
+	border-radius: 0px !important;
+}
+
+.leaflet-popup-content 
+{
+    max-width: 600px;
+    width: 500px;
+    min-width: 400px;
+}
+
+.esri-search__input
+{
+	font-family: inherit;
+    display: block;
+    width: 100%;
+    margin: 0;
+    padding: 0 .5em;
+    font-size: 14px;
+    background-color: inherit;
+    color: inherit;
+    border: none;
+    height: 2rem;
+}
+
+.esri-draw-button 
+{
+    background-color: rgba(255, 255, 255, 0.65);
+    cursor: pointer;
+    display: inline-block;
+    width: 26px;
+    font-size: 1.5em;
+}
+
+.esri-draw-button-selected 
+{
+    opacity: 1;
+    background-color: rgba(102, 0, 255, 0.75);
+    color: white;
+}
+
+.esri-draw-button-selected:hover 
+{
+	background-color: rgba(102, 0, 255, 0.3);
+	color: white;
+}
