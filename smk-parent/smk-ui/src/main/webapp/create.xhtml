@@ -82,7 +82,7 @@
 													<h:selectOneRadio value="#{CreateBean.resource.viewer.type}" required="true" requireMessage="Please select a map service. If you're not sure, go with Leaflet (it's pretty awesome)">
 													   	<f:selectItem itemValue="leaflet" itemLabel="Leaflet" />
 													   	<f:selectItem itemValue="esri2d" itemLabel="ESRI ArcGIS 2D" itemDisabled="true"/>
-													   	<f:selectItem itemValue="esri3d" itemLabel="ESRI ArcGIS 3D" itemDisabled="true" />
+													   	<f:selectItem itemValue="esri3d" itemLabel="ESRI ArcGIS 3D" />
 													   	<p:ajax update="createMashupForm" />
 													</h:selectOneRadio>
 												</div>
@@ -135,10 +135,10 @@
 													<table>
 														<tr><td><p>Add Layers from...</p></td></tr>
 														<tr><td><a class="waves-effect waves-dark btn grey lighten-2" href="#layerCatalogBox" style="width: 100%;">DataBC Catalog</a></td></tr>
-														<c:if test="#{CreateBean.resource.viewer.type eq 'leaflet'}"><tr><td><a class="waves-effect waves-dark btn grey lighten-2" href="#wmsServiceBox" style="width: 100%;">WMS Service</a></td></tr></c:if>
+														<tr><td><a class="waves-effect waves-dark btn grey lighten-2" href="#wmsServiceBox" style="width: 100%;">WMS Service</a></td></tr>
 														<!-- <tr><td><a class="waves-effect waves-dark btn grey lighten-2" href="#esriFeatureServiceBox" style="width: 100%;">ESRI Feature Service</a></td></tr> -->
-														<c:if test="#{CreateBean.resource.viewer.type eq 'leaflet'}"><tr><td><a class="waves-effect waves-dark btn grey lighten-2" href="#importBox" onclick="initImportKml()" style="width: 100%;">KML Import</a></td></tr></c:if>
-														<c:if test="#{CreateBean.resource.viewer.type eq 'leaflet'}"><tr><td><a class="waves-effect waves-dark btn grey lighten-2" href="#importBox" onclick="initImportJson()" style="width: 100%;">GeoJSON Import</a></td></tr></c:if>
+														<tr><td><a class="waves-effect waves-dark btn grey lighten-2" href="#importBox" onclick="initImportKml()" style="width: 100%;">KML Import</a></td></tr>
+														<tr><td><a class="waves-effect waves-dark btn grey lighten-2" href="#importBox" onclick="initImportJson()" style="width: 100%;">GeoJSON Import</a></td></tr>
 
 														<p:remoteCommand name="initImportKml" actionListener="#{CreateBean.initImportKml()}" />
 														<p:remoteCommand name="initImportJson" actionListener="#{CreateBean.initImportJson()}" />

@@ -1,5 +1,11 @@
 ( function () {
 
+    window.dojoConfig = {
+        has: {
+            "esri-promise-compatibility": 1
+        }
+    }
+
     // - - - - - - - - - - - - - - - - - - - - -
     // document.currentScript polyfill for IE11
     // - - - - - - - - - - - - - - - - - - - - -
