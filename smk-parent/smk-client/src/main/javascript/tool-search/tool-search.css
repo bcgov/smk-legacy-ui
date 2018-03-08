@@ -39,6 +39,7 @@
     font-weight: bold;
 }
 
+<<<<<<< HEAD
 .smk-tool input.smk-search {
     border: 0;
     vertical-align: text-bottom;
@@ -58,3 +59,14 @@
 .smk-tool input.smk-search:hover {
     border: 1px solid black;
 }
+=======
+.smk-tool.smk-search input {
+    border: 0;
+    vertical-align: top;
+    height: 26px;
+}
+
+.smk-tool.smk-search input:focus {
+    outline: 0;
+}
+>>>>>>> master

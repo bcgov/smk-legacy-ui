@@ -459,4 +459,259 @@ public class MapConfigController
 		logger.debug(" << updateAttachment()");
 		return result;
 	}
+<<<<<<< HEAD:smk-parent/smks-api/src/main/java/ca/bc/gov/app/smks/service/MapConfigController.java
+=======
+
+	// publisher configurations
+	@RequestMapping(value = "/Published", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<?> getAllPublishedMapConfigs()
+	{
+		logger.debug(" >> getAllPublishedMapConfigs()");
+		ResponseEntity<?> result = null;
+
+		try
+		{
+			logger.debug("    Querying for all published Map Resources...");
+			List<MapConfiguration> resources = couchDAO.getPublishedConfigs();
+			logger.debug("    Success, found " + resources.size() + " results");
+
+			ArrayList<MapConfigInfo> configSnippets = new ArrayList<MapConfigInfo>();
+			for(MapConfiguration config : resources)
+			{
+				configSnippets.add(new MapConfigInfo(config));
+			}
+
+			result = new ResponseEntity<ArrayList<MapConfigInfo>>(configSnippets, HttpStatus.OK);
+		}
+		catch (Exception e)
+		{
+			logger.error("    ## Error querying Map Config Resources: " + e.getMessage());
+			result = new ResponseEntity<String>("{ \"status\": \"ERROR\", \"message\": \"" + e.getMessage() + "\" }", HttpStatus.BAD_REQUEST);
+		}
+
+		logger.info("    Get All Map Configurations completed. Response: " + result.getStatusCode().name());
+		logger.debug(" << getAllPublishedMapConfigs()");
+		return result;
+	}
+
+	@RequestMapping(value = "/Published/{id}", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseEntity<?> publishMapConfig(@PathVariable String id)
+	{
+		logger.debug(" >> publishMapConfig()");
+		ResponseEntity<?> result = null;
+
+		try
+		{
+			logger.debug("    Publishing Map Configuration " + id + "...");
+
+			MapConfiguration resource = couchDAO.getMapConfiguration(id);
+
+			if(resource != null)
+			{
+				if(resource.isPublished()) throw new Exception("The latest version of this map configuration has already been published");
+
+				// "un" publish the previous version, if it exists
+				MapConfiguration existinPublishedResource = couchDAO.getPublishedConfig(id);
+				if(existinPublishedResource != null)
+				{
+					existinPublishedResource.setPublished(false);
+					couchDAO.updateResource(existinPublishedResource);
+				}
+
+				// set the publish flag and commit
+				resource.setPublished(true);
+				couchDAO.updateResource(resource);
+
+				// clone the document, and create a new version for the edit state. You can't edit published documents
+				MapConfiguration clone = resource.clone();
+				clone.setLmfRevision(resource.getLmfRevision() + 1);
+				clone.setPublished(false);
+
+				// clone the attachments
+
+				if(resource.getAttachments() != null && resource.getAttachments().size() > 0)
+				{
+					for(String key : resource.getAttachments().keySet())
+					{
+						// get the attachment byte stream
+						AttachmentInputStream attachmentStream = couchDAO.getAttachment(resource, key);
+						byte[] media = IOUtils.toByteArray(attachmentStream);
+
+						// clone it and add it to the new doc
+						Attachment clonedAttachment = new Attachment(attachmentStream.getId(), Base64.encodeBase64String(media), attachmentStream.getContentType());
+
+						clone.addInlineAttachment(clonedAttachment);
+					}
+
+				}
+
+				couchDAO.createResource(clone);
+
+				logger.debug("    Success!");
+				result = new ResponseEntity<String>("{ \"status:\" \"Success\", \"id\": \"" + id + "\" }", HttpStatus.CREATED);
+			}
+			else throw new Exception("Map Configuration ID not found.");
+		}
+		catch (Exception e)
+		{
+			logger.error("    ## Error publishing Map Configuration resources " + e.getMessage());
+			result = new ResponseEntity<String>("{ \"status\": \"ERROR\", \"message\": \"" + e.getMessage() + "\" }", HttpStatus.BAD_REQUEST);
+		}
+
+		logger.info("   Published Map Configuration completed. Response: " + result.getStatusCode().name());
+		logger.debug(" << publishMapConfig()");
+		return result;
+	}
+
+	@RequestMapping(value = "/Published/{id}", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<?> getPublishedMapConfig(@PathVariable String id)
+	{
+		logger.debug(" >> getPublishedMapConfig()");
+		ResponseEntity<?> result = null;
+
+		try
+		{
+			logger.debug("    Fetching a published Map Configuration...");
+			MapConfiguration resource = couchDAO.getPublishedConfig(id);
+
+			if(resource != null)
+			{
+				logger.debug("    Success!");
+				result = new ResponseEntity<MapConfiguration>(resource, HttpStatus.OK);
+			}
+			else throw new Exception("Map Configuration ID not found.");
+		}
+		catch (Exception e)
+		{
+			logger.error("    ## Error fetching map configuration: " + e.getMessage());
+			result = new ResponseEntity<String>("{ \"status\": \"ERROR\", \"message\": \"" + e.getMessage() + "\" }", HttpStatus.BAD_REQUEST);
+		}
+
+		logger.info("    Fetch published Map Configuration completed. Response: " + result.getStatusCode().name());
+		logger.debug(" << getPublishedMapConfig()");
+		return result;
+	}
+
+	@RequestMapping(value = "/Published/{id}", method = RequestMethod.DELETE)
+	@ResponseBody
+	public ResponseEntity<?> deletePublishedMapConfig(@PathVariable String id)
+	{
+		logger.debug(" >> deletePublishedMapConfig()");
+		ResponseEntity<?> result = null;
+
+		try
+		{
+			logger.debug("    Un-publishing a published Map Configuration...");
+			MapConfiguration resource = couchDAO.getPublishedConfig(id);
+
+			if(resource != null)
+			{
+				// we don't actually delete a map configuration that's been published
+				// instead, we just set it to un-published. It can be deleted the old fashioned way.
+				resource.setPublished(false);
+				couchDAO.updateResource(resource);
+
+				logger.debug("    Success!");
+				result = new ResponseEntity<String>("{ \"status\": \"Success!\" }", HttpStatus.OK);
+			}
+			else throw new Exception("Map Configuration ID not found.");
+		}
+		catch (Exception e)
+		{
+			logger.error("    ## Error un publishing map configuration: " + e.getMessage());
+			result = new ResponseEntity<String>("{ \"status\": \"ERROR\", \"message\": \"" + e.getMessage() + "\" }", HttpStatus.BAD_REQUEST);
+		}
+
+		logger.info("    Delete/Un-Publish published Map Configuration completed. Response: " + result.getStatusCode().name());
+		logger.debug(" << deletePublishedMapConfig()");
+		return result;
+	}
+
+	@RequestMapping(value = "/Published/{config_id}/Attachments/", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<?> getAllPublishedAttachments(@PathVariable String config_id)
+	{
+		logger.debug(" >> getAllPublishedAttachments()");
+		ResponseEntity<?> result = null;
+
+		try
+		{
+			logger.debug("    Fetching all Published Attachments for " + config_id + "...");
+
+			MapConfiguration resource = couchDAO.getPublishedConfig(config_id);
+
+			if(resource != null)
+			{
+				ArrayList<String> attachments = new ArrayList<String>();
+
+				for(String key : resource.getAttachments().keySet())
+				{
+					Attachment attachment = resource.getAttachments().get(key);
+					attachments.add("{ \"id\": \"" + key + "\", \"content-type\": \"" + attachment.getContentType() + "\", \"content-length\": \"" + attachment.getContentLength() + "\"  }");
+				}
+
+				logger.debug("    Success!");
+				result = new ResponseEntity<ArrayList<String>>(attachments, HttpStatus.OK);
+			}
+			else throw new Exception("Map Configuration ID not found.");
+		}
+		catch (Exception e)
+		{
+			logger.error("    ## Error fetching all attachment resource: " + e.getMessage());
+			result = new ResponseEntity<String>("{ \"status\": \"ERROR\", \"message\": \"" + e.getMessage() + "\" }", HttpStatus.BAD_REQUEST);
+		}
+
+		logger.info("    Get All Attachments completed. Response: " + result.getStatusCode().name());
+		logger.debug(" << getAllPublishedAttachments()");
+		return result;
+	}
+
+	@RequestMapping(value = "/Published/{config_id}/Attachments/{attachment_id}", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<?> getPublishedAttachment(@PathVariable String config_id, @PathVariable String attachment_id)
+	{
+		logger.debug(" >> getAttachment()");
+		ResponseEntity<?> result = null;
+
+		try
+		{
+			logger.debug("    Fetching an Attachment...");
+
+			MapConfiguration resource = couchDAO.getPublishedConfig(config_id);
+
+			if(resource != null)
+			{
+				AttachmentInputStream attachment = couchDAO.getAttachment(resource, attachment_id);
+				byte[] media = IOUtils.toByteArray(attachment);
+
+				final HttpHeaders httpHeaders= new HttpHeaders();
+				MediaType contentType = MediaType.TEXT_PLAIN;
+
+				if(attachment.getContentType() != null && attachment.getContentType().length() > 0)
+				{
+					String[] contentTypeVals = attachment.getContentType().split("/");
+					contentType = new MediaType(contentTypeVals[0], contentTypeVals[1]);
+				}
+
+			    httpHeaders.setContentType(contentType);
+
+				logger.debug("    Success!");
+				result = new ResponseEntity<byte[]>(media, httpHeaders, HttpStatus.OK);
+			}
+			else throw new Exception("Map Configuration ID not found.");
+		}
+		catch (Exception e)
+		{
+			logger.error("    ## Error fetching attachment resource: " + e.getMessage());
+			result = new ResponseEntity<String>("{ \"status\": \"ERROR\", \"message\": \"" + e.getMessage() + "\" }", HttpStatus.BAD_REQUEST);
+		}
+
+		logger.info("    Get Attachment completed. Response: " + result.getStatusCode().name());
+		logger.debug(" << getAttachment()");
+		return result;
+	}
+>>>>>>> master:smk-parent/smks-api/src/main/java/ca/bc/gov/databc/smks/service/MapConfigController.java
 }

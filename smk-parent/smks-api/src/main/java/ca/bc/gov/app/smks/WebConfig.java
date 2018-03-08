@@ -20,7 +20,11 @@ import ca.bc.gov.app.smks.dao.LayerCatalogDAO;
 @EnableWebMvc
 @ComponentScan(basePackages = "ca.bc.gov.app.smks")
 @PropertySource("classpath:application.properties")
+<<<<<<< HEAD:smk-parent/smks-api/src/main/java/ca/bc/gov/app/smks/WebConfig.java
 public class WebConfig extends WebMvcConfigurerAdapter
+=======
+public class WebConfig
+>>>>>>> master:smk-parent/smks-api/src/main/java/ca/bc/gov/databc/smks/WebConfig.java
 {
 	private static Log logger = LogFactory.getLog(WebConfig.class);
 

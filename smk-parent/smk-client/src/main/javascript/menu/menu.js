@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 include.module( 'menu', [ 'vue', 'menu.menu-sidepanel-html', 'menu.menu-toolbar-html' ], function ( inc ) {
 
     Vue.component( 'menu-sidepanel', {
@@ -8,6 +9,9 @@ include.module( 'menu', [ 'vue', 'menu.menu-sidepanel-html', 'menu.menu-toolbar-
         template: inc[ 'menu.menu-toolbar-html' ],
         props: [ 'tools' ]
     } )
+=======
+include.module( 'menu', [ 'smk' ], function ( inc ) {
+>>>>>>> master
 
     function Menu( smk ) {
         var self = this
@@ -17,6 +21,7 @@ include.module( 'menu', [ 'vue', 'menu.menu-sidepanel-html', 'menu.menu-toolbar-
                 res( tool )
             }
         } )
+<<<<<<< HEAD
 
         // this.model = {
         //     expanded: false,
@@ -68,6 +73,11 @@ include.module( 'menu', [ 'vue', 'menu.menu-sidepanel-html', 'menu.menu-toolbar-
         //         self.setActiveTool( null )
         // } )
 
+=======
+    }
+
+    Menu.prototype.add = function ( tool ) {
+>>>>>>> master
         this.containerPromise.then( function ( container ) {
             container.add( tool )
         } )

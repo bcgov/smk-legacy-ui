@@ -19,10 +19,14 @@ exports.gen = function () {
 
     t.sequence( "map-frame-styles" )
         .style( "resources/css/smk-map-frame.css" )
+<<<<<<< HEAD
         .style( "resources/css/materialize.css" )
         .style( "resources/css/fonts.css" )
         .style( "https://fonts.googleapis.com/icon?family=Material+Icons" )
         .style( "resources/css/dmf.css" )
+=======
+        .style( "https://fonts.googleapis.com/icon?family=Material+Icons" )
+>>>>>>> master
 
     t.group( "surround" )
         .dir( 'surround/**/*', { cwd: baseDir } )
@@ -39,12 +43,15 @@ exports.gen = function () {
     t.group( "menu" )
         .dir( 'menu/**/*', { cwd: baseDir } )
 
+<<<<<<< HEAD
     // t.group( 'tool-bar' )
     //     .script( "sidebar.js" )
     //     .template( "sidebar-panels", "template/sidebar.html" )
     //     .template( "sidebar-button", "template/sidebar-button.html" )
     //     .template( "side-panel", "template/side-panel.html" )
 
+=======
+>>>>>>> master
 
     t.group( "tool-menu" )
         .dir( 'tool-menu/**/*', { cwd: baseDir } )
@@ -127,6 +134,10 @@ exports.gen = function () {
     t.group( "viewer-leaflet" )
         .script( "viewer-leaflet/viewer-leaflet.js" )
         .tag( "layer-leaflet" )
+<<<<<<< HEAD
+=======
+        .style( "viewer-leaflet/viewer-leaflet.css" )
+>>>>>>> master
 
     t.sequence( "leaflet" )
         .script( "https://unpkg.com/leaflet@1.2.0/dist/leaflet.js", { "integrity": "sha512-lInM/apFSqyy1o6s89K4iQUKg6ppXEgsVxT35HbzUupEVRh2Eu9Wdl4tHj7dZO0s1uvplcYGmt3498TtHq+log==" } )

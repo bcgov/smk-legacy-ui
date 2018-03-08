@@ -22,6 +22,7 @@ import javax.faces.convert.Converter;
 import javax.faces.event.AjaxBehaviorEvent;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+<<<<<<< HEAD:smk-parent/smk-ui/src/main/java/ca/bc/gov/app/smk/beans/CreateBean.java
 import ca.bc.gov.app.smk.controllers.LayerController;
 import ca.bc.gov.app.smk.dao.SMKServiceHandler;
 import ca.bc.gov.app.smks.model.CollectionLayer;
@@ -36,6 +37,11 @@ import ca.bc.gov.app.smks.model.layer.EsriDynamic;
 import ca.bc.gov.app.smks.model.layer.Geojson;
 import ca.bc.gov.app.smks.model.layer.Kml;
 import ca.bc.gov.app.smks.model.layer.Wms;
+=======
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+>>>>>>> master:smk-parent/smk-ui/src/main/java/ca/bc/gov/databc/smk/beans/CreateBean.java
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.logging.Log;
@@ -56,6 +62,25 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+<<<<<<< HEAD:smk-parent/smk-ui/src/main/java/ca/bc/gov/app/smk/beans/CreateBean.java
+=======
+import ca.bc.gov.databc.smk.controllers.LayerController;
+import ca.bc.gov.databc.smk.dao.CouchDAO;
+import ca.bc.gov.databc.smk.dao.SMKServiceHandler;
+import ca.bc.gov.databc.smks.model.CollectionLayer;
+import ca.bc.gov.databc.smks.model.FeatureLayer;
+import ca.bc.gov.databc.smks.model.Layer;
+import ca.bc.gov.databc.smks.model.LayerStyle;
+import ca.bc.gov.databc.smks.model.MapConfiguration;
+import ca.bc.gov.databc.smks.model.Tool;
+import ca.bc.gov.databc.smks.model.WMSInfoLayer;
+import ca.bc.gov.databc.smks.model.WMSInfoStyle;
+import ca.bc.gov.databc.smks.model.layer.EsriDynamic;
+import ca.bc.gov.databc.smks.model.layer.Geojson;
+import ca.bc.gov.databc.smks.model.layer.Kml;
+import ca.bc.gov.databc.smks.model.layer.Wms;
+
+>>>>>>> master:smk-parent/smk-ui/src/main/java/ca/bc/gov/databc/smk/beans/CreateBean.java
 @SuppressWarnings("restriction")
 @ManagedBean(name="CreateBean", eager=true)
 @ViewScoped
@@ -1079,6 +1104,7 @@ public class CreateBean implements Serializable
 		this.fsLayerId = fsLayerId;
 	}
 
+<<<<<<< HEAD:smk-parent/smk-ui/src/main/java/ca/bc/gov/app/smk/beans/CreateBean.java
 
 	public String getImportTitle() { return importTitle; }
 	public void setImportTitle(String importTitle) { this.importTitle = importTitle; }
@@ -1123,6 +1149,52 @@ public class CreateBean implements Serializable
 		return configureTool.isConfigured() ? "" : "disabled";
 	}
 
+=======
+
+	public String getImportTitle() { return importTitle; }
+	public void setImportTitle(String importTitle) { this.importTitle = importTitle; }
+
+	public boolean isImportIsVisible() { return importIsVisible; }
+	public void setImportIsVisible(boolean importIsVisible) { this.importIsVisible = importIsVisible; }
+
+	public double getImportOpacity() { return importOpacity; }
+	public void setImportOpacity(double importOpacity) { this.importOpacity = importOpacity; }
+
+	public String getImportLayerTitle() { return importLayerTitle; }
+	public void setImportLayerTitle(String importLayerTitle) { this.importLayerTitle = importLayerTitle; }
+
+	public boolean isImportClusterPoints() { return importClusterPoints; }
+	public void setImportClusterPoints(boolean importClusterPoints) { this.importClusterPoints = importClusterPoints; }
+
+	public boolean isImportHeatmapPoints() { return importHeatmapPoints; }
+	public void setImportHeatmapPoints(boolean importHeatmapPoints) { this.importHeatmapPoints = importHeatmapPoints; }
+
+	public double getImportStrokeWidth() { return importStrokeWidth; }
+	public void setImportStrokeWidth(double importStrokeWidth) { this.importStrokeWidth = importStrokeWidth; }
+
+	public String getImportStrokeColor() { return importStrokeColor; }
+	public void setImportStrokeColor(String importStrokeColor) { this.importStrokeColor = importStrokeColor; }
+
+	public double getImportStrokeOpacity() { return importStrokeOpacity; }
+	public void setImportStrokeOpacity(double importStrokeOpacity) { this.importStrokeOpacity = importStrokeOpacity; }
+
+	public double getImportFillOpacity() { return importFillOpacity; }
+	public void setImportFillOpacity(double importFillOpacity) { this.importFillOpacity = importFillOpacity; }
+
+	public String getImportFillColor() { return importFillColor; }
+	public void setImportFillColor(String importFillColor) { this.importFillColor = importFillColor; }
+
+
+	public Tool getConfigureTool() { return configureTool; }
+	public void setConfigureTool(Tool configureTool) { this.configureTool = configureTool; }
+
+	public String getConfigureToolDisable() {
+		// logger.debug( configureTool.getType() + ":" + configureTool.isConfigured() );
+		if ( configureTool == null ) return "disabled";
+		return configureTool.isConfigured() ? "" : "disabled";
+	}
+
+>>>>>>> master:smk-parent/smk-ui/src/main/java/ca/bc/gov/databc/smk/beans/CreateBean.java
 	public String getSurroundImageSrc() {
 		return resource.getSurround().getImageSrc();
 	}
