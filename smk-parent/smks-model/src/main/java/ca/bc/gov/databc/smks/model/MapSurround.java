@@ -8,8 +8,11 @@ public class MapSurround implements Cloneable
 {
 	private String type;
 	private String title;
+	private String imageSrc;
 
-	public MapSurround() { }
+	public MapSurround() {
+		type = "default";
+	}
 
 	protected MapSurround( MapSurround mapSurround ) {
 		this.setType(mapSurround.getType());
@@ -21,6 +24,9 @@ public class MapSurround implements Cloneable
 
 	public String getTitle() { return title; }
 	public void setTitle(String title) { this.title = title; }
+
+	public String getImageSrc() { return imageSrc; }
+	public void setImageSrc(String imageSrc) { this.imageSrc = imageSrc; }
 
 	public MapSurround clone()
 	{

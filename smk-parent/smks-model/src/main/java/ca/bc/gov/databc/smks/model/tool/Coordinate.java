@@ -2,6 +2,7 @@ package ca.bc.gov.databc.smks.model.tool;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import ca.bc.gov.databc.smks.model.Tool;
 
@@ -14,8 +15,12 @@ public class Coordinate extends Tool
 		super( about );
 	}
 
-	public String getId() {
+	public String getType() {
 		return Tool.Type.coordinate.toString();
+	}
+
+	public String getTitle() {
+		return "Coordinate";
 	}
 
 	public Coordinate clone()

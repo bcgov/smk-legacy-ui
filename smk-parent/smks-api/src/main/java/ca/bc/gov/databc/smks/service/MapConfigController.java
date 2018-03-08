@@ -222,7 +222,7 @@ public class MapConfigController
 		{
 			logger.debug("    Updating a Map Configuration...");
 
-			if(request.getIsPublished()) throw new Exception("You cannot update the currently published Map Configuration. Please update the editable version.");
+			if(request.isPublished()) throw new Exception("You cannot update the currently published Map Configuration. Please update the editable version.");
 
 			couchDAO.updateResource(request);
 			result = new ResponseEntity<String>("{ \"status\": \"Success!\" }", HttpStatus.OK);
@@ -490,24 +490,24 @@ public class MapConfigController
 
 			if(resource != null)
 			{
-				if(resource.getIsPublished()) throw new Exception("The latest version of this map configuration has already been published");
+				if(resource.isPublished()) throw new Exception("The latest version of this map configuration has already been published");
 
 				// "un" publish the previous version, if it exists
 				MapConfiguration existinPublishedResource = couchDAO.getPublishedConfig(id);
 				if(existinPublishedResource != null)
 				{
-					existinPublishedResource.setIsPublished(false);
+					existinPublishedResource.setPublished(false);
 					couchDAO.updateResource(existinPublishedResource);
 				}
 
 				// set the publish flag and commit
-				resource.setIsPublished(true);
+				resource.setPublished(true);
 				couchDAO.updateResource(resource);
 
 				// clone the document, and create a new version for the edit state. You can't edit published documents
 				MapConfiguration clone = resource.clone();
 				clone.setLmfRevision(resource.getLmfRevision() + 1);
-				clone.setIsPublished(false);
+				clone.setPublished(false);
 
 				// clone the attachments
 
@@ -591,7 +591,7 @@ public class MapConfigController
 			{
 				// we don't actually delete a map configuration that's been published
 				// instead, we just set it to un-published. It can be deleted the old fashioned way.
-				resource.setIsPublished(false);
+				resource.setPublished(false);
 				couchDAO.updateResource(resource);
 
 				logger.debug("    Success!");

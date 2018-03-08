@@ -2,12 +2,18 @@ package ca.bc.gov.databc.smks.model.tool;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import ca.bc.gov.databc.smks.model.Tool;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 @JsonInclude(Include.NON_NULL)
 public class About extends Tool
 {
+	private static Log logger = LogFactory.getLog(About.class);
+
     private String content;
 
 	public About() {}
@@ -17,12 +23,30 @@ public class About extends Tool
 		this.setContent( about.getContent());
 	}
 
-	public String getId() {
+	public String getType() {
 		return Tool.Type.about.toString();
 	}
 
-	public String getContent() { return content; }
-	public void setContent(String content) { this.content = content; }
+	public String getTitle() {
+		return "About Panel";
+	}
+
+    public String getDescription() {
+        return "Provide the contents of about panel.";
+    }
+
+    public boolean isConfigured() {
+        return true;
+    }
+
+	public String getContent() {
+		// logger.debug( "get " + content );
+		return content;
+	}
+	public void setContent(String content) {
+		// logger.debug( "set " + content );
+		this.content = content;
+	}
 
 	public About clone()
 	{

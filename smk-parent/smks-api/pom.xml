@@ -6,7 +6,7 @@
 	  <parent>
 	    <groupId>ca.bc.gov.databc</groupId>
 	    <artifactId>smk-parent</artifactId>
-	    <version>1.0.0</version>
+	    <version>1.0.x-SNAPSHOT</version>
 	  </parent>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -118,7 +118,7 @@
 
 	</dependencies>
 	<build>
-		<finalName>smks</finalName>
+		<finalName>smks-api</finalName>
 		<plugins>
 		  <plugin>
 			<groupId>org.apache.maven.plugins</groupId>
@@ -152,7 +152,7 @@
 			</configuration>
 		  </plugin>
 
-		  <plugin>
+		  <!-- <plugin>
 			<groupId>org.asciidoctor</groupId>
 			<artifactId>asciidoctor-maven-plugin</artifactId>
 			<version>1.5.3</version>
@@ -176,7 +176,7 @@
 					<version>2.0.0.RELEASE</version>
 				</dependency>
 			</dependencies>
-		</plugin>
+		</plugin> -->
 		<plugin>
 			<artifactId>maven-resources-plugin</artifactId>
 			<version>2.7</version>

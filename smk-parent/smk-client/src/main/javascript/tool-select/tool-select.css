@@ -1,0 +1,17 @@
+
+.smk-selected-panel .smk-placeholder {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: lightgray;
+    font-style: italic;
+    font-size: 20px;
+    padding:5px 10px;
+    text-align: center;
+}
+

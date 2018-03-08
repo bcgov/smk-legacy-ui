@@ -15,10 +15,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import ca.bc.gov.databc.smks.model.MapConfiguration;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 // import ca.bc.gov.databc.smk.model.MapConfiguration;
 
 public class SMKServiceHandler
 {
+	private static Log logger = LogFactory.getLog(SMKServiceHandler.class);
+
 	private String serviceUrl;
 
 	public SMKServiceHandler(String url) throws MalformedURLException
@@ -39,6 +44,7 @@ public class SMKServiceHandler
 
         ObjectMapper mapper = new ObjectMapper();
         String json = mapper.writeValueAsString(resource);
+		logger.debug("sending " + json);
 
         OutputStream os = conn.getOutputStream();
         os.write(json.getBytes("UTF-8"));
@@ -85,6 +91,20 @@ public class SMKServiceHandler
 	public void deleteResource(MapConfiguration resource) throws MalformedURLException, IOException
 	{
 		HttpURLConnection conn = (HttpURLConnection) new URL(serviceUrl + "MapConfigurations/" + resource.getLmfId() + "/").openConnection();
+		conn.setDoOutput(true);
+        conn.setRequestMethod("DELETE");
+        conn.setRequestProperty("Content-Type", "application/json");
+
+        if (conn.getResponseCode() == HttpURLConnection.HTTP_OK)
+        {
+        }
+
+        conn.disconnect();
+	}
+
+	public void deleteAttachment(MapConfiguration resource, String layerId ) throws MalformedURLException, IOException
+	{
+		HttpURLConnection conn = (HttpURLConnection) new URL(serviceUrl + "MapConfigurations/" + resource.getLmfId() + "/Attachments/" + layerId ).openConnection();
 		conn.setDoOutput(true);
         conn.setRequestMethod("DELETE");
         conn.setRequestProperty("Content-Type", "application/json");
@@ -253,4 +273,17 @@ public class SMKServiceHandler
 
         return result;
 	}
+
+	public static String convertNameToId( String name ) {
+		return name.toLowerCase().replaceAll("[^0-9a-z]+", "-").replaceAll("^[-]+", "").replaceAll("[-]+$", "");
+    }
+
+	public static String convertNamesToId( List<String> names ) {
+        if ( names.isEmpty() ) return "";
+        String out = "";
+        for ( String n : names )
+		    out = out.concat( convertNameToId( n ) ).concat( "--" );
+        return out.substring( 0, out.length() - 2 );
+    }
+
 }

@@ -6,18 +6,18 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 @JsonInclude(Include.NON_NULL)
 public class Attribute implements Cloneable
 {
-	private Integer id;
+	private String id;
 	private String name;
 	private String title;
-	// private Boolean visible;
+	private Boolean visible;
 
 	public Attribute() { }
 
-	public Integer getId() {
+	public String getId() {
 		return id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 
@@ -37,13 +37,13 @@ public class Attribute implements Cloneable
 		this.title = title;
 	}
 
-	// public Boolean getVisible() {
-	// 	return visible;
-	// }
+	public Boolean getVisible() {
+		return visible;
+	}
 
-	// public void setVisible(Boolean visible) {
-	// 	this.visible = visible;
-	// }
+	public void setVisible(Boolean visible) {
+		this.visible = visible;
+	}
 
 	public Attribute clone()
 	{
@@ -52,7 +52,7 @@ public class Attribute implements Cloneable
 		clone.setId(id);
 		clone.setTitle(title);
 		clone.setName(name);
-		// clone.setVisible(visible);
+		clone.setVisible(visible);
 
 		return clone;
 	}

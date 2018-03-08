@@ -63,6 +63,7 @@ public class Geojson extends FeatureLayer
 
 	public LayerStyle getStyle()
 	{
+		if ( style == null ) style = new LayerStyle();
 		return style;
 	}
 

@@ -2,6 +2,7 @@ package ca.bc.gov.databc.smks.model.tool;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import ca.bc.gov.databc.smks.model.Tool;
 
@@ -23,10 +24,22 @@ public class Zoom extends Tool
 		this.setMouseWheel( zoom.getMouseWheel());
 	}
 
-	public String getId() {
+	public String getTitle() {
+		return "Zooming";
+	}
+
+	public String getType() {
 		return Tool.Type.zoom.toString();
 	}
-	
+
+    public String getDescription() {
+        return "Zooming options for the viewer.";
+    }
+
+    public boolean isConfigured() {
+        return true;
+    }
+
 	public boolean getMouseWheel() { return mouseWheel; }
 	public void setMouseWheel(boolean mouseWheel) { this.mouseWheel = mouseWheel; }
 

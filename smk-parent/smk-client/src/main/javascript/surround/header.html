@@ -1,0 +1,7 @@
+<div class="smk-header">
+    <span id="smk-header-logo"
+        v-bind:style="{ 'background-image': imageSrc && url( '../smks-api/MapConfigurations/' + lmfId + '/Attachments/' + imageSrc ) }"
+        v-bind:class="{ 'smk-default-header-image': !imageSrc }">
+    </span>
+    <span id="smk-header-title">{{ title }}</span>
+</div>

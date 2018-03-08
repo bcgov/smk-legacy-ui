@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import ca.bc.gov.databc.smks.model.layer.EsriDynamic;
 import ca.bc.gov.databc.smks.model.layer.Folder;
@@ -32,26 +33,26 @@ import ca.bc.gov.databc.smks.model.layer.Geojson;
 @JsonInclude(Include.NON_NULL)
 public class Layer implements Cloneable
 {
-	public enum Type { 
+	public enum Type {
 		EsriDynamic( "esri-dynamic" ),
 		Folder( "folder" ),
 		Group( "group" ),
 		Wms( "wms" ),
 		Kml( "kml" ),
 		Geojson( "geojson" );
-		
+
 		private String jsonType;
-		
+
 		private Type( String json ) {
 			jsonType = json;
 		}
-		
+
 		public String getJsonType() { return jsonType; }
 	}
-	
+
 	private String id;
 	private String title;
-	private Boolean isVisible;
+	private boolean isVisible;
 	private String attribution;
 	private String metadataUrl;
 	private Double opacity;
@@ -84,6 +85,7 @@ public class Layer implements Cloneable
 		this.id = id;
 	}
 
+    @JsonIgnore
 	public String getType()
 	{
 		return "unknown";

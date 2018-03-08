@@ -8,6 +8,7 @@ import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -17,14 +18,23 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
+import javax.faces.convert.Converter;
+import javax.faces.event.AjaxBehaviorEvent;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.ektorp.Attachment;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.FlowEvent;
 import org.primefaces.event.NodeSelectEvent;
+import org.primefaces.event.SelectEvent;
 import org.primefaces.event.TreeDragDropEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.DualListModel;
@@ -38,24 +48,26 @@ import org.w3c.dom.NodeList;
 import ca.bc.gov.databc.smk.controllers.LayerController;
 import ca.bc.gov.databc.smk.dao.CouchDAO;
 import ca.bc.gov.databc.smk.dao.SMKServiceHandler;
-
 import ca.bc.gov.databc.smks.model.CollectionLayer;
+import ca.bc.gov.databc.smks.model.FeatureLayer;
 import ca.bc.gov.databc.smks.model.Layer;
 import ca.bc.gov.databc.smks.model.LayerStyle;
 import ca.bc.gov.databc.smks.model.MapConfiguration;
 import ca.bc.gov.databc.smks.model.Tool;
 import ca.bc.gov.databc.smks.model.WMSInfoLayer;
 import ca.bc.gov.databc.smks.model.WMSInfoStyle;
+import ca.bc.gov.databc.smks.model.layer.EsriDynamic;
 import ca.bc.gov.databc.smks.model.layer.Geojson;
 import ca.bc.gov.databc.smks.model.layer.Kml;
 import ca.bc.gov.databc.smks.model.layer.Wms;
-import ca.bc.gov.databc.smks.model.layer.EsriDynamic;
 
 @SuppressWarnings("restriction")
 @ManagedBean(name="CreateBean", eager=true)
 @ViewScoped
 public class CreateBean implements Serializable
 {
+	private static Log logger = LogFactory.getLog(CreateBean.class);
+
 	private static final long serialVersionUID = -4244352433273633895L;
 
 	private MapConfiguration resource;
@@ -67,14 +79,18 @@ public class CreateBean implements Serializable
 
 	private DualListModel<Tool> tools;
 
+	private ToolConverter toolConverter;
+	private LayerConverter layerConverter;
+	private StyleConverter styleConverter;
+
 	// for WMS popup
-	private boolean wmsIsVisible;
+	private boolean wmsIsVisible = true;
 	private double wmsOpacity = 0.65;
 	private String wmsLayerTitle;
 	private String wmsServiceUrl = "https://openmaps.gov.bc.ca/geo/pub/ows";
 	private String wmsVersion = "1.3.0";
 	private WMSInfoLayer selectedServiceLayer;
-	private String selectedServiceStyle;
+	private WMSInfoStyle selectedServiceStyle;
 	private ArrayList<WMSInfoLayer> allServiceLayers;
 
 	// for Feature Service layer
@@ -86,39 +102,37 @@ public class CreateBean implements Serializable
 	private boolean fsClusterPoints;
 	private boolean fsHeatmapPoints;
 
-	// for KML
-	private boolean kmlIsVisible;
-	private double kmlOpacity = 0.65;
-	private String kmlLayerTitle;
-	private boolean kmlClusterPoints;
-	private boolean kmlHeatmapPoints;
-	private String uploadFileAttachmentBytes;
+	private String uploadFilename;
 	private String uploadContentType;
-	private double kmlStrokeWidth = 1;
-	private String kmlStrokeColor = "000";
-	private double kmlStrokeOpacity = 1.0;
-	private double kmlFillOpacity= 0.65;
-	private String kmlFillColor= "000";
+	private String uploadFileAttachmentBytes;
 
-	// for json
-	private boolean jsonIsVisible;
-	private double jsonOpacity = 0.65;
-	private String jsonLayerTitle;
-	private boolean jsonClusterPoints;
-	private boolean jsonHeatmapPoints;
-	private double jsonStrokeWidth = 1;
-	private String jsonStrokeColor = "000";
-	private double jsonStrokeOpacity = 1.0;
-	private double jsonFillOpacity= 0.65;
-	private String jsonFillColor= "000";
+	private Layer.Type importType;
+	private String importTitle;
+	private boolean importIsVisible;
+	private double importOpacity = 0.65;
+	private String importLayerTitle;
+	private boolean importClusterPoints;
+	private boolean importHeatmapPoints;
+	private double importStrokeWidth = 1;
+	private String importStrokeColor = "ff0000";
+	private double importStrokeOpacity = 1.0;
+	private double importFillOpacity= 0.65;
+	private String importFillColor= "00ff00";
+
+	private Tool configureTool;
 
 	@PostConstruct
     public void init()
 	{
+		toolConverter = new ToolConverter();
+		layerConverter = new LayerConverter();
+		styleConverter = new StyleConverter();
+
 		// init the DMF Resource object that will be stored in couch, or read from couch
 		resource = new MapConfiguration();
 		// resource.setShowHeader(true);
-		resource.getViewport().setType("leaflet");
+		resource.getViewer().setType("leaflet");
+		resource.getViewer().setBaseMap("Topographic");
 
 		// init the root node for the layer listing
 		layerNodes = new DefaultTreeNode("root", null);
@@ -126,21 +140,21 @@ public class CreateBean implements Serializable
 		// init the tools selector
 		List<Tool> toolsSource = new ArrayList<Tool>();
         List<Tool> toolsTarget = new ArrayList<Tool>();
-
-        toolsSource.add(Tool.Type.pan.create());
-        toolsSource.add(Tool.Type.zoom.create());
-        toolsSource.add(Tool.Type.measure.create());
-        toolsSource.add(Tool.Type.markup.create());
-        toolsSource.add(Tool.Type.directions.create());
-
         tools = new DualListModel<Tool>(toolsSource, toolsTarget);
 
         // check if we're loading an existing resource
         ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
 		Map<String, String> queryString = externalContext.getRequestParameterMap();
 
-		if(queryString.containsKey("id"))
-		{
+		if( !queryString.containsKey("id") ) {
+			toolsTarget.add(Tool.Type.pan.create());
+			toolsTarget.add(Tool.Type.zoom.create());
+			toolsTarget.add(Tool.Type.measure.create());
+			toolsTarget.add(Tool.Type.markup.create());
+			toolsTarget.add(Tool.Type.directions.create());
+
+		}
+		else {
 			// load the resource from couch... that's pretty much it.
 			try
 			{
@@ -160,13 +174,12 @@ public class CreateBean implements Serializable
 				// recursive layer node creator
 				loadLayerNodes(layerNodes, resource.getLayers());
 
-				for (Tool.Type toolType : Tool.Type.values() ) {
-					toolsTarget.add(toolType.create());
-					toolsSource.remove(toolType.create());				
+				for ( Tool tool: resource.getTools() ) {
+					toolsTarget.add(tool);
 				}
-				
+
 				resource.getLayers().clear();
-//				resource.getTools().clear();
+				resource.getTools().clear();
 
 				// set the wms to databc's default
 				wmsServiceUrl = "https://openmaps.gov.bc.ca/geo/pub/ows";
@@ -183,6 +196,49 @@ public class CreateBean implements Serializable
 				e.printStackTrace();
 			}
 		}
+
+		for (Tool.Type toolType : Tool.Type.values() ) {
+			if ( toolType == Tool.Type.unknown ) continue;
+
+			Tool t = toolType.create();
+			if ( toolsTarget.contains( t ) ) continue;
+
+			toolsSource.add( t );
+		}
+	}
+
+	public Converter getToolConverter() {
+		return toolConverter;
+	}
+
+	public Converter getLayerConverter() {
+		return layerConverter;
+	}
+
+	public Converter getStyleConverter() {
+		return styleConverter;
+	}
+
+	public void onToolSelect( SelectEvent event ) {
+		configureTool = ( Tool )event.getObject();
+		// logger.debug("select "+configureTool.getType());
+		RequestContext.getCurrentInstance().update("createMashupForm:configureToolBoxButton" );
+		// RequestContext.getCurrentInstance().update("createMashupForm:toolsPicklist");
+	}
+
+	public void configureTool() {
+		// logger.debug(configureTool.getType());
+		RequestContext.getCurrentInstance().update("toolForm");
+	    RequestContext.getCurrentInstance().execute("Materialize.updateTextFields();");
+	}
+
+	public void configureToolDone() {
+		// logger.debug("configureDone");
+		int pos = tools.getTarget().indexOf(configureTool);
+		tools.getTarget().remove(configureTool);
+		tools.getTarget().add(pos,configureTool);
+		RequestContext.getCurrentInstance().update("createMashupForm:toolsPicklist");
+	    // RequestContext.getCurrentInstance().execute("Materialize.updateTextFields();");
 	}
 
 	public void loadLayerNodes(TreeNode parent, List<Layer> children)
@@ -238,6 +294,7 @@ public class CreateBean implements Serializable
 
 		                NodeList layerStyles = layerElement.getElementsByTagName("Style");
 
+						List<WMSInfoStyle> styles = layer.getStyles();
 		                if (layerStyles != null)
 		    		    {
 		    		        for (int s = 0; s < layerStyles.getLength(); s++)
@@ -246,8 +303,38 @@ public class CreateBean implements Serializable
 
 								WMSInfoStyle style = new WMSInfoStyle();
 								style.setName( styleElement.getElementsByTagName("Name").item(0).getTextContent());
-		    		        	layer.getStyles().add(style);
+								style.setTitle( styleElement.getElementsByTagName("Title").item(0).getTextContent().replace("_", " "));
+
+								if ( !styles.contains( style ) )
+		    		        		styles.add(style);
 		    		        }
+
+							int p = 0;
+							String s0 = styles.get( 0 ).getTitle();
+							if ( styles.size() > 1 ) {
+								OUTER: while ( true ) {
+									if ( p >= s0.length() ) break OUTER;
+
+									char c0 = s0.charAt( p );
+									for ( int j = 1; j < styles.size(); j++ ) {
+										String n = styles.get( j ).getTitle();
+										if ( p >= n.length() ) break OUTER;
+
+										if ( c0 != n.charAt( p ) ) break OUTER;
+									}
+
+									p += 1;
+								}
+							}
+							// logger.debug( s0 + ", " + p );
+
+							if ( p > 0 )
+								for ( int j = 0; j < styles.size(); j++ ) {
+									WMSInfoStyle s = styles.get( j );
+									if ( p < ( s.getTitle().length() - 1 ) )
+										s.setTitle( "..." + s.getTitle().substring( p ) );
+									// logger.debug( s.getTitle() );
+								}
 		    		    }
 		            }
 		        }
@@ -256,12 +343,17 @@ public class CreateBean implements Serializable
 		    RequestContext.getCurrentInstance().update("wmsForm");
 		    RequestContext.getCurrentInstance().execute("Materialize.updateTextFields();");
 		    RequestContext.getCurrentInstance().execute("closeModal()");
+		    RequestContext.getCurrentInstance().execute("fixSelectOneListFilter()");
 		}
 		catch (Exception e)
 		{
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error parsing WMS capabilities:", e.getMessage()));
 			e.printStackTrace();
 		}
+	}
+
+	public void layerMessage( AjaxBehaviorEvent event ) {
+		// logger.debug( event.toString() );
 	}
 
 	public TreeNode getCatalogLayers()
@@ -295,8 +387,11 @@ public class CreateBean implements Serializable
 
 	public void addSelectedLayerMpcm()
 	{
+		// logger.debug( "addSelectedLayerMpcm " + selectedLayerNode );
+
 		layerNodes.getChildren().add(selectedLayerNode);
 		selectedLayerNode.setParent(layerNodes);
+
 		RequestContext.getCurrentInstance().update("createMashupForm:layerList");
 		RequestContext.getCurrentInstance().update("mpcmLayerForm:catalog");
 		RequestContext.getCurrentInstance().update("mpcmLayerForm:mpcmLayerPanel");
@@ -311,16 +406,13 @@ public class CreateBean implements Serializable
 		}
 
 		Wms lyr = new Wms();
+		lyr.setId(SMKServiceHandler.convertNamesToId(Arrays.asList(selectedServiceLayer.getName(),selectedServiceStyle.getName())));
 		lyr.setTitle(wmsLayerTitle);
 		lyr.setServiceUrl(wmsServiceUrl);
 		lyr.setVersion(wmsVersion);
 		lyr.setLayerName(selectedServiceLayer.getName());
-		lyr.setStyleName(selectedServiceStyle);
-		// lyr.setLayerTypeCode(LayerTypes.wmsLayer);
-		// lyr.setId(id);
+		lyr.setStyleName(selectedServiceStyle.getName());
 		lyr.setIsVisible(wmsIsVisible);
-		// lyr.setIsSelectable(true);
-		// lyr.setIsExportable(true);
 	    lyr.setOpacity(wmsOpacity);
 
 		wmsLayerTitle = null;
@@ -373,104 +465,97 @@ public class CreateBean implements Serializable
 	    RequestContext.getCurrentInstance().execute("Materialize.updateTextFields();");
 	}
 
-	public void addSelectedKml()
+	public void initImportKml() {
+		importType = Layer.Type.Kml;
+		initImport();
+	}
+
+	public void initImportJson() {
+		importType = Layer.Type.Geojson;
+		initImport();
+	}
+
+	public void initImport() {
+		importTitle = importType.toString();
+		importLayerTitle = "";
+		importIsVisible = true;
+		importClusterPoints = false;
+		importHeatmapPoints = false;
+		importOpacity = 0.65;
+		importStrokeWidth = 1.0;
+		importStrokeOpacity = 1.0;
+		importStrokeColor = "ff0000";
+		importFillColor = "00ff00";
+		importFillOpacity = 0.65;
+
+		RequestContext.getCurrentInstance().update("importForm");
+		RequestContext.getCurrentInstance().execute("Materialize.updateTextFields();");
+	}
+
+	public void addImportLayer()
 	{
+		FeatureLayer layer;
+		LayerStyle style;
+
+		switch ( importType ) {
+			case Kml:
+				layer = new Kml();
+
+				// ( ( Kml )layer ).setDataUrl( url );
+				( ( Kml )layer ).setUseClustering(importClusterPoints);
+				( ( Kml )layer ).setUseHeatmapping(importHeatmapPoints);
+
+				style = ( ( Kml )layer ).getStyle();
+				style.setStrokeWidth(importStrokeWidth);
+				style.setStrokeOpacity(importStrokeOpacity);
+				style.setStrokeColor(importStrokeColor);
+				style.setFillColor(importFillColor);
+				style.setFillOpacity(importFillOpacity);
+				break;
+
+			case Geojson:
+				layer = new Geojson();
+
+				// ( ( Geojson )layer ).setDataUrl( url );
+				( ( Geojson )layer ).setUseClustering(importClusterPoints);
+				( ( Geojson )layer ).setUseHeatmapping(importHeatmapPoints);
+
+				style = ( ( Geojson )layer ).getStyle();
+				style.setStrokeWidth(importStrokeWidth);
+				style.setStrokeOpacity(importStrokeOpacity);
+				style.setStrokeColor(importStrokeColor);
+				style.setFillColor(importFillColor);
+				style.setFillOpacity(importFillOpacity);
+				break;
+
+			default:
+				logger.error("invalid import type");
+				return;
+		}
+
+		layer.setId( SMKServiceHandler.convertNameToId(importLayerTitle));
+		layer.setTitle(importLayerTitle);
+		layer.setIsVisible(importIsVisible);
+		layer.setOpacity(importOpacity);
+
 		try
 	    {
-			Kml lyr = new Kml();
-			lyr.setTitle(kmlLayerTitle);
-			// lyr.setLayerTypeCode(LayerTypes.kmlLayer);
-			lyr.setIsVisible(kmlIsVisible);
-			// lyr.setIsSelectable(true);
-			// lyr.setIsExportable(true);
-			lyr.setUseClustering(kmlClusterPoints);
-			lyr.setUseHeatmapping(kmlHeatmapPoints);
-		    lyr.setOpacity(kmlOpacity);
+		    Attachment importAttachment = new Attachment(layer.getId(), uploadFileAttachmentBytes, uploadContentType);
+		    resource.addInlineAttachment(importAttachment);
+	    }
+		catch(Exception e)
+		{
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error writing KML document:", e.getMessage()));
+			e.printStackTrace();
+		}
 
-			LayerStyle style = lyr.getStyle();
-		    style.setStrokeWidth(kmlStrokeWidth);
-		    style.setStrokeOpacity(kmlStrokeOpacity);
-		    style.setStrokeColor(kmlStrokeColor);
-		    style.setFillColor(kmlFillColor);
-		    style.setFillOpacity(kmlFillOpacity);
-
-		    kmlLayerTitle = "";
-		    kmlIsVisible = false;
-		    kmlClusterPoints = false;
-		    kmlHeatmapPoints = false;
-		    kmlOpacity = 0.65;
-		    kmlStrokeWidth = 1.0;
-		    kmlStrokeOpacity = 1.0;
-		    kmlStrokeColor = "000";
-		    kmlFillColor = "000";
-		    kmlFillOpacity = 0.65;
-
-		    Attachment kmlAttachment = new Attachment(lyr.getTitle(), uploadFileAttachmentBytes, uploadContentType);
-		    resource.addInlineAttachment(kmlAttachment);
-
-		    TreeNode kmlNode = new DefaultTreeNode(lyr, layerNodes);
+		    TreeNode kmlNode = new DefaultTreeNode(layer, layerNodes);
 			layerNodes.getChildren().add(kmlNode);
 			kmlNode.setParent(layerNodes);
 
 			RequestContext.getCurrentInstance().update("createMashupForm:layerList");
-			RequestContext.getCurrentInstance().update("kmlForm");
+			RequestContext.getCurrentInstance().update("importForm");
 		    RequestContext.getCurrentInstance().execute("Materialize.updateTextFields();");
-	    }
-		catch(Exception e)
-		{
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error writing KML document:", e.getMessage()));
-			e.printStackTrace();
-		}
-	}
-
-	public void addSelectedJson()
-	{
-		try
-	    {
-			Geojson lyr = new Geojson();
-			lyr.setTitle(jsonLayerTitle);
-			// lyr.setLayerTypeCode(LayerTypes.jsonLayer);
-			lyr.setIsVisible(jsonIsVisible);
-			// lyr.setIsSelectable(true);
-			// lyr.setIsExportable(true);
-			lyr.setUseClustering(jsonClusterPoints);
-			lyr.setUseHeatmapping(jsonHeatmapPoints);
-		    lyr.setOpacity(jsonOpacity);
-
-			LayerStyle style = lyr.getStyle();
-		    style.setStrokeWidth(jsonStrokeWidth);
-		    style.setStrokeOpacity(jsonStrokeOpacity);
-		    style.setStrokeColor(jsonStrokeColor);
-		    style.setFillColor(jsonFillColor);
-		    style.setFillOpacity(jsonFillOpacity);
-
-		    jsonLayerTitle = "";
-		    jsonIsVisible = false;
-		    jsonClusterPoints = false;
-		    jsonHeatmapPoints = false;
-		    jsonOpacity = 0.65;
-		    jsonStrokeWidth = 1.0;
-		    jsonStrokeOpacity = 1.0;
-		    jsonStrokeColor = "000";
-		    jsonFillColor = "000";
-		    jsonFillOpacity = 0.65;
-
-		    Attachment jsonAttachment = new Attachment(lyr.getTitle(), uploadFileAttachmentBytes, uploadContentType);
-		    resource.addInlineAttachment(jsonAttachment);
-
-		    TreeNode jsonNode = new DefaultTreeNode(lyr, layerNodes);
-			layerNodes.getChildren().add(jsonNode);
-			jsonNode.setParent(layerNodes);
-
-			RequestContext.getCurrentInstance().update("createMashupForm:layerList");
-			RequestContext.getCurrentInstance().update("jsonForm");
-		    RequestContext.getCurrentInstance().execute("Materialize.updateTextFields();");
-	    }
-		catch(Exception e)
-		{
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error writing KML document:", e.getMessage()));
-			e.printStackTrace();
-		}
 	}
 
 	public void uploadDocument(FileUploadEvent event)
@@ -479,19 +564,21 @@ public class CreateBean implements Serializable
 		{
 			UploadedFile uploadFile = event.getFile();
 
-			String fullFileName = uploadFile.getFileName();
+			uploadFilename = uploadFile.getFileName();
+			importLayerTitle = uploadFilename;
+
 			String fileName, extension;
 
-			int dotPos = fullFileName.indexOf('.');
+			int dotPos = uploadFilename.indexOf('.');
 
 			if (dotPos != -1)
 			{
-				fileName = fullFileName.substring(0, dotPos);
-				extension = fullFileName.substring(dotPos);
+				fileName = uploadFilename.substring(0, dotPos);
+				extension = uploadFilename.substring(dotPos);
 			}
 			else
 			{
-				fileName = fullFileName;
+				fileName = uploadFilename;
 				extension = "";
 			}
 
@@ -509,6 +596,9 @@ public class CreateBean implements Serializable
 		    holdingFile.delete();
 
 		    uploadFileAttachmentBytes = Base64.encodeBase64String(docRawBytes);
+
+			RequestContext.getCurrentInstance().update("importForm");
+			RequestContext.getCurrentInstance().execute("Materialize.updateTextFields();");
 	    }
 		catch(Exception e)
 		{
@@ -517,47 +607,86 @@ public class CreateBean implements Serializable
 		}
     }
 
+	public void uploadImage(FileUploadEvent event)
+    {
+		try
+		{
+			UploadedFile uploadFile = event.getFile();
+
+			String uploadFilename = uploadFile.getFileName();
+			// importLayerTitle = uploadFilename;
+
+			String fileName, extension;
+
+			int dotPos = uploadFilename.indexOf('.');
+
+			if (dotPos != -1)
+			{
+				fileName = uploadFilename.substring(0, dotPos);
+				extension = uploadFilename.substring(dotPos);
+			}
+			else
+			{
+				fileName = uploadFilename;
+				extension = "";
+			}
+
+			// uploadContentType = uploadFile.getContentType();
+
+			File holdingFile = File.createTempFile(fileName + '-', extension);
+		    holdingFile.deleteOnExit();
+		    uploadFile.write(holdingFile.getAbsolutePath());
+
+		    InputStream finput = new FileInputStream(holdingFile);
+		    byte[] docRawBytes = new byte[(int)holdingFile.length()];
+
+		    finput.read(docRawBytes, 0, docRawBytes.length);
+		    finput.close();
+		    holdingFile.delete();
+
+		    // uploadFileAttachmentBytes = Base64.encodeBase64String(docRawBytes);
+
+		    Attachment importAttachment = new Attachment("surroundImage", Base64.encodeBase64String(docRawBytes), uploadFile.getContentType());
+
+		    resource.addInlineAttachment(importAttachment);
+
+			resource.getSurround().setImageSrc("surroundImage");
+	    }
+		catch(Exception e)
+		{
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error writing KML document:", e.getMessage()));
+			e.printStackTrace();
+		}
+
+		RequestContext.getCurrentInstance().update("createMashupForm:surroundImagePanel");
+		RequestContext.getCurrentInstance().execute("Materialize.updateTextFields();");
+    }
+
 	public void removeSelectedLayer()
 	{
 		TreeNode parent = selectedLayerNode.getParent();
 		parent.getChildren().remove(selectedLayerNode);
-		// is this an MPCM layer? We can tell because it'll be using a relational tree node
-//		if(selectedLayerNode instanceof RelationalTreeNode)
-//		{
-//			RelationalTreeNode node = (RelationalTreeNode)selectedLayerNode;
-//
-//			node.clearParent();
-//
-//			node.setParent(node.getOriginalParent());
-//			node.getOriginalParent().getChildren().add(node);
-//
-//			RequestContext.getCurrentInstance().update("mpcmLayerForm:catalog");
-//			RequestContext.getCurrentInstance().update("mpcmLayerForm:mpcmLayerPanel");
-//		}
 
-		Layer data = (Layer)selectedLayerNode.getData();
+		if ( selectedLayerNode.getData() != null ) {
+			Layer data = (Layer)selectedLayerNode.getData();
 
-		if(data.getType().equals(Layer.Type.Kml.getJsonType()) || data.getType().equals(Layer.Type.Geojson.getJsonType()))
-		{
-			if(data.getId() != null)
-			{
-				// delete the document in the couchDB
-				try
-				{
-					FacesContext ctx = FacesContext.getCurrentInstance();
-					String myConstantValue = ctx.getExternalContext().getInitParameter("couchdb");
+			if ( data instanceof Geojson || data instanceof Kml ) {
 
-					CouchDAO dao = new CouchDAO(myConstantValue, "", "");
-					dao.deleteAttachment(resource, data);
+				try {
+					String serviceUrl = FacesContext.getCurrentInstance().getExternalContext().getInitParameter("lmfService");
+					SMKServiceHandler service  = new SMKServiceHandler(serviceUrl);
+
+					service.deleteAttachment( resource, data.getId() );
 				}
-				catch (MalformedURLException e)
-				{
-					e.printStackTrace();
+				catch (MalformedURLException e) {
+				}
+				catch( IOException e ) {
 				}
 			}
+
+			selectedLayerNode = null;
 		}
 
-		selectedLayerNode = null;
 		RequestContext.getCurrentInstance().update("createMashupForm:layerList");
 	}
 
@@ -575,7 +704,7 @@ public class CreateBean implements Serializable
 			Layer data = (Layer) node.getData();
 
 			if(container != null && container instanceof CollectionLayer )
-			{				
+			{
 				((CollectionLayer)container).getLayers().add(data);
 			}
 			else
@@ -604,6 +733,9 @@ public class CreateBean implements Serializable
 
 			//push the tools up to the resource
 			resource.setTools(tools.getTarget());
+			// for ( Tool t: tools.getTarget() ) {
+			// 	resource.getTools().add( t );
+			// }
 
 			// we've got a complete resource at this point. set the publish flag
 			//resource.setPublished(publish);
@@ -613,8 +745,15 @@ public class CreateBean implements Serializable
 			if(resource.getLmfId() == null)
 			{
 				//resource.setLmfId(java.util.UUID.randomUUID().toString());
-				resource.setLmfId(resource.getName().toLowerCase().replaceAll(" ", "-"));
+				String id = SMKServiceHandler.convertNameToId( resource.getName() );
+				// resource.getName().toLowerCase().replaceAll("[^0-9a-z]+", "-").replaceAll("^[-]+", "").replaceAll("[-]+$", "");
+
+				logger.debug("id = "+id);
+				resource.setLmfId(id);
 			}
+
+			if(resource.getSurround().getTitle() == null || resource.getSurround().getTitle().isEmpty() )
+				resource.getSurround().setTitle(resource.getName());
 
 			// we're done, so write to couch!
 			FacesContext ctx = FacesContext.getCurrentInstance();
@@ -656,18 +795,14 @@ public class CreateBean implements Serializable
 
 	public void navigateToHome()
 	{
-		boolean flag = FacesContext.getCurrentInstance().getExternalContext().isResponseCommitted();
-		if (!flag)
+		try
 		{
-		    try
-		    {
-				FacesContext.getCurrentInstance().getExternalContext().redirect("index.xhtml");
-			}
-		    catch (IOException e)
-		    {
-		    	FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error forwarding to home page:", e.getMessage()));
-				e.printStackTrace();
-			}
+			FacesContext.getCurrentInstance().getExternalContext().redirect("index.xhtml");
+		}
+		catch (IOException e)
+		{
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error forwarding to home page:", e.getMessage()));
+			e.printStackTrace();
 		}
 	}
 
@@ -689,24 +824,24 @@ public class CreateBean implements Serializable
 
 	public void onMpcmNodeSelect(NodeSelectEvent event)
 	{
-		try
-		{
-			Layer layer = (Layer)event.getTreeNode().getData();
-			if(layer.getType().equals(Layer.Type.EsriDynamic.getJsonType()) && ((EsriDynamic)layer).getDynamicLayers().size() == 0)
-			{
-				LayerController.loadMpcmLayerDetails((EsriDynamic)layer);
+		TreeNode node = event.getTreeNode();
+		this.setSelectedLayerNode( node );
+
+		if ( node != null && node.getData() != null ) {
+			Layer layer = ( Layer )node.getData();
+
+			if ( layer instanceof EsriDynamic ) {
+				try {
+					LayerController.loadMpcmLayerDetails( ( EsriDynamic )layer );
+				}
+				catch ( Exception e) {
+					logger.error( e );
+				}
 			}
-
-			this.setSelectedLayerNode(event.getTreeNode());
-
-			RequestContext.getCurrentInstance().update("mpcmLayerForm:mpcmLayerPanel");
-			RequestContext.getCurrentInstance().execute("Materialize.updateTextFields();");
 		}
-		catch (Exception e)
-		{
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error selecting node:", e.getMessage()));
-			e.printStackTrace();
-		}
+
+		RequestContext.getCurrentInstance().update("mpcmLayerForm:mpcmLayerPanel");
+		RequestContext.getCurrentInstance().execute("Materialize.updateTextFields();");
     }
 
 	public void onDragDrop(TreeDragDropEvent event)
@@ -801,17 +936,41 @@ public class CreateBean implements Serializable
 
 	public void setSelectedServiceLayer(WMSInfoLayer selectedServiceLayer)
 	{
+		// try {
+		// logger.debug( (new ObjectMapper()).writeValueAsString(selectedServiceLayer));
+		// }
+        // catch (JsonProcessingException e) {}
+
 		this.selectedServiceLayer = selectedServiceLayer;
+		if ( selectedServiceLayer != null ) {
+			wmsLayerTitle = selectedServiceLayer.getTitle();
+
+			if ( !selectedServiceLayer.getStyles().isEmpty() ) {
+				selectedServiceStyle = selectedServiceLayer.getStyles().get(0);
+			}
+		}
+		else {
+			wmsLayerTitle = null;
+			selectedServiceStyle = null;
+		}
+
+		RequestContext.getCurrentInstance().update("wmsForm");
+		RequestContext.getCurrentInstance().execute("Materialize.updateTextFields();");
+		RequestContext.getCurrentInstance().execute("fixSelectOneListFilter()");
 	}
 
-	public String getSelectedServiceStyle()
+	public WMSInfoStyle getSelectedServiceStyle()
 	{
 		return selectedServiceStyle;
 	}
 
-	public void setSelectedServiceStyle(String selectedServiceStyle)
+	public void setSelectedServiceStyle(WMSInfoStyle selectedServiceStyle)
 	{
 		this.selectedServiceStyle = selectedServiceStyle;
+
+		RequestContext.getCurrentInstance().update("wmsForm");
+		RequestContext.getCurrentInstance().execute("Materialize.updateTextFields();");
+		RequestContext.getCurrentInstance().execute("fixSelectOneListFilter()");
 	}
 
 	public ArrayList<WMSInfoLayer> getAllServiceLayers()
@@ -925,203 +1084,51 @@ public class CreateBean implements Serializable
 		this.fsLayerId = fsLayerId;
 	}
 
-	public boolean getKmlIsVisible()
-	{
-		return kmlIsVisible;
+
+	public String getImportTitle() { return importTitle; }
+	public void setImportTitle(String importTitle) { this.importTitle = importTitle; }
+
+	public boolean isImportIsVisible() { return importIsVisible; }
+	public void setImportIsVisible(boolean importIsVisible) { this.importIsVisible = importIsVisible; }
+
+	public double getImportOpacity() { return importOpacity; }
+	public void setImportOpacity(double importOpacity) { this.importOpacity = importOpacity; }
+
+	public String getImportLayerTitle() { return importLayerTitle; }
+	public void setImportLayerTitle(String importLayerTitle) { this.importLayerTitle = importLayerTitle; }
+
+	public boolean isImportClusterPoints() { return importClusterPoints; }
+	public void setImportClusterPoints(boolean importClusterPoints) { this.importClusterPoints = importClusterPoints; }
+
+	public boolean isImportHeatmapPoints() { return importHeatmapPoints; }
+	public void setImportHeatmapPoints(boolean importHeatmapPoints) { this.importHeatmapPoints = importHeatmapPoints; }
+
+	public double getImportStrokeWidth() { return importStrokeWidth; }
+	public void setImportStrokeWidth(double importStrokeWidth) { this.importStrokeWidth = importStrokeWidth; }
+
+	public String getImportStrokeColor() { return importStrokeColor; }
+	public void setImportStrokeColor(String importStrokeColor) { this.importStrokeColor = importStrokeColor; }
+
+	public double getImportStrokeOpacity() { return importStrokeOpacity; }
+	public void setImportStrokeOpacity(double importStrokeOpacity) { this.importStrokeOpacity = importStrokeOpacity; }
+
+	public double getImportFillOpacity() { return importFillOpacity; }
+	public void setImportFillOpacity(double importFillOpacity) { this.importFillOpacity = importFillOpacity; }
+
+	public String getImportFillColor() { return importFillColor; }
+	public void setImportFillColor(String importFillColor) { this.importFillColor = importFillColor; }
+
+
+	public Tool getConfigureTool() { return configureTool; }
+	public void setConfigureTool(Tool configureTool) { this.configureTool = configureTool; }
+
+	public String getConfigureToolDisable() {
+		// logger.debug( configureTool.getType() + ":" + configureTool.isConfigured() );
+		if ( configureTool == null ) return "disabled";
+		return configureTool.isConfigured() ? "" : "disabled";
 	}
 
-	public void setKmlIsVisible(boolean kmlIsVisible)
-	{
-		this.kmlIsVisible = kmlIsVisible;
-	}
-
-	public double getKmlOpacity()
-	{
-		return kmlOpacity;
-	}
-
-	public void setKmlOpacity(double kmlOpacity)
-	{
-		this.kmlOpacity = kmlOpacity;
-	}
-
-	public String getKmlLayerTitle()
-	{
-		return kmlLayerTitle;
-	}
-
-	public void setKmlLayerTitle(String kmlLayerTitle)
-	{
-		this.kmlLayerTitle = kmlLayerTitle;
-	}
-
-	public boolean getKmlClusterPoints()
-	{
-		return kmlClusterPoints;
-	}
-
-	public void setKmlClusterPoints(boolean kmlClusterPoints)
-	{
-		this.kmlClusterPoints = kmlClusterPoints;
-	}
-
-	public boolean getKmlHeatmapPoints()
-	{
-		return kmlHeatmapPoints;
-	}
-
-	public void setKmlHeatmapPoints(boolean kmlHeatmapPoints)
-	{
-		this.kmlHeatmapPoints = kmlHeatmapPoints;
-	}
-
-	public double getKmlStrokeWidth()
-	{
-		return kmlStrokeWidth;
-	}
-
-	public void setKmlStrokeWidth(double kmlStrokeWidth)
-	{
-		this.kmlStrokeWidth = kmlStrokeWidth;
-	}
-
-	public String getKmlStrokeColor()
-	{
-		return kmlStrokeColor;
-	}
-
-	public void setKmlStrokeColor(String kmlStrokeColor)
-	{
-		this.kmlStrokeColor = kmlStrokeColor;
-	}
-
-	public double getKmlStrokeOpacity()
-	{
-		return kmlStrokeOpacity;
-	}
-
-	public void setKmlStrokeOpacity(double kmlStrokeOpacity)
-	{
-		this.kmlStrokeOpacity = kmlStrokeOpacity;
-	}
-
-	public double getKmlFillOpacity()
-	{
-		return kmlFillOpacity;
-	}
-
-	public void setKmlFillOpacity(double kmlFillOpacity)
-	{
-		this.kmlFillOpacity = kmlFillOpacity;
-	}
-
-	public String getKmlFillColor()
-	{
-		return kmlFillColor;
-	}
-
-	public void setKmlFillColor(String kmlFillColor)
-	{
-		this.kmlFillColor = kmlFillColor;
-	}
-
-	public boolean isJsonIsVisible()
-	{
-		return jsonIsVisible;
-	}
-
-	public void setJsonIsVisible(boolean jsonIsVisible)
-	{
-		this.jsonIsVisible = jsonIsVisible;
-	}
-
-	public double getJsonOpacity()
-	{
-		return jsonOpacity;
-	}
-
-	public void setJsonOpacity(double jsonOpacity)
-	{
-		this.jsonOpacity = jsonOpacity;
-	}
-
-	public String getJsonLayerTitle()
-	{
-		return jsonLayerTitle;
-	}
-
-	public void setJsonLayerTitle(String jsonLayerTitle)
-	{
-		this.jsonLayerTitle = jsonLayerTitle;
-	}
-
-	public boolean isJsonClusterPoints()
-	{
-		return jsonClusterPoints;
-	}
-
-	public void setJsonClusterPoints(boolean jsonClusterPoints)
-	{
-		this.jsonClusterPoints = jsonClusterPoints;
-	}
-
-	public boolean isJsonHeatmapPoints()
-	{
-		return jsonHeatmapPoints;
-	}
-
-	public void setJsonHeatmapPoints(boolean jsonHeatmapPoints)
-	{
-		this.jsonHeatmapPoints = jsonHeatmapPoints;
-	}
-
-	public double getJsonStrokeWidth()
-	{
-		return jsonStrokeWidth;
-	}
-
-	public void setJsonStrokeWidth(double jsonStrokeWidth)
-	{
-		this.jsonStrokeWidth = jsonStrokeWidth;
-	}
-
-	public String getJsonStrokeColor()
-	{
-		return jsonStrokeColor;
-	}
-
-	public void setJsonStrokeColor(String jsonStrokeColor)
-	{
-		this.jsonStrokeColor = jsonStrokeColor;
-	}
-
-	public double getJsonStrokeOpacity()
-	{
-		return jsonStrokeOpacity;
-	}
-
-	public void setJsonStrokeOpacity(double jsonStrokeOpacity)
-	{
-		this.jsonStrokeOpacity = jsonStrokeOpacity;
-	}
-
-	public double getJsonFillOpacity()
-	{
-		return jsonFillOpacity;
-	}
-
-	public void setJsonFillOpacity(double jsonFillOpacity)
-	{
-		this.jsonFillOpacity = jsonFillOpacity;
-	}
-
-	public String getJsonFillColor()
-	{
-		return jsonFillColor;
-	}
-
-	public void setJsonFillColor(String jsonFillColor)
-	{
-		this.jsonFillColor = jsonFillColor;
+	public String getSurroundImageSrc() {
+		return resource.getSurround().getImageSrc();
 	}
 }

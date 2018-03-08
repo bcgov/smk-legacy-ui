@@ -1,9 +1,0 @@
-<div class="smk-sidebar" v-bind:class="{ expanded: currentTool != null }">
-    <ul class="smk-sidebar-tools">
-        <li v-for="tool in tools">
-            <panel-tool v-bind="tool" v-bind:active="currentTool == tool.id"></panel-tool>
-            <!-- <panel-tool v-bind="tool" v-on:activate-tool="activateTool" v-bind:active="currentTool == tool.id"></panel-tool> -->
-        </li>
-    </ul>
-    <component class="smk-sidebar-panel" v-bind:is="currentTool && currentTool + 'Panel'" v-bind="panel[ currentTool ]"></component>
-</div>

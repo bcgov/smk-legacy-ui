@@ -1,0 +1,76 @@
+
+.smk-layers-panel input.smk-filter {
+    margin-bottom: 0;
+    border: 0;
+}
+
+.smk-layers-panel .smk-all-visibility {
+    position: absolute;
+    top: 25px;
+    right: 25px;
+    cursor: pointer;
+}
+
+.smk-layers-panel .smk-all-collapse {
+    position: absolute;
+    top: 20px;
+    right: 0px;
+    cursor: pointer;
+}
+
+.smk-layers-panel .smk-all-expand {
+    position: absolute;
+    top: 30px;
+    right: 0px;
+    cursor: pointer;
+}
+
+.smk-layers-panel .smk-all-visibility.smk-some-visible {
+    opacity: .5;
+}
+
+.smk-layer {
+    position: relative;
+    border: 1px solid transparent;
+    margin-bottom: 5px;
+    border-radius: 5px;
+}
+
+.smk-layer:hover {
+    border: 1px solid black;
+}
+
+.smk-layer .smk-layer-visibility {
+    display: inline-block;
+    /* width: 20px; */
+    vertical-align: top;
+    cursor: pointer;
+    opacity: .5;
+}
+
+.smk-layer.smk-layer-visible .smk-layer-visibility {
+    opacity: 1;
+}
+
+.smk-layer h2 {
+    display: inline-block;
+    width: 200px;
+    margin-top: 2px;
+}
+
+.smk-layer .smk-layer-expand {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 20px;
+    cursor: pointer;
+}
+
+.smk-layer .smk-layer-info {
+    padding-left: 25px;
+}
+
+.smk-layer .smk-legend span {
+    vertical-align: top;
+}
+
