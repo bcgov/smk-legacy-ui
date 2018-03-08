@@ -7,7 +7,10 @@
     top: 0;
     left: 0;
     height: 30px;
+<<<<<<< HEAD
+=======
     min-width: 300px;
+>>>>>>> master
 
     z-index: 1;
     background-color: white;
@@ -20,6 +23,8 @@
 .smk-tool {
     display: none;
     opacity: 0.5;
+<<<<<<< HEAD
+=======
     border-radius: 3px;
     border: 1px solid transparent;
     padding: 0;
@@ -33,6 +38,7 @@
 .smk-tool:focus {
     outline: 0;
     background-color: white;
+>>>>>>> master
 }
 
 .smk-tool.smk-tool-visible {
@@ -44,3 +50,9 @@
     /* pointer-events: none; */
 }
 
+<<<<<<< HEAD
+.smk-tool.smk-tool-active {
+}
+
+=======
+>>>>>>> master

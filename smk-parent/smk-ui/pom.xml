@@ -4,7 +4,7 @@
   <artifactId>smk-ui</artifactId>
   <packaging>war</packaging>
   <parent>
-    <groupId>ca.bc.gov.databc</groupId>
+    <groupId>ca.bc.gov.app</groupId>
     <artifactId>smk-parent</artifactId>
     <version>1.0.x-SNAPSHOT</version>
   </parent>
@@ -16,7 +16,7 @@
 
   <dependencies>
 		<dependency>
-		    <groupId>ca.bc.gov.databc</groupId>
+		    <groupId>ca.bc.gov.app</groupId>
 			<artifactId>smks-model</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>

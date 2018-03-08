@@ -1,6 +1,5 @@
 body {
-    /* font-family: 'Avenir Next W00','Helvetica Neue',Helvetica,Arial,sans-serif; */
-    font-family: Helvetica,Arial,sans-serif;
+    font-family: 'Avenir Next W00','Helvetica Neue',Helvetica,Arial,sans-serif;
 }
 
 .smk-map-frame {
@@ -16,9 +15,7 @@ body {
     top: 0;
     left: 0;
     right: 0;
-    height: 70px;
-	border-bottom: 2px solid #fcba19;
-	background-color: #036;
+    height: 70px
 }
 
 #smk-header-logo {
@@ -30,12 +27,11 @@ body {
     background-size:        auto 58px;
 }
 
-.smk-default-header-image {
+.default-header-image {
     background-image:       url( 'bc_gov_logo_transparent.png' );
 }
 
 #smk-header-title {
-    color: white;
     margin-left:    20px;
     font-size:      30px;
     line-height: 64px;
@@ -44,10 +40,10 @@ body {
 }
 
 .smk-viewer {
-    top: 72px;
+    top: 70px;
 }
 
 .smk-overlay {
-    top: 77px;
+    top: 75px;
 }
 

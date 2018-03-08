@@ -22,10 +22,16 @@ include.module( 'tool-select', [ 'smk', 'tool', 'widgets', 'tool-select.panel-se
         this.makePropPanel( 'highlightId', null )
 
         SMK.TYPE.Tool.prototype.constructor.call( this, $.extend( {
+<<<<<<< HEAD
+            order:      5,
+            title:      'Selection',
+            widgetComponent: 'select-widget',
+=======
             order:          5,
             position:       'menu',
             title:          'Selection',
             widgetComponent:'select-widget',
+>>>>>>> master
             panelComponent: 'select-panel',
         }, option ) )
     }
@@ -39,7 +45,11 @@ include.module( 'tool-select', [ 'smk', 'tool', 'widgets', 'tool-select.panel-se
     SelectTool.prototype.afterInitialize.push( function ( smk, aux ) {
         var self = this
 
+<<<<<<< HEAD
+        aux.toolbar.vm.$on( 'select-widget.click', function () {
+=======
         aux.widget.vm.$on( 'select-widget.click', function () {
+>>>>>>> master
             if ( !self.visible || !self.enabled ) return
 
             self.active = !self.active

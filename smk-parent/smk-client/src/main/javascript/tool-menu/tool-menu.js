@@ -6,18 +6,30 @@ include.module( 'tool-menu', [ 'smk', 'tool', 'widgets', 'tool-menu.panel-menu-h
 
     Vue.component( 'menu-panel', {
         template: inc[ 'tool-menu.panel-menu-html' ],
+<<<<<<< HEAD
+        props: [ 'title', 'widgets', 'panels' ]
+=======
         props: [ 'title', 'visible', 'enabled', 'active', 'subWidgets', 'subPanels', 'activeToolType' ]
+>>>>>>> master
     } )
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
     function MenuTool( option ) {
         this.makePropWidget( 'icon', 'menu' )
+<<<<<<< HEAD
+        this.makePropPanel( 'widgets', [] )
+        this.makePropPanel( 'panels', {} )
+
+        SMK.TYPE.Tool.prototype.constructor.call( this, $.extend( {
+            title:          'Menu',
+=======
         this.makePropPanel( 'subWidgets', [] )
         this.makePropPanel( 'subPanels', {} )
         this.makePropPanel( 'activeToolType', null )
 
         SMK.TYPE.Tool.prototype.constructor.call( this, $.extend( {
             title:          null,
+>>>>>>> master
             widgetComponent:'menu-widget',
             panelComponent: 'menu-panel',
         }, option ) )
@@ -43,13 +55,19 @@ include.module( 'tool-menu', [ 'smk', 'tool', 'widgets', 'tool-menu.panel-menu-h
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
     MenuTool.prototype.add = function ( tool ) {
+<<<<<<< HEAD
+        this.widgets.push( {
+=======
         var self = this
 
         this.subWidgets.push( {
+>>>>>>> master
             type: tool.type,
             widgetComponent: tool.widgetComponent,
             widget: tool.widget
         } )
+<<<<<<< HEAD
+=======
 
         Vue.set( this.subPanels, tool.type, {
             panelComponent: tool.panelComponent,
@@ -75,6 +93,7 @@ include.module( 'tool-menu', [ 'smk', 'tool', 'widgets', 'tool-menu.panel-menu-h
             self.activeTool.active = false
             self.activeTool = tool
         } )
+>>>>>>> master
     }
 
     return MenuTool

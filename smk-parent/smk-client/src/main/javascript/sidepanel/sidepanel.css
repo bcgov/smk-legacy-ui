@@ -52,7 +52,10 @@
     padding: 5px;
     overflow-x: hidden;
     overflow-y: scroll;
+<<<<<<< HEAD
+=======
     height: 100%;
+>>>>>>> master
 }
 
 .smk-sidepanel .smk-panel h1 {
