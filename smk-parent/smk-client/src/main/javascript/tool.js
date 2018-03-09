@@ -101,18 +101,12 @@ include.module( 'tool', [ 'smk', 'jquery', 'event' ], function () {
                 if ( self.panelComponent )
                     aux.panel.add( self )
 
-<<<<<<< HEAD
-=======
                 aux.widget = aux.toolbar
->>>>>>> master
                 break;
 
             case 'menu':
                 aux.menu.add( self )
-<<<<<<< HEAD
-=======
                 aux.widget = aux.panel
->>>>>>> master
                 break;
             }
 

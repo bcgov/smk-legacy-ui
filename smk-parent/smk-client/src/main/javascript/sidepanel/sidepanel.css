@@ -17,7 +17,7 @@
     left: 0;
     bottom: 0;
     background-color: white;
-    border-radius: 5px;
+    border-radius: 3px;
     box-shadow: 0 1px 5px rgba(0, 0, 0, 0.65);
     pointer-events: auto;
 }
@@ -52,10 +52,7 @@
     padding: 5px;
     overflow-x: hidden;
     overflow-y: scroll;
-<<<<<<< HEAD
-=======
     height: 100%;
->>>>>>> master
 }
 
 .smk-sidepanel .smk-panel h1 {

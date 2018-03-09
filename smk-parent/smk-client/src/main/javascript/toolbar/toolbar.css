@@ -7,14 +7,11 @@
     top: 0;
     left: 0;
     height: 30px;
-<<<<<<< HEAD
-=======
     min-width: 300px;
->>>>>>> master
 
     z-index: 1;
     background-color: white;
-    border-radius: 5px;
+    border-radius: 3px;
     box-shadow: 0 1px 5px rgba(0, 0, 0, 0.65);
     pointer-events: auto;
     user-select: none;
@@ -23,8 +20,6 @@
 .smk-tool {
     display: none;
     opacity: 0.5;
-<<<<<<< HEAD
-=======
     border-radius: 3px;
     border: 1px solid transparent;
     padding: 0;
@@ -38,7 +33,6 @@
 .smk-tool:focus {
     outline: 0;
     background-color: white;
->>>>>>> master
 }
 
 .smk-tool.smk-tool-visible {
@@ -50,9 +44,3 @@
     /* pointer-events: none; */
 }
 
-<<<<<<< HEAD
-.smk-tool.smk-tool-active {
-}
-
-=======
->>>>>>> master

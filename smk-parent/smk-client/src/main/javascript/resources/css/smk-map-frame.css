@@ -17,10 +17,10 @@
 
 .smk-overlay {
     position: absolute;
-    top: 5px;
-    left: 5px;
-    right: 5px;
-    bottom: 5px;
+    top: 7px;
+    left: 7px;
+    right: 7px;
+    bottom: 7px;
     z-index: 2;
     border-radius: 5px;
     /* border: 1px solid black; */
@@ -54,10 +54,7 @@
 .smk-commands {
     margin-bottom: 1px;
 }
-<<<<<<< HEAD
-=======
 
 .smk-active, .smk-tool-active {
     background-color: #d2d9e6;
 }
->>>>>>> master

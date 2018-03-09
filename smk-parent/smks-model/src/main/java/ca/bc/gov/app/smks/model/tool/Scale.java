@@ -11,8 +11,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @JsonInclude(Include.NON_NULL)
 public class Scale extends Tool
 {
-    private boolean showFactor;
-    private boolean showBar;
+    private boolean showFactor = true;
+    private boolean showBar = true;
 
 	public Scale() {}
 

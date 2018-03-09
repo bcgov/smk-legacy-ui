@@ -11,10 +11,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @JsonInclude(Include.NON_NULL)
 public class Zoom extends Tool
 {
-    private boolean mouseWheel;
-    private boolean doubleClick;
-    private boolean box;
-    private boolean control;
+    private boolean mouseWheel = true;
+    private boolean doubleClick = true;
+    private boolean box = true;
+    private boolean control = true;
 
 	public Zoom() {}
 
