@@ -6,6 +6,9 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.FileAttribute;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -333,10 +336,10 @@ public class PublishedMapConfigController
 					
 					//copy template into temp
 					ClassLoader classLoader = getClass().getClassLoader();
-					File tempExportZip = new File(classLoader.getResource("smk-export-template.war").getFile());
+					File tempExportZip = new File(classLoader.getResource("smk-client.war").getFile());
 					InputStream targetStream = new FileInputStream(tempExportZip);
 					
-					File exportTemplateZip = File.createTempFile(resource.getName() + "_export", ".war");
+					File exportTemplateZip = File.createTempFile(resource.getLmfId()+ "_export", ".war");
 					logger.debug("    Copying zip to temp file '" + exportTemplateZip.getName() + "'...");
 					FileOutputStream os = new FileOutputStream(exportTemplateZip);
 				    IOUtils.copy(targetStream, os);
@@ -359,10 +362,13 @@ public class PublishedMapConfigController
 				    zipFile.addFile(mapConfigTempFile, params);
 				    
 				    String smkConfigDocumentNames = mapConfigTempFile.getName() + ",";
-				    
 				    // copy all attachments
 				    if(resource.getAttachments() != null)
 				    {
+				    	File tempAttchPath = new File(System.getProperty("java.io.tmpdir") + File.separator + resource.getLmfId() + File.separator + "attachments" + File.separator);
+				    	tempAttchPath.mkdirs();
+				    	ArrayList<File> tempFiles = new ArrayList<File>();
+				    	
 					    for(String key : resource.getAttachments().keySet())
 						{
 					    	AttachmentInputStream attch = couchDAO.getAttachment(resource, key);
@@ -372,8 +378,23 @@ public class PublishedMapConfigController
 							{
 								InputStream dataStream = new ByteArrayInputStream(data);
 		
-								File attchFile = File.createTempFile(resource.getName() + "_" + key, ".attachment");
-								FileOutputStream attchFileStream = new FileOutputStream(attchFile);
+								String contentType = attch.getContentType();
+								String postfix = "";
+								
+								if(contentType.equals("image/gif")) postfix = "gif";
+								else if(contentType.equals("image/jpg")) postfix = "jpg";
+								else if(contentType.equals("image/jpeg")) postfix = "jpg";
+								else if(contentType.equals("image/bmp")) postfix = "bmp";
+								else if(contentType.equals("image/png")) postfix = "png";
+								else if(contentType.equals("application/vnd.google-earth.kml+xml")) postfix = "kml";
+								else postfix = "json";
+								
+								File attachmentFile = new File(tempAttchPath.getPath() + File.separator + key + "." + postfix);
+								attachmentFile.createNewFile();
+
+								tempFiles.add(attachmentFile);
+								
+								FileOutputStream attchFileStream = new FileOutputStream(attachmentFile);
 								IOUtils.copy(dataStream, attchFileStream);
 								
 								dataStream.close();
@@ -381,20 +402,25 @@ public class PublishedMapConfigController
 								attchFileStream.close();
 								attchFileStream = null;
 								
-								zipFile.addFile(attchFile, params);						
-								
-								smkConfigDocumentNames += attchFile.getName() + ",";
-								
-								attchFile.delete();
-								attchFile = null;
+								smkConfigDocumentNames += attachmentFile.getName() + ",";
 							}
 						}
+					    
+					    zipFile.addFolder(tempAttchPath.getPath(), params);
+					    
+					    //delete temp files
+					    for(File file : tempFiles)
+					    {
+					    	file.delete();
+					    }
+					    //delete temp folder
+					    Files.delete(tempAttchPath.toPath());
 				    }
 				    // trim out the trailing comma, if we have attachments
 				    if(smkConfigDocumentNames.length() > 0 && smkConfigDocumentNames.endsWith(",")) smkConfigDocumentNames = smkConfigDocumentNames.substring(0, smkConfigDocumentNames.length() - 1);
 				    
 				    // create index.html with refs to config and attachments, and insert
-				    File indexHtml = File.createTempFile(resource.getName() + "_index", ".html");
+				    File indexHtml = File.createTempFile(resource.getLmfId() + "_index", ".html");
 				                                                                                          
 				    String indexCode = "<html><head><title>" + resource.getName() + "</title></head><body><div id=\"smk-map-frame\"></div><script src=\"smk-bootstrap.js\" smk-standalone=\"true\">return " + configString + "</script></body></html>";
 				    
@@ -402,7 +428,7 @@ public class PublishedMapConfigController
 				    out.write(indexCode);
 				    out.flush();
 				    
-				    zipFile.addFile(indexHtml, params);
+				    zipFile.addFile(indexHtml, new ZipParameters());
 
 				    out.close();
 				    out = null;
