@@ -16,8 +16,6 @@ RUN curl -jksSL -o /tmp/apache-tomcat.tar.gz http://archive.apache.org/dist/tomc
     tar -C /opt -xf /tmp/apache-tomcat.tar && \
     ln -s /opt/apache-tomcat-${TOMCAT_VERSION} ${TOMCAT_HOME}
 
-COPY tomcat-users.xml ${TOMCAT_HOME}/conf/tomcat-users.xml
-
 WORKDIR /tmp
 
 #Copy SMK api
