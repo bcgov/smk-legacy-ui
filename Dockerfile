@@ -1,31 +1,38 @@
-FROM davidcaste/alpine-tomcat:tomcat8
+FROM anapsix/alpine-java:jre8
 
-ENV CATALINA_HOME="/opt/tomcat"
+RUN apk upgrade --update && \
+    apk add --update curl unzip && \
+    curl -jksSLH "Cookie: oraclelicense=accept-securebackup-cookie" -o /tmp/unlimited_jce_policy.zip "http://download.oracle.com/otn-pub/java/jce/8/jce_policy-8.zip" && \
+    unzip -jo -d ${JAVA_HOME}/jre/lib/security /tmp/unlimited_jce_policy.zip
 
-# adjust config in tomcat
-ADD docker/tomcat/conf/* ${CATALINA_HOME}/conf
+ENV TOMCAT_MAJOR=8 \
+    TOMCAT_VERSION=8.5.3 \
+    TOMCAT_HOME=/opt/tomcat \
+    CATALINA_HOME=/opt/tomcat \
+    CATALINA_OUT=/opt/tomcat/logs
 
-# ensure cUrl is available
-RUN apk upgrade --update &&\
-  apk add --update curl
+RUN curl -jksSL -o /tmp/apache-tomcat.tar.gz http://archive.apache.org/dist/tomcat/tomcat-${TOMCAT_MAJOR}/v${TOMCAT_VERSION}/bin/apache-tomcat-${TOMCAT_VERSION}.tar.gz && \
+    gunzip /tmp/apache-tomcat.tar.gz && \
+    tar -C /opt -xf /tmp/apache-tomcat.tar && \
+    ln -s /opt/apache-tomcat-${TOMCAT_VERSION} ${TOMCAT_HOME}
 
 WORKDIR /tmp
 
-# install smk-client war
-RUN wget -O /tmp/smk-client.war $APPBIN/smk-client/$SMKVER/smk-client-$SMKVER.war &&\
-  cp /tmp/smk-client.war ${CATALINA_HOME}/webapps
+#Copy SMK api
+RUN wget -O /tmp/smks-api.war $APPBIN/smks-api/$SMKVER/smks-api-$SMKVER.war \
+  && mkdir -p ${TOMCAT_HOME}/webapps/smks-api \
+  && unzip /tmp/smks-api.war -d ${TOMCAT_HOME}/webapps/smks-api
 
-# install smk-ui war
-RUN wget -O /tmp/smk-ui.war $APPBIN/smk-ui/$SMKVER/smk-ui-$SMKVER.war &&\
-  cp /tmp/smk-ui.war ${CATALINA_HOME}/webapps
+#Copy client war
+RUN wget -O /tmp/smk-client.war $APPBIN/smk-client/$SMKVER/smk-client-$SMKVER.war \
+  && cp /tmp/smk-client.war ${TOMCAT_HOME}/webapps \
+  && cp /tmp/smk-client.war ${TOMCAT_HOME}/webapps/smks-api/WEB-INF/classes/
 
-# install smks-api war
-RUN wget -O /tmp/smks-api.war $APPBIN/smks-api/$SMKVER/smks-api-$SMKVER.war &&\
-  mkdir -p ${CATALINA_HOME}/webapps/smks-api &&\
-  unzip /tmp/smks-api.war -d ${CATALINA_HOME}/webapps/smks-api
+#Copy SMK Admin UI
+RUN wget -O /tmp/smk-ui.war $APPBIN/smk-ui/$SMKVER/smk-ui-$SMKVER.war \
+  && cp /tmp/smk-ui.war ${TOMCAT_HOME}/webapps
 
-# install couchdb password
-RUN echo "couchdb.admin.password=$COUCHPW" >> ${CATALINA_HOME}/webapps/smks-api/WEB-INF/classes/application.properties
+RUN echo "couchdb.admin.password=password" >> ${TOMCAT_HOME}/webapps/smks-api/WEB-INF/classes/application.properties
 
 # add a tomcat user
 RUN adduser -S tomcat

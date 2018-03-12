@@ -11,7 +11,7 @@ node ('master'){
 
     stage ('OpenShift Build'){
     openshiftBuild apiURL: 'https://console.pathfinder.gov.bc.ca', authToken: '${OCP_TOKEN}', bldCfg: 'smk', buildName: '', checkForTriggeredDeployments: 'true', commitID: '', env: [
-            [name: 'APPBIN', value: 'http://delivery.apps.bcgov/artifactory/libs-release-local/ca/bc/gov/databc'],
+            [name: 'APPBIN', value: 'http://delivery.apps.bcgov/artifactory/libs-release-local/ca/bc/gov/app'],
             [name: 'COUCHPW', value: '${COUCHPW}'],
             [name: 'SMKVER', value: '${SMKVER}']
         ], namespace: 'dbc-mapsdk-tools', showBuildLogs: 'true', verbose: 'true', waitTime: '', waitUnit: 'sec'
