@@ -1,0 +1,53 @@
+body {
+    /* font-family: 'Avenir Next W00','Helvetica Neue',Helvetica,Arial,sans-serif; */
+    font-family: Helvetica,Arial,sans-serif;
+}
+
+.smk-map-frame {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+#smk-header {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 70px;
+	border-bottom: 2px solid #fcba19;
+	background-color: #036;
+}
+
+#smk-header-logo {
+    display: inline-block;
+    width: 180px;
+    height: 64px;
+    background-position:    6px 6px;
+    background-repeat:      no-repeat;
+    background-size:        auto 58px;
+}
+
+.smk-default-header-image {
+    background-image:       url( 'bc_gov_logo_transparent.png' );
+}
+
+#smk-header-title {
+    color: white;
+    margin-left:    20px;
+    font-size:      30px;
+    line-height: 64px;
+    vertical-align: bottom;
+    margin-left: 20px;
+}
+
+.smk-viewer {
+    top: 72px;
+}
+
+.smk-overlay {
+    top: 77px;
+}
+

@@ -1,0 +1,857 @@
+<html>
+  <head>
+    <title>Configurations - SMK</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" crossorigin=""></script>
+   	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css">
+   	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+   	<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
+	<!-- Leaflet -->
+	<link rel="stylesheet"
+		  href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css"
+		  integrity="sha512-M2wvCLH6DSRazYeZRIm1JnYyh22purTM+FDB5CsyxtQJYeKq83arPe5wgbNmcFXGqiSH2XR8dT/fJISVA1r/zQ=="
+		  crossorigin=""/>
+	<script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js"
+		    integrity="sha512-lInM/apFSqyy1o6s89K4iQUKg6ppXEgsVxT35HbzUupEVRh2Eu9Wdl4tHj7dZO0s1uvplcYGmt3498TtHq+log=="
+		    crossorigin=""></script>
+	<!-- ESRI Leaflet -->
+	<script src="https://unpkg.com/esri-leaflet@2.1.3/dist/esri-leaflet.js"
+		    integrity="sha512-pijLQd2FbV/7+Jwa86Mk3ACxnasfIMzJRrIlVQsuPKPCfUBCDMDUoLiBQRg7dAQY6D1rkmCcR8286hVTn/wlIg=="
+		    crossorigin=""></script>
+    <link rel="stylesheet" href="https://js.arcgis.com/4.4/esri/css/main.css" />
+    <!-- Quill for text editor -->
+    <script src="https://cdn.quilljs.com/1.3.5/quill.js"></script>
+    <link href="https://cdn.quilljs.com/1.3.5/quill.snow.css" rel="stylesheet">
+    <!-- Tree manager for layer viewers -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.fancytree/2.28.0/jquery.fancytree-all-deps.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/jquery.fancytree/2.28.0/skin-lion/ui.fancytree.min.css"  rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/jquery.fancytree/2.28.0/skin-lion/vline-rtl.gif"  rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/jquery.fancytree/2.28.0/skin-lion/vline.gif"  rel="stylesheet">
+    <!-- smk -->
+    <script src="resources/js/dmf.js"></script>
+    <link rel="stylesheet" type="text/css" href="resources/css/dmf.css" />
+    <!-- tree css override -->
+    <style type="text/css">
+		ul.fancytree-container 
+		{
+		  width: 100%;
+		  height: 70%;
+		  overflow: auto;
+		  position: relative;
+		}
+		</style>
+  </head>
+  <body>
+  	<div id="app">
+	   	<!-- Header section -->
+	 	<div id="header" class="header nrpp-blue-dark">
+		  <image src="resources/images/bc_gov_logo_transparent.png" style="padding: 6px;" />
+		  <span class="white-text" style="font-size: 30px; top: 18px; position: absolute; margin-left: 15px;">Simple Map Kit Configuration Utility</span>
+		</div>
+		<!-- Background map image -->
+		<div id="map" style="width: 100%; height: calc(100vh - 110px); position: absolute; z-index: -10;" ></div>
+		<div style="width: 100%; height: calc(100vh - 110px); position: absolute; background: rgba(0, 0, 0, 0.3);" ></div>
+		<!-- Main app panels -->
+		<!-- Content -->
+	    <div id="menu-content" class="container" style="margin-top: 14px; min-width: 800px;">
+		  <div class="row">
+		    <div class="col s12">
+			  <div class="card white">
+			    <div class="card-content black-text">
+				  <div class="row" style="padding: 0px; margin-bottom: 0px;">
+					<div class="col s12">
+						<h3>Welcome to the Simple Map Kit</h3>
+					</div>
+				  </div>
+				  <div class="row" style="padding: 0px;">
+					<div class="col s12">
+						<p>The Simple Map Kit allows you to create custom linkable and embedable
+						maps using data mashed up from DataBC's catalog, GeoServer and other external sources.
+						To view your map or create a new one, check the "My Maps" tab below. To discover
+						other maps, check out "All Maps". To learn more about SMK, check the about tab.</p>
+					</div>
+				  </div>
+				</div>
+			  </div>
+			</div>
+		  </div>
+		  <div class="row">
+		  	<div class="col s12">
+		  	  <ul class="tabs navbar tabs-fixed-width nrpp-blue-dark">
+				<div class="indicator nrpp-yellow" style="z-index:1"></div>
+				<li class="tab col s3"><a class="active" href="#editCopyMaps">Maps</a></li>
+				<li class="tab col s3"><a href="#publishedMaps">Published Maps</a></li>
+				<li class="tab col s3"><a href="#about">About</a></li>
+			  </ul>
+			</div>
+	        <div id="editCopyMaps" class="col s12">
+		      <div class="card white">
+	            <div class="card-content black-text" style="height: calc(100vh - 510px); overflow: auto;">
+	            <div id="loadingBar">
+	            	<div class="row">
+	            		<div class="col s12">
+	            			<p>Loading...</p>
+	            		</div>
+	            	</div>
+	            	<div class="row">
+	            		<div class="col s12">
+		            		<div  class="progress">
+		      		  			<div class="indeterminate"></div>
+		  					</div>
+		  				</div>
+		  			</div>
+	  			</div>
+	  			<div id="appsTablePanel" style="display: none;">
+		          <p>Click on a maps name to preview. To edit the working copy of an application, click "edit" in the actions.</p>
+		            <div>
+	                  <table class="bordered highlight responsive-table" id="appsTable">
+	                    <thead>
+	                      <tr>
+	                        <th>Name</th>
+	                        <th>Viewer</th>
+	                        <th>Version</th>
+	                        <th></th>
+	                        <th></th>
+	                        <th></th>
+	                      </tr>
+	                    </thead>
+	                    <tbody>
+	                    </tbody>
+	                  </table>
+				    </div>
+				   	</div>
+			      </div>
+			      <div class="card-action">
+				    <a href="#" onclick="addNewMapConfig();" class="blue-text">Create a new Map</a>
+			     </div>
+		       </div>
+	         </div>
+	         <div id="publishedMaps" class="col s12">
+	           <div class="card white">
+	            <div class="card-content black-text" style="height: calc(100vh - 460px); overflow: auto;">
+	  			<div>
+		          <p>Click on a maps name to preview. To edit the working copy of an application, click "edit" in the actions.</p>
+		            <div>
+	                  <table class="bordered highlight responsive-table" id="publishedAppsTable">
+	                    <thead>
+	                      <tr>
+	                        <th>Name</th>
+	                        <th>Viewer</th>
+	                        <th>Version</th>
+	                        <th></th>
+	                        <th></th>
+	                      </tr>
+	                    </thead>
+	                    <tbody>
+	                    </tbody>
+	                  </table>
+				    </div>
+				   	</div>
+			      </div>
+		       </div>
+	         </div>
+	         <div id="about" class="col s12">
+	         	<div class="card white">
+	            	<div class="card-content black-text" style="height: calc(100vh - 460px); overflow: auto;">
+	  					<div>
+		          			<p>The Simple Map Kit is a Map Configuration application that allows you to create custom web mapping applications.</p>
+		          			<p>The same configurations can be used across multiple different viewers, including Leaflet, ArcGIS JS, OpenLayers, and more to come.</p>
+		          			<p>Map applications can be accessed directly from the SMK REST Service API, or applications can be exported and embedded in your own web application.</p>
+				   		</div>
+			      	</div>
+		       	</div>
+	         </div>
+	       </div>
+	    </div>
+	    <div id="editor-content" class="container" style="margin-top: 14px; min-width: 800px; display: block;">
+		  <div class="row">
+			<div class="col s12">
+			  <ul class="tabs navbar tabs-fixed-width nrpp-blue-dark">
+				<div class="indicator nrpp-yellow" style="z-index:1"></div>
+				<li class="tab col s3"><a class="active" href="#identity">Identity</a></li>
+				<li class="tab col s3"><a href="#basemap" onclick="resetBasemapView()">Basemap</a></li>
+				<li class="tab col s3"><a href="#layers">Layers</a></li>
+				<li class="tab col s3"><a href="#tools">Tools</a></li>
+				<li class="tab col s3"><a href="#themes">Style &amp; Theme</a></li>
+			  </ul>
+			</div>
+			<div id="identity" class="col s12">
+				<div class="card white">
+					<div class="card-content black-text" style="height: calc(100vh - 200px); overflow: auto;">
+						<form id="identityForm">
+							<div class="row" style="margin-bottom: 0px;">
+								<div class="col s12 input-field">
+									<input id="mashupName" type="text" class="validate active" v-model="lmfId">
+	          						<label for="mashupName">ID</label>
+								</div>
+							</div>
+							<div class="row" style="margin-bottom: 0px;">
+								<div class="col s12 input-field">
+									<input id="mashupTitle" type="text" class="validate active" v-model="name">
+									<label for="mashupTitle">Title</label>
+								</div>
+							</div>
+							<div class="row" style="margin-top: 20px;">
+								<div class="col s12">
+									<p>What kind of map viewer do you want to use?</p>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col s12">
+								  <p>
+								     <input name="viewerGroup" type="radio" id="leafletViewer" value="leaflet" v-model="viewer.type" />
+								     <label for="leafletViewer">Leaflet</label>
+								  </p>
+	    						  <p>
+								     <input name="viewerGroup" type="radio" id="esri3dViewer" value="esri3d" v-model="viewer.type">
+								     <label for="esri3dViewer">ESRI ArcGIS 3D</label>
+								  </p>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+			<div id="basemap" class="col s12">
+				<div class="card white">
+					<div class="card-content black-text" style="height: calc(100vh - 200px); overflow: auto;">
+						<form id="basemapForm">
+							<div class="row" style="padding: 0px;">
+								<div class="col s4">
+									<p>
+										<input name="basemapGroup" type="radio" onclick="setBasemap('Streets')" id="Streets" value="Streets" v-model="viewer.baseMap" />
+										<label class="black-text" for="Streets">Streets</label>
+									</p>
+									<p>
+										<input name="basemapGroup" type="radio" onclick="setBasemap('Topographic')" id="Topographic" value="Topographic" v-model="viewer.baseMap" />
+										<label class="black-text" for="Topographic">Topographic</label>
+									</p>
+									<p>
+										<input name="basemapGroup" type="radio" onclick="setBasemap('NationalGeographic')" id="NationalGeographic" value="NationalGeographic" v-model="viewer.baseMap" />
+										<label class="black-text" for="NationalGeographic">National Geographic</label>
+									</p>
+									<p>
+										<input name="basemapGroup" type="radio" onclick="setBasemap('Oceans')" id="Oceans" value="Oceans" v-model="viewer.baseMap" />
+										<label class="black-text" for="Oceans">Oceans</label>
+									</p>
+									<p>
+										<input name="basemapGroup" type="radio" onclick="setBasemap('Gray')" id="Gray" value="Gray" v-model="viewer.baseMap" />
+										<label class="black-text" for="Gray">Gray</label>
+									</p>
+									<p>
+										<input name="basemapGroup" type="radio" onclick="setBasemap('DarkGray')" id="DarkGray" value="DarkGray" v-model="viewer.baseMap" />
+										<label class="black-text" for="DarkGray">Dark Gray</label>
+									</p>
+									<p>
+										<input name="basemapGroup" type="radio" onclick="setBasemap('Imagery')" id="Imagery" value="Imagery" v-model="viewer.baseMap" />
+										<label class="black-text" for="Imagery">Imagery</label>
+									</p>
+									<p>
+										<input name="basemapGroup" type="radio" onclick="setBasemap('ImageryClarity')" id="ImageryClarity" value="ImageryClarity" v-model="viewer.baseMap" />
+										<label class="black-text" for="ImageryClarity">Advanced Imagery</label>
+									</p>
+									<p>
+										<input name="basemapGroup" type="radio" onclick="setBasemap('ShadedRelief')" id="ShadedRelief" value="ShadedRelief" v-model="viewer.baseMap" />
+										<label class="black-text" for="ShadedRelief">Shaded Relief</label>
+									</p>
+									<p>
+										<input name="basemapGroup" type="radio" onclick="setBasemap('Terrain')" id="Terrain" value="Terrain" v-model="viewer.baseMap" />
+										<label class="black-text" for="Terrain">Terrain</label>
+									</p>
+									<div style="height: 20px;"></div>
+									<p>
+										Select a basemap above to set your applications default basemap. Pan and zoom the map to the right to set the applications initial extent.
+									</p>
+									<!-- <div style="height: 20px;"></div>
+									<p class="z-depth-2">
+										Current extent: {{viewer.initialExtent[0]}}, {{viewer.initialExtent[1]}}, {{viewer.initialExtent[2]}}, {{viewer.initialExtent[3]}}
+									</p>-->
+								</div>
+								<div class="col s8">
+									<div id="basemapViewer" style="height: 100%; width: 100%;"></div>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+			<div id="layers" class="col s12">
+				<div class="card white">
+					<div class="card-content black-text" style="height: calc(100vh - 200px); overflow: auto;">
+						<form id="layersForm">
+							<div id="editLayerPanel" class="row" style="height: 100%; display: none;">
+								<div style="position: absolute; bottom: 20px; right: 20px; z-index: 1100;">
+									<!-- a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="finishLayerEdits(true);" style="width: 200px;"><i class="material-icons left">save</i>Keep Changes</a -->
+									<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="finishLayerEdits(true);" style="width: 150px;"><i class="material-icons left">cancel</i>Close</a>
+								</div>
+								<div style="height: 100%;">
+									<div id="layerEditDataBCPanel" class="col s6" style="display: none; overflow: auto; height: 100%;">
+										<div style="height: 100%; margin-left: 10px;">
+											<div class="row">
+												<h5>DataBC Catalog Layer</h5>
+											</div>
+											<div class="row">
+												<p>
+													<input type="checkbox" id="dbcVisible" />
+													<label class="black-text" for="dbcVisible">Visible</label>
+												</p>
+											</div>
+											<div class="row">
+												<div class="col s12 input-field">
+													<input id="dbcName" type="text">
+					          						<label for="dbcName">Title</label>
+												</div>
+											</div>
+											<div class="row">
+												<div class="col s12 input-field">
+													<input id="dbcAttribution" type="text">
+					          						<label for="dbcAttribution">Attribution</label>
+												</div>
+											</div>
+											<div class="row">
+												<div class="col s12 input-field">
+													<input id="dbcOpacity" type="text">
+					          						<label for="dbcOpacity">Opacity</label>
+												</div>
+											</div>
+											<div id="dbcAttributes">
+											</div>
+										</div>
+									</div>
+									<div id="layerEditWMSPanel" class="col s6" style="display: none; overflow: auto; height: 100%;">
+										<div style="height: 100%; margin-left: 10px;">
+											<div class="row">
+												<h5>WMS Service Layer</h5>
+											</div>
+											<div class="row">
+												<p>
+													<input type="checkbox" id="wmsVisible" />
+													<label class="black-text" for="wmsVisible">Visible</label>
+												</p>
+											</div>
+											<div class="row">
+												<div class="col s12 input-field">
+													<input id="wmsName" type="text">
+					          						<label for="wmsName">Title</label>
+												</div>
+											</div>
+											<div class="row">
+												<div class="col s12 input-field">
+													<input id="wmsAttribution" type="text">
+					          						<label for="wmsAttribution">Attribution</label>
+												</div>
+											</div>
+											<div class="row">
+												<div class="col s12 input-field">
+													<input id="wmsOpacity" type="text">
+					          						<label for="wmsOpacity">Opacity</label>
+												</div>
+											</div>
+											<div id="wmsAttributes">
+											</div>
+										</div>
+									</div>
+									<div id="layerEditVectorPanel" class="col s6" style="display: none; overflow: auto; height: 100%;">
+										<div class="row">
+											<h5>File Upload Layer</h5>
+										</div>
+										<div class="row" >
+						    				<div class="col s12 input-field">
+												<input id="vectorName" type="text">
+				          						<label for="vectorName">Name</label>
+											</div>
+										</div>
+										<div class="row">
+											<div class="file-field input-field">
+												<div class="btn">
+													<span>Replace Data</span>
+													<input type="file" id="replaceVectorFileUpload">
+												</div>
+												<div class="file-path-wrapper">
+													<input class="file-path validate" type="text">
+												</div>
+											</div>
+										</div>
+										<div class="row" >
+											<div class="col s4">
+												<input type="checkbox" id="vectorVisible" />
+												<label class="black-text" for="vectorVisible">Visible</label>
+											</div>
+											<div class="col s4">
+												<input type="checkbox" id="vectorClustering" />
+												<label class="black-text" for="vectorClustering">Cluster Points</label>
+											</div>
+											<div class="col s4">
+												<input type="checkbox" id="vectorHeatmapping" />
+												<label class="black-text" for="vectorHeatmapping">Heatmap Points</label>
+											</div>
+						      			</div>
+						      			<div class="row">
+						      				<div class="col s4 input-field">
+												<input id="vectorOpacity" type="text">
+				          						<label for="vectorOpacity">Layer Opacity</label>
+											</div>
+											<div class="col s4 input-field">
+												<input id="vectorStrokeOpacity" type="text">
+				          						<label for="vectorStrokeOpacity">Stroke Opacity</label>
+											</div>
+											<div class="col s4 input-field">
+												<input id="vectorFillOpacity" type="text">
+				          						<label for="vectorFillOpacity">Fill Opacity</label>
+											</div>
+						      			</div>
+						      			<div class="row" >
+						    				<div class="col s4 input-field">
+												<input id="vectorStrokeWidth" type="text">
+				          						<label for="vectorStrokeWidth">Stroke Width</label>
+											</div>
+											<div class="col s4 input-field">
+												<input id="vectorStrokeStyle" type="text">
+				          						<label for="vectorStrokeStyle">Stroke Style</label>
+											</div>
+						      			</div>
+						      			<div class="row" >
+						    				<div class="col s4">
+						    					<label for="vectorStrokeColor" class="black-text">Stroke Color</label>
+												<input id="vectorStrokeColor" type="color">
+											</div>
+											<div class="col s4">
+						    					<label for="vectorFillColor" class="black-text">Fill Color</label>
+												<input id="vectorFillColor" type="color">
+											</div>
+						      			</div>
+						      			<div id="vectorAttributes">
+										</div>
+									</div>
+									<div class="col s6">
+										<div id="layerPreviewViewer" style="height: 100%; width: 100%;"></div>
+									</div>
+								</div>
+							</div>
+							<div id="layerAddPanel" class="row" style="display: block;">
+								<div class="col s6">
+									  <ul id="layerTypeTabs" class="tabs navbar tabs-fixed-width nrpp-blue-dark">
+										<div class="indicator nrpp-yellow" style="z-index:1"></div>
+										<li class="tab col s3"><a class="active" href="#dbcCatalog">DataBC</a></li>
+										<li class="tab col s3"><a href="#wmsCatalog">WMS</a></li>
+										<li class="tab col s3"><a href="#kmlLoad">File Upload</a></li>
+									  </ul>
+										<div id="dbcCatalog" class="col s12">
+							    			<div class="row" >
+							    				<div id="catalog-tree"></div>
+							      			</div>
+							      			<div class="row" >
+							      				<a href="#" onclick="addSelectedDataBCLayer();" class="blue-text">Add Selected Layers</a>
+							      			</div>
+								    	</div>
+								    	<div id="wmsCatalog" class="col s12">
+							    			<div class="row" style="padding: 5px; margin: 0px;">
+							    				<div class="col s10 input-field">
+													<input id="wmsUrlField" type="text">
+					          						<label for="wmsUrlField">WMS URL</label>
+												</div>
+												<div class="col s2 input-field">
+													<input id="wmsVersionField" type="text">
+					          						<label for="wmsVersionField">Version</label>
+												</div>
+							    			</div>
+							    			<div class="row" style="padding: 0px; margin: 0px;">
+							    				<a href="#" onclick="loadWmsLayers();" class="blue-text">Load WMS layers</a>
+							    			</div>
+							    			<div id="wmsPanelLoading" class="row" style="display: none;">
+							    				<div class="preloader-wrapper big active">
+												    <div class="spinner-layer spinner-blue-only">
+												    	<div class="circle-clipper left">
+												        	<div class="circle"></div>
+												        </div><div class="gap-patch">
+												        	<div class="circle"></div>
+												        </div><div class="circle-clipper right">
+												        	<div class="circle"></div>
+												    	</div>
+													</div>
+												</div>
+							    			</div>
+							    			<div id="wmsPanel">
+								    			<div class="row" >
+								    				<div id="wms-catalog-tree"></div>
+								      			</div>
+								      			<div class="row" >
+								      				<a href="#" onclick="addSelectedWmsLayer();" class="blue-text">Add Selected Layers</a>
+								      			</div>
+							      			</div>
+								  		</div>
+								    	<div id="kmlLoad" class="col s12">
+								    		<div class="row">
+								    			<div class="col s6">
+									    			<div class="file-field input-field">
+														<div class="btn">
+													    	<span>File</span>
+													        <input type="file" id="vectorFileUpload">
+													    </div>
+													    <div class="file-path-wrapper">
+													        <input class="file-path validate" type="text">
+													      </div>
+													    </div>
+												</div>
+												<div class="col s6" style="margin-top: 15px;">
+													<select id="vectorType">
+												      <option value="" disabled selected>Choose vector type</option>
+												      <option value="kml">Kml</option>
+												      <option value="geojson">GeoJSON</option>
+												    </select>
+												</div>
+								    		</div>
+							    			<div class="row" >
+							    				<div class="col s12 input-field">
+													<input id="kmlName" type="text">
+					          						<label for="kmlName">Name</label>
+												</div>
+							      			</div>
+							      			<div class="row">
+							      				<div class="col s4">
+													<input type="checkbox" id="kmlIsVisible" />
+													<label class="black-text" for="kmlIsVisible">Visible</label>
+												</div>
+							      				<div class="col s4">
+													<input type="checkbox" id="kmlClustering" />
+													<label class="black-text" for="kmlClustering">Cluster Points</label>
+												</div>
+												<div class="col s4">
+													<input type="checkbox" id="kmlHeatmapping" />
+													<label class="black-text" for="kmlHeatmapping">Heatmap Points</label>
+												</div>
+							      			</div>
+							      			<div class="row" >
+												<div class="col s4 input-field">
+													<input id="kmlOpacity" type="text">
+					          						<label for="kmlOpacity">Layer Opacity</label>
+												</div>
+												<div class="col s4 input-field">
+													<input id="kmlStrokeOpacity" type="text">
+					          						<label for="kmlStrokeOpacity">Stroke Opacity</label>
+												</div>
+												<div class="col s4 input-field">
+													<input id="kmlFillOpacity" type="text">
+					          						<label for="kmlFillOpacity">Fill Opacity</label>
+												</div>
+							      			</div>
+							      			<div class="row" >
+							      				<div class="col s4 input-field">
+													<input id="kmlStrokeWidth" type="text">
+					          						<label for="kmlStrokeWidth">Stroke Width</label>
+												</div>
+												<div class="col s4 input-field">
+													<input id="kmlStrokeStyle" type="text">
+					          						<label for="kmlStrokeStyle">Stroke Style</label>
+												</div>
+											</div>
+											<div class="row" >
+							    				<div class="col s4">
+													<label for="kmlStrokeColor" class="black-text">Stroke Color</label>
+													<input id="kmlStrokeColor" type="color">
+												</div>
+												<div class="col s4">
+							    					<label for="kmlFillColor" class="black-text">Fill Color</label>
+													<input id="kmlFillColor" type="color">
+												</div>
+							      			</div>
+							      			<div class="row" >
+							      				<a href="#" onclick="uploadVectorLayer();" class="blue-text">Upload Vector Layer</a>
+							      			</div>
+								    	</div>
+									</ul>
+								</div>
+								<div class="col s6">
+									<div id="layerData" style="height: 100%; width: 100%; padding: 20px;">
+										<div class="row" >
+											<h5>Active Layers</h5>
+										</div>
+										<div class="row" >
+						    				<div id="layer-tree"></div>
+						      			</div>
+						      			<div class="row" >
+						      				<a href="#" onclick="editSelectedLayer();" class="blue-text">Edit Selected Layer</a>
+						      				<a href="#" onclick="removeSelectedLayer();" class="blue-text" style="margin-left: 12px;">Remove Selected Layer</a>
+						      				<!-- a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="editSelectedLayer();" style="width: 200px;"><i class="material-icons left">mode_edit</i>Edit</a -->
+						      				<!-- a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="removeSelectedLayer();" style="width: 200px;"><i class="material-icons left">delete_forever</i>Remove</a-->
+						      			</div>
+									</div>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+			<div id="tools" class="col s12">
+				<div class="card white">
+					<div class="card-content black-text" style="height: calc(100vh - 200px); overflow: auto;">
+						<form id="toolsForm">
+							<div class="row" style="height: 100%; width: 100%; padding:0px; margin: 0px;">
+								<div class="col s3">
+									<p><h5>Map Control Tools</h5></p>
+									<p>
+										<input type="checkbox" id="panning" onclick="setToolActivation('pan')"/>
+										<label class="black-text" for="panning">Panning</label>
+									</p>
+									<p>
+										<input type="checkbox" id="zooming" onclick="setToolActivation('zoom')"/>
+										<label class="black-text" for="zooming">Zooming</label>
+									</p>
+									<p>
+										<input type="checkbox" id="directions" onclick="setToolActivation('directions')"/>
+										<label class="black-text" for="directions">Directions</label>
+									</p>
+									<p><h5>Map Information</h5></p>
+									<p>
+										<input type="checkbox" id="coordinates" onclick="setToolActivation('coordinate')"/>
+										<label class="black-text" for="coordinates">Coordinates</label>
+									</p>
+									<p>
+										<input type="checkbox" id="scale" onclick="setToolActivation('scale')"/>
+										<label class="black-text" for="scale">Scale</label>
+									</p>
+									<p>
+										<input type="checkbox" id="minimap" onclick="setToolActivation('minimap')"/>
+										<label class="black-text" for="minimap">Mini Map</label>
+									</p>
+									<p>
+										<input type="checkbox" id="attribution" onclick="setToolActivation('attribution')"/>
+										<label class="black-text" for="attribution">Attribution Label</label>
+									</p>
+									<p><h5>Drawing Tools</h5></p>
+									<p>
+										<input type="checkbox" id="measurement" onclick="setToolActivation('measure')">
+										<label class="black-text" for="measurement">Measurement</label>
+									</p>
+									<p>
+										<input type="checkbox" id="markup" onclick="setToolActivation('markup')"/>
+										<label class="black-text" for="markup">markup</label>
+									</p>
+									<p><h5>Menu Options</h5></p>
+									<p>
+										<input type="checkbox" id="sidebar" onclick="setToolActivation('sidebar')"/>
+										<label class="black-text" for="sidebar">Sidebar</label>
+									</p>
+									<p>
+										<input type="checkbox" id="aboutPanel" onclick="setToolActivation('about')"/>
+										<label class="black-text" for="aboutPanel">About Panel</label>
+									</p>
+									<p>
+										<input type="checkbox" id="basemapPanel" onclick="setToolActivation('baseMaps')"/>
+										<label class="black-text" for="basemapPanel">Base Maps Panel</label>
+									</p>
+									<p>
+										<input type="checkbox" id="layerPanel" onclick="setToolActivation('layers')"/>
+										<label class="black-text" for="layerPanel">Layer Panel</label>
+									</p>
+									<p>
+										<input type="checkbox" id="identifyPanel" onclick="setToolActivation('identify')"/>
+										<label class="black-text" for="identifyPanel">Identify Panel</label>
+									</p>
+									<p>
+										<input type="checkbox" id="selectionPanel" onclick="setToolActivation('select')"/>
+										<label class="black-text" for="selectionPanel">Selection Panel</label>
+									</p>
+									<p>
+										<input type="checkbox" id="searchPanel" onclick="setToolActivation('search')"/>
+										<label class="black-text" for="searchPanel">Search Panel</label>
+									</p>
+								</div>
+								<div class="col s9">
+									<div id="toolEditContainer">
+										<ul class="collapsible" data-collapsible="accordion">
+											<li id="aboutPanelOptions" style="display: none;">
+										      <div class="collapsible-header"><i class="material-icons">home</i>About Panel Options</div>
+										      <div class="collapsible-body">
+										      	<div class="row" >
+										      		<div id="about-toolbar"></div>
+										      		<div id="about-content" style="height: 75%"></div>
+										      	</div>
+											  </div>
+										    </li>
+										    <li id="zoomOptions" style="display: none;">
+										      <div class="collapsible-header"><i class="material-icons">zoom_out_map</i>Zooming Tool Options</div>
+										      <div class="collapsible-body">
+										      	<div class="row">
+										      		<p>
+														<input type="checkbox" id="zoomControl" onclick="toggleZoomOption('control')"/>
+														<label class="black-text" for="zoomControl">Zoom control visible on map</label>
+													</p>
+													<p>
+														<input type="checkbox" id="zoomBox" onclick="toggleZoomOption('box')"/>
+														<label class="black-text" for="zoomBox">Zoom with Box</label>
+													</p>
+													<p>
+														<input type="checkbox" id="zoomDoubleClick" onclick="toggleZoomOption('doubleClick')"/>
+														<label class="black-text" for="zoomDoubleClick">Zoom in by double-click</label>
+													</p>
+													<p>
+														<input type="checkbox" id="zoomMouseWheel" onclick="toggleZoomOption('mouseWheel')"/>
+														<label class="black-text" for="zoomMouseWheel">Zoom with mouse wheel</label>
+													</p>
+												</div>
+											  </div>
+										    </li>
+										    <li id="scaleOptions" style="display: none;">
+										      <div class="collapsible-header"><i class="material-icons">my_location</i>Scale Tool Options</div>
+										      <div class="collapsible-body">
+										      	<div class="row">
+										      		<p>
+														<input type="checkbox" id="scaleBar" onclick="toggleScaleOption('bar')"/>
+														<label class="black-text" for="scaleBar">Show a scale bar on map</label>
+													</p>
+													<p>
+														<input type="checkbox" id="scaleFactor" onclick="toggleScaleOption('factor')"/>
+														<label class="black-text" for="scaleFactor">Show the scale factor on map</label>
+													</p>
+												</div>
+											  </div>
+										    </li>
+										    <li id="minimapOptions" style="display: none;">
+										      <div class="collapsible-header"><i class="material-icons">satellite</i>Mini Map Options</div>
+										      <div class="collapsible-body">
+										      	<div class="row">
+										      		<p>
+										      			Select which basemap to use on the mini map
+										      		</p>
+										      		<p>
+														<input name="minimapGroup" type="radio" onclick="setMinimapBasemap('Streets')" id="StreetsMini" value="Streets" />
+														<label class="black-text" for="StreetsMini">Streets</label>
+													</p>
+													<p>
+														<input name="minimapGroup" type="radio" onclick="setMinimapBasemap('Topographic')" id="TopographicMini" value="Topographic" />
+														<label class="black-text" for="TopographicMini">Topographic</label>
+													</p>
+													<p>
+														<input name="minimapGroup" type="radio" onclick="setMinimapBasemap('NationalGeographic')" id="NationalGeographicMini" value="NationalGeographic" />
+														<label class="black-text" for="NationalGeographicMini">National Geographic</label>
+													</p>
+													<p>
+														<input name="minimapGroup" type="radio" onclick="setMinimapBasemap('Oceans')" id="OceansMini" value="Oceans" />
+														<label class="black-text" for="OceansMini">Oceans</label>
+													</p>
+													<p>
+														<input name="minimapGroup" type="radio" onclick="setMinimapBasemap('Gray')" id="GrayMini" value="Gray" />
+														<label class="black-text" for="GrayMini">Gray</label>
+													</p>
+													<p>
+														<input name="minimapGroup" type="radio" onclick="setMinimapBasemap('DarkGray')" id="DarkGrayMini" value="DarkGray" />
+														<label class="black-text" for="DarkGrayMini">Dark Gray</label>
+													</p>
+													<p>
+														<input name="minimapGroup" type="radio" onclick="setMinimapBasemap('Imagery')" id="ImageryMini" value="Imagery" />
+														<label class="black-text" for="ImageryMini">Imagery</label>
+													</p>
+													<p>
+														<input name="minimapGroup" type="radio" onclick="setMinimapBasemap('ImageryClarity')" id="ImageryClarityMini" value="ImageryClarity" />
+														<label class="black-text" for="ImageryClarityMini">Advanced Imagery</label>
+													</p>
+													<p>
+														<input name="minimapGroup" type="radio" onclick="setMinimapBasemap('ShadedRelief')" id="ShadedReliefMini" value="ShadedRelief" />
+														<label class="black-text" for="ShadedReliefMini">Shaded Relief</label>
+													</p>
+													<p>
+														<input name="minimapGroup" type="radio" onclick="setMinimapBasemap('Terrain')" id="TerrainMini" value="Terrain" />
+														<label class="black-text" for="TerrainMini">Terrain</label>
+													</p>
+										      	</div>
+											  </div>
+										    </li>
+										    <li id="basemapPanelOptions" style="display: none;">
+										      <div class="collapsible-header"><i class="material-icons">map</i>Base Maps Panel Options</div>
+										      <div class="collapsible-body">
+										      		<p>
+										      			Select which basemaps to make available in the Basemap selector
+										      		</p>
+										      		<p>
+														<input type="checkbox" onclick="setBasemapSelector('Streets')" id="StreetsBml" value="Streets" />
+														<label class="black-text" for="StreetsBml">Streets</label>
+													</p>
+													<p>
+														<input type="checkbox" onclick="setBasemapSelector('Topographic')" id="TopographicBml" value="Topographic" />
+														<label class="black-text" for="TopographicBml">Topographic</label>
+													</p>
+													<p>
+														<input type="checkbox" onclick="setBasemapSelector('NationalGeographic')" id="NationalGeographicBml" value="NationalGeographic" />
+														<label class="black-text" for="NationalGeographicBml">National Geographic</label>
+													</p>
+													<p>
+														<input type="checkbox" onclick="setBasemapSelector('Oceans')" id="OceansBml" value="Oceans" />
+														<label class="black-text" for="OceansBml">Oceans</label>
+													</p>
+													<p>
+														<input type="checkbox" onclick="setBasemapSelector('Gray')" id="GrayBml" value="Gray" />
+														<label class="black-text" for="GrayBml">Gray</label>
+													</p>
+													<p>
+														<input type="checkbox" onclick="setBasemapSelector('DarkGray')" id="DarkGrayBml" value="DarkGray" />
+														<label class="black-text" for="DarkGrayBml">Dark Gray</label>
+													</p>
+													<p>
+														<input type="checkbox" onclick="setBasemapSelector('Imagery')" id="ImageryBml" value="Imagery" />
+														<label class="black-text" for="ImageryBml">Imagery</label>
+													</p>
+													<p>
+														<input type="checkbox" onclick="setBasemapSelector('ImageryClarity')" id="ImageryClarityBml" value="ImageryClarity" />
+														<label class="black-text" for="ImageryClarityBml">Advanced Imagery</label>
+													</p>
+													<p>
+														<input type="checkbox" onclick="setBasemapSelector('ShadedRelief')" id="ShadedReliefBml" value="ShadedRelief" />
+														<label class="black-text" for="ShadedReliefBml">Shaded Relief</label>
+													</p>
+													<p>
+														<input type="checkbox" onclick="setBasemapSelector('Terrain')" id="TerrainBml" value="Terrain" />
+														<label class="black-text" for="TerrainBml">Terrain</label>
+													</p>
+											  </div>
+										    </li>
+										  </ul>
+									</div>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+			<div id="themes" class="col s12">
+				<div class="card white">
+					<div class="card-content black-text" style="height: calc(100vh - 200px); overflow: auto;">
+						<form id="themesForm">
+							<div style="position: absolute; bottom: 20px; right: 20px; z-index: 1100;">
+								<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="uploadSurroundHeader();"><i class="material-icons left">backup</i>Keep Changes</a>
+							</div>
+							<div class="row">
+								<h5>Header Image</h5>
+							</div>
+							<div class="row">
+								<p>Upload a header image to replace the default header style.</p>
+								<p>Once you've selected a file, click "Keep Changes" to load the file. It will be saved to your map once you click the save button.</p>
+							</div>
+							<div class="row">
+								<div class="file-field input-field">
+									<div class="btn">
+										<span>File</span>
+										<input type="file" id="headerImageFileUpload">
+									</div>
+									<div class="file-path-wrapper">
+										<input class="file-path validate" type="text">
+									</div>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		  </div>
+		  	<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="previewEdits();" style="position: fixed; bottom: 176px; left: 14px; width: 170px;"><i class="material-icons left">cached</i>Preview</a>
+		  	<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="saveMapConfig();" style="position: fixed; bottom: 110px; left: 14px; width: 170px;"><i class="material-icons left">save</i>Save</a>
+		  	<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="closeEditPanel();" style="position: fixed; bottom: 44px; left: 14px; width: 170px;"><i class="material-icons left">cancel</i>Close</a>
+	    </div>
+		<!-- Footer -->
+		<div id="footer" class="footer nrpp-blue-dark">
+		</div>
+	</div>
+	<script type="text/javascript">
+	</script>
+  </body>
+</html>
