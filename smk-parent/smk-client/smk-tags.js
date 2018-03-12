@@ -130,9 +130,9 @@ exports.gen = function () {
         .tag( "leaflet" )
         .script( "resources/js/NonTiledLayer-src.js" )
         .script( "https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-omnivore/v0.3.1/leaflet-omnivore.min.js" )
-        // .script( "https://unpkg.com/terraformer@1.0.7" )
-        // .script( "https://unpkg.com/terraformer-arcgis-parser@1.0.5" )
-        // .script( "https://unpkg.com/terraformer-wkt-parser@1.1.2" )
+        .script( "https://unpkg.com/terraformer@1.0.7" )
+        .script( "https://unpkg.com/terraformer-arcgis-parser@1.0.5" )
+        .script( "https://unpkg.com/terraformer-wkt-parser@1.1.2" )
         .script( "https://npmcdn.com/@turf/turf/turf.min.js" )
 
     // esri3d
