@@ -55,8 +55,17 @@
     var script = document.currentScript
 
     try {
-        var scriptConfig = JSON.parse( script.innerText.trim().replace( /^\s*\/\/.*$/mg, '' ).replace( /^\s*return\s*/mg, '' ) )
+        var inner = script.innerText.trim().replace( /^\s*\/\/.*$/mg, '' ).replace( /^\s*return\s*/mg, '' )
         script.innerText = ''
+        if ( inner )
+            try {
+                var scriptConfig = JSON.parse( inner )
+            }
+            catch ( e ) {
+                console.warn( e )
+                scriptConfig = inner
+            }
+
     }
     catch ( e ) {
         console.warn( 'parsing config:', e )
@@ -83,7 +92,7 @@
         config:         scriptConfig,
     }
 
-    if ( arg.config.error ) {
+    if ( arg.config && arg.config.error ) {
         document.getElementById( arg.containerId ).innerHTML = '<h1 class="error">Startup error: ' + arg.config.error + '</h1>';
         return
     }
@@ -92,9 +101,9 @@
         initializeSMK( arg )
     }
     else {
-        var el = document.createElement( 'script' )
         var includeBase = ( new URL( script.src.replace( 'smk-bootstrap.js', '' ), document.location ) ).toString()
 
+        var el = document.createElement( 'script' )
         el.addEventListener( 'load', function( ev ) {
             include.option( { baseUrl: new URL( includeBase, document.location ).toString() } )
             initializeSMK( arg )
@@ -102,11 +111,7 @@
         el.addEventListener( 'error', function( ev ) {
             throw new Error( 'failed to load script from ' + el.src )
         } )
-
-        el.setAttribute( 'src',        includeBase + '/lib/include.js' )
-    // el.setAttribute( 'data-main',  '/service/lib/main.js' )
-    // el.setAttribute( 'data-arg',   JSON.stringify( arg ) )
-    // el.setAttribute( 'data-tags',  'tags.json' )
+        el.setAttribute( 'src', includeBase + '/lib/include.js' )
 
         document.getElementsByTagName( 'head' )[ 0 ].appendChild( el )
 
