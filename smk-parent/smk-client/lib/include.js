@@ -6,7 +6,7 @@
     var TAG = {}
     var OPTION = {
         baseUrl: document.location,
-        timeout: 5000
+        timeout: 30 * 1000
     }
 
     function includeTag( tag, attr ) {
@@ -476,6 +476,7 @@
     window.include.tag = includeTag
     window.include.hash = hash
     window.include.option = option
+    window.include.parseJSONC = parseJSONC
 
 } )()
 
