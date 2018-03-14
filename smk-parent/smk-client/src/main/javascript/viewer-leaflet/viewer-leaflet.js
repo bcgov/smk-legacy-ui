@@ -1,19 +1,19 @@
 include.module( 'viewer-leaflet', [ 'viewer', 'leaflet' ], function () {
 
     function ViewerLeaflet() {
-        SMK.TYPE.ViewerBase.prototype.constructor.apply( this, arguments )
+        SMK.TYPE.Viewer.prototype.constructor.apply( this, arguments )
     }
 
     if ( !SMK.TYPE.Viewer ) SMK.TYPE.Viewer = {}
     SMK.TYPE.Viewer.leaflet = ViewerLeaflet
 
-    $.extend( ViewerLeaflet.prototype, SMK.TYPE.ViewerBase.prototype )
+    $.extend( ViewerLeaflet.prototype, SMK.TYPE.Viewer.prototype )
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
     ViewerLeaflet.prototype.initialize = function ( smk ) {
         var self = this
 
-        SMK.TYPE.ViewerBase.prototype.initialize.apply( this, arguments )
+        SMK.TYPE.Viewer.prototype.initialize.apply( this, arguments )
 
         this.deadViewerLayer = {}
 
@@ -63,6 +63,27 @@ include.module( 'viewer-leaflet', [ 'viewer', 'leaflet' ], function () {
         function changedView() {
             self.changedView( self.getView() )
         }
+
+        self.map.on( 'click', function ( ev ) {
+            self.pickedLocation( {
+                map:    ev.latlng,
+                screen: ev.containerPoint,
+            } )
+            // var bbox = vw.map.getBounds().toBBoxString()
+            // var size = vw.map.getSize()
+
+            // vw.identifyFeatures.call( vw, {
+            //     point:    ev.latlng,
+            //     bbox:     bbox,
+
+            //     position: ev.containerPoint,
+            //     size: {
+            //         width:  size.x,
+            //         height: size.y
+            //     }
+            // } )
+        } )
+
     }
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //

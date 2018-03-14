@@ -6,10 +6,11 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
         'startedLoading',
         'finishedLoading',
         'startedIdentify',
-        'finishedIdentify'
+        'finishedIdentify',
+        'pickedLocation'
     ] )
 
-    function ViewerBase() {
+    function Viewer() {
         var self = this
 
         ViewerEvent.prototype.constructor.call( this )
@@ -29,12 +30,12 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
         } )
     }
 
-    SMK.TYPE.ViewerBase = ViewerBase
+    SMK.TYPE.Viewer = Viewer
 
-    $.extend( ViewerBase.prototype, ViewerEvent.prototype )
+    $.extend( Viewer.prototype, ViewerEvent.prototype )
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
-    ViewerBase.prototype.basemap = {
+    Viewer.prototype.basemap = {
         Topographic: {
             order: 1,
             title: 'Topographic'
@@ -74,11 +75,11 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
     }
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
-    ViewerBase.prototype.destroy = function () {
+    Viewer.prototype.destroy = function () {
         ViewerEvent.prototype.destroy()
     }
 
-    ViewerBase.prototype.initialize = function ( smk ) {
+    Viewer.prototype.initialize = function ( smk ) {
         var self = this
 
         this.lmfId = smk.lmfId
@@ -113,9 +114,15 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
 
                 return lyConfig.id
             } )
+
+        this.pickedLocation( function () {
+            var enabledTools = Object.values( smk.$tool ).filter( function ( t ) { t.enabled } )
+
+
+        } )
     }
 
-    ViewerBase.prototype.initializeLayers = function ( smk ) {
+    Viewer.prototype.initializeLayers = function ( smk ) {
         var self = this;
 
         if ( !smk.layers || smk.layers.length == 0 ) return SMK.UTIL.resolved()
@@ -125,7 +132,7 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
     }
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
-    ViewerBase.prototype.setLayersVisible = function ( layerIds, visible ) {
+    Viewer.prototype.setLayersVisible = function ( layerIds, visible ) {
         var self = this
 
         var layerCount = this.layerIds.length
@@ -195,13 +202,13 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
         return SMK.UTIL.waitAll( promises )
     }
 
-    ViewerBase.prototype.addViewerLayer = function ( viewerLayer ) {
+    Viewer.prototype.addViewerLayer = function ( viewerLayer ) {
     }
 
-    ViewerBase.prototype.positionViewerLayer = function ( viewerLayer, zOrder ) {
+    Viewer.prototype.positionViewerLayer = function ( viewerLayer, zOrder ) {
     }
 
-    ViewerBase.prototype.createViewerLayer = function ( id, layers, zIndex ) {
+    Viewer.prototype.createViewerLayer = function ( id, layers, zIndex ) {
         var self = this
 
         if ( layers.length == 0 )
@@ -233,7 +240,7 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
             } )
     }
 
-    ViewerBase.prototype.afterCreateViewerLayer = function ( id, type, layers, viewerLayer ) {
+    Viewer.prototype.afterCreateViewerLayer = function ( id, type, layers, viewerLayer ) {
         viewerLayer._smk_type = type
         viewerLayer._smk_id = id
 
@@ -241,7 +248,7 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
     }
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
-    ViewerBase.prototype.identifyFeatures = function ( arg ) {
+    Viewer.prototype.identifyFeatures = function ( arg ) {
         var self = this
 
         this.startedIdentify()
@@ -280,7 +287,7 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
     }
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
-    ViewerBase.prototype.anyLayersLoading = function () {
+    Viewer.prototype.anyLayersLoading = function () {
         var self = this
 
         return this.layerIds.some( function ( id ) {
@@ -289,7 +296,7 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
     }
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
-    ViewerBase.prototype.resolveAttachmentUrl = function ( attachmentId, type ) {
+    Viewer.prototype.resolveAttachmentUrl = function ( attachmentId, type ) {
         if ( this.disconnected )
             return 'attachments/' + attachmentId + '.' + type
         else

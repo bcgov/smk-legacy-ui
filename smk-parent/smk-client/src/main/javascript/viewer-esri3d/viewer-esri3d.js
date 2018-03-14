@@ -3,13 +3,13 @@ include.module( 'viewer-esri3d', [ 'viewer', 'esri3d', 'types-esri3d' ], functio
     var E = SMK.TYPE.Esri3d
 
     function ViewerEsri3d() {
-        SMK.TYPE.ViewerBase.prototype.constructor.apply( this, arguments )
+        SMK.TYPE.Viewer.prototype.constructor.apply( this, arguments )
     }
 
     if ( !SMK.TYPE.Viewer ) SMK.TYPE.Viewer = {}
     SMK.TYPE.Viewer.esri3d = ViewerEsri3d
 
-    $.extend( ViewerEsri3d.prototype, SMK.TYPE.ViewerBase.prototype )
+    $.extend( ViewerEsri3d.prototype, SMK.TYPE.Viewer.prototype )
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
     ViewerEsri3d.prototype.basemap.Topographic.esri3d = 'topo'
@@ -25,7 +25,7 @@ include.module( 'viewer-esri3d', [ 'viewer', 'esri3d', 'types-esri3d' ], functio
     ViewerEsri3d.prototype.initialize = function ( smk ) {
         var self = this
 
-        SMK.TYPE.ViewerBase.prototype.initialize.apply( this, arguments )
+        SMK.TYPE.Viewer.prototype.initialize.apply( this, arguments )
 
         var el = smk.addToContainer( '<div class="smk-viewer">' )
 
@@ -117,6 +117,25 @@ include.module( 'viewer-esri3d', [ 'viewer', 'esri3d', 'types-esri3d' ], functio
                 // console.log( 'dead', id )
             } )
         } )
+
+        this.view.on( 'click', function ( ev ) {
+            self.pickedLocation( {
+                map:    { lat: ev.mapPoint.latitude, lng: ev.mapPoint.longitude },
+                screen: { x: ev.x, y: ev.y }
+            } )
+            // console.log( ev )
+            // vw.identifyFeatures.call( vw, {
+            //     point:    { lat: ev.mapPoint.latitude, lng: ev.mapPoint.longitude },
+            //     bbox:     vw.getView().extent.join( ',' ),
+
+            //     position: { x: ev.x, y: ev.y },
+            //     size: {
+            //         width:  vw.view.width,
+            //         height: vw.view.height
+            //     }
+            // } )
+        } )
+
     }
 
     ViewerEsri3d.prototype.getView = function () {

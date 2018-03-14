@@ -5,6 +5,7 @@
     </template>
 
     <template slot="commands">
+        <span class="smk-command" v-on:click="$$emit( 'add' )">Add waypoint</span>
         <span class="smk-command" v-bind:class="{ 'smk-disabled': isEmpty() }" v-on:click="$$emit( 'clear' )">Clear</span>
         <!-- <span class="smk-command" v-bind:class="{ 'smk-disabled': isEmpty() }" v-on:click="$$emit( 'add-all' )">Add all to selection</span> -->
     </template>
@@ -13,15 +14,14 @@
         Click on map to identify features.
     </div> -->
 
-    <div class="smk-waypoint" 
-        v-for="node in waypoints" 
-        v-on:mouseenter="$$emit( 'hover', { features: layer.features } )" 
+    <div class="smk-waypoint"
+        v-for="node in waypoints"
+        v-on:mouseenter="$$emit( 'hover', { features: layer.features } )"
         v-on:mouseleave="$$emit( 'hover', { features: null } )">
         <input v-model="node.location" class="smk-waypoint-location">
     </div>
-    <input v-model="newWaypoint" placeholder="Enter new waypoint" class="smk-waypoint-location">
 
-    <div class="smk-direction" 
+    <div class="smk-direction"
         v-for="direction in directions">
         {{ direction.description }}
     </div>
