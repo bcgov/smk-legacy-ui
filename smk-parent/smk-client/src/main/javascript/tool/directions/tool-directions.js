@@ -16,14 +16,14 @@ include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
     function DirectionsTool( option ) {
-        this.makePropWidget( 'icon', 'info_outline' )
+        this.makePropWidget( 'icon', 'directions_car' )
         this.makePropPanel( 'busy', false )
         this.makePropPanel( 'layers', [] )
         this.makePropPanel( 'highlightId', null )
 
         SMK.TYPE.Tool.prototype.constructor.call( this, $.extend( {
             order:          4,
-            title:          'Identify',
+            title:          'Directions',
             widgetComponent:'directions-widget',
             panelComponent: 'directions-panel',
         }, option ) )
