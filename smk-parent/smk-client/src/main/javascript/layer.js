@@ -128,7 +128,7 @@ include.module( 'layer', [ 'smk', 'jquery', 'util', 'event' ], function () {
             } )
         },
 
-        getFeaturesAtPoint: function ( arg ) {
+        getFeaturesAtPoint: function ( location, view ) {
             var self = this
 
             var serviceUrl  = this.config.serviceUrl
@@ -140,10 +140,10 @@ include.module( 'layer', [ 'smk', 'jquery', 'util', 'event' ], function () {
                 service:       "WMS",
                 version:       version,
                 request:       "GetFeatureInfo",
-                bbox:          arg.bbox,
+                bbox:          view.extent.join( ',' ),
                 feature_count: 20,
-                height:        arg.size.height,
-                width:         arg.size.width,
+                height:        view.screen.height,
+                width:         view.screen.width,
                 info_format:   'application/json',
                 layers:        layerName,
                 query_layers:  layerName,
@@ -152,13 +152,13 @@ include.module( 'layer', [ 'smk', 'jquery', 'util', 'event' ], function () {
 
             if ( version == '1.3.0' ) {
                 params.crs = 'EPSG:4326'
-                params.i =   parseInt( arg.position.x )
-                params.j =   parseInt( arg.position.y )
+                params.i =   parseInt( location.screen.x )
+                params.j =   parseInt( location.screen.y )
             }
             else {
                 params.srs = 'EPSG:4326'
-                params.x =   parseInt( arg.position.x )
-                params.y =   parseInt( arg.position.y )
+                params.x =   parseInt( location.screen.x )
+                params.y =   parseInt( location.screen.y )
             }
 
             var options = {
@@ -213,7 +213,7 @@ include.module( 'layer', [ 'smk', 'jquery', 'util', 'event' ], function () {
             } )
         },
 
-        getFeaturesAtPoint: function ( arg ) {
+        getFeaturesAtPoint: function ( location, view ) {
             var self = this
 
             var serviceUrl  = this.config.serviceUrl + '/identify'
@@ -223,13 +223,13 @@ include.module( 'layer', [ 'smk', 'jquery', 'util', 'event' ], function () {
                 geometryType:   'esriGeometryPoint',
                 sr:             4326,
                 tolerance:      1,
-                mapExtent:      arg.bbox,
-                imageDisplay:   [ arg.size.width, arg.size.height, 96 ].join( ',' ),
+                mapExtent:      view.extent.join( ',' ),
+                imageDisplay:   [ view.screen.width, view.screen.height, 96 ].join( ',' ),
                 returnGeometry: true,
                 returnZ:        false,
                 returnM:        false,
                 f:              'pjson',
-                geometry:       arg.point.lng + ',' + arg.point.lat,
+                geometry:       location.map.longitude + ',' + location.map.latitude,
                 dynamicLayers:  dynamicLayers
             }
 

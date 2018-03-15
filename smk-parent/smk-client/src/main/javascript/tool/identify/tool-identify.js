@@ -40,16 +40,6 @@ include.module( 'tool-identify', [ 'smk', 'tool', 'widgets', 'tool-identify.pane
 
         smk.$viewer.handlePick( this, function ( location ) {
             smk.$viewer.identifyFeatures( location )
-            // {
-            //     point:    ev.latlng,
-            //     bbox:     bbox,
-
-            //     position: ev.containerPoint,
-            //     size: {
-            //         width:  size.x,
-            //         height: size.y
-            //     }
-            // } )
         } )
 
         aux.widget.vm.$on( 'identify-widget.click', function () {

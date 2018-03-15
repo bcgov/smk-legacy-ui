@@ -204,7 +204,7 @@ include.module( 'layer-leaflet', [ 'smk', 'layer', 'util' ], function () {
         }
     }
 
-    function getVectorFeaturesAtPoint( arg, leafletLayer ) {
+    function getVectorFeaturesAtPoint( location, view, leafletLayer ) {
         var self = this
 
         if ( !leafletLayer ) return
@@ -212,7 +212,7 @@ include.module( 'layer-leaflet', [ 'smk', 'layer', 'util' ], function () {
         var fs = []
         leafletLayer.eachLayer( function ( sly ) {
             var geoj = sly.toGeoJSON()
-            var inp = turf.booleanPointInPolygon( [ arg.point.lng, arg.point.lat ] , geoj )
+            var inp = turf.booleanPointInPolygon( [ location.map.longitude, location.map.latitude ] , geoj )
             // console.log( geoj, inp )
             if ( inp ) fs.push( geoj )
         } )

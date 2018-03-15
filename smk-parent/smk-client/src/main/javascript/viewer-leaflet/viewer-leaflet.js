@@ -66,7 +66,7 @@ include.module( 'viewer-leaflet', [ 'viewer', 'leaflet' ], function () {
 
         self.map.on( 'click', function ( ev ) {
             self.pickedLocation( {
-                map:    ev.latlng,
+                map:    { latitude: ev.latlng.lat, longitude: ev.latlng.lng },
                 screen: ev.containerPoint,
             } )
             // var bbox = vw.map.getBounds().toBBoxString()
@@ -88,9 +88,18 @@ include.module( 'viewer-leaflet', [ 'viewer', 'leaflet' ], function () {
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
     ViewerLeaflet.prototype.getView = function () {
+        var b = this.map.getBounds()
+        var size = this.map.getSize()
+        var c = this.map.getCenter()
+
         return {
-            center: this.map.getCenter(),
-            zoom: this.map.getZoom()
+            center: { latitude: c.lat, longitude: c.lng },
+            zoom: this.map.getZoom(),
+            extent: [ b.getWest(), b.getSouth(), b.getEast(), b.getNorth() ],
+            screen: {
+                width:  size.x,
+                height: size.y
+            }
         }
     }
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _

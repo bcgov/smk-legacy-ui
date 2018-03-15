@@ -96,6 +96,9 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
         this.layerIdPromise = {}
         // this.layerStatus = {}
         this.deadViewerLayer = {}
+        this.handler = {
+            pick: {}
+        }
 
         if ( Array.isArray( smk.layers ) )
             self.layerIds = smk.layers.map( function ( lyConfig, i ) {
@@ -115,10 +118,17 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
                 return lyConfig.id
             } )
 
-        this.pickedLocation( function () {
-            var enabledTools = Object.values( smk.$tool ).filter( function ( t ) { t.enabled } )
+        this.pickedLocation( function ( ev ) {
+            var pickHandler = self.handler.pick
+            if ( !pickHandler ) return
 
+            var h = 'identify'
+            Object.keys( pickHandler ).forEach( function ( t ) {
+                if ( smk.$tool[ t ].active ) h = t
+            } )
+            if ( typeof pickHandler[ h ] != 'function' ) return
 
+            pickHandler[ h ].call( smk.$tool[ h ], ev )
         } )
     }
 
@@ -248,8 +258,14 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
     }
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
-    Viewer.prototype.identifyFeatures = function ( arg ) {
+    Viewer.prototype.getView = function () {
+        throw new Error( 'not implemented' )
+    }
+
+    Viewer.prototype.identifyFeatures = function ( location ) {
         var self = this
+
+        var view = this.getView()
 
         this.startedIdentify()
 
@@ -261,7 +277,7 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
 
             if ( !ly.visible ) return
 
-            var p = ly.getFeaturesAtPoint( arg, self.visibleLayer[ id ] )
+            var p = ly.getFeaturesAtPoint( location, view, self.visibleLayer[ id ] )
             if ( !p ) return
 
             promises.push(
@@ -301,6 +317,11 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
             return 'attachments/' + attachmentId + '.' + type
         else
             return '../smks-api/MapConfigurations/' + this.lmfId + '/Attachments/' + attachmentId
+    }
+    // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+    //
+    Viewer.prototype.handlePick = function ( tool, handler ) {
+        this.handler.pick[ tool.type ] = handler
     }
 
 } )

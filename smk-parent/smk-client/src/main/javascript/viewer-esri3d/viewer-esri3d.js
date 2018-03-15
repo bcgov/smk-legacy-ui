@@ -120,20 +120,9 @@ include.module( 'viewer-esri3d', [ 'viewer', 'esri3d', 'types-esri3d' ], functio
 
         this.view.on( 'click', function ( ev ) {
             self.pickedLocation( {
-                map:    { lat: ev.mapPoint.latitude, lng: ev.mapPoint.longitude },
+                map:    ev.mapPoint,
                 screen: { x: ev.x, y: ev.y }
             } )
-            // console.log( ev )
-            // vw.identifyFeatures.call( vw, {
-            //     point:    { lat: ev.mapPoint.latitude, lng: ev.mapPoint.longitude },
-            //     bbox:     vw.getView().extent.join( ',' ),
-
-            //     position: { x: ev.x, y: ev.y },
-            //     size: {
-            //         width:  vw.view.width,
-            //         height: vw.view.height
-            //     }
-            // } )
         } )
 
     }
@@ -144,9 +133,13 @@ include.module( 'viewer-esri3d', [ 'viewer', 'esri3d', 'types-esri3d' ], functio
         var ex = E.geometry.support.webMercatorUtils.webMercatorToGeographic( this.view.extent )
 
         return {
-            center: { lat: this.view.center.latitude, lng: this.view.center.longitude },
+            center: this.view.center,
             zoom: this.view.zoom,
-            extent: [ ex.xmin, ex.ymin, ex.xmax, ex.ymax ]
+            extent: [ ex.xmin, ex.ymin, ex.xmax, ex.ymax ],
+            screen: {
+                width:  this.view.width,
+                height: this.view.height
+            }
         }
     }
 

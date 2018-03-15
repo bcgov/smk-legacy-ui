@@ -3,22 +3,6 @@ include.module( 'tool-identify-leaflet', [ 'leaflet', 'tool-identify' ], functio
     SMK.TYPE.SearchTool.prototype.afterInitialize.push( function ( smk ) {
         var vw = smk.$viewer
 
-        // vw.map.on( 'click', function ( ev ) {
-        //     var bbox = vw.map.getBounds().toBBoxString()
-        //     var size = vw.map.getSize()
-
-        //     vw.identifyFeatures.call( vw, {
-        //         point:    ev.latlng,
-        //         bbox:     bbox,
-
-        //         position: ev.containerPoint,
-        //         size: {
-        //             width:  size.x,
-        //             height: size.y
-        //         }
-        //     } )
-        // } )
-
         vw.identifyHighlights = L.layerGroup( { pane: 'markerPane' } ).addTo( vw.map )
 
         vw.identified.addedFeatures( function ( ev ) {
