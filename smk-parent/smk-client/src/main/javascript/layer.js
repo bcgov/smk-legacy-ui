@@ -168,18 +168,26 @@ include.module( 'layer', [ 'smk', 'jquery', 'util', 'event' ], function () {
                 xhrFields: {},
             };
 
-            return $.ajax( options )
-                .then( function ( data ) {
-                    if ( data && data.features && data.features.length > 0 )
-                        return data.features.map( function ( f, i ) {
-                            if ( self.config.titleAttribute )
-                                f.title = f.properties[ self.config.titleAttribute ]
-                            else
-                                f.title = 'Feature #' + ( i + 1 )
+            return SMK.UTIL.makePromise( function ( res, rej ) {
+                $.ajax( options ).then( res, rej )
+            } )
+            .then( function ( geojson ) {
+                if ( !geojson || !geojson.features || geojson.features.length == 0 ) throw new Error( 'no features' )
 
-                            return f
-                        } )
+                if ( !geojson.crs ) return geojson
+
+                return SMK.UTIL.reproject( geojson, geojson.crs )
+            } )
+            .then( function ( geojson ) {
+                return geojson.features.map( function ( f, i ) {
+                    if ( self.config.titleAttribute )
+                        f.title = f.properties[ self.config.titleAttribute ]
+                    else
+                        f.title = 'Feature #' + ( i + 1 )
+
+                    return f
                 } )
+            } )
 
             // if ( queryLayer.withCreds )
             //     options.xhrFields.withCredentials = true
@@ -243,8 +251,8 @@ include.module( 'layer', [ 'smk', 'jquery', 'util', 'event' ], function () {
                     withCredentials: true,
                 } )
                 .then( function ( data ) {
-                    if ( !data ) return
-                    if ( !data.results || data.results.length == 0 ) return
+                    if ( !data ) throw new Error( 'no features' )
+                    if ( !data.results || data.results.length == 0 ) throw new Error( 'no features' )
 
                     return data.results.map( function ( r, i ) {
                         var f = {}
