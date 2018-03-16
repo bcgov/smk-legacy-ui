@@ -1,0 +1,16 @@
+<div class="smk-location-popup" v-if="coordinate">
+    <div class="smk-address">
+        <h3 v-if="street">{{ street }}</h2>
+        <h2 v-if="city">{{ city }}</h2>
+    </div>
+
+    <div class="smk-coordinate">
+        <h3>{{ coordinate.latitude }} , {{ coordinate.longitude }}</h2>
+    </div>
+
+    <div class="smk-commands">
+        <span class="smk-command" v-on:click="identifyFeatures( coordinate )">Identify features</span>
+        <span class="smk-command" v-on:click="startMeasurement( coordinate )">Start measurement</span>
+        <span class="smk-command" v-on:click="startDirections( coordinate )">Directions to here</span>
+    </div>
+</div>
