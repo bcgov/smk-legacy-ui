@@ -63,6 +63,14 @@ include.module( 'layer', [ 'smk', 'jquery', 'util', 'event' ], function () {
     Layer.prototype.canMergeWith = function ( other ) {
         return false
     }
+
+    Layer.prototype.inScaleRange = function ( view ) {
+        console.log( this.config.title, this.config.scaleMin, view.scale, this.config.scaleMax )
+        if ( this.config.scaleMax && view.scale > this.config.scaleMax ) return false
+        if ( this.config.scaleMin && view.scale < this.config.scaleMin ) return false
+        return true
+    }
+
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
     SMK.TYPE.Layer = {}

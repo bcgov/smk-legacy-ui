@@ -94,7 +94,6 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
         this.layerId = {}
         this.visibleLayer = {}
         this.layerIdPromise = {}
-        // this.layerStatus = {}
         this.deadViewerLayer = {}
         this.handler = {
             pick: {}
@@ -276,6 +275,8 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
             var ly = self.layerId[ id ]
 
             if ( !ly.visible ) return
+            if ( !ly.config.isQueryable ) return
+            if ( !ly.inScaleRange( view ) ) return
 
             var p = ly.getFeaturesAtPoint( location, view, self.visibleLayer[ id ] )
             if ( !p ) return
@@ -321,5 +322,21 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
     Viewer.prototype.handlePick = function ( tool, handler ) {
         this.handler.pick[ tool.type ] = handler
     }
+    // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+    //
+    Viewer.prototype.pixelsToMillimeters = ( function () {
+        var e = document.createElement( 'div' )
+        e.style = 'height:1mm; display:none'
+        e.id = 'heightRef'
+        document.body.appendChild( e )
+
+        var pixPerMillimeter = $( '#heightRef' ).height()
+
+        e.parentNode.removeChild( e )
+
+        return function ( pixels ) {
+            return pixels / pixPerMillimeter
+        }
+    } )()
 
 } )

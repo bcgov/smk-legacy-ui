@@ -69,19 +69,6 @@ include.module( 'viewer-leaflet', [ 'viewer', 'leaflet' ], function () {
                 map:    { latitude: ev.latlng.lat, longitude: ev.latlng.lng },
                 screen: ev.containerPoint,
             } )
-            // var bbox = vw.map.getBounds().toBBoxString()
-            // var size = vw.map.getSize()
-
-            // vw.identifyFeatures.call( vw, {
-            //     point:    ev.latlng,
-            //     bbox:     bbox,
-
-            //     position: ev.containerPoint,
-            //     size: {
-            //         width:  size.x,
-            //         height: size.y
-            //     }
-            // } )
         } )
 
     }
@@ -92,10 +79,18 @@ include.module( 'viewer-leaflet', [ 'viewer', 'leaflet' ], function () {
         var size = this.map.getSize()
         var c = this.map.getCenter()
 
+        var vertical = size.y / 2,
+            mapDist = this.map.distance(
+                this.map.containerPointToLatLng( [ 0,   vertical ] ),
+                this.map.containerPointToLatLng( [ 100, vertical ] )
+            ),
+            screenDist = this.pixelsToMillimeters( 100 ) / 1000
+
         return {
             center: { latitude: c.lat, longitude: c.lng },
             zoom: this.map.getZoom(),
             extent: [ b.getWest(), b.getSouth(), b.getEast(), b.getNorth() ],
+            scale: mapDist / screenDist,
             screen: {
                 width:  size.x,
                 height: size.y
@@ -155,6 +150,10 @@ include.module( 'viewer-leaflet', [ 'viewer', 'leaflet' ], function () {
             animate: false
         } )
     }
+    // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+    //
+    ViewerLeaflet.prototype.markLocation = function ( location ) {
 
+    }
 } )
 
