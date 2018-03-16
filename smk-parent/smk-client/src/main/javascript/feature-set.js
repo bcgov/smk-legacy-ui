@@ -126,6 +126,10 @@ include.module( 'feature-set', [ 'smk', 'jquery', 'util', 'event' ], function ()
         return oldIds
     }
 
+    FeatureSet.prototype.isEmpty = function () {
+        return Object.keys( this.featureSet ).length == 0
+    }
+
     FeatureSet.prototype.clear = function () {
         this.featureSet = {}
         this.pickedFeatureId = null

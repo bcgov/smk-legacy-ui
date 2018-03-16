@@ -63,11 +63,11 @@ include.module( 'tool-identify', [ 'smk', 'tool', 'widgets', 'tool-identify.pane
             smk.$viewer.identified.clear()
         } )
 
-        smk.$viewer.pickedLocation( function () {
-            var enabledTools = Object.values( smk.$tool ).filter( function ( t ) { t.enabled } )
+        // smk.$viewer.pickedLocation( function () {
+        //     var enabledTools = Object.values( smk.$tool ).filter( function ( t ) { t.enabled } )
 
 
-        } )
+        // } )
 
         smk.$viewer.startedIdentify( function ( ev ) {
             self.busy = true
@@ -75,6 +75,9 @@ include.module( 'tool-identify', [ 'smk', 'tool', 'widgets', 'tool-identify.pane
 
         smk.$viewer.finishedIdentify( function ( ev ) {
             self.busy = false
+
+            if ( self.active && smk.$viewer.identified.isEmpty() )
+                self.active = false
         } )
 
         smk.$viewer.identified.addedFeatures( function ( ev ) {

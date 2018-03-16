@@ -113,7 +113,7 @@ include.module( 'smk-map', [ 'smk', 'jquery', 'util', 'viewer', 'layer' ], funct
 
             if ( !self.tools || self.tools.length == 0 ) return
 
-            self.tools.push( { type: 'menu' } )
+            self.tools.push( { type: 'menu' }, { type: 'location' } )
 
             return SMK.UTIL.waitAll( self.tools.map( function ( t ) {
                 var tag = 'tool-' + t.type

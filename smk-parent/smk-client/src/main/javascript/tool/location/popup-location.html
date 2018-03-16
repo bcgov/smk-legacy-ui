@@ -1,11 +1,22 @@
-<div class="smk-location-popup" v-if="coordinate">
-    <div class="smk-address">
-        <h3 v-if="street">{{ street }}</h2>
-        <h2 v-if="city">{{ city }}</h2>
+<div class="smk-location-popup" v-if="coordinate.latitude">
+    <div class="smk-address" v-if="site.fullAddress">
+        <div class="smk-street">
+            <span class="smk-civic-number">{{ site.civicNumber }}</span>
+            <span class="smk-street-name">{{ site.streetName }}</span>
+            <span class="smk-street-type">{{ site.streetType }}</span>
+        </div>
+        <div class="smk-locality">
+            <span class="smk-locality-name">{{ site.localityName }}</span>
+            <span class="smk-locality-type" v-if="site.localityType != 'Unknown'">({{ site.localityType }})</span>
+        </div>
     </div>
 
     <div class="smk-coordinate">
-        <h3>{{ coordinate.latitude }} , {{ coordinate.longitude }}</h2>
+        <span class="smk-coordinate-label">lat</span>
+        <span class="smk-coordinate-value">{{ formatDD( coordinate.latitude ) }}</span>
+        ,
+        <span class="smk-coordinate-label">long</span>
+        <span class="smk-coordinate-value">{{ formatDD( coordinate.longitude ) }}</span>
     </div>
 
     <div class="smk-commands">
