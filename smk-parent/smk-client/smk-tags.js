@@ -55,6 +55,9 @@ exports.gen = function () {
     t.group( "tool-layers" )
         .dir( 'tool/layers/**/*', { cwd: baseDir } )
 
+    t.group( "tool-location" )
+        .dir( 'tool/location/**/*', { cwd: baseDir } )
+
     t.group( "tool-identify" )
         .dir( 'tool/identify/**/*', { cwd: baseDir } )
 
@@ -101,6 +104,9 @@ exports.gen = function () {
 
     t.group( "tool-directions-leaflet" )
         .dir( 'viewer-leaflet/tool/directions/**/*', { cwd: baseDir } )
+
+    t.group( "tool-location-leaflet" )
+        .dir( 'viewer-leaflet/tool/location/**/*', { cwd: baseDir } )
 
     t.group( "tool-minimap-leaflet" )
         .dir( 'viewer-leaflet/tool/minimap/**/*', { cwd: baseDir } )
