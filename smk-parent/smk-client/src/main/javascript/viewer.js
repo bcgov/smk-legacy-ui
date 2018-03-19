@@ -338,5 +338,10 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
             return pixels / pixPerMillimeter
         }
     } )()
+    // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+    //
+    Viewer.prototype.getCurrentLocation = function () {
+        throw new Error( 'not implemented' )
+    }
 
 } )

@@ -1,5 +1,33 @@
 include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.panel-directions-html', 'tool-directions.popup-directions-html' ], function ( inc ) {
 
+    var request
+
+    function findRoute( locations ) {
+        if ( request )
+            request.abort()
+
+        var query = {
+            points:     locations.map( function ( l ) { return l.longtiude + ',' + l.latitude } ).join( ',' ),
+            outputSRS:  4326,
+        }
+
+        return SMK.UTIL.makePromise( function ( res, rej ) {
+            ( request = $.ajax( {
+                timeout:    10 * 1000,
+                dataType:   'jsonp',
+                url:        'https://router.api.gov.bc.ca/directions.geojsonp',
+                data:       query,
+                headers: {
+                    apikey: ''
+                }
+            } ) ).then( res, rej )
+        } )
+        .then( function ( data ) {
+            return data.properties
+        } )
+    }
+    // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+    //
     Vue.component( 'directions-widget', {
         extends: inc.widgets.toolButton,
     } )
@@ -38,11 +66,16 @@ include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.
     DirectionsTool.prototype.afterInitialize.push( function ( smk, aux ) {
         var self = this
 
+        smk.$viewer.handlePick( this, function ( location ) {
+            // smk.$viewer.identifyFeatures( location )
+        } )
+
         aux.widget.vm.$on( 'directions-widget.click', function () {
             if ( !self.visible || !self.enabled ) return
 
             self.active = !self.active
         } )
+
 
         // aux.panel.vm.$on( 'directions-panel.active', function ( ev ) {
         //     smk.$viewer.identified.pick( ev.feature.id )
@@ -131,5 +164,8 @@ include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.
         // smk.$viewer.getIdentifyPopupEl = function () { return self.popupVm.$el }
     } )
 
+    DirectionsTool.prototype.start = function ( locations ) {
+    }
+    
     return DirectionsTool
 } )

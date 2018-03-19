@@ -31,6 +31,7 @@ include.module( 'tool-location', [ 'smk', 'tool', 'widgets', 'tool-location.popu
     function LocationTool( option ) {
         this.makePropWidget( 'coordinate', {} )
         this.makePropWidget( 'site', {} )
+        this.makePropWidget( 'tool', {} )
 
         SMK.TYPE.Tool.prototype.constructor.call( this, $.extend( {
             // order:          4,
@@ -49,6 +50,15 @@ include.module( 'tool-location', [ 'smk', 'tool', 'widgets', 'tool-location.popu
     LocationTool.prototype.afterInitialize.push( function ( smk, aux ) {
         var self = this
 
+        if ( smk.$tool.identify )
+            this.tool.identify = true 
+
+        if ( smk.$tool.measure )
+            this.tool.measure = true 
+
+        if ( smk.$tool.directions )
+            this.tool.directions = true 
+            
         var el = smk.addToOverlay( inc[ 'tool-location.popup-location-html' ] )
 
         this.vm = new Vue( {
@@ -57,7 +67,23 @@ include.module( 'tool-location', [ 'smk', 'tool', 'widgets', 'tool-location.popu
             methods: {
                 formatDD: function ( dd ) {
                     return dd.toFixed( 4 )
-                }
+                },
+                identifyFeatures: function ( location ) {
+
+                },
+                startMeasurement: function ( location ) {
+
+                },
+                startDirections: function ( location, site ) {
+                    return smk.$viewer.getCurrentLocation().then( function ( curLoc ) {
+                        return findNearestSite( curLoc ).then( function ( curSite ) {
+                            smk.$tool.directions.start( [
+                                { location: curLoc, site: curSite },
+                                { location: location, site: site }
+                            ] )    
+                        } )
+                    } )
+                },
             }
         } )
 

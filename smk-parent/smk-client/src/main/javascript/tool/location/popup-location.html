@@ -20,8 +20,8 @@
     </div>
 
     <div class="smk-commands">
-        <span class="smk-command" v-on:click="identifyFeatures( coordinate )">Identify features</span>
-        <span class="smk-command" v-on:click="startMeasurement( coordinate )">Start measurement</span>
-        <span class="smk-command" v-on:click="startDirections( coordinate )">Directions to here</span>
+        <span class="smk-command" v-if="tool.identify" v-on:click="identifyFeatures( coordinate )">Identify features</span>
+        <span class="smk-command" v-if="tool.measure" v-on:click="startMeasurement( coordinate )">Start measurement</span>
+        <span class="smk-command" v-if="tool.directions" v-on:click="startDirections( coordinate, site )">Directions to here</span>
     </div>
 </div>

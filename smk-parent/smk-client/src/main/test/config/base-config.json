@@ -29,7 +29,7 @@
     },
 
     "tools": [
-        { "type": "measure" },
+        // { "type": "measure" },
         { "type": "scale",
             "showFactor": true,
             "showBar": true },

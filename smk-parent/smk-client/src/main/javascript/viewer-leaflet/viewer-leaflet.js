@@ -152,8 +152,24 @@ include.module( 'viewer-leaflet', [ 'viewer', 'leaflet' ], function () {
     }
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
-    ViewerLeaflet.prototype.markLocation = function ( location ) {
-
+    Viewer.prototype.getCurrentLocation = function () {
+        return SMK.UTIL.makePromise( function ( res, rej ) {
+            this.map.on( { 
+                locationfound: res,
+                locationerror: rej 
+            } )
+            this.map.locate()    
+        } )
+        .finally( function () {
+            map.off( 'locationfound' )
+            map.off( 'locationerror' )
+        } )
+        .then( function ( ev ) {
+            return { 
+                latitude: ev.latlng.lat,
+                longitude: ev.latlng.lng
+            }
+        } )
     }
 } )
 
