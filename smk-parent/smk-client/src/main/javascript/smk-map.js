@@ -29,6 +29,7 @@ include.module( 'smk-map', [ 'smk', 'jquery', 'util', 'viewer', 'layer' ], funct
             .then( initTools )
             .catch( function ( e ) {
                 console.error( 'smk viewer #' + self.$option.containerId + ' failed to initialize:', e )
+                window.alert( 'smk viewer #' + self.$option.containerId + ' failed to initialize' )
             } )
 
         function loadConfigs() {
