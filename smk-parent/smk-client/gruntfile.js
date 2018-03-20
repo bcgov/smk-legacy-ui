@@ -18,10 +18,18 @@ module.exports = function( grunt ) {
                     hostname: '*',
                     port: 8888,
                     base: '<%= buildPath %>',
-                    livereload: true,
-                    // open: 'http://localhost:8888/test',
+                    livereload: true
                 }
             },
+            https: {
+                options: {
+                    protocol: 'https',
+                    hostname: '*',
+                    port: 8443,
+                    base: '<%= buildPath %>',
+                    livereload: true
+                }
+            }
         },
 
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

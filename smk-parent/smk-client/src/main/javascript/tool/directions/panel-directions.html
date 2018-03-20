@@ -1,4 +1,4 @@
-<side-panel class="smk-identify-panel" v-bind:class="{ 'smk-busy': busy }">
+<side-panel class="smk-directions-panel" v-bind:class="{ 'smk-busy': busy }">
     <template slot="header">
         <h1>Route Planner</h1>
         <div class="smk-spinner"></div>
@@ -15,10 +15,20 @@
     </div> -->
 
     <div class="smk-waypoint"
-        v-for="node in waypoints"
-        v-on:mouseenter="$$emit( 'hover', { features: layer.features } )"
-        v-on:mouseleave="$$emit( 'hover', { features: null } )">
-        <input v-model="node.location" class="smk-waypoint-location">
+        v-for="node in waypoints">
+
+        <span class="smk-reorder">
+            <i class="material-icons">drag_handle</i>
+        </span>
+
+        <input class="smk-waypoint-location" v-model="node.site">
+
+        <span class="smk-zoomto">
+            <i class="material-icons">location_on</i>
+        </span>
+        <span class="smk-zoomto">
+            <i class="material-icons">delete</i>
+        </span>
     </div>
 
     <div class="smk-direction"

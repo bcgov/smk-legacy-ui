@@ -51,6 +51,7 @@ exports.gen = function () {
 
     t.group( "tool-directions" )
         .dir( 'tool/directions/**/*', { cwd: baseDir } )
+        .script( "https://rubaxa.github.io/Sortable/Sortable.js" )
 
     t.group( "tool-layers" )
         .dir( 'tool/layers/**/*', { cwd: baseDir } )

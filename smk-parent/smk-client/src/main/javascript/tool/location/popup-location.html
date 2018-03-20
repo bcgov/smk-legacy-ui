@@ -1,4 +1,4 @@
-<div class="smk-location-popup" v-if="coordinate.latitude">
+<div class="smk-location-popup" v-if="location.latitude">
     <div class="smk-address" v-if="site.fullAddress">
         <div class="smk-street">
             <span class="smk-civic-number">{{ site.civicNumber }}</span>
@@ -13,15 +13,15 @@
 
     <div class="smk-coordinate">
         <span class="smk-coordinate-label">lat</span>
-        <span class="smk-coordinate-value">{{ formatDD( coordinate.latitude ) }}</span>
+        <span class="smk-coordinate-value">{{ formatDD( location.latitude ) }}</span>
         ,
         <span class="smk-coordinate-label">long</span>
-        <span class="smk-coordinate-value">{{ formatDD( coordinate.longitude ) }}</span>
+        <span class="smk-coordinate-value">{{ formatDD( location.longitude ) }}</span>
     </div>
 
     <div class="smk-commands">
-        <span class="smk-command" v-if="tool.identify" v-on:click="identifyFeatures( coordinate )">Identify features</span>
-        <span class="smk-command" v-if="tool.measure" v-on:click="startMeasurement( coordinate )">Start measurement</span>
-        <span class="smk-command" v-if="tool.directions" v-on:click="startDirections( coordinate, site )">Directions to here</span>
+        <span class="smk-command" v-if="tool.identify" v-on:click="identifyFeatures( location )">Identify features</span>
+        <span class="smk-command" v-if="tool.measure" v-on:click="startMeasurement( location )">Start measurement</span>
+        <span class="smk-command" v-if="tool.directions" v-on:click="startDirections( location, site )">Directions to here</span>
     </div>
 </div>

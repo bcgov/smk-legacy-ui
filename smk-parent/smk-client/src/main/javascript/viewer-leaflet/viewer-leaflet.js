@@ -150,26 +150,30 @@ include.module( 'viewer-leaflet', [ 'viewer', 'leaflet' ], function () {
             animate: false
         } )
     }
-    // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-    //
-    Viewer.prototype.getCurrentLocation = function () {
-        return SMK.UTIL.makePromise( function ( res, rej ) {
-            this.map.on( { 
-                locationfound: res,
-                locationerror: rej 
-            } )
-            this.map.locate()    
-        } )
-        .finally( function () {
-            map.off( 'locationfound' )
-            map.off( 'locationerror' )
-        } )
-        .then( function ( ev ) {
-            return { 
-                latitude: ev.latlng.lat,
-                longitude: ev.latlng.lng
-            }
-        } )
-    }
+    // // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+    // //
+    // ViewerLeaflet.prototype.getCurrentLocation = function () {
+    //     var self = this
+
+    //     return SMK.UTIL.makePromise( function ( res, rej ) {
+    //         self.map.on( {
+    //             locationfound: res,
+    //             locationerror: rej
+    //         } )
+    //         self.map.locate( { maximumAge: 10 * 1000 } )
+    //     } )
+    //     .finally( function () {
+    //         self.map.off( 'locationfound' )
+    //         self.map.off( 'locationerror' )
+    //     } )
+    //     .then( function ( ev ) {
+    //         return {
+    //             map: {
+    //                 latitude: ev.latlng.lat,
+    //                 longitude: ev.latlng.lng
+    //             }
+    //         }
+    //     } )
+    // }
 } )
 

@@ -275,7 +275,7 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
             var ly = self.layerId[ id ]
 
             if ( !ly.visible ) return
-            if ( !ly.config.isQueryable ) return
+            if ( ly.config.isQueryable === false ) return
             if ( !ly.inScaleRange( view ) ) return
 
             var p = ly.getFeaturesAtPoint( location, view, self.visibleLayer[ id ] )
@@ -341,7 +341,23 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
     Viewer.prototype.getCurrentLocation = function () {
-        throw new Error( 'not implemented' )
+        var self = this
+
+        if ( this.currentLocationPromise && ( !this.currentLocationTimestamp || this.currentLocationTimestamp > ( ( new Date() ).getTime() - 600000 ) ) )
+            return this.currentLocationPromise
+
+        this.currentLocationTimestamp = null
+        return this.currentLocationPromise = SMK.UTIL.makePromise( function ( res, rej ) {
+            navigator.geolocation.getCurrentPosition( res, rej, {
+                timeout:            10 * 1000,
+                enableHighAccuracy: true,
+                // maximumAge:         60 * 1000,
+            } )
+        } )
+        .then( function ( pos ) {
+            self.currentLocationTimestamp = ( new Date() ).getTime()
+            return pos.coords
+        } )
     }
 
 } )

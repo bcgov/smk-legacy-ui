@@ -7,7 +7,7 @@ include.module( 'tool-location', [ 'smk', 'tool', 'widgets', 'tool-location.popu
             request.abort()
 
         var query = {
-            point:              [ location.map.longitude, location.map.latitude ].join( ',' ),
+            point:              [ location.longitude, location.latitude ].join( ',' ),
             outputSRS:          4326,
             locationDescriptor: 'routingPoint',
             maxDistance:        1000,
@@ -29,7 +29,7 @@ include.module( 'tool-location', [ 'smk', 'tool', 'widgets', 'tool-location.popu
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
     function LocationTool( option ) {
-        this.makePropWidget( 'coordinate', {} )
+        this.makePropWidget( 'location', {} )
         this.makePropWidget( 'site', {} )
         this.makePropWidget( 'tool', {} )
 
@@ -51,14 +51,14 @@ include.module( 'tool-location', [ 'smk', 'tool', 'widgets', 'tool-location.popu
         var self = this
 
         if ( smk.$tool.identify )
-            this.tool.identify = true 
+            this.tool.identify = true
 
         if ( smk.$tool.measure )
-            this.tool.measure = true 
+            this.tool.measure = true
 
         if ( smk.$tool.directions )
-            this.tool.directions = true 
-            
+            this.tool.directions = true
+
         var el = smk.addToOverlay( inc[ 'tool-location.popup-location-html' ] )
 
         this.vm = new Vue( {
@@ -77,10 +77,10 @@ include.module( 'tool-location', [ 'smk', 'tool', 'widgets', 'tool-location.popu
                 startDirections: function ( location, site ) {
                     return smk.$viewer.getCurrentLocation().then( function ( curLoc ) {
                         return findNearestSite( curLoc ).then( function ( curSite ) {
-                            smk.$tool.directions.start( [
+                            smk.$tool.directions.setWaypoints( [
                                 { location: curLoc, site: curSite },
                                 { location: location, site: site }
-                            ] )    
+                            ] )
                         } )
                     } )
                 },
@@ -88,10 +88,10 @@ include.module( 'tool-location', [ 'smk', 'tool', 'widgets', 'tool-location.popu
         } )
 
         smk.$viewer.pickedLocation( function ( location ) {
-            self.coordinate = location.map
+            self.location = location.map
             self.site = {}
 
-            findNearestSite( location ).then( function ( site ) {
+            findNearestSite( location.map ).then( function ( site ) {
                 // console.log( JSON.stringify( site, null, '  ' ) )
                 self.site = site
             } )
