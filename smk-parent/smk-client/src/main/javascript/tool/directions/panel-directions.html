@@ -5,8 +5,18 @@
     </template>
 
     <template slot="commands">
-        <span class="smk-command" v-on:click="$$emit( 'add' )">Add waypoint</span>
-        <span class="smk-command" v-bind:class="{ 'smk-disabled': isEmpty() }" v-on:click="$$emit( 'clear' )">Clear</span>
+        <div class="smk-command-row">
+            <label class="smk-command"><input type="checkbox" v-model="optimal" v-on:change="$$emit( 'option' )">Optimal order</label>
+            <label class="smk-command"><input type="checkbox" v-model="roundTrip" v-on:change="$$emit( 'option' )">Round trip</label>
+        </div>
+        <div class="smk-command-row">
+            <label class="smk-command"><input type="radio" v-model="criteria" value="shortest" v-on:change="$$emit( 'option' )">Shortest</label>
+            <label class="smk-command"><input type="radio" v-model="criteria" value="fastest" v-on:change="$$emit( 'option' )">Fastest</label>
+        </div>
+        <div class="smk-command-row">
+            <span class="smk-command" v-on:click="$$emit( 'add' )">Add waypoint</span>
+            <span class="smk-command" v-bind:class="{ 'smk-disabled': isEmpty() }" v-on:click="$$emit( 'clear' )">Clear</span>
+        </div>
         <!-- <span class="smk-command" v-bind:class="{ 'smk-disabled': isEmpty() }" v-on:click="$$emit( 'add-all' )">Add all to selection</span> -->
     </template>
 
@@ -15,13 +25,13 @@
     </div> -->
 
     <div class="smk-waypoint"
-        v-for="node in waypoints">
-
+        v-for="node in waypoints"
+    >
         <span class="smk-reorder">
             <i class="material-icons">drag_handle</i>
         </span>
 
-        <input class="smk-waypoint-location" v-model="node.site">
+        <input class="smk-waypoint-site" v-model="node.site">
 
         <span class="smk-zoomto">
             <i class="material-icons">location_on</i>
@@ -32,7 +42,10 @@
     </div>
 
     <div class="smk-direction"
-        v-for="direction in directions">
-        {{ direction.description }}
+        v-for="(direction, i) in directions"
+        v-on:mouseenter="$$emit( 'hover', { highlight: i } )" 
+        v-on:mouseleave="$$emit( 'hover', { highlight: null } )"
+    >
+        {{ direction.text }}
     </div>
 </side-panel>

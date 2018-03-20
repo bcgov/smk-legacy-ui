@@ -145,7 +145,7 @@
                                 if ( this.$options._componentTag )
                                     event = this.$options._componentTag + '.' + event
 
-                                this.$root.$emit( event, arg )
+                                this.$root.$emit( event, arg, this )
                             }
                         }
                     } )

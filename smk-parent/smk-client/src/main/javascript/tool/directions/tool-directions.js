@@ -2,12 +2,12 @@ include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.
 
     var request
 
-    function findRoute( locations, option ) {
+    function findRoute( wayPoints, option ) {
         if ( request )
             request.abort()
 
         var query = {
-            points:     locations.map( function ( l ) { return l.longtiude + ',' + l.latitude } ).join( ',' ),
+            points:     wayPoints.map( function ( w ) { return w.location.longitude + ',' + w.location.latitude } ).join( ',' ),
             outputSRS:  4326,
             criteria:   option.criteria,
             roundTrip:  option.roundTrip
@@ -30,9 +30,6 @@ include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.
             return data
         } )
     }
-
-
-
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
     Vue.component( 'directions-widget', {
@@ -42,6 +39,13 @@ include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.
     Vue.component( 'directions-panel', {
         template: inc[ 'tool-directions.panel-directions-html' ],
         props: [ 'busy', 'waypoints', 'directions' ],
+        data: function () {
+            return {
+                optimal:    true,
+                roundTrip:  false,
+                criteria:   'shortest'       
+            }
+        },
         methods: {
             isEmpty: function () {
                 return !this.layers || this.layers.length == 0
@@ -62,6 +66,12 @@ include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.
             widgetComponent:'directions-widget',
             panelComponent: 'directions-panel',
         }, option ) )
+
+        this.routeOption = {
+            optimal:    true,
+            roundTrip:  false,
+            criteria:   'shortest'       
+        }
     }
 
     SMK.TYPE.DirectionsTool = DirectionsTool
@@ -82,6 +92,13 @@ include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.
 
             self.active = !self.active
         } )
+
+        aux.panel.vm.$on( 'directions-panel.option', function ( ev, comp ) {
+            self.routeOption.optimal = comp.optimal
+            self.routeOption.roundTrip = comp.roundTrip
+            self.routeOption.criteria = comp.criteria
+            self.findRoute()
+        } )        
     } )
 
     DirectionsTool.prototype.setWaypoints = function ( locations ) {
@@ -89,7 +106,7 @@ include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.
 
         this.waypoints = locations.map( function ( l ) {
             return {
-                location: Object.assign( {}, l.location ),
+                location: { latitude: l.location.latitude, longitude: l.location.longitude },
                 site: l.site.fullAddress
             }
         } )
@@ -100,7 +117,9 @@ include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.
     DirectionsTool.prototype.findRoute = function () {
         var self = this
 
-        findRoute( this.waypoints, {} ).then( function ( data ) {
+        if ( this.waypoints.length < 2 ) return
+        
+        findRoute( this.waypoints, this.routeOption ).then( function ( data ) {
             self.displayRoute( data.route )
 
             self.directions = data.directions
