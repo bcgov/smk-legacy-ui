@@ -343,7 +343,7 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
     Viewer.prototype.getCurrentLocation = function () {
         var self = this
 
-        if ( this.currentLocationPromise && ( !this.currentLocationTimestamp || this.currentLocationTimestamp > ( ( new Date() ).getTime() - 600000 ) ) )
+        if ( this.currentLocationPromise && ( !this.currentLocationTimestamp || this.currentLocationTimestamp > ( ( new Date() ).getTime() - 10 * 60 * 1000 ) ) )
             return this.currentLocationPromise
 
         this.currentLocationTimestamp = null
@@ -353,10 +353,21 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
                 enableHighAccuracy: true,
                 // maximumAge:         60 * 1000,
             } )
+            setTimeout( function () { rej( new Error( 'timeout' ) ) }, 10 * 1000 )
         } )
         .then( function ( pos ) {
             self.currentLocationTimestamp = ( new Date() ).getTime()
+            window.localStorage.setItem( 'smk-location', JSON.stringify( pos.coords ) )
             return pos.coords
+        } )
+        .catch( function ( err ) {
+            var coords = window.localStorage.getItem( 'smk-location' )
+            if ( coords ) {
+                console.warn( 'using cached location', coords )
+                return JSON.parse( coords )
+            }
+
+            return Promise.reject( err )
         } )
     }
 

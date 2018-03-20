@@ -43,7 +43,7 @@ include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.
             return {
                 optimal:    true,
                 roundTrip:  false,
-                criteria:   'shortest'       
+                criteria:   'shortest'
             }
         },
         methods: {
@@ -70,7 +70,7 @@ include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.
         this.routeOption = {
             optimal:    true,
             roundTrip:  false,
-            criteria:   'shortest'       
+            criteria:   'shortest'
         }
     }
 
@@ -98,7 +98,7 @@ include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.
             self.routeOption.roundTrip = comp.roundTrip
             self.routeOption.criteria = comp.criteria
             self.findRoute()
-        } )        
+        } )
     } )
 
     DirectionsTool.prototype.setWaypoints = function ( locations ) {
@@ -118,7 +118,7 @@ include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.
         var self = this
 
         if ( this.waypoints.length < 2 ) return
-        
+
         findRoute( this.waypoints, this.routeOption ).then( function ( data ) {
             self.displayRoute( data.route )
 
