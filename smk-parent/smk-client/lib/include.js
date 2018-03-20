@@ -213,8 +213,8 @@
         var anon = tag
         var newTag
         if ( base && tag.url && !tag.external && !/[/][/]/.test( tag.url ) ) {
-            var m = tag.url.match( /[/]([^/]+)$/ )
-            newTag = base + '.' +  m[ 1 ].replace( /[.]/g, '-' ).toLowerCase()
+            var m = tag.url.match( /(^|[/])([^/]+)$/ )
+            newTag = base + '.' +  m[ 2 ].replace( /[.]/g, '-' ).toLowerCase()
             // console.log( tag.url, m, newTag )
         }
         else {
