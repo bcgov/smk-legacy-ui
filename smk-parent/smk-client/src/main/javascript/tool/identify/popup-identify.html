@@ -12,7 +12,7 @@
             <span class="smk-attribute-value">{{ feature.properties[ attr.name ] }}</span>
         </div>
 
-        <div class="smk-attribute" v-for="(val, attr) in feature.properties" v-if="!layer.config.attributes">
+        <div class="smk-attribute" v-for="(val, attr) in feature.properties" v-if="!layer.config.attributes || layer.config.attributes.length == 0">
             <span class="smk-attribute-title">{{ attr }}</span>
             <span class="smk-attribute-value">{{ val }}</span>
         </div>
