@@ -17,10 +17,10 @@ include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.
             ( request = $.ajax( {
                 timeout:    10 * 1000,
                 dataType:   'json',
-                url:        'https://router.api.gov.bc.ca/' + ( option.optimal ? 'optimalDirections' : 'directions' ) + '.json',
+                url:        'https://routerdlv.api.gov.bc.ca/' + ( option.optimal ? 'optimalDirections' : 'directions' ) + '.json',
                 data:       query,
                 headers: {
-                    apikey: '11dd756f680c47b5aef5093d95543738'
+                    apikey: 'ndLv6oEJN4z5FwwhDyaNoF4NfnYWXwVJ'
                 }
             } ) ).then( res, rej )
         } )
@@ -38,7 +38,7 @@ include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.
 
     Vue.component( 'directions-panel', {
         template: inc[ 'tool-directions.panel-directions-html' ],
-        props: [ 'busy', 'waypoints', 'directions' ],
+        props: [ 'busy', 'waypoints', 'directions', 'summary' ],
         data: function () {
             return {
                 optimal:    true,
@@ -59,6 +59,7 @@ include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.
         this.makePropPanel( 'busy', false )
         this.makePropPanel( 'waypoints', [] )
         this.makePropPanel( 'directions', [] )
+        this.makePropPanel( 'summary', null )
 
         SMK.TYPE.Tool.prototype.constructor.call( this, $.extend( {
             order:          4,
@@ -99,7 +100,10 @@ include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.
             self.routeOption.criteria = comp.criteria
             self.findRoute()
         } )
+
     } )
+
+    DirectionsTool.prototype.addWaypoint = function ( locations ) {}
 
     DirectionsTool.prototype.setWaypoints = function ( locations ) {
         this.active = true
@@ -121,6 +125,8 @@ include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.
 
         findRoute( this.waypoints, this.routeOption ).then( function ( data ) {
             self.displayRoute( data.route )
+
+            self.summary = 'Route travels ' + data.distance + ' km in ' + data.timeText
 
             self.directions = data.directions
         } )

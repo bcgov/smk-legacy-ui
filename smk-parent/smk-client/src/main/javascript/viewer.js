@@ -362,7 +362,7 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
         } )
         .catch( function ( err ) {
             var coords = window.localStorage.getItem( 'smk-location' )
-            if ( coords ) {
+            if ( coords && coords.latitude ) {
                 console.warn( 'using cached location', coords )
                 return JSON.parse( coords )
             }

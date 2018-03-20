@@ -41,10 +41,12 @@
         </span>
     </div>
 
+    <div class="smk-summary">{{ summary }}</div>
+
     <div class="smk-direction"
         v-for="(direction, i) in directions"
-        v-on:mouseenter="$$emit( 'hover', { highlight: i } )" 
-        v-on:mouseleave="$$emit( 'hover', { highlight: null } )"
+        v-on:mouseenter="$$emit( 'hover-direction', { highlight: i } )"
+        v-on:mouseleave="$$emit( 'hover-direction', { highlight: null } )"
     >
         {{ direction.text }}
     </div>

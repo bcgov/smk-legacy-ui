@@ -46,14 +46,17 @@ include.module( 'tool-directions-leaflet', [ 'leaflet', 'tool-directions' ], fun
 
 
     SMK.TYPE.DirectionsTool.prototype.afterInitialize.push( function ( smk, aux ) {
+        var self = this
 
         this.displayRoute = function ( points ) {
-            var routeLayer = L.geoJson( {
+            if ( self.routeLayer )
+                smk.$viewer.map.removeLayer( self.routeLayer )
+
+            self.routeLayer = L.geoJson( {
                 type: "Feature",
-                properties: {},
                 geometry: {
                     type: "LineString",
-                    coordinates: data.route
+                    coordinates: points
                 }
             }, {
                 onEachFeature: function( feature, layer ) {
@@ -63,7 +66,9 @@ include.module( 'tool-directions-leaflet', [ 'leaflet', 'tool-directions' ], fun
                     // }
                     layer.setStyle( { color:color, weight:7, opacity: 0.5 } );
                 }
-            } ).addTo( smk.$viewer.map );
+            } )
+
+            smk.$viewer.map.addLayer( self.routeLayer )
 
             bounds = routeLayer.getBounds()
 
@@ -84,6 +89,10 @@ include.module( 'tool-directions-leaflet', [ 'leaflet', 'tool-directions' ], fun
             // }
 
         }
+
+        aux.panel.vm.$on( 'directions-panel.hover-direction', function ( ev ) {
+            if 9 ev.highlight
+        } )
     } )
 
 
