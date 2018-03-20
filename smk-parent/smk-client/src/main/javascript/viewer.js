@@ -262,12 +262,10 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
                     return p
                 } )
                 .then( function ( features ) {
-                    if ( !features || features.length == 0 ) return
-
                     self.identified.add( id, features )
                 } )
-                .catch( function () {
-                    console.warn( 'identify fail:', arguments )
+                .catch( function ( err ) {
+                    console.debug( id, 'identify fail:', err.message )
                     return SMK.UTIL.resolved()
                 } )
             )

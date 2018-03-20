@@ -187,5 +187,9 @@ exports.gen = function () {
         // .style( "https://js.arcgis.com/4.4/esri/css/main.css" )
         // .script( "https://js.arcgis.com/4.4/" )
 
+    t.sequence( "proj4" )
+        .script( 'https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.4.4/proj4.js' )
+        .script( 'projections.js' )
+
     return t
 }
