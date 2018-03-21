@@ -38,7 +38,7 @@ include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.
 
     Vue.component( 'directions-panel', {
         template: inc[ 'tool-directions.panel-directions-html' ],
-        props: [ 'busy', 'waypoints', 'directions', 'summary' ],
+        props: [ 'busy', 'waypoints', 'waypointsId', 'directions', 'directionHighlight', 'directionPick', 'summary' ],
         data: function () {
             return {
                 optimal:    true,
@@ -46,6 +46,26 @@ include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.
                 criteria:   'shortest'
             }
         },
+        // mounted: function ( el ) {
+        //     var self = this
+
+        //     this.waypointsSortable = Sortable.create( document.getElementById( this.waypointsId ), {
+        //         handle:         '.smk-handle',
+        //         draggable:      '.smk-waypoint',
+        //         forceFallback:  true,
+        //         // onUpdate: function ( ev ) {
+        //         //     console.log( ev, self.waypoints.map( function ( w ) { return w.site } ) )
+        //         //     self.waypoints.splice( ev.newIndex, 0, self.waypoints.splice( ev.oldIndex, 1 )[ 0 ] )
+        //         //     // self.wayPoints.splice( ev.newIndex, )
+        //         //     console.log( ev, self.waypoints.map( function ( w ) { return w.site } ) )
+        //         //     self.$forceUpdate()
+        //         // },
+        //         onMove: function ( ev ) {
+        //             console.log( ev )
+        //             return false
+        //         }
+        //     } )                
+        // },
         methods: {
             isEmpty: function () {
                 return !this.layers || this.layers.length == 0
@@ -58,7 +78,10 @@ include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.
         this.makePropWidget( 'icon', 'directions_car' )
         this.makePropPanel( 'busy', false )
         this.makePropPanel( 'waypoints', [] )
+        this.makePropPanel( 'waypointsId', SMK.UTIL.uniqueId() )
         this.makePropPanel( 'directions', [] )
+        this.makePropPanel( 'directionHighlight', null )
+        this.makePropPanel( 'directionPick', null )
         this.makePropPanel( 'summary', null )
 
         SMK.TYPE.Tool.prototype.constructor.call( this, $.extend( {
@@ -101,6 +124,31 @@ include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.
             self.findRoute()
         } )
 
+        aux.panel.vm.$on( 'directions-panel.hover-direction', function ( ev ) {
+            self.directionHighlight = ev.highlight
+        } )        
+
+        aux.panel.vm.$on( 'directions-panel.pick-direction', function ( ev ) {
+            self.directionPick = ev.pick
+        } )        
+
+        aux.panel.vm.$on( 'directions-panel.waypoints-changed', function ( ev ) {
+            console.log( self.waypoints.map( function ( w ) { return w.site } ) )
+        } )        
+            
+
+        // this.changedActive( function () {
+        //     if ( !self.active ) return
+
+        //     self.waypointsSortable = Sortable.create( document.getElementById( self.waypointsId ), {
+        //         handle:         '.smk-handle',
+        //         draggable:      '.smk-waypoint',
+        //         forceFallback:  true,
+        //         onUpdate: function ( ev ) {
+        //             console.log( ev )
+        //         }
+        //     } )                
+        // } )
     } )
 
     DirectionsTool.prototype.addWaypoint = function ( locations ) {}
@@ -128,7 +176,13 @@ include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.
 
             self.summary = 'Route travels ' + data.distance + ' km in ' + data.timeText
 
-            self.directions = data.directions
+            self.directions = data.directions.map( function ( d ) {
+                d.text = d.text.replace( /\sfor\s(\d+.?\d*\sk?m\s.+)$/, function ( m, p1 ) {
+                    d.metric = p1
+                    return ''
+                } )
+                return d
+            } )
         } )
     }
 

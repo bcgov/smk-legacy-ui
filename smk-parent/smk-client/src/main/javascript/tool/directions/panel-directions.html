@@ -20,26 +20,29 @@
         <!-- <span class="smk-command" v-bind:class="{ 'smk-disabled': isEmpty() }" v-on:click="$$emit( 'add-all' )">Add all to selection</span> -->
     </template>
 
-    <!-- <div v-if="isEmpty()" class="smk-placeholder">
-        Click on map to identify features.
-    </div> -->
-
-    <div class="smk-waypoint"
-        v-for="node in waypoints"
+    <draggable class="smk-waypoints"
+        v-bind:list="waypoints"
+        v-bind:id="waypointsId"
+        v-on:end="$$emit( 'waypoints-changed' )"
     >
-        <span class="smk-reorder">
-            <i class="material-icons">drag_handle</i>
-        </span>
+        <div class="smk-waypoint"
+            v-for="node in waypoints"
+        >
+            <span class="smk-handle">
+                <i class="material-icons">drag_handle</i>
+            </span>
 
-        <input class="smk-waypoint-site" v-model="node.site">
+            <input class="smk-waypoint-site" v-model="node.site">
 
-        <span class="smk-zoomto">
-            <i class="material-icons">location_on</i>
-        </span>
-        <span class="smk-zoomto">
-            <i class="material-icons">delete</i>
-        </span>
-    </div>
+            <span class="smk-zoomto">
+                <i class="material-icons">location_on</i>
+            </span>
+            <span class="smk-zoomto">
+                <i class="material-icons">delete</i>
+            </span>
+        </div>
+    </draggable>
+    
 
     <div class="smk-summary">{{ summary }}</div>
 
@@ -47,7 +50,10 @@
         v-for="(direction, i) in directions"
         v-on:mouseenter="$$emit( 'hover-direction', { highlight: i } )"
         v-on:mouseleave="$$emit( 'hover-direction', { highlight: null } )"
+        v-on:click="$$emit( 'pick-direction', { pick: i } )"
+        v-bind:class="{ 'smk-highlight': i == directionHighlight, 'smk-pick': i == directionPick }"
     >
         {{ direction.text }}
+        <div class="smk-direction-metric">...for {{ direction.metric }}</div>
     </div>
 </side-panel>

@@ -70,7 +70,7 @@ include.module( 'tool-directions-leaflet', [ 'leaflet', 'tool-directions' ], fun
 
             smk.$viewer.map.addLayer( self.routeLayer )
 
-            bounds = routeLayer.getBounds()
+            bounds = self.routeLayer.getBounds()
 
             // function centerMap(bounds, center = true) {
             //     var options = {
@@ -91,8 +91,28 @@ include.module( 'tool-directions-leaflet', [ 'leaflet', 'tool-directions' ], fun
         }
 
         aux.panel.vm.$on( 'directions-panel.hover-direction', function ( ev ) {
-            if 9 ev.highlight
+            if ( self.directionHighlightLayer )
+                smk.$viewer.map.removeLayer( self.directionHighlightLayer )
+
+            if ( !ev.highlight )
+                return
+
+            var p = self.directions[ ev.highlight ].point
+            self.directionHighlightLayer = L.circleMarker( [ p[ 1 ], p[ 0 ] ] )
+            smk.$viewer.map.addLayer( self.directionHighlightLayer )
         } )
+
+        aux.panel.vm.$on( 'directions-panel.pick-direction', function ( ev ) {
+            if ( self.directionPickLayer )
+                smk.$viewer.map.removeLayer( self.directionPickLayer )
+
+            if ( !ev.pick )
+                return
+
+            var p = self.directions[ ev.pick ].point
+            self.directionPickLayer = L.circleMarker( [ p[ 1 ], p[ 0 ] ], { radius: 15 } )
+            smk.$viewer.map.addLayer( self.directionPickLayer )
+        } )        
     } )
 
 
