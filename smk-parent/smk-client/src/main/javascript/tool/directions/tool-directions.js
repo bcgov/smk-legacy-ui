@@ -134,7 +134,7 @@ include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.
 
     Vue.component( 'directions-panel', {
         template: inc[ 'tool-directions.panel-directions-html' ],
-        props: [ 'busy', 'waypoints', 'directions', 'directionHighlight', 'directionPick', 'summary' ],
+        props: [ 'busy', 'waypoints', 'directions', 'directionHighlight', 'directionPick', 'summary', 'message' ],
         data: function () {
             return {
                 optimal:    false,
@@ -166,6 +166,7 @@ include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.
         this.makePropPanel( 'directionHighlight', null )
         this.makePropPanel( 'directionPick', null )
         this.makePropPanel( 'summary', null )
+        this.makePropPanel( 'message', null )
 
         SMK.TYPE.Tool.prototype.constructor.call( this, $.extend( {
             order:          4,
@@ -192,6 +193,8 @@ include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.
 
         this.changedActive( function () {
             if ( self.active ) {
+                smk.$tool.location.enabled = false
+
                 if ( self.waypoints.length == 0 ) {
                     self.addWaypointCurrentLocation().then( function () {
                         self.addWaypoint()
@@ -202,6 +205,9 @@ include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.
                     self.findRoute()
                 }
             }
+            else {
+                smk.$tool.location.enabled = true
+            }
         } )
 
         this.getCurrentLocation = function () {
@@ -209,6 +215,10 @@ include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.
                 return smk.$viewer.findNearestSite( loc ).then( function ( site ) {
                     return { location: loc, description: site.fullAddress }
                 } )
+            } )
+            .catch( function ( err ) {
+                console.warn( err )
+                self.message = 'Unable to get current location'
             } )
         }
 
@@ -224,6 +234,10 @@ include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.
                 self.addWaypoint()
 
                 self.findRoute()
+            } )
+            .catch( function ( err ) {
+                console.warn( err )
+                self.message = 'Unable to find address'
             } )
         } )
 
@@ -264,9 +278,6 @@ include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.
 
         aux.panel.vm.$on( 'directions-panel.changed-waypoints', function ( ev ) {
             self.findRoute()
-        } )
-
-        aux.panel.vm.$on( 'directions-panel.zoom-waypoint', function ( ev ) {
         } )
 
         aux.panel.vm.$on( 'directions-panel.remove-waypoint', function ( ev ) {
@@ -325,6 +336,7 @@ include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.
         this.directionHighlight = null
         this.directionPick = null
         this.summary = null
+        this.message = null
     }
 
     DirectionsTool.prototype.findRoute = function () {
@@ -332,6 +344,7 @@ include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.
 
         this.directions = []
         this.summary = null
+        this.message = null
         this.displayRoute()
 
         var points = this.waypoints
@@ -378,6 +391,10 @@ include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.
         } )
         .finally( function () {
             self.busy = false
+        } )
+        .catch( function ( err ) {
+            console.warn( err )
+            self.message = 'Unable to find route'
         } )
     }
 

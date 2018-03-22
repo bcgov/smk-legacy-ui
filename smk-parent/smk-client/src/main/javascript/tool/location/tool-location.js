@@ -58,6 +58,8 @@ include.module( 'tool-location', [ 'smk', 'tool', 'widgets', 'tool-location.popu
         } )
 
         smk.$viewer.pickedLocation( function ( location ) {
+            if ( !self.enabled ) return
+
             self.location = location.map
             self.site = {}
 
@@ -73,6 +75,11 @@ include.module( 'tool-location', [ 'smk', 'tool', 'widgets', 'tool-location.popu
 
         smk.$viewer.changedView( function () {
             self.coordinate = {}
+        } )
+
+        self.changedEnabled( function () {
+            if ( !self.enabled )
+                self.location = {}
         } )
 
     } )

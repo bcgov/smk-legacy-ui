@@ -15,15 +15,17 @@
         </span>
         <div class="smk-command-row">
             <span class="smk-command"
-                v-bind:class="{ 'smk-disabled': optimal }"
                 v-on:click="$$emit( 'reverse' )"
             >Reverse</span>
 
             <span class="smk-command"
                 v-on:click="$$emit( 'clear' )"
             >Reset</span>
+
         </div>
     </template>
+
+    <div class="smk-message">{{ message }}</div>
 
     <draggable class="smk-waypoints"
         v-bind:list="waypoints"
@@ -46,7 +48,7 @@
             ></address-search>
 
             <span class="smk-command smk-zoomto" title="Zoom to this waypoint"
-                v-on:click="node.location && $$emit( 'zoom-waypoint', { location: node.location } )"
+                v-on:click="node.location && $$emit( 'zoom-waypoint', { location: node.location, index: i } )"
                 v-bind:class="{
                     'smk-disabled': !node.location,
                     'smk-first':    firstWaypointIndex == i,
@@ -77,10 +79,10 @@
             v-on:click="$$emit( 'pick-direction', { pick: i } )"
             v-bind:class="{ 'smk-highlight': i == directionHighlight, 'smk-pick': i == directionPick }"
         >
-            {{ direction.instruction }}
-            <div class="smk-direction-metric"
+            <span class="smk-instruction">{{ direction.instruction }}</span>
+            <span class="smk-metric"
                 v-if="direction.distance"
-            >...for {{ direction.distance }} ({{ direction.time}})</div>
+            >for {{ direction.distance }} ({{ direction.time}})</span>
         </div>
     </div>
 
