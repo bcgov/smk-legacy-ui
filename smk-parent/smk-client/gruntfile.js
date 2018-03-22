@@ -11,7 +11,7 @@ module.exports = function( grunt ) {
 
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-        connect: {
+        connectOption: {
             http: {
                 options: {
                     protocol: 'http',
@@ -74,7 +74,11 @@ module.exports = function( grunt ) {
 
         watch: {
             options: {
-                livereload: true,
+                livereload: {
+                    host:   'vivid-w100z.vividsolutions.com',
+                    key:    grunt.file.read( 'node_modules/grunt-contrib-connect/tasks/certs/server.key' ),
+                    cert:   grunt.file.read( 'node_modules/grunt-contrib-connect/tasks/certs/server.crt' )
+                },
                 spawn: false
                 // interrupt: true,
             },
@@ -105,7 +109,7 @@ module.exports = function( grunt ) {
         var tags = require( './smk-tags' )
         var out = grunt.template.process( '<%= buildPath %>/smk-tags.json' )
         grunt.file.write( out, JSON.stringify( tags.gen(), null, '  ' ) )
-        grunt.log.writeln( 'wrote tags to ' + out )
+        grunt.log.writeln( 'Wrote tags to ' + out )
     } )
 
     grunt.registerTask( 'deploy', 'set deploy dir', function ( dir ) {
@@ -124,6 +128,21 @@ module.exports = function( grunt ) {
         } )
 
         grunt.task.run( 'build', 'watch' )
+    } )
+
+    grunt.registerTask( 'use', 'connection to use', function ( protocol ) {
+        var connectOption = grunt.config( 'connectOption' )
+
+        if ( !( protocol in connectOption ) ) return
+
+        var connectConfig = { connect: {} }
+        connectConfig.connect[ protocol ] = connectOption[ protocol ]
+
+        grunt.config.merge( connectConfig )
+
+        grunt.log.writeln( 'Use connection: ' + protocol )
+
+        grunt.task.run( 'default' )
     } )
 
     grunt.registerTask( 'build', [
