@@ -5,8 +5,8 @@
 .smk-directions-panel .smk-description {
     width: calc( 100% - 92px );
     height: 24px;
-    border: none;
     vertical-align: top;
+    margin-top: 2px;
 }
 
 .smk-directions-panel .smk-waypoint {

@@ -1,4 +1,4 @@
-include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.panel-directions-html', 'tool-directions.popup-directions-html' ], function ( inc ) {
+include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.panel-directions-html', 'tool-directions.address-search-html' ], function ( inc ) {
 
     var request
 
@@ -30,6 +30,102 @@ include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.
             return data
         } )
     }
+    // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+    //
+    Vue.component( 'address-search', {
+        template: inc[ 'tool-directions.address-search-html' ],
+        props: [ 'value', 'placeholder' ],
+        data: function () {
+            return {
+                search: this.value,
+                list: null,
+                selectedIndex: null,
+                expanded: false
+            }
+        },
+        watch: {
+            value: function ( val ) {
+                this.search = this.value
+            }
+        },
+        methods: {
+            onChange: function () {
+                var self = this
+
+                this.$emit( 'input', this.search )
+                this.$emit( 'update', { location: null, description: this.search } )
+
+                this.list = null
+
+                var query = {
+                    ver:            1.2,
+                    maxResults:     20,
+                    outputSRS:      4326,
+                    addressString:  this.search,
+                    autoComplete:   true
+                }
+
+                return SMK.UTIL.makePromise( function ( res, rej ) {
+                    $.ajax( {
+                        timeout:    10 * 1000,
+                        dataType:   'jsonp',
+                        url:        'https://apps.gov.bc.ca/pub/geocoder/addresses.geojsonp',
+                        data:       query,
+                    } ).then( res, rej )
+                } )
+                .then( function ( data ) {
+                    self.list = $.map( data.features, function ( feature ) {
+                        if ( !feature.geometry.coordinates ) return;
+
+                        // exclude whole province match
+                        if ( feature.properties.fullAddress == 'BC' ) return;
+
+                        return {
+                            location: { longitude: feature.geometry.coordinates[ 0 ], latitude: feature.geometry.coordinates[ 1 ] },
+                            description: feature.properties.fullAddress
+                        }
+                    } )
+
+                    self.expanded = self.list.length > 0
+                    self.selectedIndex = self.list.length > 0 ? 0 : null
+                } )
+            },
+
+            onArrowDown: function () {
+                if ( !this.expanded && this.list ) {
+                    this.expanded = true
+                    this.selectedIndex = 0
+                    return
+                }
+                this.selectedIndex = ( ( this.selectedIndex || 0 ) + 1 ) % this.list.length
+            },
+
+            onArrowUp: function () {
+                if ( !this.expanded ) return
+                this.selectedIndex = ( ( this.selectedIndex || 0 ) + this.list.length - 1 ) % this.list.length
+            },
+
+            onEnter: function () {
+                if ( !this.expanded ) return
+                this.search = this.list[ this.selectedIndex ].description
+                this.expanded = false
+                this.$emit( 'update', this.list[ this.selectedIndex ] )
+            },
+
+            handleClickOutside( ev ) {
+                if ( this.$el.contains( ev.target ) ) return
+
+                this.expanded = false
+                this.selectedIndex = null
+            }
+        },
+        mounted() {
+            document.addEventListener( 'click', this.handleClickOutside )
+        },
+        destroyed() {
+            document.removeEventListener( 'click', this.handleClickOutside )
+        }
+    } )
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
     Vue.component( 'directions-widget', {
@@ -123,8 +219,8 @@ include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.
                 if ( !empty )
                     throw new Error( 'shouldnt happen' )
 
-                empty.location = location.map
                 empty.description = site.fullAddress
+                empty.location = location.map
                 self.addWaypoint()
 
                 self.findRoute()
@@ -175,6 +271,20 @@ include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.
 
         aux.panel.vm.$on( 'directions-panel.remove-waypoint', function ( ev ) {
             self.waypoints.splice( ev.index, 1 )
+
+            self.findRoute()
+        } )
+
+        aux.panel.vm.$on( 'directions-panel.update-waypoint', function ( ev ) {
+            var empty = self.waypoints.findIndex( function ( w ) { return !w.location } )
+
+            self.waypoints[ ev.index ] = ev.item
+
+            if ( !ev.item.location && ev.index != empty )
+                self.waypoints.splice( empty, 1 )
+
+            if ( ev.item.location && ev.index == empty )
+                self.addWaypoint()
 
             self.findRoute()
         } )

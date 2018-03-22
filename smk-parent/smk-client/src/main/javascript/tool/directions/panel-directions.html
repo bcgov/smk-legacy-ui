@@ -18,6 +18,7 @@
                 v-bind:class="{ 'smk-disabled': optimal }"
                 v-on:click="$$emit( 'reverse' )"
             >Reverse</span>
+
             <span class="smk-command"
                 v-on:click="$$emit( 'clear' )"
             >Reset</span>
@@ -39,10 +40,10 @@
                 <i class="material-icons">drag_handle</i>
             </span>
 
-            <input class="smk-description" placeholder="Click on point, or enter address"
-                v-bind:title="node.description"
+            <address-search class="smk-description" placeholder="Click on point, or enter address"
                 v-model="node.description"
-            >
+                v-on:update="$$emit( 'update-waypoint', { index: i, item: $event } )"
+            ></address-search>
 
             <span class="smk-command smk-zoomto" title="Zoom to this waypoint"
                 v-on:click="node.location && $$emit( 'zoom-waypoint', { location: node.location } )"
@@ -68,16 +69,19 @@
 
     <div class="smk-summary">{{ summary }}</div>
 
-    <div class="smk-direction"
-        v-for="(direction, i) in directions"
-        v-on:mouseenter="$$emit( 'hover-direction', { highlight: i } )"
-        v-on:mouseleave="$$emit( 'hover-direction', { highlight: null } )"
-        v-on:click="$$emit( 'pick-direction', { pick: i } )"
-        v-bind:class="{ 'smk-highlight': i == directionHighlight, 'smk-pick': i == directionPick }"
-    >
-        {{ direction.instruction }}
-        <div class="smk-direction-metric"
-            v-if="direction.distance"
-        >...for {{ direction.distance }} ({{ direction.time}})</div>
+    <div class="smk-directions">
+        <div class="smk-direction"
+            v-for="(direction, i) in directions"
+            v-on:mouseenter="$$emit( 'hover-direction', { highlight: i } )"
+            v-on:mouseleave="$$emit( 'hover-direction', { highlight: null } )"
+            v-on:click="$$emit( 'pick-direction', { pick: i } )"
+            v-bind:class="{ 'smk-highlight': i == directionHighlight, 'smk-pick': i == directionPick }"
+        >
+            {{ direction.instruction }}
+            <div class="smk-direction-metric"
+                v-if="direction.distance"
+            >...for {{ direction.distance }} ({{ direction.time}})</div>
+        </div>
     </div>
+
 </side-panel>
