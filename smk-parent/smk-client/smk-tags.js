@@ -49,8 +49,17 @@ exports.gen = function () {
     t.group( "tool-coordinate" )
         .dir( 'tool/coordinate/**/*', { cwd: baseDir } )
 
+    t.group( "tool-directions" )
+        .dir( 'tool/directions/**/*', { cwd: baseDir } )
+        // .script( "https://rubaxa.github.io/Sortable/Sortable.js" )
+        .script( "//cdn.jsdelivr.net/npm/sortablejs@1.7.0/Sortable.min.js" )
+        .script( "//cdnjs.cloudflare.com/ajax/libs/Vue.Draggable/2.16.0/vuedraggable.min.js" )
+
     t.group( "tool-layers" )
         .dir( 'tool/layers/**/*', { cwd: baseDir } )
+
+    t.group( "tool-location" )
+        .dir( 'tool/location/**/*', { cwd: baseDir } )
 
     t.group( "tool-identify" )
         .dir( 'tool/identify/**/*', { cwd: baseDir } )
@@ -96,6 +105,12 @@ exports.gen = function () {
     t.group( "tool-coordinate-leaflet" )
         .dir( 'viewer-leaflet/tool/coordinate/**/*', { cwd: baseDir } )
 
+    t.group( "tool-directions-leaflet" )
+        .dir( 'viewer-leaflet/tool/directions/**/*', { cwd: baseDir } )
+
+    t.group( "tool-location-leaflet" )
+        .dir( 'viewer-leaflet/tool/location/**/*', { cwd: baseDir } )
+
     t.group( "tool-minimap-leaflet" )
         .dir( 'viewer-leaflet/tool/minimap/**/*', { cwd: baseDir } )
 
@@ -130,9 +145,9 @@ exports.gen = function () {
         .tag( "leaflet" )
         .script( "resources/js/NonTiledLayer-src.js" )
         .script( "https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-omnivore/v0.3.1/leaflet-omnivore.min.js" )
-        // .script( "https://unpkg.com/terraformer@1.0.7" )
-        // .script( "https://unpkg.com/terraformer-arcgis-parser@1.0.5" )
-        // .script( "https://unpkg.com/terraformer-wkt-parser@1.1.2" )
+        .script( "https://unpkg.com/terraformer@1.0.7" )
+        .script( "https://unpkg.com/terraformer-arcgis-parser@1.0.5" )
+        .script( "https://unpkg.com/terraformer-wkt-parser@1.1.2" )
         .script( "https://npmcdn.com/@turf/turf/turf.min.js" )
 
     // esri3d
@@ -186,6 +201,10 @@ exports.gen = function () {
         .script( "https://unpkg.com/terraformer-wkt-parser@1.1.2" )
         // .style( "https://js.arcgis.com/4.4/esri/css/main.css" )
         // .script( "https://js.arcgis.com/4.4/" )
+
+    t.sequence( "proj4" )
+        .script( 'https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.4.4/proj4.js' )
+        .script( 'projections.js' )
 
     return t
 }

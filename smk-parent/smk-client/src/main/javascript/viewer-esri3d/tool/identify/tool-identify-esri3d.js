@@ -3,19 +3,6 @@ include.module( 'tool-identify-esri3d', [ 'esri3d', 'tool-identify' ], function 
     SMK.TYPE.SearchTool.prototype.afterInitialize.push( function ( smk ) {
         var vw = smk.$viewer
 
-        vw.view.on( 'click', function ( ev ) {
-            // console.log( ev )
-            vw.identifyFeatures.call( vw, {
-                point:    { lat: ev.mapPoint.latitude, lng: ev.mapPoint.longitude },
-                bbox:     vw.getView().extent.join( ',' ),
-
-                position: { x: ev.x, y: ev.y },
-                size: {
-                    width:  vw.view.width,
-                    height: vw.view.height
-                }
-            } )
-        } )
 
         // vw.identifyHighlights = L.layerGroup( { pane: 'markerPane' } ).addTo( vw.map )
 

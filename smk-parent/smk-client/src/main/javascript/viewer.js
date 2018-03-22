@@ -6,10 +6,11 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
         'startedLoading',
         'finishedLoading',
         'startedIdentify',
-        'finishedIdentify'
+        'finishedIdentify',
+        'pickedLocation'
     ] )
 
-    function ViewerBase() {
+    function Viewer() {
         var self = this
 
         ViewerEvent.prototype.constructor.call( this )
@@ -29,12 +30,12 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
         } )
     }
 
-    SMK.TYPE.ViewerBase = ViewerBase
+    SMK.TYPE.Viewer = Viewer
 
-    $.extend( ViewerBase.prototype, ViewerEvent.prototype )
+    $.extend( Viewer.prototype, ViewerEvent.prototype )
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
-    ViewerBase.prototype.basemap = {
+    Viewer.prototype.basemap = {
         Topographic: {
             order: 1,
             title: 'Topographic'
@@ -74,11 +75,11 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
     }
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
-    ViewerBase.prototype.destroy = function () {
+    Viewer.prototype.destroy = function () {
         ViewerEvent.prototype.destroy()
     }
 
-    ViewerBase.prototype.initialize = function ( smk ) {
+    Viewer.prototype.initialize = function ( smk ) {
         var self = this
 
         this.lmfId = smk.lmfId
@@ -93,8 +94,10 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
         this.layerId = {}
         this.visibleLayer = {}
         this.layerIdPromise = {}
-        // this.layerStatus = {}
         this.deadViewerLayer = {}
+        this.handler = {
+            pick: {}
+        }
 
         if ( Array.isArray( smk.layers ) )
             self.layerIds = smk.layers.map( function ( lyConfig, i ) {
@@ -113,9 +116,22 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
 
                 return lyConfig.id
             } )
+
+        this.pickedLocation( function ( ev ) {
+            var pickHandler = self.handler.pick
+            if ( !pickHandler ) return
+
+            var h = 'identify'
+            Object.keys( pickHandler ).forEach( function ( t ) {
+                if ( smk.$tool[ t ].active ) h = t
+            } )
+            if ( typeof pickHandler[ h ] != 'function' ) return
+
+            pickHandler[ h ].call( smk.$tool[ h ], ev )
+        } )
     }
 
-    ViewerBase.prototype.initializeLayers = function ( smk ) {
+    Viewer.prototype.initializeLayers = function ( smk ) {
         var self = this;
 
         if ( !smk.layers || smk.layers.length == 0 ) return SMK.UTIL.resolved()
@@ -125,7 +141,7 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
     }
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
-    ViewerBase.prototype.setLayersVisible = function ( layerIds, visible ) {
+    Viewer.prototype.setLayersVisible = function ( layerIds, visible ) {
         var self = this
 
         var layerCount = this.layerIds.length
@@ -195,13 +211,13 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
         return SMK.UTIL.waitAll( promises )
     }
 
-    ViewerBase.prototype.addViewerLayer = function ( viewerLayer ) {
+    Viewer.prototype.addViewerLayer = function ( viewerLayer ) {
     }
 
-    ViewerBase.prototype.positionViewerLayer = function ( viewerLayer, zOrder ) {
+    Viewer.prototype.positionViewerLayer = function ( viewerLayer, zOrder ) {
     }
 
-    ViewerBase.prototype.createViewerLayer = function ( id, layers, zIndex ) {
+    Viewer.prototype.createViewerLayer = function ( id, layers, zIndex ) {
         var self = this
 
         if ( layers.length == 0 )
@@ -233,7 +249,7 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
             } )
     }
 
-    ViewerBase.prototype.afterCreateViewerLayer = function ( id, type, layers, viewerLayer ) {
+    Viewer.prototype.afterCreateViewerLayer = function ( id, type, layers, viewerLayer ) {
         viewerLayer._smk_type = type
         viewerLayer._smk_id = id
 
@@ -241,8 +257,14 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
     }
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
-    ViewerBase.prototype.identifyFeatures = function ( arg ) {
+    Viewer.prototype.getView = function () {
+        throw new Error( 'not implemented' )
+    }
+
+    Viewer.prototype.identifyFeatures = function ( location ) {
         var self = this
+
+        var view = this.getView()
 
         this.startedIdentify()
 
@@ -253,8 +275,10 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
             var ly = self.layerId[ id ]
 
             if ( !ly.visible ) return
+            if ( ly.config.isQueryable === false ) return
+            if ( !ly.inScaleRange( view ) ) return
 
-            var p = ly.getFeaturesAtPoint( arg, self.visibleLayer[ id ] )
+            var p = ly.getFeaturesAtPoint( location, view, self.visibleLayer[ id ] )
             if ( !p ) return
 
             promises.push(
@@ -262,12 +286,10 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
                     return p
                 } )
                 .then( function ( features ) {
-                    if ( !features || features.length == 0 ) return
-
                     self.identified.add( id, features )
                 } )
-                .catch( function () {
-                    console.warn( 'identify fail:', arguments )
+                .catch( function ( err ) {
+                    console.debug( id, 'identify fail:', err.message )
                     return SMK.UTIL.resolved()
                 } )
             )
@@ -280,7 +302,7 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
     }
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
-    ViewerBase.prototype.anyLayersLoading = function () {
+    Viewer.prototype.anyLayersLoading = function () {
         var self = this
 
         return this.layerIds.some( function ( id ) {
@@ -289,11 +311,95 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
     }
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
-    ViewerBase.prototype.resolveAttachmentUrl = function ( attachmentId, type ) {
+    Viewer.prototype.resolveAttachmentUrl = function ( attachmentId, type ) {
         if ( this.disconnected )
             return 'attachments/' + attachmentId + '.' + type
         else
             return '../smks-api/MapConfigurations/' + this.lmfId + '/Attachments/' + attachmentId
+    }
+    // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+    //
+    Viewer.prototype.handlePick = function ( tool, handler ) {
+        this.handler.pick[ tool.type ] = handler
+    }
+    // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+    //
+    Viewer.prototype.pixelsToMillimeters = ( function () {
+        var e = document.createElement( 'div' )
+        e.style = 'height:1mm; display:none'
+        e.id = 'heightRef'
+        document.body.appendChild( e )
+
+        var pixPerMillimeter = $( '#heightRef' ).height()
+
+        e.parentNode.removeChild( e )
+
+        return function ( pixels ) {
+            return pixels / pixPerMillimeter
+        }
+    } )()
+    // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+    //
+    Viewer.prototype.getCurrentLocation = function ( option ) {
+        var self = this
+
+        option = Object.assign( {
+            timeout:         10 * 1000,
+            maxAge:     10 * 60 * 1000,
+            cacheKey:   'smk-location'
+        }, option )
+
+        if ( this.currentLocationPromise && ( !this.currentLocationTimestamp || this.currentLocationTimestamp > ( ( new Date() ).getTime() - option.maxAge ) ) )
+            return this.currentLocationPromise
+
+        this.currentLocationTimestamp = null
+        return this.currentLocationPromise = SMK.UTIL.makePromise( function ( res, rej ) {
+            navigator.geolocation.getCurrentPosition( res, rej, {
+                timeout:            option.timeout,
+                enableHighAccuracy: true,
+            } )
+            setTimeout( function () { rej( new Error( 'timeout' ) ) }, option.timeout )
+        } )
+        .then( function ( pos ) {
+            self.currentLocationTimestamp = ( new Date() ).getTime()
+            window.localStorage.setItem( option.cacheKey, JSON.stringify( { latitude: pos.coords.latitude, longitude: pos.coords.longitude } ) )
+            return pos.coords
+        } )
+        .catch( function ( err ) {
+            try {
+                var coords = JSON.parse( window.localStorage.getItem( option.cacheKey ) )
+                if ( coords && coords.latitude ) {
+                    console.warn( 'using cached location', coords )
+                    return coords
+                }
+            }
+            catch ( e ) {}
+            return Promise.reject( err )
+        } )
+    }
+    // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+    //
+    Viewer.prototype.findNearestSite = function ( location ) {
+        var self = this
+
+        var query = {
+            point:              [ location.longitude, location.latitude ].join( ',' ),
+            outputSRS:          4326,
+            locationDescriptor: 'routingPoint',
+            maxDistance:        1000,
+        }
+
+        return SMK.UTIL.makePromise( function ( res, rej ) {
+            $.ajax( {
+                timeout:    10 * 1000,
+                dataType:   'json',
+                url:        'https://geocoder.api.gov.bc.ca/sites/nearest.geojson',
+                data:       query,
+            } ).then( res, rej )
+        } )
+        .then( function ( data ) {
+            return data.properties
+        } )
     }
 
 } )

@@ -1,0 +1,42 @@
+.smk-directions-panel .smk-command-col {
+    display: inline-block;
+}
+
+.smk-directions-panel .smk-description {
+    width: calc( 100% - 92px );
+    height: 24px;
+    border: none;
+    vertical-align: top;
+}
+
+.smk-directions-panel .smk-waypoint {
+    border: 1px solid gray;
+    border-radius: 5px;
+    margin-bottom: 1px;
+}
+
+.smk-directions-panel .smk-waypoint .smk-command {
+    display: inline-block;
+    padding: 0;
+    margin: 0;
+    margin-top: 1px;
+    color: black;
+}
+
+.smk-directions-panel .smk-waypoint .smk-command.smk-disabled {
+    opacity: 0.4;
+    cursor: default;
+}
+
+.smk-directions-panel .smk-waypoint .smk-zoomto.smk-first {
+    color: green;
+}
+
+.smk-directions-panel .smk-waypoint .smk-zoomto.smk-middle {
+    color: blue;
+}
+
+.smk-directions-panel .smk-waypoint .smk-zoomto.smk-last {
+    color: red;
+}
+

@@ -6,7 +6,7 @@
     var TAG = {}
     var OPTION = {
         baseUrl: document.location,
-        timeout: 5000
+        timeout: 30 * 1000
     }
 
     function includeTag( tag, attr ) {
@@ -213,8 +213,8 @@
         var anon = tag
         var newTag
         if ( base && tag.url && !tag.external && !/[/][/]/.test( tag.url ) ) {
-            var m = tag.url.match( /[/]([^/]+)$/ )
-            newTag = base + '.' +  m[ 1 ].replace( /[.]/g, '-' ).toLowerCase()
+            var m = tag.url.match( /(^|[/])([^/]+)$/ )
+            newTag = base + '.' +  m[ 2 ].replace( /[.]/g, '-' ).toLowerCase()
             // console.log( tag.url, m, newTag )
         }
         else {
@@ -476,6 +476,7 @@
     window.include.tag = includeTag
     window.include.hash = hash
     window.include.option = option
+    window.include.parseJSONC = parseJSONC
 
 } )()
 
