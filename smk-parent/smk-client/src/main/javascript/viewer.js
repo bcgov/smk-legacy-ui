@@ -340,34 +340,65 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
     } )()
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
-    Viewer.prototype.getCurrentLocation = function () {
+    Viewer.prototype.getCurrentLocation = function ( option ) {
         var self = this
 
-        if ( this.currentLocationPromise && ( !this.currentLocationTimestamp || this.currentLocationTimestamp > ( ( new Date() ).getTime() - 10 * 60 * 1000 ) ) )
+        option = Object.assign( {
+            timeout:         10 * 1000,
+            maxAge:     10 * 60 * 1000,
+            cacheKey:   'smk-location'
+        }, option )
+
+        if ( this.currentLocationPromise && ( !this.currentLocationTimestamp || this.currentLocationTimestamp > ( ( new Date() ).getTime() - option.maxAge ) ) )
             return this.currentLocationPromise
 
         this.currentLocationTimestamp = null
         return this.currentLocationPromise = SMK.UTIL.makePromise( function ( res, rej ) {
             navigator.geolocation.getCurrentPosition( res, rej, {
-                timeout:            10 * 1000,
+                timeout:            option.timeout,
                 enableHighAccuracy: true,
-                // maximumAge:         60 * 1000,
             } )
-            setTimeout( function () { rej( new Error( 'timeout' ) ) }, 10 * 1000 )
+            setTimeout( function () { rej( new Error( 'timeout' ) ) }, option.timeout )
         } )
         .then( function ( pos ) {
             self.currentLocationTimestamp = ( new Date() ).getTime()
-            window.localStorage.setItem( 'smk-location', JSON.stringify( pos.coords ) )
+            window.localStorage.setItem( option.cacheKey, JSON.stringify( { latitude: pos.coords.latitude, longitude: pos.coords.longitude } ) )
             return pos.coords
         } )
         .catch( function ( err ) {
-            var coords = window.localStorage.getItem( 'smk-location' )
-            if ( coords && coords.latitude ) {
-                console.warn( 'using cached location', coords )
-                return JSON.parse( coords )
+            try {
+                var coords = JSON.parse( window.localStorage.getItem( option.cacheKey ) )
+                if ( coords && coords.latitude ) {
+                    console.warn( 'using cached location', coords )
+                    return coords
+                }
             }
-
+            catch ( e ) {}
             return Promise.reject( err )
+        } )
+    }
+    // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+    //
+    Viewer.prototype.findNearestSite = function ( location ) {
+        var self = this
+
+        var query = {
+            point:              [ location.longitude, location.latitude ].join( ',' ),
+            outputSRS:          4326,
+            locationDescriptor: 'routingPoint',
+            maxDistance:        1000,
+        }
+
+        return SMK.UTIL.makePromise( function ( res, rej ) {
+            $.ajax( {
+                timeout:    10 * 1000,
+                dataType:   'json',
+                url:        'https://geocoder.api.gov.bc.ca/sites/nearest.geojson',
+                data:       query,
+            } ).then( res, rej )
+        } )
+        .then( function ( data ) {
+            return data.properties
         } )
     }
 

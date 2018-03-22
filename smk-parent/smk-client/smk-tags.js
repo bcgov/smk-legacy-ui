@@ -51,7 +51,9 @@ exports.gen = function () {
 
     t.group( "tool-directions" )
         .dir( 'tool/directions/**/*', { cwd: baseDir } )
-        .script( "https://rubaxa.github.io/Sortable/Sortable.js" )
+        // .script( "https://rubaxa.github.io/Sortable/Sortable.js" )
+        .script( "//cdn.jsdelivr.net/npm/sortablejs@1.7.0/Sortable.min.js" )
+        .script( "//cdnjs.cloudflare.com/ajax/libs/Vue.Draggable/2.16.0/vuedraggable.min.js" )
 
     t.group( "tool-layers" )
         .dir( 'tool/layers/**/*', { cwd: baseDir } )

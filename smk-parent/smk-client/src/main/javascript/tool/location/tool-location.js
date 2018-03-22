@@ -1,33 +1,5 @@
 include.module( 'tool-location', [ 'smk', 'tool', 'widgets', 'tool-location.popup-location-html' ], function ( inc ) {
 
-    var request
-
-    function findNearestSite( location ) {
-        if ( request )
-            request.abort()
-
-        var query = {
-            point:              [ location.longitude, location.latitude ].join( ',' ),
-            outputSRS:          4326,
-            locationDescriptor: 'routingPoint',
-            maxDistance:        1000,
-        }
-
-        return SMK.UTIL.makePromise( function ( res, rej ) {
-            ( request = $.ajax( {
-                timeout:    10 * 1000,
-                dataType:   'jsonp',
-                url:        'https://geocoder.api.gov.bc.ca/sites/nearest.geojsonp',
-                data:       query,
-            } ) ).then( res, rej )
-        } )
-        .then( function ( data ) {
-            return data.properties
-        } )
-    }
-
-    // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-    //
     function LocationTool( option ) {
         this.makePropWidget( 'location', {} )
         this.makePropWidget( 'site', {} )
@@ -75,13 +47,11 @@ include.module( 'tool-location', [ 'smk', 'tool', 'widgets', 'tool-location.popu
 
                 },
                 startDirections: function ( location, site ) {
-                    return smk.$viewer.getCurrentLocation().then( function ( curLoc ) {
-                        return findNearestSite( curLoc ).then( function ( curSite ) {
-                            smk.$tool.directions.setWaypoints( [
-                                { location: curLoc, site: curSite },
-                                { location: location, site: site }
-                            ] )
-                        } )
+                    smk.$tool.directions.resetWaypoints()
+                    smk.$tool.directions.addWaypointCurrentLocation().then( function () {
+                        smk.$tool.directions.addWaypoint( location, site.fullAddress )
+                        smk.$tool.directions.addWaypoint()
+                        smk.$tool.directions.active = true
                     } )
                 },
             }
@@ -91,7 +61,7 @@ include.module( 'tool-location', [ 'smk', 'tool', 'widgets', 'tool-location.popu
             self.location = location.map
             self.site = {}
 
-            findNearestSite( location.map ).then( function ( site ) {
+            smk.$viewer.findNearestSite( location.map ).then( function ( site ) {
                 // console.log( JSON.stringify( site, null, '  ' ) )
                 self.site = site
             } )

@@ -48,9 +48,18 @@ include.module( 'tool-directions-leaflet', [ 'leaflet', 'tool-directions' ], fun
     SMK.TYPE.DirectionsTool.prototype.afterInitialize.push( function ( smk, aux ) {
         var self = this
 
+        this.changedActive( function () {
+            if ( self.active ) {
+            }
+            else {
+                reset()
+            }
+        } )
+
         this.displayRoute = function ( points ) {
-            if ( self.routeLayer )
-                smk.$viewer.map.removeLayer( self.routeLayer )
+            reset()
+
+            if ( !points ) return
 
             self.routeLayer = L.geoJson( {
                 type: "Feature",
@@ -61,9 +70,6 @@ include.module( 'tool-directions-leaflet', [ 'leaflet', 'tool-directions' ], fun
             }, {
                 onEachFeature: function( feature, layer ) {
                     var color = "#0000FF";
-                    // if(params['criteria'] == "fastest") {
-                    //     color = "#FF00FF";
-                    // }
                     layer.setStyle( { color:color, weight:7, opacity: 0.5 } );
                 }
             } )
@@ -72,27 +78,54 @@ include.module( 'tool-directions-leaflet', [ 'leaflet', 'tool-directions' ], fun
 
             bounds = self.routeLayer.getBounds()
 
-            // function centerMap(bounds, center = true) {
-            //     var options = {
-            //         maxZoom: 16
-            //     };
-            //     if(tabs) {
-            //         options.paddingTopLeft = [400,0];
-            //     }
-                // if(center) {
             smk.$viewer.map.fitBounds( bounds.pad( 0.25 ) )
-                // } else if(!map.getBounds().contains(bounds.pad(0.25))) {
-                    // if the bounds aren't within the current map bounds
-                    // zoom out to include the bounds
-                    // map.fitBounds(bounds.extend(map.getBounds()).pad(0.25), options);
-                // }
-            // }
+        }
 
+        this.displayWaypoints = function () {
+            if ( self.waypointLayers && self.waypointLayers.length > 0 ) {
+                self.waypointLayers.forEach( function ( l ) {
+                    smk.$viewer.map.removeLayer( l )
+                } )
+            }
+
+            var last = self.waypoints.length - 2
+            self.waypointLayers = self.waypoints
+                .filter( function ( w ) { return !!w.location } )
+                .map( function ( w, i ) {
+                    return L.marker( [ w.location.latitude, w.location.longitude ], {
+                        icon: i == 0 ? greenIcon
+                            : i == last ? redIcon
+                            : new L.NumberedIcon( { number: i } )
+                    } ).addTo( smk.$viewer.map )
+                } )
+        }
+
+        function reset() {
+            if ( self.routeLayer )
+                smk.$viewer.map.removeLayer( self.routeLayer )
+            self.routeLayer = null
+
+            if ( self.directionHighlightLayer )
+                smk.$viewer.map.removeLayer( self.directionHighlightLayer )
+            self.directionHighlightLayer = null
+
+            if ( self.directionPickLayer )
+                smk.$viewer.map.removeLayer( self.directionPickLayer )
+            self.directionPickLayer = null
+
+            if ( self.waypointLayers && self.waypointLayers.length > 0 ) {
+                self.waypointLayers.forEach( function ( l ) {
+                    smk.$viewer.map.removeLayer( l )
+                } )
+            }
+            self.waypointLayers = null
         }
 
         aux.panel.vm.$on( 'directions-panel.hover-direction', function ( ev ) {
-            if ( self.directionHighlightLayer )
+            if ( self.directionHighlightLayer ) {
                 smk.$viewer.map.removeLayer( self.directionHighlightLayer )
+                self.directionHighlightLayer = null
+            }
 
             if ( !ev.highlight )
                 return
@@ -103,8 +136,10 @@ include.module( 'tool-directions-leaflet', [ 'leaflet', 'tool-directions' ], fun
         } )
 
         aux.panel.vm.$on( 'directions-panel.pick-direction', function ( ev ) {
-            if ( self.directionPickLayer )
+            if ( self.directionPickLayer ) {
                 smk.$viewer.map.removeLayer( self.directionPickLayer )
+                self.directionPickLayer = null
+            }
 
             if ( !ev.pick )
                 return
@@ -112,7 +147,15 @@ include.module( 'tool-directions-leaflet', [ 'leaflet', 'tool-directions' ], fun
             var p = self.directions[ ev.pick ].point
             self.directionPickLayer = L.circleMarker( [ p[ 1 ], p[ 0 ] ], { radius: 15 } )
             smk.$viewer.map.addLayer( self.directionPickLayer )
-        } )        
+        } )
+
+        aux.panel.vm.$on( 'directions-panel.clear', function ( ev ) {
+            reset()
+        } )
+
+        aux.panel.vm.$on( 'directions-panel.zoom-waypoint', function ( ev ) {
+        } )
+
     } )
 
 
