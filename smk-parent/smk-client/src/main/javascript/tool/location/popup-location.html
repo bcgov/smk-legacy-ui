@@ -1,0 +1,27 @@
+<div class="smk-location-popup" v-if="location.latitude">
+    <div class="smk-address" v-if="site.fullAddress">
+        <div class="smk-street">
+            <span class="smk-civic-number">{{ site.civicNumber }}</span>
+            <span class="smk-street-name">{{ site.streetName }}</span>
+            <span class="smk-street-type">{{ site.streetType }}</span>
+        </div>
+        <div class="smk-locality">
+            <span class="smk-locality-name">{{ site.localityName }}</span>
+            <span class="smk-locality-type" v-if="site.localityType != 'Unknown'">({{ site.localityType }})</span>
+        </div>
+    </div>
+
+    <div class="smk-coordinate">
+        <span class="smk-coordinate-label">lat</span>
+        <span class="smk-coordinate-value">{{ formatDD( location.latitude ) }}</span>
+        ,
+        <span class="smk-coordinate-label">long</span>
+        <span class="smk-coordinate-value">{{ formatDD( location.longitude ) }}</span>
+    </div>
+
+    <div class="smk-commands">
+        <span class="smk-command" v-if="tool.identify" v-on:click="identifyFeatures( location )">Identify features</span>
+        <span class="smk-command" v-if="tool.measure" v-on:click="startMeasurement( location )">Start measurement</span>
+        <span class="smk-command" v-if="tool.directions" v-on:click="startDirections( location, site )">Directions to here</span>
+    </div>
+</div>

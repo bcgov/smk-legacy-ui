@@ -29,14 +29,14 @@
     },
 
     "tools": [
-        { "type": "measure" },
+        // { "type": "measure" },
         { "type": "scale",
             "showFactor": true,
             "showBar": true },
         { "type": "coordinate" },
         { "type": "minimap", "baseMap": "Imagery" },
         { "type": "markup" },
-        { "type": "direction" },
+        { "type": "directions" },
         { "type": "pan" },
         { "type": "zoom",
             "mouseWheel": true,

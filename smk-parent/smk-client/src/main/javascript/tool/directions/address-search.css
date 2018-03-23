@@ -1,0 +1,61 @@
+.smk-address-search {
+    position: relative;
+    display: inline-block;
+}
+
+.smk-address-search input {
+    width: 100%;
+    height: 100%;
+    border: none;
+    vertical-align: top;
+    border-bottom: 1px solid transparent;
+}
+
+.smk-address-search input:focus {
+    outline: none;
+    border-bottom: 1px dashed gray;
+}
+
+.smk-popup-list {
+    z-index: 5;
+    position: absolute;
+    top: 20px;
+    border: 1px solid gray;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.65);
+    background-color: white;
+    font-size: 12px;
+    max-width: 200px;
+}
+
+.smk-popup-item {
+    overflow-x: hidden;
+    white-space: nowrap;
+}
+
+.smk-popup-item.smk-active-item {
+    background-color: lightskyblue;
+    font-weight: bold;
+}
+
+/*
+    <input type="text"
+        v-bind:placeholder="placeholder"
+        v-model="search"
+        v-on:input="onChange"
+        v-on:keyup.down="onArrowDown"
+        v-on:keyup.up="onArrowUp"
+        v-on:keyup.enter="onEnter"
+    >
+
+    <div class="smk-popup-list" v-if="expanded">
+        <div class="smk-popup-item"
+            v-for="( item, i ) in list"
+            v-bind:class="{ 'smk-active-item': i == selectedIndex }"
+            v-on:mouseenter="selectedIndex = i"
+            v-on:mouseleave="selectedIndex = null"
+            v-on:click="onEnter"
+        >
+            {{ item.description }}
+        </div>
+    </div>
+</div> */

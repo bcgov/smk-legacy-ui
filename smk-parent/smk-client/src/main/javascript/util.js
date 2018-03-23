@@ -134,6 +134,104 @@ include.module( 'util', [ 'jquery' ], function ( inc ) {
             }
 
             throw new Error( 'not supposed to be here' )
+        },
+
+        extractCRS: function ( obj ) {
+            if ( obj.properties )
+                if ( obj.properties.name )
+                    return obj.properties.name
+
+            throw new Error( 'unable to determine CRS from: ' + JSON.stringify( obj ) )
+        },
+
+        reproject: function ( geojson, crs ) {
+            var self = this
+
+            return include( 'proj4' ).then( function ( inc ) {
+                var proj = proj4( self.extractCRS( crs ) )
+
+                return self.traverse.GeoJSON( geojson, {
+                    coordinate: function ( c ) {
+                        return proj.inverse( c )
+                    }
+                } )
+            } )
+        },
+
+        traverse: {
+            GeoJSON: function ( geojson, cb ) {
+                Object.assign( {
+                    coordinate: function ( c ) { return c }
+                }, cb )
+
+                return this[ geojson.type ]( geojson, cb )
+            },
+
+            Point: function ( obj, cb ) {
+                return {
+                    type: 'Point',
+                    coordinates: cb.coordinate( obj.coordinates )
+                }
+            },
+
+            MultiPoint: function ( obj, cb ) {
+                return {
+                    type: 'MultiPoint',
+                    coordinates: obj.coordinates.map( function ( c ) { return cb.coordinate( c ) } )
+                }
+            },
+
+            LineString: function ( obj, cb ) {
+                return {
+                    type: 'LineString',
+                    coordinates: obj.coordinates.map( function ( c ) { return cb.coordinate( c ) } )
+                }
+            },
+
+            MultiLineString: function ( obj, cb ) {
+                return {
+                    type: 'MultiLineString',
+                    coordinates: obj.coordinates.map( function ( ls ) { return ls.map( function ( c ) { return cb.coordinate( c ) } ) } )
+                }
+            },
+
+            Polygon: function ( obj, cb ) {
+                return {
+                    type: 'Polygon',
+                    coordinates: obj.coordinates.map( function ( ls ) { return ls.map( function ( c ) { return cb.coordinate( c ) } ) } )
+                }
+            },
+
+            MultiPolygon: function ( obj, cb ) {
+                return {
+                    type: 'MultiPolygon',
+                    coordinates: obj.coordinates.map( function ( ps ) { return ps.map( function ( ls ) { return ls.map( function ( c ) { return cb.coordinate( c ) } ) } ) } )
+                }
+            },
+
+            GeometryCollection: function ( obj, cb ) {
+                var self = this
+                return {
+                    type: 'GeometryCollection',
+                    geometries: obj.geometries.map( function ( g ) { return self[ g.type ]( g, cb ) } )
+                }
+            },
+
+            FeatureCollection:  function ( obj, cb ) {
+                var self = this
+                return {
+                    type: 'FeatureCollection',
+                    features: obj.features.map( function ( f ) { return self[ f.type ]( f, cb ) } )
+                }
+            },
+
+            Feature: function( obj, cb ) {
+                return {
+                    type: 'Feature',
+                    geometry: this[ obj.geometry.type ]( obj.geometry, cb ),
+                    properties: obj.properties
+                }
+            }
         }
 
     } )

@@ -1,25 +1,11 @@
 include.module( 'tool-identify-leaflet', [ 'leaflet', 'tool-identify' ], function ( inc ) {
 
-    SMK.TYPE.SearchTool.prototype.afterInitialize.push( function ( smk ) {
+    SMK.TYPE.IdentifyTool.prototype.afterInitialize.push( function ( smk ) {
+        var self = this
+
         var vw = smk.$viewer
 
-        vw.map.on( 'click', function ( ev ) {
-            var bbox = vw.map.getBounds().toBBoxString()
-            var size = vw.map.getSize()
-
-            vw.identifyFeatures.call( vw, {
-                point:    ev.latlng,
-                bbox:     bbox,
-
-                position: ev.containerPoint,
-                size: {
-                    width:  size.x,
-                    height: size.y
-                }
-            } )
-        } )
-
-        vw.identifyHighlights = L.layerGroup( { pane: 'markerPane' } ).addTo( vw.map )
+        this.highlights = L.layerGroup( { pane: 'markerPane' } ).addTo( vw.map )
 
         vw.identified.addedFeatures( function ( ev ) {
             ev.features.forEach( function ( f ) {
@@ -33,7 +19,7 @@ include.module( 'tool-identify-leaflet', [ 'leaflet', 'tool-identify' ], functio
                     }
                 } )
 
-                vw.identifyHighlights.addLayer( l )
+                self.highlights.addLayer( l )
                 f.highlightLayer = l
 
                 l.bindPopup( vw.getIdentifyPopupEl, {
@@ -85,7 +71,7 @@ include.module( 'tool-identify-leaflet', [ 'leaflet', 'tool-identify' ], functio
         } )
 
         vw.identified.clearedFeatures( function ( ev ) {
-            vw.identifyHighlights.clearLayers()
+            self.highlights.clearLayers()
         } )
 
         function brightHighlight( highlightLayer, bright ) {

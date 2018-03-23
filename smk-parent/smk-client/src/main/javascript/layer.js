@@ -63,6 +63,14 @@ include.module( 'layer', [ 'smk', 'jquery', 'util', 'event' ], function () {
     Layer.prototype.canMergeWith = function ( other ) {
         return false
     }
+
+    Layer.prototype.inScaleRange = function ( view ) {
+        console.log( this.config.title, this.config.scaleMin, view.scale, this.config.scaleMax )
+        if ( this.config.scaleMax && view.scale > this.config.scaleMax ) return false
+        if ( this.config.scaleMin && view.scale < this.config.scaleMin ) return false
+        return true
+    }
+
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
     SMK.TYPE.Layer = {}
@@ -128,22 +136,23 @@ include.module( 'layer', [ 'smk', 'jquery', 'util', 'event' ], function () {
             } )
         },
 
-        getFeaturesAtPoint: function ( arg ) {
+        getFeaturesAtPoint: function ( location, view ) {
             var self = this
 
             var serviceUrl  = this.config.serviceUrl
             var layerName   = this.config.layerName
             var styleName   = this.config.styleName
-            var version     = this.config.version || '1.1.1'
+            // var version     = this.config.version || '1.1.1'
+            var version     = '1.1.1'
 
             var params = {
                 service:       "WMS",
                 version:       version,
                 request:       "GetFeatureInfo",
-                bbox:          arg.bbox,
+                bbox:          view.extent.join( ',' ),
                 feature_count: 20,
-                height:        arg.size.height,
-                width:         arg.size.width,
+                height:        view.screen.height,
+                width:         view.screen.width,
                 info_format:   'application/json',
                 layers:        layerName,
                 query_layers:  layerName,
@@ -152,13 +161,13 @@ include.module( 'layer', [ 'smk', 'jquery', 'util', 'event' ], function () {
 
             if ( version == '1.3.0' ) {
                 params.crs = 'EPSG:4326'
-                params.i =   parseInt( arg.position.x )
-                params.j =   parseInt( arg.position.y )
+                params.i =   parseInt( location.screen.x )
+                params.j =   parseInt( location.screen.y )
             }
             else {
                 params.srs = 'EPSG:4326'
-                params.x =   parseInt( arg.position.x )
-                params.y =   parseInt( arg.position.y )
+                params.x =   parseInt( location.screen.x )
+                params.y =   parseInt( location.screen.y )
             }
 
             var options = {
@@ -168,18 +177,26 @@ include.module( 'layer', [ 'smk', 'jquery', 'util', 'event' ], function () {
                 xhrFields: {},
             };
 
-            return $.ajax( options )
-                .then( function ( data ) {
-                    if ( data && data.features && data.features.length > 0 )
-                        return data.features.map( function ( f, i ) {
-                            if ( self.config.titleAttribute )
-                                f.title = f.properties[ self.config.titleAttribute ]
-                            else
-                                f.title = 'Feature #' + ( i + 1 )
+            return SMK.UTIL.makePromise( function ( res, rej ) {
+                $.ajax( options ).then( res, rej )
+            } )
+            .then( function ( geojson ) {
+                if ( !geojson || !geojson.features || geojson.features.length == 0 ) throw new Error( 'no features' )
 
-                            return f
-                        } )
+                if ( !geojson.crs ) return geojson
+
+                return SMK.UTIL.reproject( geojson, geojson.crs )
+            } )
+            .then( function ( geojson ) {
+                return geojson.features.map( function ( f, i ) {
+                    if ( self.config.titleAttribute )
+                        f.title = f.properties[ self.config.titleAttribute ]
+                    else
+                        f.title = 'Feature #' + ( i + 1 )
+
+                    return f
                 } )
+            } )
 
             // if ( queryLayer.withCreds )
             //     options.xhrFields.withCredentials = true
@@ -213,7 +230,7 @@ include.module( 'layer', [ 'smk', 'jquery', 'util', 'event' ], function () {
             } )
         },
 
-        getFeaturesAtPoint: function ( arg ) {
+        getFeaturesAtPoint: function ( location, view ) {
             var self = this
 
             var serviceUrl  = this.config.serviceUrl + '/identify'
@@ -223,13 +240,13 @@ include.module( 'layer', [ 'smk', 'jquery', 'util', 'event' ], function () {
                 geometryType:   'esriGeometryPoint',
                 sr:             4326,
                 tolerance:      1,
-                mapExtent:      arg.bbox,
-                imageDisplay:   [ arg.size.width, arg.size.height, 96 ].join( ',' ),
+                mapExtent:      view.extent.join( ',' ),
+                imageDisplay:   [ view.screen.width, view.screen.height, 96 ].join( ',' ),
                 returnGeometry: true,
                 returnZ:        false,
                 returnM:        false,
                 f:              'pjson',
-                geometry:       arg.point.lng + ',' + arg.point.lat,
+                geometry:       location.map.longitude + ',' + location.map.latitude,
                 dynamicLayers:  dynamicLayers
             }
 
@@ -243,8 +260,8 @@ include.module( 'layer', [ 'smk', 'jquery', 'util', 'event' ], function () {
                     withCredentials: true,
                 } )
                 .then( function ( data ) {
-                    if ( !data ) return
-                    if ( !data.results || data.results.length == 0 ) return
+                    if ( !data ) throw new Error( 'no features' )
+                    if ( !data.results || data.results.length == 0 ) throw new Error( 'no features' )
 
                     return data.results.map( function ( r, i ) {
                         var f = {}
