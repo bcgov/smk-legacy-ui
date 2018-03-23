@@ -134,7 +134,7 @@ include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.
 
     Vue.component( 'directions-panel', {
         template: inc[ 'tool-directions.panel-directions-html' ],
-        props: [ 'busy', 'waypoints', 'directions', 'directionHighlight', 'directionPick', 'summary', 'message' ],
+        props: [ 'busy', 'waypoints', 'directions', 'directionHighlight', 'directionPick', 'message', 'messageClass' ],
         data: function () {
             return {
                 optimal:    false,
@@ -165,8 +165,8 @@ include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.
         this.makePropPanel( 'directions', [] )
         this.makePropPanel( 'directionHighlight', null )
         this.makePropPanel( 'directionPick', null )
-        this.makePropPanel( 'summary', null )
         this.makePropPanel( 'message', null )
+        this.makePropPanel( 'messageClass', null )
 
         SMK.TYPE.Tool.prototype.constructor.call( this, $.extend( {
             order:          4,
@@ -180,6 +180,8 @@ include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.
             roundTrip:  false,
             criteria:   'shortest'
         }
+
+        this.activating = SMK.UTIL.resolved()
     }
 
     SMK.TYPE.DirectionsTool = DirectionsTool
@@ -191,18 +193,19 @@ include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.
     DirectionsTool.prototype.afterInitialize.push( function ( smk, aux ) {
         var self = this
 
-        this.changedActive( function () {
+        self.changedActive( function () {
             if ( self.active ) {
                 smk.$tool.location.enabled = false
 
                 if ( self.waypoints.length == 0 ) {
-                    self.addWaypointCurrentLocation().then( function () {
-                        self.addWaypoint()
-                        self.displayWaypoints()
+                    self.activating = self.activating.then( function () {
+                        return self.startAtCurrentLocation()
                     } )
                 }
                 else {
-                    self.findRoute()
+                    self.activating = self.activating.then( function () {
+                        return self.findRoute()
+                    } )
                 }
             }
             else {
@@ -210,15 +213,18 @@ include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.
             }
         } )
 
-        this.getCurrentLocation = function () {
+        self.getCurrentLocation = function () {
+            self.setMessage( 'Finding current location', 'progress' )
+            self.busy = true
+
             return smk.$viewer.getCurrentLocation().then( function ( loc ) {
                 return smk.$viewer.findNearestSite( loc ).then( function ( site ) {
                     return { location: loc, description: site.fullAddress }
                 } )
             } )
-            .catch( function ( err ) {
-                console.warn( err )
-                self.message = 'Unable to get current location'
+            .finally( function () {
+                self.busy = false
+                self.setMessage()
             } )
         }
 
@@ -233,11 +239,11 @@ include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.
                 empty.location = location.map
                 self.addWaypoint()
 
-                self.findRoute()
+                return self.findRoute()
             } )
             .catch( function ( err ) {
                 console.warn( err )
-                self.message = 'Unable to find address'
+                self.setMessage( 'Unable to find address', 'error' )
             } )
         } )
 
@@ -261,11 +267,7 @@ include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.
         } )
 
         aux.panel.vm.$on( 'directions-panel.clear', function ( ev ) {
-            self.resetWaypoints()
-            self.addWaypointCurrentLocation().then( function () {
-                self.addWaypoint()
-                self.displayWaypoints()
-            } )
+            self.startAtCurrentLocation()
         } )
 
         aux.panel.vm.$on( 'directions-panel.hover-direction', function ( ev ) {
@@ -314,17 +316,25 @@ include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.
         this.waypoints.push( wp )
     }
 
-    DirectionsTool.prototype.addWaypointCurrentLocation = function () {
+    DirectionsTool.prototype.startAtCurrentLocation = function ( location, description ) {
         var self = this
 
-        this.busy = true
-
-        return this.getCurrentLocation()
-            .then( function ( res ) {
-                self.addWaypoint( res.location, '(CURRENT) ' + res.description )
+        return self.resetWaypoints()
+            .then( function () {
+                return self.getCurrentLocation()
+                    .then( function ( res ) {
+                        self.addWaypoint( res.location, '(CURRENT) ' + res.description )
+                    } )
+                    .catch( function () {
+                        return self.setMessage( 'Unable to get current location', 'error', 1000 )
+                    } )
             } )
-            .finally( function () {
-                self.busy = false
+            .then( function () {
+                if ( location && description ) {
+                    self.addWaypoint( location, description )
+                }
+                self.addWaypoint()
+                return self.findRoute()
             } )
     }
 
@@ -332,19 +342,16 @@ include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.
         var self = this
 
         this.waypoints = []
-        this.directions = []
-        this.directionHighlight = null
-        this.directionPick = null
-        this.summary = null
-        this.message = null
+        return this.findRoute()
     }
 
     DirectionsTool.prototype.findRoute = function () {
         var self = this
 
         this.directions = []
-        this.summary = null
-        this.message = null
+        this.directionHighlight = null
+        this.directionPick = null
+        this.setMessage()
         this.displayRoute()
 
         var points = this.waypoints
@@ -353,13 +360,14 @@ include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.
 
         if ( points.length < 2 ) {
             self.displayWaypoints()
-            return
+            this.setMessage( 'Add a waypoint' )
+            return SMK.UTIL.resolved()
         }
-        // console.log( points )
 
+        this.setMessage( 'Calculating...', 'progress' )
         this.busy = true
 
-        findRoute( points, this.routeOption ).then( function ( data ) {
+        return findRoute( points, this.routeOption ).then( function ( data ) {
             self.displayRoute( data.route )
 
             if ( data.visitOrder && data.visitOrder.findIndex( function ( v, i ) { return points[ v ].index != i } ) != -1 ) {
@@ -374,7 +382,7 @@ include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.
 
             self.displayWaypoints()
 
-            self.summary = 'Route travels ' + data.distance + ' km in ' + data.timeText
+            self.setMessage( 'Route travels ' + data.distance + ' km in ' + data.timeText, 'summary' )
 
             self.directions = data.directions.map( function ( dir ) {
                 dir.instruction = dir.text.replace( /\sfor\s(\d+.?\d*\sk?m)\s[(](\d+).+?((\d+).+)?$/, function ( m, a, b, c, d ) {
@@ -394,8 +402,19 @@ include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.
         } )
         .catch( function ( err ) {
             console.warn( err )
-            self.message = 'Unable to find route'
+            self.setMessage( 'Unable to find route', 'error' )
         } )
+    }
+
+    DirectionsTool.prototype.setMessage = function ( message, Class, delay ) {
+        this.message = message
+
+        this.messageClass = {}
+        if ( Class )
+            this.messageClass[ 'smk-' + Class ] = true
+
+        if ( delay )
+            return SMK.UTIL.makePromise( function ( res ) { setTimeout( res, delay ) } )
     }
 
     return DirectionsTool

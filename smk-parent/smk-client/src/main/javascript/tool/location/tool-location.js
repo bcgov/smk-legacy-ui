@@ -47,11 +47,10 @@ include.module( 'tool-location', [ 'smk', 'tool', 'widgets', 'tool-location.popu
 
                 },
                 startDirections: function ( location, site ) {
-                    smk.$tool.directions.resetWaypoints()
-                    smk.$tool.directions.addWaypointCurrentLocation().then( function () {
-                        smk.$tool.directions.addWaypoint( location, site.fullAddress )
-                        smk.$tool.directions.addWaypoint()
-                        smk.$tool.directions.active = true
+                    smk.$tool.directions.active = true
+
+                    smk.$tool.directions.activating.then( function () {
+                        return smk.$tool.directions.startAtCurrentLocation( location, site.fullAddress )
                     } )
                 },
             }
@@ -64,13 +63,11 @@ include.module( 'tool-location', [ 'smk', 'tool', 'widgets', 'tool-location.popu
             self.site = {}
 
             smk.$viewer.findNearestSite( location.map ).then( function ( site ) {
-                // console.log( JSON.stringify( site, null, '  ' ) )
                 self.site = site
             } )
             .catch( function ( err ) {
                 console.warn( err )
             } )
-
         } )
 
         smk.$viewer.changedView( function () {

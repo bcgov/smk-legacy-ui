@@ -49,19 +49,29 @@
     color: red;
 }
 
-.smk-directions-panel .smk-message {
+.smk-directions-panel div.smk-message {
     font-weight: bold;
     font-size: 15px;
     margin-bottom: 5px;
     margin-top: -5px;
     text-align: center;
+    min-height: 40px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.smk-directions-panel .smk-message.smk-error {
     color: red;
 }
 
-.smk-summary {
-    padding: 5px 10px;
-    text-align: center;
-    border-bottom: 1px solid gray;
+.smk-directions-panel .smk-message.smk-summary {
+}
+
+.smk-directions-panel .smk-message.smk-progress {
+    color: blue;
 }
 
 .smk-directions-panel .smk-body .smk-directions {
@@ -70,6 +80,7 @@
     overflow-x: hidden;
     overflow-y: scroll;
     height: 100%;
+    margin-top: 5px;
 }
 
 .smk-direction {
@@ -95,6 +106,7 @@
     white-space: nowrap;
     font-size: 11px;
     flex: 1 0 33%;
+    align-self: flex-end;
 }
 
 .smk-direction.smk-highlight {

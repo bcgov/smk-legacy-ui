@@ -107,12 +107,13 @@ include.module( 'tool-directions-leaflet', [ 'leaflet', 'tool-directions' ], fun
                         prefix = 'STOPOVER ' + i + ':\n'
                         break;
                     }
+
                     return L.marker( [ w.location.latitude, w.location.longitude ], {
-                        title: prefix + w.description,
-                        icon: icon
-                    } )
-                    .bindPopup( $( '<pre class="smk-popup">' ).text( prefix + w.description ).get( 0 ) )
-                    .addTo( smk.$viewer.map )
+                            title: prefix + w.description,
+                            icon: icon
+                        } )
+                        .bindPopup( $( '<pre class="smk-popup">' ).text( prefix + w.description ).get( 0 ) )
+                        .addTo( smk.$viewer.map )
                 } )
         }
 

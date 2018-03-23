@@ -6,26 +6,32 @@
 
     <template slot="commands">
         <span class="smk-command-col">
-            <label class="smk-command"><input type="checkbox" v-model="optimal" v-on:change="$$emit( 'option' )">Optimal order</label><br/>
-            <label class="smk-command"><input type="checkbox" v-model="roundTrip" v-on:change="$$emit( 'option' )">Round trip</label>
+            <label class="smk-command" v-bind:class="{ 'smk-disabled': busy }"><input type="checkbox" v-model="optimal" v-on:change="$$emit( 'option' )">Optimal order</label><br/>
+            <label class="smk-command" v-bind:class="{ 'smk-disabled': busy }"><input type="checkbox" v-model="roundTrip" v-on:change="$$emit( 'option' )">Round trip</label>
         </span>
         <span class="smk-command-col">
-            <label class="smk-command"><input type="radio" v-model="criteria" value="shortest" v-on:change="$$emit( 'option' )">Shortest</label><br/>
-            <label class="smk-command"><input type="radio" v-model="criteria" value="fastest" v-on:change="$$emit( 'option' )">Fastest</label>
+            <label class="smk-command" v-bind:class="{ 'smk-disabled': busy }"><input type="radio" v-model="criteria" value="shortest" v-on:change="$$emit( 'option' )">Shortest</label><br/>
+            <label class="smk-command" v-bind:class="{ 'smk-disabled': busy }"><input type="radio" v-model="criteria" value="fastest" v-on:change="$$emit( 'option' )">Fastest</label>
         </span>
         <div class="smk-command-row">
             <span class="smk-command"
+                v-bind:class="{ 'smk-disabled': busy }"
                 v-on:click="$$emit( 'reverse' )"
             >Reverse</span>
 
             <span class="smk-command"
+                v-bind:class="{ 'smk-disabled': busy }"
                 v-on:click="$$emit( 'clear' )"
             >Reset</span>
 
         </div>
     </template>
 
-    <div class="smk-message">{{ message }}</div>
+    <div class="smk-message"
+        v-bind:class="messageClass"
+    >
+        <span>{{ message }}</span>
+    </div>
 
     <draggable class="smk-waypoints"
         v-bind:list="waypoints"
@@ -36,7 +42,7 @@
             v-for="( node, i ) in waypoints"
         >
             <span class="smk-command smk-handle"
-                v-bind:class="{ 'smk-disabled': optimal }"
+                v-bind:class="{ 'smk-disabled': optimal || busy }"
                 v-bind:title="optimal ? 'Optimal order' : 'Drag to reorder'"
             >
                 <i class="material-icons">drag_handle</i>
@@ -61,19 +67,16 @@
 
             <span class="smk-command smk-remove" title="Remove this waypoint"
                 v-on:click="waypoints.length > 2 && node.location && $$emit( 'remove-waypoint', { index: i } )"
-                v-bind:class="{ 'smk-disabled': !node.location || waypoints.length < 3 }"
+                v-bind:class="{ 'smk-disabled': !node.location || waypoints.length < 3 || busy }"
             >
                 <i class="material-icons">delete</i>
             </span>
         </div>
     </draggable>
 
-
-    <div class="smk-summary">{{ summary }}</div>
-
     <div class="smk-directions">
         <div class="smk-direction"
-            v-for="(direction, i) in directions"
+            v-for="( direction, i ) in directions"
             v-on:mouseenter="$$emit( 'hover-direction', { highlight: i } )"
             v-on:mouseleave="$$emit( 'hover-direction', { highlight: null } )"
             v-on:click="$$emit( 'pick-direction', { pick: i } )"
@@ -82,7 +85,7 @@
             <span class="smk-instruction">{{ direction.instruction }}</span>
             <span class="smk-metric"
                 v-if="direction.distance"
-            >for {{ direction.distance }} ({{ direction.time}})</span>
+            >for {{ direction.distance }} ({{ direction.time }})</span>
         </div>
     </div>
 
