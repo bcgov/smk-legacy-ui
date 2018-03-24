@@ -34,7 +34,7 @@ include.module( 'tool-baseMaps', [ 'smk', 'tool', 'widgets', 'viewer', 'leaflet'
             map.addLayer( L.esri.basemapLayer( binding.value.basemap.id, { detectRetina: true } ) )
 
             if ( binding.value.center ) {
-                map.setView( binding.value.center, binding.value.zoom )
+                map.setView( smkPointLatLng( binding.value.center ), binding.value.zoom )
             }
 
             map.invalidateSize()
@@ -46,12 +46,15 @@ include.module( 'tool-baseMaps', [ 'smk', 'tool', 'widgets', 'viewer', 'leaflet'
             var map = binding.value.basemap.map
 
             if ( binding.value.center ) {
-                map.setView( binding.value.center, binding.value.zoom )
+                map.setView( smkPointLatLng( binding.value.center ), binding.value.zoom )
                 map.invalidateSize();
             }
         }
     } )
 
+    function smkPointLatLng( pt ) {
+        return [ pt.latitude, pt.longitude ]
+    }
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
     function BaseMapsTool( option ) {

@@ -40,6 +40,8 @@ include.module( 'viewer-leaflet', [ 'viewer', 'leaflet' ], function () {
 
         self.map.on( 'zoomstart', changedView )
         self.map.on( 'movestart', changedView )
+        self.map.on( 'zoomend', changedView )
+        self.map.on( 'moveend', changedView )
         changedView()
 
         self.finishedLoading( function () {
