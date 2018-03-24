@@ -7,7 +7,7 @@ include.module( 'tool-baseMaps', [ 'smk', 'tool', 'widgets', 'viewer', 'leaflet'
 
     Vue.component( 'baseMaps-panel', {
         template: inc[ 'tool-baseMaps.panel-base-maps-html' ],
-        props: [ 'center', 'zoom', 'current', 'basemaps', ]
+        props: [ 'center', 'zoom', 'current', 'basemaps', 'mapStyle' ]
     } )
 
     // leaflet specific
@@ -63,6 +63,10 @@ include.module( 'tool-baseMaps', [ 'smk', 'tool', 'widgets', 'viewer', 'leaflet'
         this.makePropPanel( 'zoom', null )
         this.makePropPanel( 'current', null )
         this.makePropPanel( 'basemaps', [] )
+        this.makePropPanel( 'mapStyle', {
+            width: '130px',
+            height: '130px',
+        } )
 
         SMK.TYPE.Tool.prototype.constructor.call( this, $.extend( {
             order:          3,
