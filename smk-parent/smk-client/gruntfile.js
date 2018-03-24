@@ -9,6 +9,8 @@ module.exports = function( grunt ) {
 
         buildPath: 'build',
 
+        serverHost: 'localhost',
+
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
         connectOption: {
@@ -75,7 +77,7 @@ module.exports = function( grunt ) {
         watch: {
             options: {
                 livereload: {
-                    host:   'vivid-w100z.vividsolutions.com',
+                    host:   '<%= serverHost %>',
                     key:    grunt.file.read( 'node_modules/grunt-contrib-connect/tasks/certs/server.key' ),
                     cert:   grunt.file.read( 'node_modules/grunt-contrib-connect/tasks/certs/server.crt' )
                 },
@@ -130,7 +132,7 @@ module.exports = function( grunt ) {
         grunt.task.run( 'build', 'watch' )
     } )
 
-    grunt.registerTask( 'use', 'connection to use', function ( protocol ) {
+    grunt.registerTask( 'use', 'connection to use', function ( protocol, host ) {
         var connectOption = grunt.config( 'connectOption' )
 
         if ( !( protocol in connectOption ) ) return
@@ -140,9 +142,17 @@ module.exports = function( grunt ) {
 
         grunt.config.merge( connectConfig )
 
-        grunt.log.writeln( 'Use connection: ' + protocol )
+        if ( host )
+            grunt.config( 'serverHost', host )
 
-        grunt.task.run( 'default' )
+        grunt.log.writeln( 'Use connection: ' + protocol )
+        grunt.log.writeln( 'Server host: ' + grunt.config( 'serverHost' ) )
+
+        grunt.task.run( 
+            'build',
+            'connect',
+            'watch' 
+        )
     } )
 
     grunt.registerTask( 'build', [
@@ -154,10 +164,6 @@ module.exports = function( grunt ) {
         'copy:deploy'
     ] )
 
-    grunt.registerTask( 'default', [
-        'build',
-        'connect',
-        'watch'
-    ] )
+    grunt.registerTask( 'default', 'use:https' )
 
 }
