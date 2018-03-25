@@ -38,6 +38,11 @@ include.module( 'tool-menu', [ 'smk', 'tool', 'widgets', 'tool-menu.panel-menu-h
             self.active = !self.active
         } )
 
+        self.changedActive( function () {
+            if ( self.selectedTool )
+                self.selectedTool.active = self.active
+        } )
+
         aux.menu.setContainer( this )
     } )
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
@@ -56,24 +61,26 @@ include.module( 'tool-menu', [ 'smk', 'tool', 'widgets', 'tool-menu.panel-menu-h
             panel: tool.panel
         } )
 
-        if ( !this.activeTool ) {
-            this.activeTool = tool
-            this.activeToolType = tool.type
-            this.activeTool.active = true
-        }
+        if ( !this.selectedTool ) 
+            this.selectedTool = tool
 
         tool.changedActive( function () {
-            if ( !tool.active && tool.type == self.activeToolType ) {
-                tool.active = true
-                return
+            console.log(tool.type,tool.active)
+            
+            if ( tool.active ) {
+                if ( self.selectedTool.type != tool.type ) {
+                    var prev = self.selectedTool 
+                    self.selectedTool = tool
+                    prev.active = false
+                }
+            }
+            else {
+                if ( self.selectedTool.type == tool.type && self.active )
+                    tool.active = true
             }
 
-            if ( !tool.active ) return
-            if ( self.activeToolType == tool.type ) return
-
-            self.activeToolType = tool.type
-            self.activeTool.active = false
-            self.activeTool = tool
+            if ( tool.type == self.selectedTool.type )
+                self.activeToolType = tool.active ? tool.type : null
         } )
     }
 
