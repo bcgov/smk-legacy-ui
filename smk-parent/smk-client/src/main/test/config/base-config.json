@@ -36,7 +36,7 @@
         { "type": "coordinate" },
         { "type": "minimap", "baseMap": "Imagery" },
         { "type": "markup" },
-        { "type": "directions" },
+        { "type": "directions", "position": "menu" },
         { "type": "pan" },
         { "type": "zoom",
             "mouseWheel": true,
@@ -50,7 +50,9 @@
         { "type": "baseMaps" },
         { "type": "layers", "position": "toolbar" },
         { "type": "search" },
-        { "type": "identify" },
-        { "type": "select" }
+        { "type": "identify", "position": "toolbar" },
+        { "type": "location" },
+        { "type": "select" },
+        { "type": "query" }
     ]
 }

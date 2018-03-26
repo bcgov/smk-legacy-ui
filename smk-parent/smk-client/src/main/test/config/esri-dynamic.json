@@ -56,8 +56,8 @@
                     "title": "Object ID"
                 }
             ],
-            "serviceUrl": "http://maps.gov.bc.ca/arcgis/rest/services/mpcm/bcgw/MapServer",
-            "metadataUrl": "http://catalogue.data.gov.bc.ca/dataset/diagnostic-facilities",
+            "serviceUrl": "//maps.gov.bc.ca/arcgis/rest/services/mpcm/bcgw/MapServer",
+            "metadataUrl": "//catalogue.data.gov.bc.ca/dataset/diagnostic-facilities",
             "opacity": 0.65,
             "scaleMin": 500000,
             "scaleMax": 0,
@@ -107,7 +107,7 @@
                     "title": "FEATURE_LENGTH_M"
                 }
             ],
-            "serviceUrl": "http://maps.gov.bc.ca/arcgis/rest/services/mpcm/bcgw/MapServer",
+            "serviceUrl": "//maps.gov.bc.ca/arcgis/rest/services/mpcm/bcgw/MapServer",
             "metadataUrl": "https://catalogue.data.gov.bc.ca/dataset/e5dd2faf-bbfc-4ed6-877f-6be0e873941e",
             "opacity": 0.65,
             "scaleMin": 5000000,
@@ -116,6 +116,70 @@
             "mpcmWorkspace": "MPCM_ALL_PUB",
             "dynamicLayers": [
                 "{\"id\":6,\"minScale\":5000000,\"maxScale\":0,\"source\":{\"type\":\"dataLayer\",\"dataSource\":{\"type\":\"table\",\"workspaceId\":\"MPCM_ALL_PUB\",\"dataSourceName\":\"WHSE_ADMIN_BOUNDARIES.FADM_BCTS_AREA_SP\",\"gdbVersion\":\"\"}},\"drawingInfo\":{\"renderer\":{\"type\":\"simple\",\"symbol\":{\"type\":\"esriSFS\",\"style\":\"esriSFSSolid\",\"color\":[211,255,190,255],\"outline\":{\"type\":\"esriSLS\",\"style\":\"esriSLSSolid\",\"color\":[104,104,104,255],\"width\":0.4}},\"label\":\"BC Timber Sale Areas\",\"description\":\"\"},\"transparency\":20,\"labelingInfo\":null}}"
+            ],
+            "queries": [
+                {
+                    "id": "query1",
+                    "title": "The first query",
+                    "parameters": [
+                        {
+                            "id": "param1",
+                            "type": "constant",
+                            "value": "constant value"
+                        },
+                        {
+                            "id": "param2",
+                            "type": "input",
+                            "title": "Text value"
+                        },
+                        {
+                            "id": "param3",
+                            "type": "select",
+                            "title": "Select value",
+                            "choices": [
+                                {
+                                    "title": "Value #1",
+                                    "value": 1
+                                },
+                                {
+                                    "title": "Value #2",
+                                    "value": 2
+                                }
+                            ]
+                        }
+                    ],
+                    "clause": {
+                        "operator": "and",
+                        "arguments": [
+                            {
+                                "operator": "equals",
+                                "arguments": [
+                                    {
+                                        "type": "attribute",
+                                        "name": "FEATURE_CODE"
+                                    },
+                                    {
+                                        "type": "parameter",
+                                        "id": "param1"
+                                    }
+                                ]
+                            },
+                            {
+                                "operator": "contains",
+                                "arguments": [
+                                    {
+                                        "type": "attribute",
+                                        "name": "FEATURE_NAME"
+                                    },
+                                    {
+                                        "type": "parameter",
+                                        "id": "param2"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
             ]
         }
     ]

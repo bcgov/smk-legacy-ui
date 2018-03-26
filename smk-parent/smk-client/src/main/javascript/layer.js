@@ -230,10 +230,10 @@ include.module( 'layer', [ 'smk', 'jquery', 'util', 'event' ], function () {
             } )
         },
 
-        getFeaturesAtPoint: function ( location, view ) {
+        getFeatures: function ( view ) {
             var self = this
 
-            var serviceUrl  = this.config.serviceUrl + '/identify'
+            var serviceUrl  = this.config.serviceUrl + '/query'
             var dynamicLayers = '[' + this.config.dynamicLayers.join( ',' ) + ']'
 
             var param = {

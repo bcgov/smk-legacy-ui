@@ -1,4 +1,4 @@
-include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-set' ], function () {
+include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-set', 'query' ], function () {
 
     var ViewerEvent = SMK.TYPE.Event.define( [
         'changedView',
@@ -89,6 +89,7 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
         this.identified = new SMK.TYPE.FeatureSet()
         this.selected = new SMK.TYPE.FeatureSet()
         this.searched = new SMK.TYPE.FeatureSet()
+        this.queried = {} // new SMK.TYPE.FeatureSet()
 
         this.layerIds = []
         this.layerId = {}
@@ -98,6 +99,7 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
         this.handler = {
             pick: {}
         }
+        this.query = {}
 
         if ( Array.isArray( smk.layers ) )
             self.layerIds = smk.layers.map( function ( lyConfig, i ) {
@@ -113,6 +115,14 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
                 ly.finishedLoading( function () {
                     self.loading = self.anyLayersLoading()
                 } )
+
+                if ( lyConfig.queries )
+                    lyConfig.queries.forEach( function ( q ) {
+                        var query = new SMK.TYPE.Query[ lyConfig.type ]( ly, q )
+
+                        self.query[ query.id ] = query
+                        self.queried[ query.id ] = new SMK.TYPE.FeatureSet()
+                    } )
 
                 return lyConfig.id
             } )

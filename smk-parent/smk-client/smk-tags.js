@@ -75,6 +75,9 @@ exports.gen = function () {
     t.group( 'tool-pan' )
         .dir( 'tool/pan/**/*', { cwd: baseDir } )
 
+    t.group( 'tool-query' )
+        .dir( 'tool/query/**/*', { cwd: baseDir } )
+
     t.group( 'tool-scale' )
         .dir( 'tool/scale/**/*', { cwd: baseDir } )
 
@@ -117,6 +120,9 @@ exports.gen = function () {
         .dir( 'viewer-leaflet/tool/markup/**/*', { cwd: baseDir } )
         .style( 'https://unpkg.com/leaflet.pm@0.17.3/dist/leaflet.pm.css' )
         .script( 'https://unpkg.com/leaflet.pm@0.17.3/dist/leaflet.pm.min.js' )
+
+    t.group( 'tool-query-leaflet' )
+        .dir( 'viewer-leaflet/tool/query/**/*', { cwd: baseDir } )
 
     t.group( 'tool-identify-leaflet' )
         .dir( 'viewer-leaflet/tool/identify/**/*', { cwd: baseDir } )
