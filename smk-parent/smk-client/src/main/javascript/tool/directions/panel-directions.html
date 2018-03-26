@@ -5,6 +5,17 @@
     </template>
 
     <template slot="commands">
+        <div class="smk-command-col">
+            <div class="smk-command"
+                v-bind:class="{ 'smk-disabled': busy }"
+                v-on:click="$$emit( 'reverse' )"
+            >Reverse</div>
+
+            <div class="smk-command"
+                v-bind:class="{ 'smk-disabled': busy }"
+                v-on:click="$$emit( 'clear' )"
+            >Reset</div>
+        </div>
         <span class="smk-command-col">
             <label class="smk-command" v-bind:class="{ 'smk-disabled': busy }"><input type="checkbox" v-model="optimal" v-on:change="$$emit( 'option' )">Optimal order</label><br/>
             <label class="smk-command" v-bind:class="{ 'smk-disabled': busy }"><input type="checkbox" v-model="roundTrip" v-on:change="$$emit( 'option' )">Round trip</label>
@@ -13,18 +24,6 @@
             <label class="smk-command" v-bind:class="{ 'smk-disabled': busy }"><input type="radio" v-model="criteria" value="shortest" v-on:change="$$emit( 'option' )">Shortest</label><br/>
             <label class="smk-command" v-bind:class="{ 'smk-disabled': busy }"><input type="radio" v-model="criteria" value="fastest" v-on:change="$$emit( 'option' )">Fastest</label>
         </span>
-        <div class="smk-command-row">
-            <span class="smk-command"
-                v-bind:class="{ 'smk-disabled': busy }"
-                v-on:click="$$emit( 'reverse' )"
-            >Reverse</span>
-
-            <span class="smk-command"
-                v-bind:class="{ 'smk-disabled': busy }"
-                v-on:click="$$emit( 'clear' )"
-            >Reset</span>
-
-        </div>
     </template>
 
     <div class="smk-message"

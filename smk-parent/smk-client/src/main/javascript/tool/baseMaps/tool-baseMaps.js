@@ -7,7 +7,7 @@ include.module( 'tool-baseMaps', [ 'smk', 'tool', 'widgets', 'viewer', 'leaflet'
 
     Vue.component( 'baseMaps-panel', {
         template: inc[ 'tool-baseMaps.panel-base-maps-html' ],
-        props: [ 'center', 'zoom', 'current', 'basemaps', ]
+        props: [ 'center', 'zoom', 'current', 'basemaps', 'mapStyle' ]
     } )
 
     // leaflet specific
@@ -34,7 +34,7 @@ include.module( 'tool-baseMaps', [ 'smk', 'tool', 'widgets', 'viewer', 'leaflet'
             map.addLayer( L.esri.basemapLayer( binding.value.basemap.id, { detectRetina: true } ) )
 
             if ( binding.value.center ) {
-                map.setView( binding.value.center, binding.value.zoom )
+                map.setView( smkPointLatLng( binding.value.center ), binding.value.zoom )
             }
 
             map.invalidateSize()
@@ -46,12 +46,15 @@ include.module( 'tool-baseMaps', [ 'smk', 'tool', 'widgets', 'viewer', 'leaflet'
             var map = binding.value.basemap.map
 
             if ( binding.value.center ) {
-                map.setView( binding.value.center, binding.value.zoom )
+                map.setView( smkPointLatLng( binding.value.center ), binding.value.zoom )
                 map.invalidateSize();
             }
         }
     } )
 
+    function smkPointLatLng( pt ) {
+        return [ pt.latitude, pt.longitude ]
+    }
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
     function BaseMapsTool( option ) {
@@ -60,6 +63,10 @@ include.module( 'tool-baseMaps', [ 'smk', 'tool', 'widgets', 'viewer', 'leaflet'
         this.makePropPanel( 'zoom', null )
         this.makePropPanel( 'current', null )
         this.makePropPanel( 'basemaps', [] )
+        this.makePropPanel( 'mapStyle', {
+            width: '110px',
+            height: '110px',
+        } )
 
         SMK.TYPE.Tool.prototype.constructor.call( this, $.extend( {
             order:          3,

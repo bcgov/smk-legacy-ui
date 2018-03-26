@@ -2,13 +2,14 @@
     display: inline-block;
 }
 
-.smk-directions-panel .smk-body {
+.smk-sidepanel .smk-panel.smk-directions-panel .smk-body {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: stretch;
     align-content: stretch;
     height: 100%;
+    overflow-y: hidden;
 }
 
 .smk-directions-panel .smk-description {
