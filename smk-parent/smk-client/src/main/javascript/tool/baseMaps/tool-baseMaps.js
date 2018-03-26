@@ -64,8 +64,8 @@ include.module( 'tool-baseMaps', [ 'smk', 'tool', 'widgets', 'viewer', 'leaflet'
         this.makePropPanel( 'current', null )
         this.makePropPanel( 'basemaps', [] )
         this.makePropPanel( 'mapStyle', {
-            width: '130px',
-            height: '130px',
+            width: '110px',
+            height: '110px',
         } )
 
         SMK.TYPE.Tool.prototype.constructor.call( this, $.extend( {

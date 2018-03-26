@@ -1,9 +1,9 @@
 .smk-base-maps-panel .smk-body {
     display: flex;
     flex-direction: row;
-    justify-content: top;
+    justify-content: space-around;
     align-items: stretch;
-    align-content: flex-start;    
+    align-content: flex-start;
     flex-wrap: wrap;
     height: 100%;
 }
@@ -16,13 +16,6 @@
     padding: 4px;
     border-radius: 5px;
     border: 1px solid transparent;
-    flex-basis: 45%;
-
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    /* align-items: center; */
-    align-content: center;    
 }
 
 .smk-base-map:hover {
