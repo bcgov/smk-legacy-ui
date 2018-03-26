@@ -61,16 +61,17 @@ include.module( 'tool-menu', [ 'smk', 'tool', 'widgets', 'tool-menu.panel-menu-h
             panel: tool.panel
         } )
 
-        if ( !this.selectedTool ) 
+        if ( !this.selectedTool )
             this.selectedTool = tool
 
         tool.changedActive( function () {
             if ( tool.active ) {
                 if ( self.selectedTool.type != tool.type ) {
-                    var prev = self.selectedTool 
+                    var prev = self.selectedTool
                     self.selectedTool = tool
                     prev.active = false
                 }
+                self.active = true
             }
             else {
                 if ( self.selectedTool.type == tool.type && self.active )
