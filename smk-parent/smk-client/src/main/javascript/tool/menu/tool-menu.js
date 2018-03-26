@@ -65,8 +65,6 @@ include.module( 'tool-menu', [ 'smk', 'tool', 'widgets', 'tool-menu.panel-menu-h
             this.selectedTool = tool
 
         tool.changedActive( function () {
-            console.log(tool.type,tool.active)
-            
             if ( tool.active ) {
                 if ( self.selectedTool.type != tool.type ) {
                     var prev = self.selectedTool 
