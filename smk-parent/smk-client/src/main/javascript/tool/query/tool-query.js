@@ -1,21 +1,38 @@
-include.module( 'tool-query', [ 'smk', 'tool', 'widgets', 'tool-query.panel-query-html', 'tool-query.parameter-input-html', 'tool-query.parameter-select-html' ], function ( inc ) {
+include.module( 'tool-query', [ 'smk', 'tool', 'widgets', 'tool-query.panel-query-html', 'tool-query.parameter-input-html', 'tool-query.parameter-select-html', 'tool-query.parameter-constant-html' ], function ( inc ) {
+
+    Vue.component( 'parameter-constant', {
+        template: inc[ 'tool-query.parameter-constant-html' ],
+        props: [ 'title', 'value' ],
+    } )
 
     Vue.component( 'parameter-input', {
         template: inc[ 'tool-query.parameter-input-html' ],
-        props: [ 'title' ],
+        props: [ 'title', 'value' ],
         data: function () {
             return {
-                input: null
+                input: this.value
+            }
+        },
+        watch: {
+            value: function ( val ) {
+                this.input = val
             }
         }
     } )
 
     Vue.component( 'parameter-select', {
         template: inc[ 'tool-query.parameter-select-html' ],
-        props: [ 'title' ],
+        props: [ 'title', 'choices', 'value' ],
         data: function () {
+            // console.log( 'data', this.value )
             return {
-                input: null
+                selected: this.value
+            }
+        },
+        watch: {
+            value: function ( val ) {
+                // console.log( 'watch', val )
+                this.selected = val
             }
         }
     } )
@@ -24,16 +41,16 @@ include.module( 'tool-query', [ 'smk', 'tool', 'widgets', 'tool-query.panel-quer
     Vue.component( 'query-widget', {
         extends: inc.widgets.toolButton,
     } )
-    
+
     Vue.component( 'query-panel', {
         template: inc[ 'tool-query.panel-query-html' ],
-        props: [ 'busy', 'queries', 'summary', 'parameters', 'layerTitle', 'features', 'highlightId', 'pickId' ],
+        props: [ 'busy', 'queries', 'description', 'parameters', 'layerTitle', 'features', 'highlightId', 'pickId' ],
         methods: {
             isEmpty: function () {
                 return !this.parameters
             }
         },
-    } )    
+    } )
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
     function QueryTool( option ) {
@@ -41,7 +58,7 @@ include.module( 'tool-query', [ 'smk', 'tool', 'widgets', 'tool-query.panel-quer
 
         this.makePropPanel( 'busy', false )
         this.makePropPanel( 'queries', [] )
-        this.makePropPanel( 'summary', null )
+        this.makePropPanel( 'description', null )
         this.makePropPanel( 'parameters', null )
         this.makePropPanel( 'layerTitle', null )
         this.makePropPanel( 'features', null )
@@ -69,7 +86,7 @@ include.module( 'tool-query', [ 'smk', 'tool', 'widgets', 'tool-query.panel-quer
         //     smk.$viewer.identifyFeatures( location )
         // } )
 
-        this.queries = Object.values( smk.$viewer.query ).map( function ( q ) { 
+        this.queries = Object.values( smk.$viewer.query ).map( function ( q ) {
             return {
                 id: q.id,
                 title: q.title
@@ -83,8 +100,17 @@ include.module( 'tool-query', [ 'smk', 'tool', 'widgets', 'tool-query.panel-quer
         } )
 
         aux.panel.vm.$on( 'query-panel.select-query', function ( ev ) {
+            self.selectedQueryId = ev.id
+            self.layerTitle = smk.$viewer.query[ ev.id ].layer.config.title
+            self.description = smk.$viewer.query[ ev.id ].description
             self.parameters = smk.$viewer.query[ ev.id ].getParameters()
         } )
+
+        aux.panel.vm.$on( 'query-panel.parameter-input', function ( ev ) {
+            // console.log( ev )
+            self.parameters[ ev.index ].prop.value = ev.value
+        } )
+
 
         // aux.panel.vm.$on( 'query-panel.hover', function ( ev ) {
         //     smk.$viewer.identified.highlight( ev.features && ev.features.map( function ( f ) { return f.id } ) )
@@ -93,9 +119,28 @@ include.module( 'tool-query', [ 'smk', 'tool', 'widgets', 'tool-query.panel-quer
         // aux.panel.vm.$on( 'query-panel.add-all', function ( ev ) {
         // } )
 
-        // aux.panel.vm.$on( 'query-panel.clear', function ( ev ) {
-        //     smk.$viewer.identified.clear()
-        // } )
+        aux.panel.vm.$on( 'query-panel.clear', function ( ev ) {
+            smk.$viewer.queried[ self.selectedQueryId ].clear()
+
+            self.parameters.forEach( function ( p, i ) {
+                p.prop.value = smk.$viewer.query[ self.selectedQueryId ].parameters[ i ].value
+            } )
+        } )
+
+        aux.panel.vm.$on( 'query-panel.execute', function ( ev ) {
+            smk.$viewer.queried[ self.selectedQueryId ].clear()
+            self.busy = true
+
+            var param = {}
+            self.parameters.forEach( function ( p, i ) {
+                param[ p.prop.id ] = $.extend( {}, p.prop )
+            } )
+
+            return smk.$viewer.query[ self.selectedQueryId ].queryLayer( param )
+                .finally( function () {
+                    self.busy = false
+                } )
+        } )
 
         // smk.$viewer.pickedLocation( function () {
         //     var enabledTools = Object.values( smk.$tool ).filter( function ( t ) { t.enabled } )

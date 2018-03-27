@@ -120,59 +120,28 @@
             "queries": [
                 {
                     "id": "query1",
-                    "title": "The first query",
+                    "title": "Test query 1",
+                    "description": "Query BCTS Name",
                     "parameters": [
-                        {
-                            "id": "param1",
-                            "type": "constant",
-                            "value": "constant value"
-                        },
                         {
                             "id": "param2",
                             "type": "input",
-                            "title": "Text value"
-                        },
-                        {
-                            "id": "param3",
-                            "type": "select",
-                            "title": "Select value",
-                            "choices": [
-                                {
-                                    "title": "Value #1",
-                                    "value": 1
-                                },
-                                {
-                                    "title": "Value #2",
-                                    "value": 2
-                                }
-                            ]
+                            "title": "Name matches",
+                            "value": "Area"
                         }
                     ],
                     "clause": {
                         "operator": "and",
                         "arguments": [
                             {
-                                "operator": "equals",
-                                "arguments": [
-                                    {
-                                        "type": "attribute",
-                                        "name": "FEATURE_CODE"
-                                    },
-                                    {
-                                        "type": "parameter",
-                                        "id": "param1"
-                                    }
-                                ]
-                            },
-                            {
                                 "operator": "contains",
                                 "arguments": [
                                     {
-                                        "type": "attribute",
-                                        "name": "FEATURE_NAME"
+                                        "operand": "attribute",
+                                        "name": "BCTS_NAME"
                                     },
                                     {
-                                        "type": "parameter",
+                                        "operand": "parameter",
                                         "id": "param2"
                                     }
                                 ]
@@ -182,32 +151,14 @@
                 },
                 {
                     "id": "query2",
-                    "title": "The second query",
+                    "title": "Test query 2",
+                    "description": "Query Feature Code",
                     "parameters": [
-                        {
-                            "id": "param1",
-                            "type": "constant",
-                            "value": "constant value"
-                        },
                         {
                             "id": "param2",
                             "type": "input",
-                            "title": "Text value"
-                        },
-                        {
-                            "id": "param3",
-                            "type": "select",
-                            "title": "Select value",
-                            "choices": [
-                                {
-                                    "title": "Value #1",
-                                    "value": 1
-                                },
-                                {
-                                    "title": "Value #2",
-                                    "value": 2
-                                }
-                            ]
+                            "title": "Feature Code",
+                            "value": "FM90410000"
                         }
                     ],
                     "clause": {
@@ -217,24 +168,11 @@
                                 "operator": "equals",
                                 "arguments": [
                                     {
-                                        "type": "attribute",
+                                        "operand": "attribute",
                                         "name": "FEATURE_CODE"
                                     },
                                     {
-                                        "type": "parameter",
-                                        "id": "param1"
-                                    }
-                                ]
-                            },
-                            {
-                                "operator": "contains",
-                                "arguments": [
-                                    {
-                                        "type": "attribute",
-                                        "name": "FEATURE_NAME"
-                                    },
-                                    {
-                                        "type": "parameter",
+                                        "operand": "parameter",
                                         "id": "param2"
                                     }
                                 ]

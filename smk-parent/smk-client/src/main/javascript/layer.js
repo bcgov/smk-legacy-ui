@@ -28,6 +28,10 @@ include.module( 'layer', [ 'smk', 'jquery', 'util', 'event' ], function () {
                     self.finishedLoading()
             }
         } )
+
+        Object.defineProperty( this, 'id', {
+            get: function () { return config.id }
+        } )
     }
 
     $.extend( Layer.prototype, LayerEvent.prototype )
@@ -230,10 +234,10 @@ include.module( 'layer', [ 'smk', 'jquery', 'util', 'event' ], function () {
             } )
         },
 
-        getFeatures: function ( view ) {
+        getFeaturesAtPoint: function ( location, view ) {
             var self = this
 
-            var serviceUrl  = this.config.serviceUrl + '/query'
+            var serviceUrl  = this.config.serviceUrl + '/identify'
             var dynamicLayers = '[' + this.config.dynamicLayers.join( ',' ) + ']'
 
             var param = {

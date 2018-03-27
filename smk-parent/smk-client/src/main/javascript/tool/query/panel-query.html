@@ -4,8 +4,8 @@
         <div class="smk-spinner"></div>
     </template>
 
-    <template slot="commands">        
-        <select class="smk-command" 
+    <template slot="commands">
+        <select class="smk-command"
             v-on:change="$$emit( 'select-query', { id: $event.target.value } )"
         >
             <option selected disabled>Pick a query</option>
@@ -15,7 +15,7 @@
             >{{ query.title }}</option>
         </select>
 
-        <div class="smk-summary">{{ summary }}</div>
+        <div class="smk-description">{{ description }}</div>
 
         <div class="smk-parameters">
             <component class="smk-parameter"
@@ -23,18 +23,18 @@
                 v-bind:key="parameter.id"
                 v-bind:is="parameter.component"
                 v-bind="parameter.prop"
-                v-on:input="$$emit( 'parameter-change', { index: i, ev: $event } )"
+                v-on:input="$$emit( 'parameter-input', { index: i, value: $event.value } )"
             ></component>
         </div>
 
         <div class="smk-command-row">
-            <span class="smk-command" 
-                v-bind:class="{ 'smk-disabled': isEmpty() }" 
+            <span class="smk-command"
+                v-bind:class="{ 'smk-disabled': isEmpty() }"
                 v-on:click="$$emit( 'execute' )"
             >Execute</span>
 
-            <span class="smk-command" 
-                v-bind:class="{ 'smk-disabled': isEmpty() }" 
+            <span class="smk-command"
+                v-bind:class="{ 'smk-disabled': isEmpty() }"
                 v-on:click="$$emit( 'clear' )"
             >Reset</span>
         </div>
@@ -48,9 +48,9 @@
 
     <div class="smk-query-feature"
         v-for="feature in features"
-        v-bind:class="{ 
+        v-bind:class="{
             'smk-highlight': feature.id == highlightId,
-            'smk-pick': feature.id == pickId 
+            'smk-pick': feature.id == pickId
         }"
     >
         <span v-on:click="$$emit( 'active', { feature: feature } )"
