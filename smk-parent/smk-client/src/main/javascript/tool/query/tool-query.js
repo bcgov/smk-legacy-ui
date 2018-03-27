@@ -1,25 +1,52 @@
-include.module( 'tool-query', [ 'smk', 'tool', 'widgets', 'tool-query.panel-query-html', 'tool-query.popup-query-html' ], function ( inc ) {
+include.module( 'tool-query', [ 'smk', 'tool', 'widgets', 'tool-query.panel-query-html', 'tool-query.parameter-input-html', 'tool-query.parameter-select-html' ], function ( inc ) {
 
+    Vue.component( 'parameter-input', {
+        template: inc[ 'tool-query.parameter-input-html' ],
+        props: [ 'title' ],
+        data: function () {
+            return {
+                input: null
+            }
+        }
+    } )
+
+    Vue.component( 'parameter-select', {
+        template: inc[ 'tool-query.parameter-select-html' ],
+        props: [ 'title' ],
+        data: function () {
+            return {
+                input: null
+            }
+        }
+    } )
+    // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+    //
     Vue.component( 'query-widget', {
         extends: inc.widgets.toolButton,
     } )
-
+    
     Vue.component( 'query-panel', {
         template: inc[ 'tool-query.panel-query-html' ],
-        props: [ 'busy', 'queries' ],
+        props: [ 'busy', 'queries', 'summary', 'parameters', 'layerTitle', 'features', 'highlightId', 'pickId' ],
         methods: {
             isEmpty: function () {
-                return !this.layers || this.layers.length == 0
+                return !this.parameters
             }
         },
-    } )
+    } )    
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
     function QueryTool( option ) {
         this.makePropWidget( 'icon', 'question_answer' )
+
         this.makePropPanel( 'busy', false )
-        this.makePropPanel( 'layers', [] )
+        this.makePropPanel( 'queries', [] )
+        this.makePropPanel( 'summary', null )
+        this.makePropPanel( 'parameters', null )
+        this.makePropPanel( 'layerTitle', null )
+        this.makePropPanel( 'features', null )
         this.makePropPanel( 'highlightId', null )
+        this.makePropPanel( 'pickId', null )
 
         SMK.TYPE.Tool.prototype.constructor.call( this, $.extend( {
             order:          4,
@@ -42,14 +69,21 @@ include.module( 'tool-query', [ 'smk', 'tool', 'widgets', 'tool-query.panel-quer
         //     smk.$viewer.identifyFeatures( location )
         // } )
 
+        this.queries = Object.values( smk.$viewer.query ).map( function ( q ) { 
+            return {
+                id: q.id,
+                title: q.title
+            }
+        } )
+
         aux.widget.vm.$on( 'query-widget.click', function () {
             if ( !self.visible || !self.enabled ) return
 
             self.active = !self.active
         } )
 
-        aux.panel.vm.$on( 'query-panel.active', function ( ev ) {
-            smk.$viewer.identified.pick( ev.feature.id )
+        aux.panel.vm.$on( 'query-panel.select-query', function ( ev ) {
+            self.parameters = smk.$viewer.query[ ev.id ].getParameters()
         } )
 
         // aux.panel.vm.$on( 'query-panel.hover', function ( ev ) {

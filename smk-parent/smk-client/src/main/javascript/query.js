@@ -14,6 +14,7 @@ include.module( 'query', [ 'smk', 'jquery', 'util', 'event' ], function () {
             layer: layer
         }, config )
 
+        this.id = layer.id + '--' + this.id
         // var loading = false
         // Object.defineProperty( this, 'loading', {
         //     get: function () { return loading },
@@ -53,8 +54,20 @@ include.module( 'query', [ 'smk', 'jquery', 'util', 'event' ], function () {
     //     }
     // }
 
-    // Query.prototype.getLegends = function () {
-    // }
+    Query.prototype.getParameters = function () {
+        var self = this;
+
+        return this.parameters.map( function ( p ) {
+            return {
+                id: self.id + '--' + p.id,
+                component: 'parameter-' + p.type,
+                prop: {
+                    title: p.title,
+                    initial: null
+                }
+            }
+        } )
+    }
 
     // Query.prototype.getFeaturesAtPoint = function ( arg ) {
     // }

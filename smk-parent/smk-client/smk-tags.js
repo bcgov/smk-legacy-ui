@@ -15,6 +15,7 @@ exports.gen = function () {
     t.script( 'viewer', 'viewer.js' )
     t.script( 'layer', 'layer.js' )
     t.script( 'tool', 'tool.js' )
+    t.script( 'query', 'query.js' )
     t.script( 'feature-set', 'feature-set.js' )
 
     t.sequence( 'map-frame-styles' )

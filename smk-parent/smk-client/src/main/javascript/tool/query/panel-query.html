@@ -1,0 +1,59 @@
+<side-panel class="smk-query-panel" v-bind:class="{ 'smk-busy': busy }">
+    <template slot="header">
+        <h1>Query Layer</h1>
+        <div class="smk-spinner"></div>
+    </template>
+
+    <template slot="commands">        
+        <select class="smk-command" 
+            v-on:change="$$emit( 'select-query', { id: $event.target.value } )"
+        >
+            <option selected disabled>Pick a query</option>
+            <option
+                v-for="query in queries"
+                v-bind:value="query.id"
+            >{{ query.title }}</option>
+        </select>
+
+        <div class="smk-summary">{{ summary }}</div>
+
+        <div class="smk-parameters">
+            <component class="smk-parameter"
+                v-for="( parameter, i ) in parameters"
+                v-bind:key="parameter.id"
+                v-bind:is="parameter.component"
+                v-bind="parameter.prop"
+                v-on:input="$$emit( 'parameter-change', { index: i, ev: $event } )"
+            ></component>
+        </div>
+
+        <div class="smk-command-row">
+            <span class="smk-command" 
+                v-bind:class="{ 'smk-disabled': isEmpty() }" 
+                v-on:click="$$emit( 'execute' )"
+            >Execute</span>
+
+            <span class="smk-command" 
+                v-bind:class="{ 'smk-disabled': isEmpty() }" 
+                v-on:click="$$emit( 'clear' )"
+            >Reset</span>
+        </div>
+    </template>
+
+    <div v-if="isEmpty()" class="smk-placeholder">
+        Select a query.
+    </div>
+
+    <h2>{{ layerTitle }}</h2>
+
+    <div class="smk-query-feature"
+        v-for="feature in features"
+        v-bind:class="{ 
+            'smk-highlight': feature.id == highlightId,
+            'smk-pick': feature.id == pickId 
+        }"
+    >
+        <span v-on:click="$$emit( 'active', { feature: feature } )"
+        >{{ feature.title }}</span>
+    </div>
+</side-panel>
