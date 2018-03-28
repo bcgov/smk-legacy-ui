@@ -13,6 +13,18 @@ var getQueryString = function ( field, url )
     return string ? string[1] : null;
 };
 
+function isURL(str) 
+{
+  var pattern = new RegExp('^(https?:\\/\\/)?'+ // protocol
+  '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.?)+[a-z]{2,}|'+ // domain name
+  '((\\d{1,3}\\.){3}\\d{1,3}))'+ // OR ip (v4) address
+  '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ // port and path
+  '(\\?[;&a-z\\d%_.~+=-]*)?'+ // query string
+  '(\\#[-a-z\\d_]*)?$','i'); // fragment locator
+  
+  return pattern.test(str);
+}
+
 var serviceUrl = "../smks-api/";
 var wmsUrl = "https://openmaps.gov.bc.ca/geo/pub/ows";
 var wmsPostfix = "?service=WMS&request=GetCapabilities";
@@ -276,8 +288,12 @@ function editMapConfig(mapConfigId)
 
         	 // init basemap viewer
         	    setBasemap(data.viewer.baseMap);
-        	    layerPreviewViewer.setView(new L.latLng(rndLat, rndLon), rndZoom, { animate: true, duration: 60 } );
-        	    layerPreviewViewer.fitBounds(basemapViewerMap.getBounds());
+        	    var southWest = L.latLng(47.294133725, -113.291015625),
+                	northEast = L.latLng(61.1326289908, -141.064453125),
+                	bounds = L.latLngBounds(southWest, northEast);
+        	    basemapViewerMap.fitBounds(bounds);
+            
+        	    layerPreviewViewer.fitBounds(bounds);
         	});
 		}
 	});
@@ -552,7 +568,7 @@ function saveMapConfig()
         withCredentials: true,
         success: function (result)
         {
-        	Materialize.toast('Successfully saved application ' + data.lmfId, 4000);
+        	Materialize.toast('Successfully saved application ' + data.lmfId + '. Checking for attachment uploads...', 4000);
 
         	// now we need to complete any attachments before moving on.
 
@@ -563,12 +579,22 @@ function saveMapConfig()
         		documentData.append('file', attachment.contents);
 
         		var attchId;
-        		if(attachment.type == "header_upload") attchId = "surroundImage";
-        		else attchId = attachment.layer.id;
+        		var attchType;
+        		
+        		if(attachment.type == "header_upload") 
+    			{
+    				attchId = "surroundImage";
+    				attchType = "image";
+    			}
+        		else 
+    			{
+        			attchId = attachment.layer.id;
+        			attchType = attachment.type;
+    			}
 
         		$.ajax
         		({
-        			url: serviceUrl + "MapConfigurations/" + data.lmfId + "/Attachments/?id=" + attchId,
+        			url: serviceUrl + "MapConfigurations/" + data.lmfId + "/Attachments/?id=" + attchId + "&type=" + attchType,
         	        type: "post",
         	        data: documentData,
         	        crossDomain: true,
@@ -578,7 +604,7 @@ function saveMapConfig()
         	        processData: false,
         	        success: function (result)
         	        {
-        	        	console.log("attachment " + attachment.layer.id + " uploaded!");
+        	        	Materialize.toast('Successfully uploaded attachment for ' + attachment.layer.title, 4000);
         	        	loadConfigs();
         	        },
         	        error: function (status)
@@ -725,13 +751,7 @@ function previewMapConfig(mapConfigId)
 	{
 		if(mapConfig.lmfId == mapConfigId)
 		{
-			var html = '<html><head><title>' + mapConfig.name + '</title><head><body><div id="smk-map-frame"></div><script src="../smk-client/smk-bootstrap.js" smk-standalone="true">return ' + JSON.stringify(mapConfig) + '</script></body></html>';
-
-			//var newWindow = window.open();
-			//newWindow.document.body.innerHTML = html;
-
-			var newWindow2 = window.open();
-			newWindow2.document.write(html);
+			window.open("viewer.html?type=edit&id=" + mapConfig.lmfId);
 		}
 	});
 }
@@ -742,13 +762,7 @@ function previewPublishedMapConfig(mapConfigId)
 	{
 		if(mapConfig.lmfId == mapConfigId)
 		{
-			var html = '<html><head><title>' + mapConfig.name + '</title><head><body><div id="smk-map-frame"></div><script src="../smk-client/smk-bootstrap.js" smk-standalone="true">return ' + JSON.stringify(mapConfig) + '</script></body></html>';
-
-			//var newWindow = window.open();
-			//newWindow.document.body.innerHTML = html;
-
-			var newWindow2 = window.open();
-			newWindow2.document.write(html);
+			window.open("viewer.html?type=published&id=" + mapConfig.lmfId);
 		}
 	});
 }
@@ -824,6 +838,7 @@ function finishLayerEdits(save)
 		{
 			selectedLayerNode.data.isVisible = $("#vectorVisible").is(":checked");
 			selectedLayerNode.data.title = $("#vectorName").val();
+			selectedLayerNode.data.dataUrl = $("#vectorUrl").val();
 			selectedLayerNode.data.opacity = $("#vectorOpacity").val();
 			selectedLayerNode.data.useClustering = $("#vectorClustering").is(":checked");
 			selectedLayerNode.data.useHeatmapping = $("#vectorHeatmapping").is(":checked");
@@ -835,11 +850,12 @@ function finishLayerEdits(save)
 			selectedLayerNode.data.style.fillOpacity = $("#vectorFillOpacity").val();
 
 			// add the attachment data to the cache for upload after save
+			// currently you cannot re-upload and must create a new layer
 			if(fileContents != null)
 			{
 				unsavedAttachments.push(
 				{
-					type: "vector_upload",
+					type: $("#vectorType").val(),
 					layer: selectedLayerNode.data,
 					contents: fileContents
 				});
@@ -1037,7 +1053,7 @@ function uploadVectorLayer()
 	// create kml doc
 	var layer =
 	{
-		type: $("#vectorType").val(),
+		type: "geojson",
 		id: $("#kmlName").val().replace(/\s+/g, '-').toLowerCase(),
 	    title: $("#kmlName").val(),
 	    isVisible: $("#kmlIsVisible").is(":checked"),
@@ -1045,6 +1061,7 @@ function uploadVectorLayer()
 	    attributes: [],
 		useClustering: $("#kmlClustering").is(":checked"),
 		useHeatmapping: $("#kmlHeatmapping").is(":checked"),
+		dataUrl: $("#vectorUrl").val(),
 		style:
 		{
 			strokeWidth: $("#kmlStrokeWidth").val(),
@@ -1075,12 +1092,15 @@ function uploadVectorLayer()
 	tree.reload(layerSource);
 
 	// add the attachment data to the cache for upload after save
-	unsavedAttachments.push(
+	if($("#vectorUrl").val() == null || $("#vectorUrl").val() == "")
 	{
-		type: "vector_upload",
-		layer: layer,
-		contents: fileContents
-	});
+		unsavedAttachments.push(
+		{
+			type: $("#vectorType").val(),
+			layer: layer,
+			contents: fileContents
+		});
+	}
 
 	document.getElementById("layersForm").reset();
 }
@@ -1201,7 +1221,7 @@ function getCompleteCatalogItem(mpcmId)
             error: function (status)
             {
                 // error handler
-                Materialize.toast('Error MPCM Layer ' + catalogItem.mpcmId, 4000);
+                Materialize.toast('Error loading MPCM Layer', 4000);
             }
 		});
 	}

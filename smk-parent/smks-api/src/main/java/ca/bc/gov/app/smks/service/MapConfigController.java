@@ -25,6 +25,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import ca.bc.gov.app.smks.converter.DocumentConverterFactory;
+import ca.bc.gov.app.smks.converter.DocumentConverterFactory.DocumentType;
 import ca.bc.gov.app.smks.dao.CouchDAO;
 import ca.bc.gov.app.smks.model.MapConfigInfo;
 import ca.bc.gov.app.smks.model.MapConfiguration;
@@ -258,7 +260,7 @@ public class MapConfigController
 
 	@RequestMapping(value = "/{config_id}/Attachments", headers=("content-type=multipart/form-data"), method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity<?> createAttachment(@PathVariable String config_id, @RequestParam("file") MultipartFile request, @RequestParam("id") String id)
+	public ResponseEntity<?> createAttachment(@PathVariable String config_id, @RequestParam("file") MultipartFile request, @RequestParam("id") String id, @RequestParam("type") String type)
 	{
 		logger.debug(" >> createAttachment()");
 		ResponseEntity<?> result = null;
@@ -273,7 +275,19 @@ public class MapConfigController
 
 				if(resource != null)
 				{
-					Attachment attachment = new Attachment(id, Base64.encodeBase64String(request.getBytes()), request.getContentType());
+					// convert resource to geojson if it's a vector type
+					byte[] docBytes = request.getBytes();
+					
+					String contentType = request.getContentType();
+					
+					if(type.equals("kml")) { docBytes = DocumentConverterFactory.convertDocument(request.getBytes(), DocumentType.KML); contentType = "application/octet-stream"; }
+					if(type.equals("kmz")) { docBytes = DocumentConverterFactory.convertDocument(request.getBytes(), DocumentType.KMZ); contentType = "application/octet-stream"; }
+					else if(type.equals("csv")) { docBytes = DocumentConverterFactory.convertDocument(request.getBytes(), DocumentType.CSV); contentType = "application/octet-stream"; }
+					else if(type.equals("wkt")) { docBytes = DocumentConverterFactory.convertDocument(request.getBytes(), DocumentType.WKT); contentType = "application/octet-stream"; }
+					else if(type.equals("gml")) { docBytes = DocumentConverterFactory.convertDocument(request.getBytes(), DocumentType.GML); contentType = "application/octet-stream"; }
+					else if(type.equals("shape")) { docBytes = DocumentConverterFactory.convertDocument(request.getBytes(), DocumentType.SHAPE); contentType = "application/octet-stream"; }
+					
+					Attachment attachment = new Attachment(id, Base64.encodeBase64String(docBytes), contentType);
 				    resource.addInlineAttachment(attachment);
 
 				    couchDAO.updateResource(resource);

@@ -27,6 +27,8 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/jquery.fancytree/2.28.0/skin-lion/ui.fancytree.min.css"  rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/jquery.fancytree/2.28.0/skin-lion/vline-rtl.gif"  rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/jquery.fancytree/2.28.0/skin-lion/vline.gif"  rel="stylesheet">
+    <!-- Omnivore, for converting file uploads -->
+    <script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-omnivore/v0.2.0/leaflet-omnivore.min.js'></script>
     <!-- smk -->
     <script src="resources/js/dmf.js"></script>
     <link rel="stylesheet" type="text/css" href="resources/css/dmf.css" />
@@ -286,69 +288,65 @@
 								</div>
 								<div style="height: 100%;">
 									<div id="layerEditDataBCPanel" class="col s6" style="display: none; overflow: auto; height: 100%;">
-										<div style="height: 100%; margin-left: 10px;">
-											<div class="row">
-												<h5>DataBC Catalog Layer</h5>
+										<div class="row">
+											<h5>DataBC Catalog Layer</h5>
+										</div>
+										<div class="row">
+											<p>
+												<input type="checkbox" id="dbcVisible" />
+												<label class="black-text" for="dbcVisible">Visible</label>
+											</p>
+										</div>
+										<div class="row">
+											<div class="col s12 input-field">
+												<input id="dbcName" type="text">
+				          						<label for="dbcName">Title</label>
 											</div>
-											<div class="row">
-												<p>
-													<input type="checkbox" id="dbcVisible" />
-													<label class="black-text" for="dbcVisible">Visible</label>
-												</p>
+										</div>
+										<div class="row">
+											<div class="col s12 input-field">
+												<input id="dbcAttribution" type="text">
+				          						<label for="dbcAttribution">Attribution</label>
 											</div>
-											<div class="row">
-												<div class="col s12 input-field">
-													<input id="dbcName" type="text">
-					          						<label for="dbcName">Title</label>
-												</div>
+										</div>
+										<div class="row">
+											<div class="col s12 input-field">
+												<input id="dbcOpacity" type="text">
+				          						<label for="dbcOpacity">Opacity</label>
 											</div>
-											<div class="row">
-												<div class="col s12 input-field">
-													<input id="dbcAttribution" type="text">
-					          						<label for="dbcAttribution">Attribution</label>
-												</div>
-											</div>
-											<div class="row">
-												<div class="col s12 input-field">
-													<input id="dbcOpacity" type="text">
-					          						<label for="dbcOpacity">Opacity</label>
-												</div>
-											</div>
-											<div id="dbcAttributes">
-											</div>
+										</div>
+										<div id="dbcAttributes">
 										</div>
 									</div>
 									<div id="layerEditWMSPanel" class="col s6" style="display: none; overflow: auto; height: 100%;">
-										<div style="height: 100%; margin-left: 10px;">
-											<div class="row">
-												<h5>WMS Service Layer</h5>
+										<div class="row">
+											<h5>WMS Service Layer</h5>
+										</div>
+										<div class="row">
+											<p>
+												<input type="checkbox" id="wmsVisible" />
+												<label class="black-text" for="wmsVisible">Visible</label>
+											</p>
+										</div>
+										<div class="row">
+											<div class="col s12 input-field">
+												<input id="wmsName" type="text">
+				          						<label for="wmsName">Title</label>
 											</div>
-											<div class="row">
-												<p>
-													<input type="checkbox" id="wmsVisible" />
-													<label class="black-text" for="wmsVisible">Visible</label>
-												</p>
+										</div>
+										<div class="row">
+											<div class="col s12 input-field">
+												<input id="wmsAttribution" type="text">
+				          						<label for="wmsAttribution">Attribution</label>
 											</div>
-											<div class="row">
-												<div class="col s12 input-field">
-													<input id="wmsName" type="text">
-					          						<label for="wmsName">Title</label>
-												</div>
+										</div>
+										<div class="row">
+											<div class="col s12 input-field">
+												<input id="wmsOpacity" type="text">
+				          						<label for="wmsOpacity">Opacity</label>
 											</div>
-											<div class="row">
-												<div class="col s12 input-field">
-													<input id="wmsAttribution" type="text">
-					          						<label for="wmsAttribution">Attribution</label>
-												</div>
-											</div>
-											<div class="row">
-												<div class="col s12 input-field">
-													<input id="wmsOpacity" type="text">
-					          						<label for="wmsOpacity">Opacity</label>
-												</div>
-											</div>
-											<div id="wmsAttributes">
-											</div>
+										</div>
+										<div id="wmsAttributes">
 										</div>
 									</div>
 									<div id="layerEditVectorPanel" class="col s6" style="display: none; overflow: auto; height: 100%;">
@@ -496,9 +494,25 @@
 												<div class="col s6" style="margin-top: 15px;">
 													<select id="vectorType">
 												      <option value="" disabled selected>Choose vector type</option>
-												      <option value="kml">Kml</option>
+												      <option value="kml">KML</option>
+												      <option value="kmz">KMZ</option>
 												      <option value="geojson">GeoJSON</option>
+												      <!-- <option value="wkt">WKT</option>-->
+												      <!-- <option value="gml">GML</option>-->
+												      <!-- <option value="csv">CSV</option>-->
+												      <option value="shape">Shapefile (zip only)</option>
 												    </select>
+												</div>
+								    		</div>
+								    		<div class="row">
+								    			<p>As an alternative to embedded file uploads, you can supply a link to your vector file data.</p>
+								    			<p>If you include a URL, it will override any previously uploaded data.</p>
+								    			<p>URL linked vector geometry MUST be in GeoJSON format. All other file types will be ignored.</p>
+								    		</div>
+								    		<div class="row">
+								    			<div class="col s12 input-field">
+													<input id="vectorUrl" type="text">
+					          						<label for="vectorUrl">URL Location</label>
 												</div>
 								    		</div>
 							    			<div class="row" >

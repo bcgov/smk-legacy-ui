@@ -1,0 +1,26 @@
+== {GET} MapConfiguration/{id} - Retrieve the latest versions of a LMF Map Configurations (non-published only)
+
+Executing a GET at the MapConfiguration endpoint with the LMF id will return the related Map Configuration document
+
+NOTE: The document returned will be the latest version, not the published version. To get the published version, you must call the /Published/ endpoints
+NOTE: It is possible to fetch previous version from this endpoint by including a query parameter of 'version' with the desired version number. This is not the preferred method of getting the current published configuration.
+
+Example of curl command:
+
+include::{snippets}/mapconfig-get/curl-request.adoc[]
+
+Path Parameters:
+
+include::{snippets}/mapconfig-get/path-parameters.adoc[]
+
+Example of http request:
+
+include::{snippets}/mapconfig-get/http-request.adoc[]
+
+Example of http response:
+
+include::{snippets}/mapconfig-get/http-response.adoc[]
+
+Response body:
+
+include::{snippets}/mapconfig-get/response-body.adoc[]
