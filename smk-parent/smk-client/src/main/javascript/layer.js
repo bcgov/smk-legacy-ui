@@ -65,9 +65,9 @@ include.module( 'layer', [ 'smk', 'jquery', 'util', 'event' ], function () {
     }
 
     Layer.prototype.inScaleRange = function ( view ) {
-        console.log( this.config.title, this.config.scaleMin, view.scale, this.config.scaleMax )
-        if ( this.config.scaleMax && view.scale > this.config.scaleMax ) return false
-        if ( this.config.scaleMin && view.scale < this.config.scaleMin ) return false
+        // console.log( this.config.title, this.config.minScale, view.scale, this.config.maxScale )
+        if ( this.config.maxScale && view.scale < this.config.maxScale ) return false
+        if ( this.config.minScale && view.scale > this.config.minScale ) return false
         return true
     }
 
@@ -245,40 +245,42 @@ include.module( 'layer', [ 'smk', 'jquery', 'util', 'event' ], function () {
                 returnGeometry: true,
                 returnZ:        false,
                 returnM:        false,
-                f:              'pjson',
+                f:              'json',
                 geometry:       location.map.longitude + ',' + location.map.latitude,
                 dynamicLayers:  dynamicLayers
             }
 
-            return $.ajax( {
+            return SMK.UTIL.makePromise( function ( res, rej ) {
+                $.ajax( {
                     url:            serviceUrl,
-                    type:           "get",
+                    type:           'post',
                     data:           param,
-                    dataType:       "jsonp",
-                    contentType:    "application/json",
-                    crossDomain:    true,
-                    withCredentials: true,
+                    dataType:       'json',
+                    // contentType:    "application/json",
+                    // crossDomain:    true,
+                    // withCredentials: true,
+                } ).then( res, rej )
+            } )
+            .then( function ( data ) {
+                if ( !data ) throw new Error( 'no features' )
+                if ( !data.results || data.results.length == 0 ) throw new Error( 'no features' )
+
+                return data.results.map( function ( r, i ) {
+                    var f = {}
+
+                    if ( self.config.titleAttribute )
+                        f.title = r.attributes[ self.config.titleAttribute ]
+                    else if ( r.displayFieldName )
+                        f.title = r.attributes[ r.displayFieldName ]
+                    else
+                        f.title = 'Feature #' + ( i + 1 )
+
+                    f.geometry = Terraformer.ArcGIS.parse( r.geometry )
+                    f.properties = r.attributes
+
+                    return f
                 } )
-                .then( function ( data ) {
-                    if ( !data ) throw new Error( 'no features' )
-                    if ( !data.results || data.results.length == 0 ) throw new Error( 'no features' )
-
-                    return data.results.map( function ( r, i ) {
-                        var f = {}
-
-                        if ( self.config.titleAttribute )
-                            f.title = r.attributes[ self.config.titleAttribute ]
-                        else if ( r.displayFieldName )
-                            f.title = r.attributes[ r.displayFieldName ]
-                        else
-                            f.title = 'Feature #' + ( i + 1 )
-
-                        f.geometry = Terraformer.ArcGIS.parse( r.geometry )
-                        f.properties = r.attributes
-
-                        return f
-                    } )
-                } )
+            } )
         },
 
 

@@ -72,12 +72,26 @@ include.module( 'layer-leaflet', [ 'smk', 'layer', 'util' ], function () {
         // var attribution = layers[ 0 ].config.attribution
         var opacity     = layers[ 0 ].config.opacity
 
+        var minZoom
+        if ( layers[ 0 ].config.minScale )
+            minZoom = this.getZoomBracketForScale( layers[ 0 ].config.minScale )[ 1 ]
+
+        var maxZoom
+        if ( layers[ 0 ].config.maxScale )
+            maxZoom = this.getZoomBracketForScale( layers[ 0 ].config.maxScale )[ 1 ]
+
+        console.log(  layers[ 0 ].config.id, layers[ 0 ].config.minScale, layers[ 0 ].config.maxScale, maxZoom, minZoom );
+
         var layer = L.esri.dynamicMapLayer( {
             url:            serviceUrl,
             opacity:        opacity,
             layers:         layerNames,
-            dynamicLayers:  dynamicLayers
+            dynamicLayers:  dynamicLayers,
+            maxZoom:        maxZoom,
+            minZoom:        minZoom
         });
+        console.log( layer.minZoom, layer.maxZoom );
+
 
         layer.on( 'load', function ( ev ) {
             if ( layer._currentImage )
