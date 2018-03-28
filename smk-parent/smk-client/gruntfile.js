@@ -77,6 +77,7 @@ module.exports = function( grunt ) {
         watch: {
             options: {
                 livereload: {
+                    debounceDelay: 2000,
                     host:   '<%= serverHost %>',
                     key:    grunt.file.read( 'node_modules/grunt-contrib-connect/tasks/certs/server.key' ),
                     cert:   grunt.file.read( 'node_modules/grunt-contrib-connect/tasks/certs/server.crt' )
@@ -148,10 +149,10 @@ module.exports = function( grunt ) {
         grunt.log.writeln( 'Use connection: ' + protocol )
         grunt.log.writeln( 'Server host: ' + grunt.config( 'serverHost' ) )
 
-        grunt.task.run( 
+        grunt.task.run(
             'build',
             'connect',
-            'watch' 
+            'watch'
         )
     } )
 
