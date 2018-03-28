@@ -132,20 +132,17 @@ include.module( 'tool-query', [ 'smk', 'tool', 'widgets', 'tool-query.panel-quer
         } )
 
         this.queries.forEach( function ( q ) {
-            var query = smk.$viewer.query[ q.id ]
-
-            smk.$viewer.queried[ q.id ].addedFeatures( function ( ev ) {
-                self.features[ q.id ] = ev.features
-            } )
-            
-            smk.$viewer.queried[ q.id ].pickedFeature( function ( ev ) {
-                self.pickId = ev.feature && ev.feature.id
-            } )
-
-            smk.$viewer.queried[ q.id ].clearedFeatures( function ( ev ) {
-                self.features[ q.id ] = null                
-            } )
-        } ) 
+            smk.$viewer.queried[ q.id ]
+                .addedFeatures( function ( ev ) {
+                    self.features[ q.id ] = ev.features
+                } )
+                .pickedFeature( function ( ev ) {
+                    self.pickId = ev.feature && ev.feature.id
+                } )
+                .clearedFeatures( function ( ev ) {
+                    self.features[ q.id ] = null
+                } )
+        } )
 
         // var el = smk.addToContainer( inc[ 'tool-query.popup-identify-html' ] )
 

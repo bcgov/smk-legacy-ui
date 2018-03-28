@@ -1,7 +1,7 @@
 include.module( 'event', [ 'vue', 'util' ], function () {
 
     function Event ( events ) {
-        this.eventDispatch = new Vue()
+        this.dispatcher = new Vue()
     }
 
     SMK.TYPE.Event = Event
@@ -9,7 +9,7 @@ include.module( 'event', [ 'vue', 'util' ], function () {
     Event.prototype.catchExceptions = true
 
     Event.prototype.destroy = function () {
-        this.eventDispatch.$off()
+        this.dispatcher.$off()
     }
 
     Event.define = function ( names ) {
@@ -22,7 +22,7 @@ include.module( 'event', [ 'vue', 'util' ], function () {
         names.forEach( function ( n ) {
             subclass.prototype[ n ] = function ( handler ) {
                 if ( $.isFunction( handler ) ) {
-                    this.eventDispatch.$on( n, handler )
+                    this.dispatcher.$on( n, handler )
                     return this
                 }
 
@@ -30,7 +30,7 @@ include.module( 'event', [ 'vue', 'util' ], function () {
                 args.unshift( n )
 
                 try {
-                    this.eventDispatch.$emit.apply( this.eventDispatch, args )
+                    this.dispatcher.$emit.apply( this.dispatcher, args )
                 }
                 catch ( err ) {
                     if ( this.catchExceptions ) {
@@ -41,6 +41,8 @@ include.module( 'event', [ 'vue', 'util' ], function () {
                         throw err
                     }
                 }
+
+                return this
             }
         } )
 
