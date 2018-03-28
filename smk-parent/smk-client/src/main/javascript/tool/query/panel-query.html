@@ -5,7 +5,7 @@
     </template>
 
     <template slot="commands">
-        <select class="smk-command"
+        <select class="smk-command smk-select-query"
             v-on:change="$$emit( 'select-query', { id: $event.target.value } )"
         >
             <option selected disabled>Pick a query</option>
