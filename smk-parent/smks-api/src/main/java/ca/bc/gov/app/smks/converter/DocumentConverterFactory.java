@@ -495,12 +495,15 @@ public class DocumentConverterFactory
     		
     		// add the properties based off the attributes in the shape database
     		
-    		for(Property property : feature.getProperties())
+    		if(feature.getProperties() != null && dataFile != null)
     		{
-    			if(!property.getName().toString().equals("the_geom"))
-    			{
-    				jsonProperties.put(property.getName().toString(), property.getValue().toString());
-    			}
+	    		for(Property property : feature.getProperties())
+	    		{
+	    			if(!property.getName().toString().equals("the_geom"))
+	    			{
+	    				jsonProperties.put(property.getName().toString(), property.getValue().toString());
+	    			}
+	    		}
     		}
         }
     
