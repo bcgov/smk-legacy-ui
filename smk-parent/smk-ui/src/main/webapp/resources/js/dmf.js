@@ -798,6 +798,7 @@ function finishLayerEdits(save)
 		{
 			//set fields
 			selectedLayerNode.data.isVisible = $("#wmsVisible").is(":checked");
+			selectedLayerNode.data.isQueryable = $("#wmsQueryable").is(":checked");
 			selectedLayerNode.data.title = $("#wmsName").val();
 			selectedLayerNode.data.attribution = $("#wmsAttribution").val();
 			selectedLayerNode.data.opacity = $("#wmsOpacity").val();
@@ -814,6 +815,7 @@ function finishLayerEdits(save)
 		{
 			//set fields
 			selectedLayerNode.data.isVisible = $("#dbcVisible").is(":checked");
+			selectedLayerNode.data.isQueryable = $("#dbcQueryable").is(":checked");
 			selectedLayerNode.data.title = $("#dbcName").val();
 			selectedLayerNode.data.attribution = $("#dbcAttribution").val();
 			selectedLayerNode.data.opacity = $("#dbcOpacity").val();
@@ -828,6 +830,7 @@ function finishLayerEdits(save)
 		else // kml, geojson
 		{
 			selectedLayerNode.data.isVisible = $("#vectorVisible").is(":checked");
+			selectedLayerNode.data.isQueryable = $("#vectorQueryable").is(":checked");
 			selectedLayerNode.data.title = $("#vectorName").val();
 			selectedLayerNode.data.dataUrl = $("#vectorUrl").val();
 			selectedLayerNode.data.opacity = $("#vectorOpacity").val();
