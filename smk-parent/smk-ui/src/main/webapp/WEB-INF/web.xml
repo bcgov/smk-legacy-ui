@@ -1,37 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:web="http://java.sun.com/xml/ns/javaee" xmlns="http://java.sun.com/xml/ns/javaee" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" id="WebApp_ID" version="2.5">
-  <display-name>Digital Mashup Framework</display-name>
-  <context-param>
-    <param-name>javax.faces.PROJECT_STAGE</param-name>
-    <param-value>Development</param-value>
-  </context-param>
-  <context-param>
-    <param-name>couchdb</param-name>
-    <param-value>http://couchdb-dbc-mapsdk-tools.pathfinder.gov.bc.ca/</param-value>
-    <!-- <param-value>${smk.couchdb.uri}</param-value> -->
-  </context-param>
-  <context-param>
-    <param-name>lmfService</param-name>
-    <!-- <param-value>http://localhost:8080/smks-api/</param-value> -->
-    <param-value>http://smks-api.pathfinder.gov.bc.ca/smks-api/</param-value>
-    <!-- <param-value>${smks.uri}</param-value> -->
-  </context-param>
+  <display-name>Simple Map Kit</display-name>
   <welcome-file-list>
     <welcome-file>index.html</welcome-file>
   </welcome-file-list>
-  <servlet>
-    <servlet-name>Faces Servlet</servlet-name>
-    <servlet-class>javax.faces.webapp.FacesServlet</servlet-class>
-    <load-on-startup>1</load-on-startup>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>Faces Servlet</servlet-name>
-    <url-pattern>*.xhtml</url-pattern>
-  </servlet-mapping>
-  <mime-mapping>
-    <extension>xhtml</extension>
-    <mime-type>application/xml</mime-type>
-  </mime-mapping>
   <mime-mapping>
     <extension>eot</extension>
     <mime-type>application/vnd.ms-fontobject</mime-type>
@@ -60,7 +32,6 @@
     <extension>json</extension>
     <mime-type>application/json</mime-type>
   </mime-mapping>
-  
   <filter>    
 		<filter-name>CorsFilter</filter-name>
 		<filter-class>org.apache.catalina.filters.CorsFilter</filter-class>

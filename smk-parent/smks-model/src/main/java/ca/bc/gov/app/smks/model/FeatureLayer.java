@@ -12,7 +12,7 @@ public class FeatureLayer extends Layer
 	private List<Attribute> attributes;
 	private String geometryAttribute;
     private String titleAttribute;
-
+    
 	public FeatureLayer()
 	{
 	}
@@ -59,7 +59,7 @@ public class FeatureLayer extends Layer
 	{
 		this.attributes = attributes;
 	}
-
+	
 	public FeatureLayer clone()
 	{
 		FeatureLayer clone = new FeatureLayer( this );
