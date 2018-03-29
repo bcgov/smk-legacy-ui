@@ -80,8 +80,6 @@ include.module( 'layer-leaflet', [ 'smk', 'layer', 'util' ], function () {
         if ( layers[ 0 ].config.maxScale )
             maxZoom = this.getZoomBracketForScale( layers[ 0 ].config.maxScale )[ 1 ]
 
-        console.log(  layers[ 0 ].config.id, layers[ 0 ].config.minScale, layers[ 0 ].config.maxScale, maxZoom, minZoom );
-
         var layer = L.esri.dynamicMapLayer( {
             url:            serviceUrl,
             opacity:        opacity,
@@ -90,8 +88,6 @@ include.module( 'layer-leaflet', [ 'smk', 'layer', 'util' ], function () {
             maxZoom:        maxZoom,
             minZoom:        minZoom
         });
-        console.log( layer.minZoom, layer.maxZoom );
-
 
         layer.on( 'load', function ( ev ) {
             if ( layer._currentImage )
