@@ -7,7 +7,7 @@
     <div v-html="feature.properties.description" v-if="feature.properties.description"></div>
 
     <div class="smk-attributes" v-if="!feature.properties.description">
-        <div class="smk-attribute" v-for="attr in layer.config.attributes" v-if="layer.config.attributes">
+        <div class="smk-attribute" v-for="attr in layer.config.attributes" v-if="layer.config.attributes && attr.visible !== false">
             <span class="smk-attribute-title">{{ attr.title }}</span>
             <span class="smk-attribute-value">{{ feature.properties[ attr.name ] }}</span>
         </div>
@@ -20,7 +20,7 @@
 
     <div class="smk-commands">
         <span class="smk-command" v-on:click="zoomToFeature( layer, feature )">Zoom to</span>
-        <span class="smk-command" v-on:click="directionsToFeature( layer, feature )">Directions to</span>
+        <!-- <span class="smk-command" v-on:click="directionsToFeature( layer, feature )">Directions to</span> -->
         <span class="smk-command" v-on:click="selectFeature( layer, feature )">Add to selection</span>
     </div>
 </div>

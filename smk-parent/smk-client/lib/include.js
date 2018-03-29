@@ -476,6 +476,7 @@
     window.include.tag = includeTag
     window.include.hash = hash
     window.include.option = option
+    window.include.parseJSONC = parseJSONC
 
 } )()
 

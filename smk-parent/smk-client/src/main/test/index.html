@@ -1,87 +1,50 @@
+<!doctype html>
 <html>
     <head>
         <title>STANDALONE</title>
+        <!-- STATIC -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+        <script src="https://cdn.rawgit.com/harvesthq/chosen/gh-pages/chosen.jquery.min.js"></script>
+        <link href="https://cdn.rawgit.com/harvesthq/chosen/gh-pages/chosen.min.css" rel="stylesheet"/>
+        <link rel="stylesheet" href="test-settings.css">
+        <script src="test-settings.js"></script>
+        <!-- DYNAMIC LOADED -->
     </head>
     <body >
         <div id="smk-map-frame"></div>
 
-        <!-- <script src="/service/lib/smk-bootstrap.js" smk-standalone smk-config="LAND-TENURES-1.json"> -->
-        <!-- <script src="/service/lib/smk-bootstrap.js" smk-standalone smk-config="STATIC-DATA.json"> -->
-        <script src="../smk-bootstrap.js" smk-standalone smk-config="BCGW-ESRI.json">
-        // <script src="../smk-bootstrap.js" smk-disconnected smk-standalone smk-config="GEOJSON.json">
-        // <script src="../smk-bootstrap.js" smk-disconnected smk-standalone smk-config="KML.json">
-        // <script src="../smk-bootstrap.js" smk-disconnected smk-standalone smk-config="KML.json, LAND-TENURES-1.json, BCGW-ESRI.json, LAND-TENURES-2.json, BASE-LAYERS.json, WATER-MANAGEMENT.json">
-        // <script src="../smk-bootstrap.js" smk-standalone smk-config="LAND-TENURES-1.json, BCGW-ESRI.json, LAND-TENURES-2.json">
-        return {
-            // "_id": "1",
-            // "_rev": "29-1442dc3c9b983dc90e19edb49915fa06",
-            "smkId": "bens-app",
-            "smkRevision": 1,
+        <div id="test-settings">
+            <select id="config" data-placeholder="Config..." multiple name="config">
+                <option value="esri3d">ESRI 3D</option>
+                <option value="base-mapping">Base Mapping</option>
+                <option value="esri-dynamic">ESRI Dynamic</option>
+                <option value="land-tenures-1">Land Tenures 1</option>
+                <option value="land-tenures-2">Land Tenures 2</option>
+                <option value="water-management">Water Management</option>
+                <option value="geojson">GeoJson</option>
+                <option value="kml">Kml</option>
+            </select>
 
-            "name": "SMK Demo App",
+            <div id="tools">
+                <input id="apply" type="button" value="Apply">
+            </div>
+        </div>
 
-            "createdBy": "bwj",
-            "published": false,
+        <div id="wait">Wait...</div>
 
-            "viewer": {
-                // "type": "leaflet",
-                "type": "esri3d",
-
-                // province
-                // "initialExtent": [ -139.1782, 47.6039, -110.3533, 60.5939 ],
-
-                //kamloops
-                // "initialExtent": [ -120.52923981333151, 50.57821309403696, -120.23672882700342, 50.776409182217485 ],
-
-                // victoria
-                "initialExtent": [-124.075062648127, 48.308715168546286, -123.2273664662494, 48.75197162170292],
-
-                "baseMap": "Streets"
-            },
-
-            "surround": {
-                "type": "default",
-                "title": "Standalone SMK Demo App"
-                // "surroundType": "default",
-                // "showHeader": true
-                // "aboutPage": "This application is a demonstration of Simple Mapping Kit (SMK).<p>It is a standalone web app."
-                // "showSidebar": true
-            },
-
-            "tools": [
-                { "type": "measure" },
-                { "type": "scale",
-                    "showFactor": true,
-                    "showBar": true },
-                { "type": "coordinate" },
-                { "type": "minimap", "baseMap": "Imagery" },
-                { "type": "markup" },
-                // { "type": "direction" },
-                { "type": "pan" },
-                { "type": "zoom",
-                    "mouseWheel": true,
-                    "doubleClick": true,
-                    "box": true,
-                    "control": true
-                },
-                { "type": "about",
-                    // "position": "menu",
-                    "content": "This application is a demonstration of Simple Mapping Kit (SMK).<p>It is a standalone web app."
-                },
-                { "type": "baseMaps" },
-                { "type": "layers", "position": "toolbar" },
-                { "type": "search" },
-                { "type": "identify" },
-                { "type": "select" }
-                // { "type": "sidebar",
-
-                //     "container": "smk-sidebar",
-                //     "pane": {
-                //     }
-                // },
-            ]
-
-        }
+        <script>
+            $( function () {
+                $( '#wait' ).show()
+                setTimeout( function () {
+                    $( '#wait' ).hide()
+                    var script = document.createElement( 'script' )
+                    script.setAttribute( 'src', '../smk-bootstrap.js' )
+                    script.setAttribute( 'smk-disconnected', true )
+                    script.setAttribute( 'smk-standalone', true )
+                    script.setAttribute( 'smk-config', [ 'base-config' ].concat( PARAM.config || [] ).map( function ( c ) { return 'config/' + c + '.json' } ).join( ',' ) )
+                    document.getElementsByTagName( 'head' )[ 0 ].appendChild( script );
+                }, 3000 )
+            } )
         </script>
     </body>
 </html>

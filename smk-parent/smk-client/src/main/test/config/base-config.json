@@ -1,0 +1,57 @@
+{
+    "smkId": "test-app",
+    "smkRevision": 1,
+
+    "name": "SMK Demo App",
+
+    "createdBy": "bwj",
+    "published": false,
+
+    "viewer": {
+        "type": "leaflet",
+        // "type": "esri3d",
+
+        // province
+        "initialExtent": [ -139.1782, 47.6039, -110.3533, 60.5939 ],
+
+        //kamloops
+        // "initialExtent": [ -120.52923981333151, 50.57821309403696, -120.23672882700342, 50.776409182217485 ],
+
+        // victoria
+        // "initialExtent": [-124.075062648127, 48.308715168546286, -123.2273664662494, 48.75197162170292],
+
+        "baseMap": "Streets"
+    },
+
+    "surround": {
+        "type": "default",
+        "title": "Standalone SMK Demo App"
+    },
+
+    "tools": [
+        // { "type": "measure" },
+        { "type": "scale",
+            "showFactor": true,
+            "showBar": true },
+        { "type": "coordinate" },
+        { "type": "minimap", "baseMap": "Imagery" },
+        { "type": "markup", "enabled": false },
+        { "type": "measure", "enabled": false },
+        { "type": "directions" },
+        { "type": "pan" },
+        { "type": "zoom",
+            "mouseWheel": true,
+            "doubleClick": true,
+            "box": true,
+            "control": true
+        },
+        { "type": "about",
+            "content": "This application is a demonstration of Simple Mapping Kit (SMK).<p>It is a standalone web app."
+        },
+        { "type": "baseMaps" },
+        { "type": "layers", "position": "toolbar" },
+        { "type": "search" },
+        { "type": "identify" },
+        { "type": "select" }
+    ]
+}

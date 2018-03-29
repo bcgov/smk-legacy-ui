@@ -13,6 +13,18 @@ var getQueryString = function ( field, url )
     return string ? string[1] : null;
 };
 
+function isURL(str) 
+{
+  var pattern = new RegExp('^(https?:\\/\\/)?'+ // protocol
+  '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.?)+[a-z]{2,}|'+ // domain name
+  '((\\d{1,3}\\.){3}\\d{1,3}))'+ // OR ip (v4) address
+  '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ // port and path
+  '(\\?[;&a-z\\d%_.~+=-]*)?'+ // query string
+  '(\\#[-a-z\\d_]*)?$','i'); // fragment locator
+  
+  return pattern.test(str);
+}
+
 var serviceUrl = "../smks-api/";
 var wmsUrl = "https://openmaps.gov.bc.ca/geo/pub/ows";
 var wmsPostfix = "?service=WMS&request=GetCapabilities";
@@ -21,7 +33,6 @@ var mapConfigs = [];
 var publishedMapConfigs = [];
 var selectedMapConfig;
 var basemapViewerMap;
-var layerPreviewViewer;
 var aboutEditor;
 var editMode = false;
 
@@ -111,8 +122,8 @@ function setToolActivation(toolType)
     		}
 	    	else if(tool.type == "baseMaps" && tool.enabled == false) $("#basemapPanelOptions").hide();
 
-			if(tool.enabled == true) Materialize.toast('Activated ' + tool.type + " tool!", 4000);
-			else Materialize.toast('Deactivated ' + tool.type + " tool!", 4000);
+			//if(tool.enabled == true) Materialize.toast('Activated ' + tool.type + " tool!", 4000);
+			//else Materialize.toast('Deactivated ' + tool.type + " tool!", 4000);
 		}
    	});
 }
@@ -265,7 +276,6 @@ function editMapConfig(mapConfigId)
         	});
 
         	basemapViewerMap.invalidateSize();
-        	layerPreviewViewer.invalidateSize();
 
         	unsavedAttachments = [];
         	fileContents = null;
@@ -276,8 +286,10 @@ function editMapConfig(mapConfigId)
 
         	 // init basemap viewer
         	    setBasemap(data.viewer.baseMap);
-        	    layerPreviewViewer.setView(new L.latLng(rndLat, rndLon), rndZoom, { animate: true, duration: 60 } );
-        	    layerPreviewViewer.fitBounds(basemapViewerMap.getBounds());
+        	    var southWest = L.latLng(47.294133725, -113.291015625),
+                	northEast = L.latLng(61.1326289908, -141.064453125),
+                	bounds = L.latLngBounds(southWest, northEast);
+        	    basemapViewerMap.fitBounds(bounds);
         	});
 		}
 	});
@@ -517,8 +529,6 @@ function addNewMapConfig()
 		basemapViewerMap.invalidateSize();
 	    setBasemap(data.viewer.baseMap);
 
-	    layerPreviewViewer.fitBounds(bounds);
-
 	    // reset the layer tree
 		var tree = $('#layer-tree').fancytree('getTree');
 		tree.reload([]);
@@ -552,7 +562,7 @@ function saveMapConfig()
         withCredentials: true,
         success: function (result)
         {
-        	Materialize.toast('Successfully saved application ' + data.lmfId, 4000);
+        	Materialize.toast('Successfully saved application ' + data.lmfId + '. Checking for attachment uploads...', 4000);
 
         	// now we need to complete any attachments before moving on.
 
@@ -563,12 +573,22 @@ function saveMapConfig()
         		documentData.append('file', attachment.contents);
 
         		var attchId;
-        		if(attachment.type == "header_upload") attchId = "surroundImage";
-        		else attchId = attachment.layer.id;
+        		var attchType;
+        		
+        		if(attachment.type == "header_upload") 
+    			{
+    				attchId = "surroundImage";
+    				attchType = "image";
+    			}
+        		else 
+    			{
+        			attchId = attachment.layer.id;
+        			attchType = attachment.type;
+    			}
 
         		$.ajax
         		({
-        			url: serviceUrl + "MapConfigurations/" + data.lmfId + "/Attachments/?id=" + attchId,
+        			url: serviceUrl + "MapConfigurations/" + data.lmfId + "/Attachments/?id=" + attchId + "&type=" + attchType,
         	        type: "post",
         	        data: documentData,
         	        crossDomain: true,
@@ -578,7 +598,7 @@ function saveMapConfig()
         	        processData: false,
         	        success: function (result)
         	        {
-        	        	console.log("attachment " + attachment.layer.id + " uploaded!");
+        	        	Materialize.toast('Successfully uploaded attachment for ' + attachment.layer.title, 4000);
         	        	loadConfigs();
         	        },
         	        error: function (status)
@@ -725,13 +745,7 @@ function previewMapConfig(mapConfigId)
 	{
 		if(mapConfig.lmfId == mapConfigId)
 		{
-			var html = '<html><head><title>' + mapConfig.name + '</title><head><body><div id="smk-map-frame"></div><script src="../smk-client/smk-bootstrap.js" smk-standalone="true">return ' + JSON.stringify(mapConfig) + '</script></body></html>';
-
-			//var newWindow = window.open();
-			//newWindow.document.body.innerHTML = html;
-
-			var newWindow2 = window.open();
-			newWindow2.document.write(html);
+			window.open("viewer.html?type=edit&id=" + mapConfig.lmfId);
 		}
 	});
 }
@@ -742,13 +756,7 @@ function previewPublishedMapConfig(mapConfigId)
 	{
 		if(mapConfig.lmfId == mapConfigId)
 		{
-			var html = '<html><head><title>' + mapConfig.name + '</title><head><body><div id="smk-map-frame"></div><script src="../smk-client/smk-bootstrap.js" smk-standalone="true">return ' + JSON.stringify(mapConfig) + '</script></body></html>';
-
-			//var newWindow = window.open();
-			//newWindow.document.body.innerHTML = html;
-
-			var newWindow2 = window.open();
-			newWindow2.document.write(html);
+			window.open("viewer.html?type=published&id=" + mapConfig.lmfId);
 		}
 	});
 }
@@ -758,11 +766,9 @@ function setBasemap(id)
 	basemapViewerMap.eachLayer(function (layer)
 	{
 		basemapViewerMap.removeLayer(layer);
-		layerPreviewViewer.removeLayer(layer);
 	});
 
 	basemapViewerMap.addLayer(L.esri.basemapLayer(id));
-	layerPreviewViewer.addLayer(L.esri.basemapLayer(id));
 	//resetBasemapView();
 }
 
@@ -783,7 +789,6 @@ function resetBasemapView()
 }
 
 var selectedLayerNode;
-var selectedLayerPreviewObject;
 
 function finishLayerEdits(save)
 {
@@ -824,6 +829,7 @@ function finishLayerEdits(save)
 		{
 			selectedLayerNode.data.isVisible = $("#vectorVisible").is(":checked");
 			selectedLayerNode.data.title = $("#vectorName").val();
+			selectedLayerNode.data.dataUrl = $("#vectorUrl").val();
 			selectedLayerNode.data.opacity = $("#vectorOpacity").val();
 			selectedLayerNode.data.useClustering = $("#vectorClustering").is(":checked");
 			selectedLayerNode.data.useHeatmapping = $("#vectorHeatmapping").is(":checked");
@@ -835,11 +841,12 @@ function finishLayerEdits(save)
 			selectedLayerNode.data.style.fillOpacity = $("#vectorFillOpacity").val();
 
 			// add the attachment data to the cache for upload after save
+			// currently you cannot re-upload and must create a new layer
 			if(fileContents != null)
 			{
 				unsavedAttachments.push(
 				{
-					type: "vector_upload",
+					type: $("#vectorType").val(),
 					layer: selectedLayerNode.data,
 					contents: fileContents
 				});
@@ -875,8 +882,7 @@ function finishLayerEdits(save)
       	});
 	}
 
-	$("#dbcAttributes").empty();
-	$("#wmsAttributes").empty();
+	$("#attributePanel").empty();
 	$("#editLayerPanel").hide();
 	$("#layerEditDataBCPanel").hide();
 	$("#layerEditWMSPanel").hide();
@@ -892,119 +898,124 @@ function finishLayerEdits(save)
 function editSelectedLayer()
 {
 	var nodes = $("#layer-tree").fancytree('getTree').getSelectedNodes();
-	$("#dbcAttributes").empty();
-	$("#wmsAttributes").empty();
+	$("#attributePanel").empty();
 
+	var firstEdited = false;
+	
 	nodes.forEach(function(node)
    	{
-		// display edit panel with node object
-		$("#editLayerPanel").show();
-		$("#layerAddPanel").hide();
-
-		layerPreviewViewer.invalidateSize();
-
-		selectedLayerNode = node;
-		// setup the preview map
-		if(selectedLayerPreviewObject != null) layerPreviewViewer.removeLayer(selectedLayerPreviewObject);
-
-		if(node.data.type == "wms")
+		if(!firstEdited)
 		{
-			$("#layerEditWMSPanel").show();
-
-			var layer = L.tileLayer.wms(node.data.serviceUrl,
-		    {
-		        layers: [node.data.layerName],
-		        styles: [node.data.styleName],
-		        version: node.data.version,
-		        format: 'image/png',
-		        transparent: true,
-		        attribution: node.data.attribution
-		    });
-
-		    layer.setOpacity(node.data.opacity);
-
-		    selectedLayerPreviewObject = layer;
-		    layerPreviewViewer.addLayer(layer);
-
-		    //set fields
-			$("#wmsVisible").prop('checked', node.data.isVisible);
-			$("#wmsName").val(node.data.title);
-			$("#wmsAttribution").val(node.data.attribution);
-			$("#wmsOpacity").val(node.data.opacity);
-
-			if(node.data.attributes == null) node.data.attributes = [];
-			node.data.attributes.forEach(function (attribute)
+			firstEdited = true;
+			// display edit panel with node object
+			$("#editLayerPanel").show();
+			$("#layerAddPanel").hide();
+	
+			selectedLayerNode = node;
+	
+			if(node.data.type == "wms")
 			{
-				$("#wmsAttributes").append('<div class="row"><div class="col s4"><p><input type="checkbox" id="' + attribute.id + '_visible" /><label class="black-text" for="' + attribute.id + '_visible">Visible</label></p></div><div class="col s8 input-field"><input id="' + attribute.id + '_label" type="text"><label for="' + attribute.id + '_label">Label</label></div></div>');
-				$("#" + attribute.id + "_visible").prop('checked', attribute.visible);
-				$("#" + attribute.id + "_label").val(attribute.title);
-			});
-		}
-		else if(node.data.type == "esri-dynamic")
-		{
-			$("#layerEditDataBCPanel").show();
-
-			var layer = L.esri.dynamicMapLayer(
-		    {
-		        url: node.data.serviceUrl,
-		        opacity: node.data.opacity,
-		        layers: [node.data.mpcmId],
-		        dynamicLayers: [JSON.parse(node.data.dynamicLayers[0])],
-		        useCors: false
-		    });
-
-			selectedLayerPreviewObject = layer;
-			layerPreviewViewer.addLayer(layer);
-
-			//set fields
-			$("#dbcVisible").prop('checked', node.data.isVisible);
-			$("#dbcName").val(node.data.title);
-			$("#dbcAttribution").val(node.data.attribution);
-			$("#dbcOpacity").val(node.data.opacity);
-
-			if(node.data.attributes == null) node.data.attributes = [];
-			node.data.attributes.forEach(function (attribute)
+				$("#layerEditWMSPanel").show();
+	
+				var layer = L.tileLayer.wms(node.data.serviceUrl,
+			    {
+			        layers: [node.data.layerName],
+			        styles: [node.data.styleName],
+			        version: node.data.version,
+			        format: 'image/png',
+			        transparent: true,
+			        attribution: node.data.attribution
+			    });
+	
+			    layer.setOpacity(node.data.opacity);
+	
+			    //set fields
+				$("#wmsVisible").prop('checked', node.data.isVisible);
+				$("#wmsQueryable").prop('checked', node.data.isQueryable);
+				$("#wmsName").val(node.data.title);
+				$("#wmsAttribution").val(node.data.attribution);
+				$("#wmsOpacity").val(node.data.opacity);
+	
+				if(node.data.attributes == null) node.data.attributes = [];
+				$("#attributePanel").empty();
+				node.data.attributes.forEach(function (attribute)
+				{
+					$("#attributePanel").append('<div class="row"><div class="col s4"><p><input type="checkbox" id="' + attribute.id + '_visible" /><label class="black-text" for="' + attribute.id + '_visible">Visible</label></p></div><div class="col s8 input-field"><input id="' + attribute.id + '_label" type="text"><label for="' + attribute.id + '_label">Label</label></div></div>');
+					$("#" + attribute.id + "_visible").prop('checked', attribute.visible);
+					$("#" + attribute.id + "_label").val(attribute.title);
+				});
+			}
+			else if(node.data.type == "esri-dynamic")
 			{
-				$("#dbcAttributes").append('<div class="row"><div class="col s4"><p><input type="checkbox" id="' + attribute.id + '_visible" /><label class="black-text" for="' + attribute.id + '_visible">Visible</label></p></div><div class="col s8 input-field"><input id="' + attribute.id + '_label" type="text"><label for="' + attribute.id + '_label">Label</label></div></div>');
-				$("#" + attribute.id + "_visible").prop('checked', attribute.visible);
-				$("#" + attribute.id + "_label").val(attribute.title);
-			});
-		}
-		else
-		{
-			$("#layerEditVectorPanel").show(); //kml, geojson
-
-			$("#vectorVisible").prop('checked', node.data.isVisible);
-			$("#vectorName").val(node.data.title);
-			$("#vectorOpacity").val(node.data.opacity);
-			$("#vectorClustering").prop('checked', node.data.useClustering);
-			$("#vectorHeatmapping").prop('checked', node.data.useHeatmapping);
-			$("#vectorStrokeWidth").val(node.data.style.strokeWidth);
-			$("#vectorStrokeStyle").val(node.data.stylestrokeStyle);
-		    $("#vectorStrokeColor").val(node.data.style.strokeColor);
-		    $("#vectorStrokeOpacity").val(node.data.style.strokeOpacity);
-		    $("#vectorFillColor").val(node.data.style.fillColor);
-		    $("#vectorFillOpacity").val(node.data.style.fillOpacity);
-
-		    if(node.data.attributes == null) node.data.attributes = [];
-			node.data.attributes.forEach(function (attribute)
+				$("#layerEditDataBCPanel").show();
+	
+				var layer = L.esri.dynamicMapLayer(
+			    {
+			        url: node.data.serviceUrl,
+			        opacity: node.data.opacity,
+			        layers: [node.data.mpcmId],
+			        dynamicLayers: [JSON.parse(node.data.dynamicLayers[0])],
+			        useCors: false
+			    });
+	
+				//set fields
+				$("#dbcVisible").prop('checked', node.data.isVisible);
+				$("#dbcQueryable").prop('checked', node.data.isQueryable);
+				$("#dbcName").val(node.data.title);
+				$("#dbcAttribution").val(node.data.attribution);
+				$("#dbcOpacity").val(node.data.opacity);
+	
+				if(node.data.attributes == null) node.data.attributes = [];
+				$("#attributePanel").empty();
+				node.data.attributes.forEach(function (attribute)
+				{
+					$("#attributePanel").append('<div class="row"><div class="col s4"><p><input type="checkbox" id="' + attribute.id + '_visible" /><label class="black-text" for="' + attribute.id + '_visible">Visible</label></p></div><div class="col s8 input-field"><input id="' + attribute.id + '_label" type="text"><label for="' + attribute.id + '_label">Label</label></div></div>');
+					$("#" + attribute.id + "_visible").prop('checked', attribute.visible);
+					$("#" + attribute.id + "_label").val(attribute.title);
+				});
+			}
+			else
 			{
-				$("#vectorAttributes").append('<div class="row"><div class="col s4"><p><input type="checkbox" id="' + attribute.id + '_visible" /><label class="black-text" for="' + attribute.id + '_visible">Visible</label></p></div><div class="col s8 input-field"><input id="' + attribute.id + '_label" type="text"><label for="' + attribute.id + '_label">Label</label></div></div>');
-				$("#" + attribute.id + "_visible").prop('checked', attribute.visible);
-				$("#" + attribute.id + "_label").val(attribute.title);
-			});
-		}
-
-		Materialize.updateTextFields();
+				$("#layerEditVectorPanel").show(); //kml, geojson
+	
+				$("#vectorVisible").prop('checked', node.data.isVisible);
+				$("#vectorQueryable").prop('checked', node.data.isQueryable);
+				$("#vectorName").val(node.data.title);
+				$("#vectorOpacity").val(node.data.opacity);
+				$("#vectorClustering").prop('checked', node.data.useClustering);
+				$("#vectorHeatmapping").prop('checked', node.data.useHeatmapping);
+				$("#vectorStrokeWidth").val(node.data.style.strokeWidth);
+				$("#vectorStrokeStyle").val(node.data.stylestrokeStyle);
+			    $("#vectorStrokeColor").val(node.data.style.strokeColor);
+			    $("#vectorStrokeOpacity").val(node.data.style.strokeOpacity);
+			    $("#vectorFillColor").val(node.data.style.fillColor);
+			    $("#vectorFillOpacity").val(node.data.style.fillOpacity);
+	
+			    if(node.data.attributes == null) node.data.attributes = [];
+			    $("#attributePanel").empty();
+				node.data.attributes.forEach(function (attribute)
+				{
+					$("#attributePanel").append('<div class="row"><div class="col s4"><p><input type="checkbox" id="' + attribute.id + '_visible" /><label class="black-text" for="' + attribute.id + '_visible">Visible</label></p></div><div class="col s8 input-field"><input id="' + attribute.id + '_label" type="text"><label for="' + attribute.id + '_label">Label</label></div></div>');
+					$("#" + attribute.id + "_visible").prop('checked', attribute.visible);
+					$("#" + attribute.id + "_label").val(attribute.title);
+				});
+			}
+	
+			Materialize.updateTextFields();
+   		}
    	});
 }
 
 function removeSelectedLayer()
 {
 	var nodes = $("#layer-tree").fancytree('getTree').getSelectedNodes();
-
+	var nodesToRemoveCount = nodes.length;
+	var index = 0;
+	
 	nodes.forEach(function(node)
    	{
+		index++;
+		
 		var tree = $('#layer-tree').fancytree('getTree');
     	var layerSource = tree.getRootNode().children;
 
@@ -1015,10 +1026,8 @@ function removeSelectedLayer()
 			if (nodeIndex !== -1) layerSource.splice(nodeIndex, 1);
 		}
 
-		tree.reload(layerSource);
-
 		data.layers.forEach(function(lyr)
-          	{
+      	{
 			if(lyr.id == node.data.id)
 			{
 				var contains = (data.layers.indexOf(lyr) > -1);
@@ -1028,7 +1037,9 @@ function removeSelectedLayer()
 					if (index !== -1) data.layers.splice(index, 1);
 				}
 			}
-          	});
+      	});
+		
+		if(index == nodesToRemoveCount) tree.reload(layerSource);
    	});
 }
 
@@ -1037,14 +1048,16 @@ function uploadVectorLayer()
 	// create kml doc
 	var layer =
 	{
-		type: $("#vectorType").val(),
+		type: "geojson",
 		id: $("#kmlName").val().replace(/\s+/g, '-').toLowerCase(),
 	    title: $("#kmlName").val(),
 	    isVisible: $("#kmlIsVisible").is(":checked"),
+	    isQueryable: $("#kmlQueryable").is(":checked"),
 	    opacity: $("#kmlOpacity").val(),
 	    attributes: [],
 		useClustering: $("#kmlClustering").is(":checked"),
 		useHeatmapping: $("#kmlHeatmapping").is(":checked"),
+		dataUrl: $("#vectorUrl").val(),
 		style:
 		{
 			strokeWidth: $("#kmlStrokeWidth").val(),
@@ -1075,14 +1088,39 @@ function uploadVectorLayer()
 	tree.reload(layerSource);
 
 	// add the attachment data to the cache for upload after save
-	unsavedAttachments.push(
+	if($("#vectorUrl").val() == null || $("#vectorUrl").val() == "")
 	{
-		type: "vector_upload",
-		layer: layer,
-		contents: fileContents
-	});
+		unsavedAttachments.push(
+		{
+			type: $("#vectorType").val(),
+			layer: layer,
+			contents: fileContents
+		});
+	}
 
 	document.getElementById("layersForm").reset();
+}
+
+var dbcSelected = false;
+var wmsSelected = false;
+var uploadSelected = false;
+
+function selectLayerType(type)
+{
+	dbcSelected = false;
+	wmsSelected = false;
+	uploadSelected = false;
+	
+	if(type == "dbc") dbcSelected = true;
+	else if(type == "wms") wmsSelected = true;
+	else if(type == "upload") uploadSelected = true;
+}
+
+function addSelectedDataLayer()
+{
+	if(dbcSelected) addSelectedDataBCLayer();
+	else if(wmsSelected) addSelectedWmsLayer();
+	else if(uploadSelected) uploadVectorLayer();
 }
 
 function addSelectedWmsLayer()
@@ -1114,6 +1152,7 @@ function addSelectedWmsLayer()
 					id: wmsStyleData != null ? wmsData.name + "-" + wmsStyleData.name : wmsData.name,
 					title: wmsStyleData != null ? wmsData.title + " " + wmsStyleData.title : wmsData.title,
 					isVisible: true,
+					isQueryable: true,
 					attribution: "",
 					metadataUrl: "",
 					opacity: 0.65,
@@ -1182,26 +1221,36 @@ function getCompleteCatalogItem(mpcmId)
             withCredentials: true,
             success: function (catalogCompleteItem)
             {
-            	if(data.layers == null) data.layers = [];
-            	data.layers.push(catalogCompleteItem);
-
-            	var lyrNode = {
-						title: catalogCompleteItem.title,
-						folder: false,
-						expanded: false,
-						data: catalogCompleteItem,
-						children: []
-					};
-
-            	var tree = $('#layer-tree').fancytree('getTree');
-            	var layerSource = tree.getRootNode().children;
-            	layerSource.push(lyrNode);
-        		tree.reload(layerSource);
+            	if(catalogCompleteItem.mpcmWorkspace == "MPCM_ALL_PUB")
+        		{
+	            	catalogCompleteItem.isVisible = true;
+	            	catalogCompleteItem.isQueryable = true;
+	            	
+	            	if(data.layers == null) data.layers = [];
+	            	data.layers.push(catalogCompleteItem);
+	
+	            	var lyrNode = {
+							title: catalogCompleteItem.title,
+							folder: false,
+							expanded: false,
+							data: catalogCompleteItem,
+							children: []
+						};
+	
+	            	var tree = $('#layer-tree').fancytree('getTree');
+	            	var layerSource = tree.getRootNode().children;
+	            	layerSource.push(lyrNode);
+	        		tree.reload(layerSource);
+        		}
+            	else
+        		{
+            		alert("This layer is flagged as secure, and cannot be added to an SMK Application at this time.");
+        		}
             },
             error: function (status)
             {
                 // error handler
-                Materialize.toast('Error MPCM Layer ' + catalogItem.mpcmId, 4000);
+                Materialize.toast('Error loading MPCM Layer. This layer may be secure and unloadable.', 4000);
             }
 		});
 	}
@@ -1252,12 +1301,91 @@ function createWmsTreeItem(wmsItem)
 	return item
 }
 
+var defaultFilterOptions = {
+	    autoApply: true,
+        autoExpand: true,
+        counter: true,
+        fuzzy: false,
+        hideExpandedCounter: true,
+        hideExpanders: false,
+        highlight: true,
+        leavesOnly: false,
+        nodata: true,
+        mode: "hide"
+      };
+
+function dbcTreeFilter()
+{
+	  var tree = $("#catalog-tree").fancytree('getTree');
+	  var match = $("#searchDbcTree").val();
+	  var opts = defaultFilterOptions;
+	  var n;
+
+	  if(match.length > 2)
+	  {
+		  n = tree.filterBranches.call(tree, match, opts);
+		  $("#btnResetDbcTreeSearch").attr("disabled", false);
+		  $("#dbcTreeMatches").text("(" + n + " matches)");
+	  }
+	  else
+	  {
+		  $("#catalog-tree").fancytree("getTree").clearFilter();
+		  $("#dbcTreeMatches").text("");
+	  }
+}
+
+function wmsTreeFilter()
+{
+	  var tree = $("#wms-catalog-tree").fancytree('getTree');
+	  var match = $("#searchWmsTree").val();
+	  var opts = defaultFilterOptions;
+	  var n;
+
+	  if(match.length > 2)
+	  {
+		  n = tree.filterBranches.call(tree, match, opts);
+		  $("#btnResetWmsTreeSearch").attr("disabled", false);
+		  $("#wmsTreeMatches").text("(" + n + " matches)");
+	  }
+	  else
+	  {
+		  $("#wms-catalog-tree").fancytree("getTree").clearFilter();
+		  $("#wmsTreeMatches").text("");
+	  }
+}
+
+function layerTreeFilter()
+{
+	  var tree = $("#layer-tree").fancytree('getTree');
+	  var match = $("#searchLayerTree").val();
+	  var opts = defaultFilterOptions;
+	  var n;
+
+	  n = tree.filterBranches.call(tree, match, opts);
+	  $("#btnResetLayerTreeSearch").attr("disabled", false);
+	  $("#layerTreeMatches").text("(" + n + " matches)");
+}
+
 function loadCatalogLayers()
 {
 	// setup catalog layers
 	var catalogTreeSource = [];
 
 	$("#catalog-tree").fancytree({
+		extensions: ["filter"],
+		quicksearch: true,
+		filter: {
+			autoApply: true,
+	        autoExpand: true,
+	        counter: true,
+	        fuzzy: false,
+	        hideExpandedCounter: true,
+	        hideExpanders: false,
+	        highlight: true,
+	        leavesOnly: false,
+	        nodata: true,
+	        mode: "hide"
+	      },
 	    checkbox: true,
 	    selectMode: 3,
 	    source: catalogTreeSource,
@@ -1268,6 +1396,14 @@ function loadCatalogLayers()
 	    {
 	    }
 	  });
+	  
+	  $("#btnResetDbcTreeSearch").click(function(e)
+	  {
+	      $("#searchDbcTree").val("");
+	      $("#dbcTreeMatches").text("");
+	      $("#catalog-tree").fancytree("getTree").clearFilter();
+	      $("#btnResetDbcTreeSearch").attr("disabled", true);
+	  }).attr("disabled", true);
 
 	$.ajax
 	({
@@ -1298,11 +1434,26 @@ function loadCatalogLayers()
 function loadWmsLayers()
 {
 	$("#wmsPanelLoading").show();
+	$("#wmsRefreshButton").hide();
 	$("#wmsPanel").hide();
 
 	var catalogTreeSource = [];
 
 	$("#wms-catalog-tree").fancytree({
+		extensions: ["filter"],
+		quicksearch: true,
+		filter: {
+			autoApply: true,
+	        autoExpand: true,
+	        counter: true,
+	        fuzzy: false,
+	        hideExpandedCounter: true,
+	        hideExpanders: false,
+	        highlight: true,
+	        leavesOnly: false,
+	        nodata: true,
+	        mode: "hide"
+	      },
 	    checkbox: true,
 	    selectMode: 3,
 	    source: catalogTreeSource,
@@ -1314,6 +1465,14 @@ function loadWmsLayers()
 	    }
 	  });
 
+	$("#btnResetWmsTreeSearch").click(function(e)
+	{
+	    $("#searchWmsTree").val("");
+	    $("#wmsTreeMatches").text("");
+	    $("#wms-catalog-tree").fancytree("getTree").clearFilter();
+	    $("#btnResetWmsTreeSearch").attr("disabled", true);
+	}).attr("disabled", true);
+	
 	wmsUrl = $("#wmsUrlField").val();
 	wmsVersion = $("#wmsVersionField").val();
 
@@ -1334,6 +1493,7 @@ function loadWmsLayers()
         	});
 
         	$("#wmsPanelLoading").hide();
+        	$("#wmsRefreshButton").show();
         	$("#wmsPanel").show();
         },
         error: function (status)
@@ -1341,6 +1501,7 @@ function loadWmsLayers()
             // error handler
             Materialize.toast('Error loading GetCapabilities from ' + wmsUrl + '. Please try again later', 4000);
             $("#wmsPanelLoading").hide();
+            $("#wmsRefreshButton").show();
         	$("#wmsPanel").show();
         }
 	});
@@ -1351,8 +1512,7 @@ function loadConfigs()
 	// clear the tables
 	$("#appsTable > tbody").html("");
 	$("#publishedAppsTable > tbody").html("");
-	$("#dbcAttributes").empty();
-	$("#wmsAttributes").empty();
+	$("#attributePanel").empty();
 
 	mapConfigs = [];
 	publishedMapConfigs = [];
@@ -1476,10 +1636,6 @@ $(document).ready(function()
 
 	map.setView(new L.latLng(rndLat, rndLon), rndZoom, { animate: true, duration: 60 } );
 
-	// reset preview to basemap exent on config edit
-	layerPreviewViewer = L.map('layerPreviewViewer');
-	layerPreviewViewer.setView(new L.latLng(rndLat, rndLon), rndZoom, { animate: true, duration: 60 } );
-
 	// set basemap
 	basemapViewerMap = L.map('basemapViewer');
 		basemapViewerMap.on('moveend', function()
@@ -1510,8 +1666,22 @@ $(document).ready(function()
 	var layerTreeSource = [];
 
 	$("#layer-tree").fancytree({
+		extensions: ["filter"],
+		quicksearch: true,
+		filter: {
+			autoApply: true,
+	        autoExpand: true,
+	        counter: true,
+	        fuzzy: false,
+	        hideExpandedCounter: true,
+	        hideExpanders: false,
+	        highlight: true,
+	        leavesOnly: false,
+	        nodata: true,
+	        mode: "hide"
+	      },
 	    checkbox: true,
-	    selectMode: 1,
+	    selectMode: 3,
 	    source: [],
 	    activate: function(event, data)
 	    {
@@ -1521,6 +1691,14 @@ $(document).ready(function()
 	    }
 	  });
 
+	$("#btnResetLayerTreeSearch").click(function(e)
+    {
+        $("#searchLayerTree").val("");
+        $("#layerTreeMatches").text("");
+        $("#layer-tree").fancytree("getTree").clearFilter();
+        $("#btnResetLayerTreeSearch").attr("disabled", true);
+    }).attr("disabled", true);
+	
 	$('ul.tabs').tabs();
 	$('ul.tabs').tabs('select_tab', 'editCopyMaps');
 

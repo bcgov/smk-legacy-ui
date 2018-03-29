@@ -1,19 +1,19 @@
 include.module( 'viewer-leaflet', [ 'viewer', 'leaflet' ], function () {
 
     function ViewerLeaflet() {
-        SMK.TYPE.ViewerBase.prototype.constructor.apply( this, arguments )
+        SMK.TYPE.Viewer.prototype.constructor.apply( this, arguments )
     }
 
     if ( !SMK.TYPE.Viewer ) SMK.TYPE.Viewer = {}
     SMK.TYPE.Viewer.leaflet = ViewerLeaflet
 
-    $.extend( ViewerLeaflet.prototype, SMK.TYPE.ViewerBase.prototype )
+    $.extend( ViewerLeaflet.prototype, SMK.TYPE.Viewer.prototype )
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
     ViewerLeaflet.prototype.initialize = function ( smk ) {
         var self = this
 
-        SMK.TYPE.ViewerBase.prototype.initialize.apply( this, arguments )
+        SMK.TYPE.Viewer.prototype.initialize.apply( this, arguments )
 
         this.deadViewerLayer = {}
 
@@ -38,8 +38,14 @@ include.module( 'viewer-leaflet', [ 'viewer', 'leaflet' ], function () {
                 self.setBasemap( smk.viewer.baseMap )
         }
 
+        function changedView() {
+            self.changedView( self.getView() )
+        }
+
         self.map.on( 'zoomstart', changedView )
         self.map.on( 'movestart', changedView )
+        self.map.on( 'zoomend', changedView )
+        self.map.on( 'moveend', changedView )
         changedView()
 
         self.finishedLoading( function () {
@@ -60,16 +66,44 @@ include.module( 'viewer-leaflet', [ 'viewer', 'leaflet' ], function () {
             } )
         } )
 
-        function changedView() {
-            self.changedView( self.getView() )
-        }
+        self.map.on( 'click', function ( ev ) {
+            self.pickedLocation( {
+                map:    { latitude: ev.latlng.lat, longitude: ev.latlng.lng },
+                screen: ev.containerPoint,
+            } )
+        } )
+
+        self.screenpixelsToMeters = self.pixelsToMillimeters( 100 ) / 1000
+
     }
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
+    ViewerLeaflet.prototype.getScale = function () {
+        var size = this.map.getSize()
+
+        var vertical = size.y / 2,
+            mapDist = this.map.distance(
+                this.map.containerPointToLatLng( [ 0,   vertical ] ),
+                this.map.containerPointToLatLng( [ 100, vertical ] )
+            )
+
+        return mapDist / this.screenpixelsToMeters
+    }
+
     ViewerLeaflet.prototype.getView = function () {
+        var b = this.map.getBounds()
+        var size = this.map.getSize()
+        var c = this.map.getCenter()
+
         return {
-            center: this.map.getCenter(),
-            zoom: this.map.getZoom()
+            center: { latitude: c.lat, longitude: c.lng },
+            zoom: this.map.getZoom(),
+            extent: [ b.getWest(), b.getSouth(), b.getEast(), b.getNorth() ],
+            scale: this.getScale(),
+            screen: {
+                width:  size.x,
+                height: size.y
+            }
         }
     }
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
@@ -125,6 +159,30 @@ include.module( 'viewer-leaflet', [ 'viewer', 'leaflet' ], function () {
             animate: false
         } )
     }
+    // // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+    // //
+    // ViewerLeaflet.prototype.getCurrentLocation = function () {
+    //     var self = this
 
+    //     return SMK.UTIL.makePromise( function ( res, rej ) {
+    //         self.map.on( {
+    //             locationfound: res,
+    //             locationerror: rej
+    //         } )
+    //         self.map.locate( { maximumAge: 10 * 1000 } )
+    //     } )
+    //     .finally( function () {
+    //         self.map.off( 'locationfound' )
+    //         self.map.off( 'locationerror' )
+    //     } )
+    //     .then( function ( ev ) {
+    //         return {
+    //             map: {
+    //                 latitude: ev.latlng.lat,
+    //                 longitude: ev.latlng.lng
+    //             }
+    //         }
+    //     } )
+    // }
 } )
 

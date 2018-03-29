@@ -1,4 +1,4 @@
-include.module( 'util', [ 'jquery' ], function ( inc ) {
+include.module( 'util', [ 'jquery', 'smk' ], function ( inc ) {
 
     $.extend( window.SMK.UTIL, {
         makePromise: function( withFn ) {

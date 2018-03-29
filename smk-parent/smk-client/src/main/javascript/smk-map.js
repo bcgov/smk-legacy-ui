@@ -61,7 +61,7 @@ include.module( 'smk-map', [ 'smk', 'jquery', 'util', 'viewer', 'layer' ], funct
             try {
                 configs.forEach( function ( cfg ) {
                     if ( typeof( cfg ) == 'string' ) {
-                        var parsed = JSON.parse( cfg.replace( /^\s*\/\/.*$/mg, '' ).replace( /^\s*return\s*/mg, '' ) )
+                        var parsed = include.parseJSONC( cfg )
                         SMK.UTIL.mergeConfig( config, parsed )
                     }
                     else {
@@ -114,9 +114,9 @@ include.module( 'smk-map', [ 'smk', 'jquery', 'util', 'viewer', 'layer' ], funct
 
             if ( !self.tools || self.tools.length == 0 ) return
 
-            self.tools.push( { type: 'menu' } )
+            self.tools.push( { type: 'menu' }, { type: 'location' } )
 
-            return SMK.UTIL.waitAll( self.tools.map( function ( t ) {
+            return SMK.UTIL.waitAll( self.tools.filter( function ( t ) { return t.enabled !== false } ).map( function ( t ) {
                 var tag = 'tool-' + t.type
                 return include( tag )
                     .then( function ( inc ) {

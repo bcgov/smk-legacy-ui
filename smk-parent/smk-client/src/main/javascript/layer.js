@@ -63,6 +63,14 @@ include.module( 'layer', [ 'smk', 'jquery', 'util', 'event' ], function () {
     Layer.prototype.canMergeWith = function ( other ) {
         return false
     }
+
+    Layer.prototype.inScaleRange = function ( view ) {
+        // console.log( this.config.title, this.config.minScale, view.scale, this.config.maxScale )
+        if ( this.config.maxScale && view.scale < this.config.maxScale ) return false
+        if ( this.config.minScale && view.scale > this.config.minScale ) return false
+        return true
+    }
+
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
     SMK.TYPE.Layer = {}
@@ -128,7 +136,7 @@ include.module( 'layer', [ 'smk', 'jquery', 'util', 'event' ], function () {
             } )
         },
 
-        getFeaturesAtPoint: function ( arg ) {
+        getFeaturesAtPoint: function ( location, view ) {
             var self = this
 
             var serviceUrl  = this.config.serviceUrl
@@ -140,10 +148,10 @@ include.module( 'layer', [ 'smk', 'jquery', 'util', 'event' ], function () {
                 service:       "WMS",
                 version:       version,
                 request:       "GetFeatureInfo",
-                bbox:          arg.bbox,
+                bbox:          view.extent.join( ',' ),
                 feature_count: 20,
-                height:        arg.size.height,
-                width:         arg.size.width,
+                height:        view.screen.height,
+                width:         view.screen.width,
                 info_format:   'application/json',
                 layers:        layerName,
                 query_layers:  layerName,
@@ -152,13 +160,13 @@ include.module( 'layer', [ 'smk', 'jquery', 'util', 'event' ], function () {
 
             if ( version == '1.3.0' ) {
                 params.crs = 'EPSG:4326'
-                params.i =   parseInt( arg.position.x )
-                params.j =   parseInt( arg.position.y )
+                params.i =   parseInt( location.screen.x )
+                params.j =   parseInt( location.screen.y )
             }
             else {
                 params.srs = 'EPSG:4326'
-                params.x =   parseInt( arg.position.x )
-                params.y =   parseInt( arg.position.y )
+                params.x =   parseInt( location.screen.x )
+                params.y =   parseInt( location.screen.y )
             }
 
             var options = {
@@ -221,7 +229,7 @@ include.module( 'layer', [ 'smk', 'jquery', 'util', 'event' ], function () {
             } )
         },
 
-        getFeaturesAtPoint: function ( arg ) {
+        getFeaturesAtPoint: function ( location, view ) {
             var self = this
 
             var serviceUrl  = this.config.serviceUrl + '/identify'
@@ -231,45 +239,53 @@ include.module( 'layer', [ 'smk', 'jquery', 'util', 'event' ], function () {
                 geometryType:   'esriGeometryPoint',
                 sr:             4326,
                 tolerance:      1,
-                mapExtent:      arg.bbox,
-                imageDisplay:   [ arg.size.width, arg.size.height, 96 ].join( ',' ),
+                mapExtent:      view.extent.join( ',' ),
+                imageDisplay:   [ view.screen.width, view.screen.height, 96 ].join( ',' ),
                 returnGeometry: true,
                 returnZ:        false,
                 returnM:        false,
-                f:              'pjson',
-                geometry:       arg.point.lng + ',' + arg.point.lat,
+                f:              'json',
+                geometry:       location.map.longitude + ',' + location.map.latitude,
                 dynamicLayers:  dynamicLayers
             }
 
-            return $.ajax( {
+            return SMK.UTIL.makePromise( function ( res, rej ) {
+                $.ajax( {
                     url:            serviceUrl,
-                    type:           "get",
+                    type:           'post',
                     data:           param,
-                    dataType:       "jsonp",
-                    contentType:    "application/json",
-                    crossDomain:    true,
-                    withCredentials: true,
+                    dataType:       'json',
+                    // contentType:    "application/json",
+                    // crossDomain:    true,
+                    // withCredentials: true,
+                } ).then( res, rej )
+            } )
+            .then( function ( data ) {
+                if ( !data ) throw new Error( 'no features' )
+                if ( !data.results || data.results.length == 0 ) throw new Error( 'no features' )
+
+                return data.results.map( function ( r, i ) {
+                    var f = {}
+
+                    if ( self.config.titleAttribute )
+                        f.title = r.attributes[ self.config.titleAttribute ]
+                    else if ( r.displayFieldName )
+                        f.title = r.attributes[ r.displayFieldName ]
+                    else
+                        f.title = 'Feature #' + ( i + 1 )
+
+                    f.geometry = Terraformer.ArcGIS.parse( r.geometry )
+
+                    if ( f.geometry.type == 'MultiPoint' && f.geometry.coordinates.length == 1 ) {
+                        f.geometry.type = 'Point'
+                        f.geometry.coordinates = f.geometry.coordinates[ 0 ]
+                    }
+
+                    f.properties = r.attributes
+
+                    return f
                 } )
-                .then( function ( data ) {
-                    if ( !data ) throw new Error( 'no features' )
-                    if ( !data.results || data.results.length == 0 ) throw new Error( 'no features' )
-
-                    return data.results.map( function ( r, i ) {
-                        var f = {}
-
-                        if ( self.config.titleAttribute )
-                            f.title = r.attributes[ self.config.titleAttribute ]
-                        else if ( r.displayFieldName )
-                            f.title = r.attributes[ r.displayFieldName ]
-                        else
-                            f.title = 'Feature #' + ( i + 1 )
-
-                        f.geometry = Terraformer.ArcGIS.parse( r.geometry )
-                        f.properties = r.attributes
-
-                        return f
-                    } )
-                } )
+            } )
         },
 
 
@@ -300,11 +316,11 @@ include.module( 'layer', [ 'smk', 'jquery', 'util', 'event' ], function () {
         var cv = $( '<canvas width="' + width + '" height="' + height + '">' ).get( 0 )
         var ctx = cv.getContext( '2d' )
 
-        ctx.fillStyle = '#' + this.config.style.fillColor
+        ctx.fillStyle = this.config.style.fillColor
         ctx.fillRect( 0, 0, width, height )
 
         ctx.lineWidth = this.config.style.strokeWidth
-        ctx.strokeStyle = '#' + this.config.style.strokeColor
+        ctx.strokeStyle = this.config.style.strokeColor
         ctx.strokeRect( 0, 0, width, height )
 
         return SMK.UTIL.resolved( [ {
