@@ -2,6 +2,7 @@ package ca.bc.gov.app.smks.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
@@ -56,17 +57,18 @@ public class MapConfigController
 			if(request.getName() == null) throw new Exception("The SMK ID is null. This is a required field");
 			if(request.getName().length() == 0) throw new Exception("The SMK ID is empty. Please fill in a valid field");
 
-			if(request.getLmfId() == null) request.setLmfId(request.getName().toLowerCase().replaceAll(" ", "-"));
-			if(request.getLmfId().length() == 0) request.setLmfId(request.getName().toLowerCase().replaceAll(" ", "-"));
-
+			request.setLmfId(request.getName().toLowerCase().replaceAll(" ", "-").replaceAll("[^A-Za-z0-9]", "-"));
+			
 			request.setLmfRevision(1);
 
 			// validate the ID, in case it's already in use.
 			MapConfiguration existingDocID = couchDAO.getMapConfiguration(request.getLmfId());
 
-			if(existingDocID != null) throw new Exception("The SMK ID is already in use. For creating new documents, ensure the ID is unique. If you are attempting to update an existing Map Configuration, please hit the following endpoint: {PUT}/MapConfigurations/{id}");
-
-			// we have a revision of 1 and a valid lmf ID, so create the document
+			if(existingDocID != null)
+			{
+				// replace ID with a random guid
+				request.setLmfId(UUID.randomUUID().toString());
+			}
 
 			couchDAO.createResource(request);
 			logger.debug("    Success!");
