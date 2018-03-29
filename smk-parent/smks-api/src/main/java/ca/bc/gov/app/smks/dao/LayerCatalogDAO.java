@@ -214,6 +214,7 @@ public class LayerCatalogDAO
         layer.setAttribution("Copyright " + Calendar.getInstance().get(Calendar.YEAR) + " DataBC, Government of British Columbia" );
         layer.setMinScale(new Double(doc.getElementsByTagName("minScale").item(0).getTextContent()));
         layer.setMaxScale(new Double(doc.getElementsByTagName("maxScale").item(0).getTextContent()));
+        layer.setIsVisible(true);
 
         // properties from MPCM
         Element propertiesElement = (Element) doc.getElementsByTagName("properties").item(0);

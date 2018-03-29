@@ -1216,6 +1216,8 @@ function getCompleteCatalogItem(mpcmId)
             withCredentials: true,
             success: function (catalogCompleteItem)
             {
+            	catalogCompleteItem.isVisible = true;
+            	
             	if(data.layers == null) data.layers = [];
             	data.layers.push(catalogCompleteItem);
 
