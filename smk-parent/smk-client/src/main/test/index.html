@@ -1,3 +1,4 @@
+<!doctype html>
 <html>
     <head>
         <title>STANDALONE</title>
@@ -29,14 +30,20 @@
             </div>
         </div>
 
+        <div id="wait">Wait...</div>
+
         <script>
             $( function () {
-                var script = document.createElement( 'script' )
-                script.setAttribute( 'src', '../smk-bootstrap.js' )
-                script.setAttribute( 'smk-disconnected', true )
-                script.setAttribute( 'smk-standalone', true )
-                script.setAttribute( 'smk-config', [ 'base-config' ].concat( PARAM.config || [] ).map( function ( c ) { return 'config/' + c + '.json' } ).join( ',' ) )
-                document.getElementsByTagName( 'head' )[ 0 ].appendChild( script );
+                $( '#wait' ).show()
+                setTimeout( function () {
+                    $( '#wait' ).hide()
+                    var script = document.createElement( 'script' )
+                    script.setAttribute( 'src', '../smk-bootstrap.js' )
+                    script.setAttribute( 'smk-disconnected', true )
+                    script.setAttribute( 'smk-standalone', true )
+                    script.setAttribute( 'smk-config', [ 'base-config' ].concat( PARAM.config || [] ).map( function ( c ) { return 'config/' + c + '.json' } ).join( ',' ) )
+                    document.getElementsByTagName( 'head' )[ 0 ].appendChild( script );
+                }, 3000 )
             } )
         </script>
     </body>

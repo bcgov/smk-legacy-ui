@@ -1,3 +1,15 @@
+#wait {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    margin-top: 50%;
+    margin-bottom: 50%;
+    text-align: center;
+}
+
 #test-settings {
     z-index: 10;
     position: absolute;

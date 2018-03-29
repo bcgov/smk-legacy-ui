@@ -166,10 +166,11 @@ include.module( 'layer-leaflet', [ 'smk', 'layer', 'util' ], function () {
         if ( layers.length != 1 ) throw new Error( 'only 1 config allowed' )
 
         var layer = new L.geoJson( null, {
-            style: convertStyle( layers[ 0 ].config.style ),
-            coordsToLatLng: function ( xy ) {
-                // if ( !layers[ 0 ].config.CRS ) return xy
-                return L.CRS[ layers[ 0 ].config.CRS ].unproject( L.point( xy ) )
+            pointToLayer: function ( geojson, latlng ) {
+                return L.circleMarker( latlng )
+            },
+            onEachFeature: function ( feature, layer ) {
+                layer.setStyle( convertStyle( layers[ 0 ].config.style, feature.geometry.type ) )
             },
             renderer: L.svg(),
             interactive: false
@@ -177,7 +178,8 @@ include.module( 'layer-leaflet', [ 'smk', 'layer', 'util' ], function () {
 
         layer.on( {
             add: function () {
-                layer.options.renderer._container.style.zIndex = zIndex
+                if ( layer.options.renderer._container )
+                    layer.options.renderer._container.style.zIndex = zIndex
             }
         } )
 
@@ -197,21 +199,31 @@ include.module( 'layer-leaflet', [ 'smk', 'layer', 'util' ], function () {
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    function convertStyle( styleConfig ) {
-        return {
-            // stroke:      true,
-            color:       styleConfig.strokeColor,
-            weight:      styleConfig.strokeWidth,
-            opacity:     styleConfig.strokeOpacity,
-            // lineCap:     styleConfig.,
-            // lineJoin:    styleConfig.,
-            // dashArray:   styleConfig.,
-            // dashOffset:  styleConfig.,
-            // fill:        styleConfig.,
-            fillColor:   styleConfig.fillColor,
-            fillOpacity: styleConfig.fillOpacity,
-            // fillRule:    styleConfig.,
-        }
+    function convertStyle( styleConfig, type ) {
+        if ( type == 'Point' || type == 'MultiPoint' )
+            return {
+                radius:      styleConfig.strokeWidth / 2,
+                color:       styleConfig.strokeColor,
+                weight:      2,
+                opacity:     styleConfig.strokeOpacity,
+                fillColor:   styleConfig.fillColor,
+                fillOpacity: styleConfig.fillOpacity,
+            }
+        else
+            return {
+                // stroke:      true,
+                color:       styleConfig.strokeColor,
+                weight:      styleConfig.strokeWidth,
+                opacity:     styleConfig.strokeOpacity,
+                // lineCap:     styleConfig.,
+                // lineJoin:    styleConfig.,
+                // dashArray:   styleConfig.,
+                // dashOffset:  styleConfig.,
+                // fill:        styleConfig.,
+                fillColor:   styleConfig.fillColor,
+                fillOpacity: styleConfig.fillOpacity,
+                // fillRule:    styleConfig.,
+            }
     }
 
     function getVectorFeaturesAtPoint( location, view, leafletLayer ) {
@@ -222,9 +234,13 @@ include.module( 'layer-leaflet', [ 'smk', 'layer', 'util' ], function () {
         var fs = []
         leafletLayer.eachLayer( function ( sly ) {
             var geoj = sly.toGeoJSON()
-            var inp = turf.booleanPointInPolygon( [ location.map.longitude, location.map.latitude ] , geoj )
-            // console.log( geoj, inp )
-            if ( inp ) fs.push( geoj )
+            if ( geoj.geometry.type == 'Polygon' || geoj.geometry.type == 'MultiPolygon' ) {
+                var inp = turf.booleanPointInPolygon( [ location.map.longitude, location.map.latitude ] , geoj )
+                if ( inp ) fs.push( geoj )
+            }
+            else {
+                console.log( 'skip', geoj.geometry.type )
+            }
         } )
 
         fs.forEach( function ( f, i ) {

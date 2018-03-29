@@ -1,0 +1,9 @@
+<div class="smk-search-popup" v-if="feature">
+    <div class="smk-header">
+        <h2>{{ feature.properties.fullAddress }}</h2>
+    </div>
+
+    <div class="smk-commands">
+        <span class="smk-command" v-if="tool.directions" v-on:click="directionsToFeature( feature )">Directions to here</span>
+    </div>
+</div>

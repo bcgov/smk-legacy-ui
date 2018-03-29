@@ -403,6 +403,7 @@ include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.
         .catch( function ( err ) {
             console.warn( err )
             self.setMessage( 'Unable to find route', 'error' )
+            self.displayWaypoints()
         } )
     }
 
