@@ -331,10 +331,14 @@
 											<h5>DataBC Catalog Layer</h5>
 										</div>
 										<div class="row">
-											<p>
+											<div class="col s6">
 												<input type="checkbox" id="dbcVisible" />
 												<label class="black-text" for="dbcVisible">Visible</label>
-											</p>
+											</div>
+											<div class="col s6">
+												<input type="checkbox" id="dbcQueryable" />
+												<label class="black-text" for="dbcQueryable">Identifiable</label>
+											</div>
 										</div>
 										<div class="row">
 											<div class="col s12 input-field">
@@ -360,10 +364,14 @@
 											<h5>WMS Service Layer</h5>
 										</div>
 										<div class="row">
-											<p>
+											<div class="col s6">
 												<input type="checkbox" id="wmsVisible" />
 												<label class="black-text" for="wmsVisible">Visible</label>
-											</p>
+											</div>
+											<div class="col s6">
+												<input type="checkbox" id="wmsQueryable" />
+												<label class="black-text" for="wmsQueryable">Identifiable</label>
+											</div>
 										</div>
 										<div class="row">
 											<div class="col s12 input-field">
@@ -405,16 +413,26 @@
 												</div>
 											</div>
 										</div>
+										<div class="row">
+											<div class="col s4 input-field">
+												<input id="vectorEditUrl" type="text">
+				          						<label for="vectorEditUrl">URL</label>
+											</div>
+										</div>
 										<div class="row" >
-											<div class="col s4">
+											<div class="col s3">
 												<input type="checkbox" id="vectorVisible" />
 												<label class="black-text" for="vectorVisible">Visible</label>
 											</div>
-											<div class="col s4">
+											<div class="col s3">
+												<input type="checkbox" id="vectorQueryable" />
+												<label class="black-text" for="vectorQueryable">Identifiable</label>
+											</div>
+											<div class="col s3">
 												<input type="checkbox" id="vectorClustering" />
 												<label class="black-text" for="vectorClustering">Cluster Points</label>
 											</div>
-											<div class="col s4">
+											<div class="col s3">
 												<input type="checkbox" id="vectorHeatmapping" />
 												<label class="black-text" for="vectorHeatmapping">Heatmap Points</label>
 											</div>
@@ -584,15 +602,19 @@
 												</div>
 							      			</div>
 							      			<div class="row">
-							      				<div class="col s4">
+							      				<div class="col s3">
 													<input type="checkbox" id="kmlIsVisible" />
 													<label class="black-text" for="kmlIsVisible">Visible</label>
 												</div>
-							      				<div class="col s4">
+												<div class="col s3">
+													<input type="checkbox" id="kmlQueryable" />
+													<label class="black-text" for="kmlQueryable">Identifiable</label>
+												</div>
+							      				<div class="col s3">
 													<input type="checkbox" id="kmlClustering" />
 													<label class="black-text" for="kmlClustering">Cluster Points</label>
 												</div>
-												<div class="col s4">
+												<div class="col s3">
 													<input type="checkbox" id="kmlHeatmapping" />
 													<label class="black-text" for="kmlHeatmapping">Heatmap Points</label>
 												</div>

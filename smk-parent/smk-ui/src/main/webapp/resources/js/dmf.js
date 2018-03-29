@@ -931,6 +931,7 @@ function editSelectedLayer()
 	
 			    //set fields
 				$("#wmsVisible").prop('checked', node.data.isVisible);
+				$("#wmsQueryable").prop('checked', node.data.isQueryable);
 				$("#wmsName").val(node.data.title);
 				$("#wmsAttribution").val(node.data.attribution);
 				$("#wmsOpacity").val(node.data.opacity);
@@ -959,6 +960,7 @@ function editSelectedLayer()
 	
 				//set fields
 				$("#dbcVisible").prop('checked', node.data.isVisible);
+				$("#dbcQueryable").prop('checked', node.data.isQueryable);
 				$("#dbcName").val(node.data.title);
 				$("#dbcAttribution").val(node.data.attribution);
 				$("#dbcOpacity").val(node.data.opacity);
@@ -977,6 +979,7 @@ function editSelectedLayer()
 				$("#layerEditVectorPanel").show(); //kml, geojson
 	
 				$("#vectorVisible").prop('checked', node.data.isVisible);
+				$("#vectorQueryable").prop('checked', node.data.isQueryable);
 				$("#vectorName").val(node.data.title);
 				$("#vectorOpacity").val(node.data.opacity);
 				$("#vectorClustering").prop('checked', node.data.useClustering);
@@ -1049,6 +1052,7 @@ function uploadVectorLayer()
 		id: $("#kmlName").val().replace(/\s+/g, '-').toLowerCase(),
 	    title: $("#kmlName").val(),
 	    isVisible: $("#kmlIsVisible").is(":checked"),
+	    isQueryable: $("#kmlQueryable").is(":checked"),
 	    opacity: $("#kmlOpacity").val(),
 	    attributes: [],
 		useClustering: $("#kmlClustering").is(":checked"),
@@ -1148,6 +1152,7 @@ function addSelectedWmsLayer()
 					id: wmsStyleData != null ? wmsData.name + "-" + wmsStyleData.name : wmsData.name,
 					title: wmsStyleData != null ? wmsData.title + " " + wmsStyleData.title : wmsData.title,
 					isVisible: true,
+					isQueryable: true,
 					attribution: "",
 					metadataUrl: "",
 					opacity: 0.65,
@@ -1219,6 +1224,7 @@ function getCompleteCatalogItem(mpcmId)
             	if(catalogCompleteItem.mpcmWorkspace == "MPCM_ALL_PUB")
         		{
 	            	catalogCompleteItem.isVisible = true;
+	            	catalogCompleteItem.isQueryable = true;
 	            	
 	            	if(data.layers == null) data.layers = [];
 	            	data.layers.push(catalogCompleteItem);
