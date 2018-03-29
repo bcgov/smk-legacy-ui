@@ -276,6 +276,12 @@ include.module( 'layer', [ 'smk', 'jquery', 'util', 'event' ], function () {
                         f.title = 'Feature #' + ( i + 1 )
 
                     f.geometry = Terraformer.ArcGIS.parse( r.geometry )
+
+                    if ( f.geometry.type == 'MultiPoint' && f.geometry.coordinates.length == 1 ) {
+                        f.geometry.type = 'Point'
+                        f.geometry.coordinates = f.geometry.coordinates[ 0 ]
+                    }
+
                     f.properties = r.attributes
 
                     return f

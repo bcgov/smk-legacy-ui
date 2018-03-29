@@ -7,7 +7,7 @@
     <div v-html="feature.properties.description" v-if="feature.properties.description"></div>
 
     <div class="smk-attributes" v-if="!feature.properties.description">
-        <div class="smk-attribute" v-for="attr in layer.config.attributes" v-if="layer.config.attributes">
+        <div class="smk-attribute" v-for="attr in layer.config.attributes" v-if="layer.config.attributes && attr.visible !== false">
             <span class="smk-attribute-title">{{ attr.title }}</span>
             <span class="smk-attribute-value">{{ feature.properties[ attr.name ] }}</span>
         </div>
