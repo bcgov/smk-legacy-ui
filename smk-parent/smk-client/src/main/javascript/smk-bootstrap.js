@@ -87,8 +87,8 @@
     var arg = {
         containerId:    attr( 'smk-container', 'smk-map-frame' ),
         configUrls:     attr( 'smk-config', '' ).split( /\s*,\s*/ ).filter( function ( url ) { return !!url } ),
-        standalone:     attr( 'smk-standalone', false ),
-        disconnected:   attr( 'smk-disconnected', false ),
+        standalone:     eval( attr( 'smk-standalone', false ) ),
+        disconnected:   eval( attr( 'smk-disconnected', false ) ),
         config:         scriptConfig,
     }
 
