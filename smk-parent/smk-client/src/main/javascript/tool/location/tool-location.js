@@ -22,11 +22,11 @@ include.module( 'tool-location', [ 'smk', 'tool', 'widgets', 'tool-location.popu
     LocationTool.prototype.afterInitialize.push( function ( smk, aux ) {
         var self = this
 
-        if ( smk.$tool.identify )
-            this.tool.identify = true
+        // if ( smk.$tool.identify )
+        //     this.tool.identify = true
 
-        if ( smk.$tool.measure )
-            this.tool.measure = true
+        // if ( smk.$tool.measure )
+        //     this.tool.measure = true
 
         if ( smk.$tool.directions )
             this.tool.directions = true
@@ -47,32 +47,36 @@ include.module( 'tool-location', [ 'smk', 'tool', 'widgets', 'tool-location.popu
 
                 },
                 startDirections: function ( location, site ) {
-                    smk.$tool.directions.resetWaypoints()
-                    smk.$tool.directions.addWaypointCurrentLocation().then( function () {
-                        smk.$tool.directions.addWaypoint( location, site.fullAddress )
-                        smk.$tool.directions.addWaypoint()
-                        smk.$tool.directions.active = true
+                    smk.$tool.directions.active = true
+
+                    smk.$tool.directions.activating.then( function () {
+                        return smk.$tool.directions.startAtCurrentLocation( location, site.fullAddress )
                     } )
                 },
             }
         } )
 
         smk.$viewer.pickedLocation( function ( location ) {
+            if ( !self.enabled ) return
+
             self.location = location.map
             self.site = {}
 
             smk.$viewer.findNearestSite( location.map ).then( function ( site ) {
-                // console.log( JSON.stringify( site, null, '  ' ) )
                 self.site = site
             } )
             .catch( function ( err ) {
                 console.warn( err )
             } )
-
         } )
 
         smk.$viewer.changedView( function () {
-            self.coordinate = {}
+            self.location = {}
+        } )
+
+        self.changedEnabled( function () {
+            if ( !self.enabled )
+                self.location = {}
         } )
 
     } )

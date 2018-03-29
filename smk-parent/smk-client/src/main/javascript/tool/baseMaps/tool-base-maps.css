@@ -1,7 +1,15 @@
+.smk-base-maps-panel .smk-body {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: stretch;
+    align-content: flex-start;
+    flex-wrap: wrap;
+    height: 100%;
+}
 
 .smk-base-map-sample {
-    width: 100%;
-    height: 80px;
+    border-radius: 5px;
 }
 
 .smk-base-map {

@@ -92,11 +92,28 @@ include.module( 'tool-directions-leaflet', [ 'leaflet', 'tool-directions' ], fun
             self.waypointLayers = self.waypoints
                 .filter( function ( w ) { return !!w.location } )
                 .map( function ( w, i ) {
+                    var icon, prefix
+                    switch ( i ) {
+                    case 0:
+                        icon = greenIcon
+                        prefix = 'START HERE:\n'
+                        break;
+                    case last:
+                        icon = redIcon
+                        prefix = 'END HERE:\n'
+                        break;
+                    default:
+                        icon = new L.NumberedIcon( { number: i } )
+                        prefix = 'STOPOVER ' + i + ':\n'
+                        break;
+                    }
+
                     return L.marker( [ w.location.latitude, w.location.longitude ], {
-                        icon: i == 0 ? greenIcon
-                            : i == last ? redIcon
-                            : new L.NumberedIcon( { number: i } )
-                    } ).addTo( smk.$viewer.map )
+                            title: prefix + w.description,
+                            icon: icon
+                        } )
+                        .bindPopup( $( '<pre class="smk-popup">' ).text( prefix + w.description ).get( 0 ) )
+                        .addTo( smk.$viewer.map )
                 } )
         }
 
@@ -132,7 +149,9 @@ include.module( 'tool-directions-leaflet', [ 'leaflet', 'tool-directions' ], fun
 
             var p = self.directions[ ev.highlight ].point
             self.directionHighlightLayer = L.circleMarker( [ p[ 1 ], p[ 0 ] ] )
-            smk.$viewer.map.addLayer( self.directionHighlightLayer )
+                .bindPopup( self.directions[ ev.highlight ].instruction, { closeButton: false } )
+                .addTo( smk.$viewer.map )
+                .openPopup()
         } )
 
         aux.panel.vm.$on( 'directions-panel.pick-direction', function ( ev ) {
@@ -146,7 +165,11 @@ include.module( 'tool-directions-leaflet', [ 'leaflet', 'tool-directions' ], fun
 
             var p = self.directions[ ev.pick ].point
             self.directionPickLayer = L.circleMarker( [ p[ 1 ], p[ 0 ] ], { radius: 15 } )
-            smk.$viewer.map.addLayer( self.directionPickLayer )
+                .bindPopup( self.directions[ ev.pick ].instruction )
+                .addTo( smk.$viewer.map )
+                .openPopup()
+
+            smk.$viewer.map.panTo( [ p[ 1 ], p[ 0 ] ] )
         } )
 
         aux.panel.vm.$on( 'directions-panel.clear', function ( ev ) {
@@ -154,6 +177,8 @@ include.module( 'tool-directions-leaflet', [ 'leaflet', 'tool-directions' ], fun
         } )
 
         aux.panel.vm.$on( 'directions-panel.zoom-waypoint', function ( ev ) {
+            smk.$viewer.map.panTo( [ ev.location.latitude, ev.location.longitude ] )
+            self.waypointLayers[ ev.index ].openPopup()
         } )
 
     } )

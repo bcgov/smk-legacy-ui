@@ -1,4 +1,4 @@
-include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.panel-directions-html', 'tool-directions.popup-directions-html' ], function ( inc ) {
+include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.panel-directions-html', 'tool-directions.address-search-html' ], function ( inc ) {
 
     var request
 
@@ -32,13 +32,109 @@ include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.
     }
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
+    Vue.component( 'address-search', {
+        template: inc[ 'tool-directions.address-search-html' ],
+        props: [ 'value', 'placeholder' ],
+        data: function () {
+            return {
+                search: this.value,
+                list: null,
+                selectedIndex: null,
+                expanded: false
+            }
+        },
+        watch: {
+            value: function ( val ) {
+                this.search = this.value
+            }
+        },
+        methods: {
+            onChange: function () {
+                var self = this
+
+                this.$emit( 'input', this.search )
+                this.$emit( 'update', { location: null, description: this.search } )
+
+                this.list = null
+
+                var query = {
+                    ver:            1.2,
+                    maxResults:     20,
+                    outputSRS:      4326,
+                    addressString:  this.search,
+                    autoComplete:   true
+                }
+
+                return SMK.UTIL.makePromise( function ( res, rej ) {
+                    $.ajax( {
+                        timeout:    10 * 1000,
+                        dataType:   'jsonp',
+                        url:        'https://apps.gov.bc.ca/pub/geocoder/addresses.geojsonp',
+                        data:       query,
+                    } ).then( res, rej )
+                } )
+                .then( function ( data ) {
+                    self.list = $.map( data.features, function ( feature ) {
+                        if ( !feature.geometry.coordinates ) return;
+
+                        // exclude whole province match
+                        if ( feature.properties.fullAddress == 'BC' ) return;
+
+                        return {
+                            location: { longitude: feature.geometry.coordinates[ 0 ], latitude: feature.geometry.coordinates[ 1 ] },
+                            description: feature.properties.fullAddress
+                        }
+                    } )
+
+                    self.expanded = self.list.length > 0
+                    self.selectedIndex = self.list.length > 0 ? 0 : null
+                } )
+            },
+
+            onArrowDown: function () {
+                if ( !this.expanded && this.list ) {
+                    this.expanded = true
+                    this.selectedIndex = 0
+                    return
+                }
+                this.selectedIndex = ( ( this.selectedIndex || 0 ) + 1 ) % this.list.length
+            },
+
+            onArrowUp: function () {
+                if ( !this.expanded ) return
+                this.selectedIndex = ( ( this.selectedIndex || 0 ) + this.list.length - 1 ) % this.list.length
+            },
+
+            onEnter: function () {
+                if ( !this.expanded ) return
+                this.search = this.list[ this.selectedIndex ].description
+                this.expanded = false
+                this.$emit( 'update', this.list[ this.selectedIndex ] )
+            },
+
+            handleClickOutside( ev ) {
+                if ( this.$el.contains( ev.target ) ) return
+
+                this.expanded = false
+                this.selectedIndex = null
+            }
+        },
+        mounted() {
+            document.addEventListener( 'click', this.handleClickOutside )
+        },
+        destroyed() {
+            document.removeEventListener( 'click', this.handleClickOutside )
+        }
+    } )
+    // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+    //
     Vue.component( 'directions-widget', {
         extends: inc.widgets.toolButton,
     } )
 
     Vue.component( 'directions-panel', {
         template: inc[ 'tool-directions.panel-directions-html' ],
-        props: [ 'busy', 'waypoints', 'directions', 'directionHighlight', 'directionPick', 'summary' ],
+        props: [ 'busy', 'waypoints', 'directions', 'directionHighlight', 'directionPick', 'message', 'messageClass' ],
         data: function () {
             return {
                 optimal:    false,
@@ -69,7 +165,8 @@ include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.
         this.makePropPanel( 'directions', [] )
         this.makePropPanel( 'directionHighlight', null )
         this.makePropPanel( 'directionPick', null )
-        this.makePropPanel( 'summary', null )
+        this.makePropPanel( 'message', null )
+        this.makePropPanel( 'messageClass', null )
 
         SMK.TYPE.Tool.prototype.constructor.call( this, $.extend( {
             order:          4,
@@ -83,6 +180,8 @@ include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.
             roundTrip:  false,
             criteria:   'shortest'
         }
+
+        this.activating = SMK.UTIL.resolved()
     }
 
     SMK.TYPE.DirectionsTool = DirectionsTool
@@ -94,25 +193,38 @@ include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.
     DirectionsTool.prototype.afterInitialize.push( function ( smk, aux ) {
         var self = this
 
-        this.changedActive( function () {
+        self.changedActive( function () {
             if ( self.active ) {
+                smk.$tool.location.enabled = false
+
                 if ( self.waypoints.length == 0 ) {
-                    self.addWaypointCurrentLocation().then( function () {
-                        self.addWaypoint()
-                        self.displayWaypoints()
+                    self.activating = self.activating.then( function () {
+                        return self.startAtCurrentLocation()
                     } )
                 }
                 else {
-                    self.findRoute()
+                    self.activating = self.activating.then( function () {
+                        return self.findRoute()
+                    } )
                 }
+            }
+            else {
+                smk.$tool.location.enabled = true
             }
         } )
 
-        this.getCurrentLocation = function () {
+        self.getCurrentLocation = function () {
+            self.setMessage( 'Finding current location', 'progress' )
+            self.busy = true
+
             return smk.$viewer.getCurrentLocation().then( function ( loc ) {
                 return smk.$viewer.findNearestSite( loc ).then( function ( site ) {
                     return { location: loc, description: site.fullAddress }
                 } )
+            } )
+            .finally( function () {
+                self.busy = false
+                self.setMessage()
             } )
         }
 
@@ -123,11 +235,15 @@ include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.
                 if ( !empty )
                     throw new Error( 'shouldnt happen' )
 
-                empty.location = location.map
                 empty.description = site.fullAddress
+                empty.location = location.map
                 self.addWaypoint()
 
-                self.findRoute()
+                return self.findRoute()
+            } )
+            .catch( function ( err ) {
+                console.warn( err )
+                self.setMessage( 'Unable to find address', 'error' )
             } )
         } )
 
@@ -151,11 +267,7 @@ include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.
         } )
 
         aux.panel.vm.$on( 'directions-panel.clear', function ( ev ) {
-            self.resetWaypoints()
-            self.addWaypointCurrentLocation().then( function () {
-                self.addWaypoint()
-                self.displayWaypoints()
-            } )
+            self.startAtCurrentLocation()
         } )
 
         aux.panel.vm.$on( 'directions-panel.hover-direction', function ( ev ) {
@@ -170,11 +282,22 @@ include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.
             self.findRoute()
         } )
 
-        aux.panel.vm.$on( 'directions-panel.zoom-waypoint', function ( ev ) {
-        } )
-
         aux.panel.vm.$on( 'directions-panel.remove-waypoint', function ( ev ) {
             self.waypoints.splice( ev.index, 1 )
+
+            self.findRoute()
+        } )
+
+        aux.panel.vm.$on( 'directions-panel.update-waypoint', function ( ev ) {
+            var empty = self.waypoints.findIndex( function ( w ) { return !w.location } )
+
+            self.waypoints[ ev.index ] = ev.item
+
+            if ( !ev.item.location && ev.index != empty )
+                self.waypoints.splice( empty, 1 )
+
+            if ( ev.item.location && ev.index == empty )
+                self.addWaypoint()
 
             self.findRoute()
         } )
@@ -193,17 +316,25 @@ include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.
         this.waypoints.push( wp )
     }
 
-    DirectionsTool.prototype.addWaypointCurrentLocation = function () {
+    DirectionsTool.prototype.startAtCurrentLocation = function ( location, description ) {
         var self = this
 
-        this.busy = true
-
-        return this.getCurrentLocation()
-            .then( function ( res ) {
-                self.addWaypoint( res.location, '(CURRENT) ' + res.description )
+        return self.resetWaypoints()
+            .then( function () {
+                return self.getCurrentLocation()
+                    .then( function ( res ) {
+                        self.addWaypoint( res.location, '(CURRENT) ' + res.description )
+                    } )
+                    .catch( function () {
+                        return self.setMessage( 'Unable to get current location', 'error', 1000 )
+                    } )
             } )
-            .finally( function () {
-                self.busy = false
+            .then( function () {
+                if ( location && description ) {
+                    self.addWaypoint( location, description )
+                }
+                self.addWaypoint()
+                return self.findRoute()
             } )
     }
 
@@ -211,17 +342,16 @@ include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.
         var self = this
 
         this.waypoints = []
-        this.directions = []
-        this.directionHighlight = null
-        this.directionPick = null
-        this.summary = null
+        return this.findRoute()
     }
 
     DirectionsTool.prototype.findRoute = function () {
         var self = this
 
         this.directions = []
-        this.summary = null
+        this.directionHighlight = null
+        this.directionPick = null
+        this.setMessage()
         this.displayRoute()
 
         var points = this.waypoints
@@ -230,13 +360,14 @@ include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.
 
         if ( points.length < 2 ) {
             self.displayWaypoints()
-            return
+            this.setMessage( 'Add a waypoint' )
+            return SMK.UTIL.resolved()
         }
-        // console.log( points )
 
+        this.setMessage( 'Calculating...', 'progress' )
         this.busy = true
 
-        findRoute( points, this.routeOption ).then( function ( data ) {
+        return findRoute( points, this.routeOption ).then( function ( data ) {
             self.displayRoute( data.route )
 
             if ( data.visitOrder && data.visitOrder.findIndex( function ( v, i ) { return points[ v ].index != i } ) != -1 ) {
@@ -251,10 +382,10 @@ include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.
 
             self.displayWaypoints()
 
-            self.summary = 'Route travels ' + data.distance + ' km in ' + data.timeText
+            self.setMessage( 'Route travels ' + data.distance + ' km in ' + data.timeText, 'summary' )
 
             self.directions = data.directions.map( function ( dir ) {
-                dir.instruction = dir.text.replace( /\sfor\s(\d+.?\d*\sk?m)\s[(](\d+).+?((\d+).+)?$/, function ( m, a, b, c, d ) {
+                dir.instruction = dir.text.replace( /^"|"$/g, '' ).replace( /\sfor\s(\d+.?\d*\sk?m)\s[(](\d+).+?((\d+).+)?$/, function ( m, a, b, c, d ) {
                     dir.distance = a
                     if ( d )
                         dir.time = ( '0' + b ).substr( -2 ) + ':' + ( '0' + d ).substr( -2 )
@@ -269,6 +400,22 @@ include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.
         .finally( function () {
             self.busy = false
         } )
+        .catch( function ( err ) {
+            console.warn( err )
+            self.setMessage( 'Unable to find route', 'error' )
+            self.displayWaypoints()
+        } )
+    }
+
+    DirectionsTool.prototype.setMessage = function ( message, Class, delay ) {
+        this.message = message
+
+        this.messageClass = {}
+        if ( Class )
+            this.messageClass[ 'smk-' + Class ] = true
+
+        if ( delay )
+            return SMK.UTIL.makePromise( function ( res ) { setTimeout( res, delay ) } )
     }
 
     return DirectionsTool

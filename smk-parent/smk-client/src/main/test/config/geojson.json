@@ -12,7 +12,7 @@
                 "strokeWidth": 8,
                 "strokeOpacity": 0.8,
                 "fillOpacity": 0.6,
-                "fillColor": "red"
+                "fillColor": "blue"
             }
         },
 
@@ -23,7 +23,7 @@
             "isVisible": false,
             "opacity": 0.65,
             "style": {
-                "strokeColor": "red",
+                "strokeColor": "green",
                 "strokeWidth": 8,
                 "strokeOpacity": 0.8,
                 "fillOpacity": 0.6,
@@ -38,11 +38,11 @@
             "isVisible": false,
             "opacity": 0.65,
             "style": {
-                "strokeColor": "red",
+                "strokeColor": "blue",
                 "strokeWidth": 8,
                 "strokeOpacity": 0.8,
                 "fillOpacity": 0.6,
-                "fillColor": "red"
+                "fillColor": "green"
             }
         },
 
@@ -57,7 +57,7 @@
                 "strokeWidth": 8,
                 "strokeOpacity": 0.8,
                 "fillOpacity": 0.6,
-                "fillColor": "red"
+                "fillColor": "blue"
             }
         },
 
@@ -68,11 +68,11 @@
             "isVisible": false,
             "opacity": 0.65,
             "style": {
-                "strokeColor": "red",
+                "strokeColor": "green",
                 "strokeWidth": 8,
                 "strokeOpacity": 0.8,
                 "fillOpacity": 0.6,
-                "fillColor": "red"
+                "fillColor": "blue"
             }
         },
 
@@ -87,7 +87,7 @@
                 "strokeWidth": 8,
                 "strokeOpacity": 0.8,
                 "fillOpacity": 0.6,
-                "fillColor": "red"
+                "fillColor": "green"
             }
         },
 
@@ -98,7 +98,7 @@
             "isVisible": false,
             "opacity": 0.65,
             "style": {
-                "strokeColor": "red",
+                "strokeColor": "blue",
                 "strokeWidth": 8,
                 "strokeOpacity": 0.8,
                 "fillOpacity": 0.6,
@@ -113,11 +113,11 @@
             "isVisible": false,
             "opacity": 0.65,
             "style": {
-                "strokeColor": "red",
+                "strokeColor": "green",
                 "strokeWidth": 8,
                 "strokeOpacity": 0.8,
                 "fillOpacity": 0.6,
-                "fillColor": "red"
+                "fillColor": "blue"
             }
         },
 
@@ -132,7 +132,7 @@
                 "strokeWidth": 8,
                 "strokeOpacity": 0.8,
                 "fillOpacity": 0.6,
-                "fillColor": "red"
+                "fillColor": "green"
             }
         },
 
@@ -143,7 +143,7 @@
             "isVisible": false,
             "opacity": 0.65,
             "style": {
-                "strokeColor": "red",
+                "strokeColor": "blue",
                 "strokeWidth": 8,
                 "strokeOpacity": 0.8,
                 "fillOpacity": 0.6,

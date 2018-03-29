@@ -77,7 +77,7 @@ include.module( 'feature-set', [ 'smk', 'jquery', 'util', 'event' ], function ()
         return fs.map( function ( f ) { return f.id } )
     }
 
-    FeatureSet.prototype.pick = function ( featureId ) {
+    FeatureSet.prototype.pick = function ( featureId, option ) {
         if ( featureId && !this.has( featureId ) )
             throw new Error( 'feature id ' + featureId + ' not present' )
 
@@ -86,10 +86,10 @@ include.module( 'feature-set', [ 'smk', 'jquery', 'util', 'event' ], function ()
         var old = this.pickedFeatureId
         this.pickedFeatureId = featureId
 
-        this.pickedFeature( {
+        this.pickedFeature( Object.assign( {
             feature: featureId && this.featureSet[ featureId ],
             was: old && this.featureSet[ old ]
-        } )
+        }, option ) )
 
         return old
     }
