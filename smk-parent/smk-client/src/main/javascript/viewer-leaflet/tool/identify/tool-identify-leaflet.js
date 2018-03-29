@@ -29,7 +29,7 @@ include.module( 'tool-identify-leaflet', [ 'leaflet', 'tool-identify' ], functio
 
                 l.on( {
                     popupopen: function ( e ) {
-                        vw.identified.pick( f.id )
+                        vw.identified.pick( f.id, { popupopen: true } )
 
                         var px = vw.map.project( e.popup._latlng )
                         px.y -= e.popup._container.clientHeight / 2
@@ -37,7 +37,7 @@ include.module( 'tool-identify-leaflet', [ 'leaflet', 'tool-identify' ], functio
                         vw.map.panTo( vw.map.unproject( px ), { animate: true } )
                     },
                     popupclose: function () {
-                        vw.identified.pick( null )
+                        vw.identified.pick( null, { popupclose: true } )
                     },
                 } )
 
@@ -47,7 +47,7 @@ include.module( 'tool-identify-leaflet', [ 'leaflet', 'tool-identify' ], functio
         vw.identified.pickedFeature( function ( ev ) {
             if ( ev.was ) {
                 var ly = ev.was.highlightLayer
-                if ( ly.isPopupOpen() ) ly.closePopup()
+                if ( ly.isPopupOpen() && !ev.popupclose ) ly.closePopup()
                 brightHighlight( ly, vw.identified.isHighlighted( ev.was.id ) )
             }
 
