@@ -122,8 +122,8 @@ function setToolActivation(toolType)
     		}
 	    	else if(tool.type == "baseMaps" && tool.enabled == false) $("#basemapPanelOptions").hide();
 
-			if(tool.enabled == true) Materialize.toast('Activated ' + tool.type + " tool!", 4000);
-			else Materialize.toast('Deactivated ' + tool.type + " tool!", 4000);
+			//if(tool.enabled == true) Materialize.toast('Activated ' + tool.type + " tool!", 4000);
+			//else Materialize.toast('Deactivated ' + tool.type + " tool!", 4000);
 		}
    	});
 }
@@ -1216,28 +1216,35 @@ function getCompleteCatalogItem(mpcmId)
             withCredentials: true,
             success: function (catalogCompleteItem)
             {
-            	catalogCompleteItem.isVisible = true;
-            	
-            	if(data.layers == null) data.layers = [];
-            	data.layers.push(catalogCompleteItem);
-
-            	var lyrNode = {
-						title: catalogCompleteItem.title,
-						folder: false,
-						expanded: false,
-						data: catalogCompleteItem,
-						children: []
-					};
-
-            	var tree = $('#layer-tree').fancytree('getTree');
-            	var layerSource = tree.getRootNode().children;
-            	layerSource.push(lyrNode);
-        		tree.reload(layerSource);
+            	if(catalogCompleteItem.mpcmWorkspace == "MPCM_ALL_PUB")
+        		{
+	            	catalogCompleteItem.isVisible = true;
+	            	
+	            	if(data.layers == null) data.layers = [];
+	            	data.layers.push(catalogCompleteItem);
+	
+	            	var lyrNode = {
+							title: catalogCompleteItem.title,
+							folder: false,
+							expanded: false,
+							data: catalogCompleteItem,
+							children: []
+						};
+	
+	            	var tree = $('#layer-tree').fancytree('getTree');
+	            	var layerSource = tree.getRootNode().children;
+	            	layerSource.push(lyrNode);
+	        		tree.reload(layerSource);
+        		}
+            	else
+        		{
+            		alert("This layer is flagged as secure, and cannot be added to an SMK Application at this time.");
+        		}
             },
             error: function (status)
             {
                 // error handler
-                Materialize.toast('Error loading MPCM Layer', 4000);
+                Materialize.toast('Error loading MPCM Layer. This layer may be secure and unloadable.', 4000);
             }
 		});
 	}

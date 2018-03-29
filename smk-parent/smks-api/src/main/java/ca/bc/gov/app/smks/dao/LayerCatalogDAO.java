@@ -189,7 +189,7 @@ public class LayerCatalogDAO
 		return id;
 	}
 
-	public EsriDynamic createCatalogLayer(String id) throws SAXException, IOException, ParserConfigurationException
+	public EsriDynamic createCatalogLayer(String id) throws Exception
 	{
 		logger.debug(" >> createCatalogLayer()");
 		EsriDynamic layer = new EsriDynamic();
@@ -273,6 +273,12 @@ public class LayerCatalogDAO
 	        }
 	    }
 
+	    if(!layer.getMpcmWorkspace().toUpperCase().equals("MPCM_ALL_PUB"))
+	    {
+	    	logger.debug(layer.getTitle() + " is not a public layer. Cancelling process...");
+	    	throw new Exception(layer.getTitle() + " is not a public layer. Cancelling process...");
+	    }
+	    
 	    logger.debug("Successfully created layer " + layer.getTitle());
 	    logger.debug(" << createCatalogLayer()");
 	    return layer;
