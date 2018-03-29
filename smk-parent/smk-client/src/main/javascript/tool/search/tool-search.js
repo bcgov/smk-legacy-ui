@@ -1,4 +1,4 @@
-include.module( 'tool-search', [ 'smk', 'tool', 'widgets', 'tool-search.widget-search-html', 'tool-search.panel-search-html' ], function ( inc ) {
+include.module( 'tool-search', [ 'smk', 'tool', 'widgets', 'tool-search.widget-search-html', 'tool-search.panel-search-html', 'tool-search.popup-search-html' ], function ( inc ) {
 
     var request
 
@@ -139,6 +139,8 @@ include.module( 'tool-search', [ 'smk', 'tool', 'widgets', 'tool-search.widget-s
 
         smk.$viewer.searched.pickedFeature( function ( ev ) {
             self.highlightId = ev.feature && ev.feature.id
+            
+            Vue.set( self.popupModel, 'feature', ev.feature )
         } )
 
         // // smk.$viewer.selected.highlightedFeatures( function ( ev ) {
@@ -146,6 +148,34 @@ include.module( 'tool-search', [ 'smk', 'tool', 'widgets', 'tool-search.widget-s
 
         smk.$viewer.searched.clearedFeatures( function ( ev ) {
             self.results = []
+        } )
+
+        var el = smk.addToContainer( inc[ 'tool-search.popup-search-html' ] )
+
+        this.popupModel = {
+            feature: null,
+            tool: {}
+        }
+
+        if ( smk.$tool.directions )
+            this.popupModel.tool.directions = true
+
+        this.popupVm = new Vue( {
+            el: el,
+            data: self.popupModel,
+            methods: {
+                debug: function ( x ) {
+                    console.log( arguments )
+                    return x
+                },
+                directionsToFeature: function ( feature ) {
+                    smk.$tool.directions.active = true
+
+                    smk.$tool.directions.activating.then( function () {
+                        return smk.$tool.directions.startAtCurrentLocation( { latitude: feature.geometry.coordinates[ 1 ], longitude: feature.geometry.coordinates[ 0 ] }, feature.properties.fullAddress )
+                    } )
+                },
+            }
         } )
     } )
 

@@ -8,7 +8,17 @@ include.module( 'tool-search-leaflet', [ 'leaflet', 'tool-search' ], function ( 
         _OTHER_:        10000
     }
 
+    var precisionZoom = { 
+        INTERSECTION:   14,
+        STREET:         13,
+        BLOCK:          14,
+        CIVIC_NUMBER:   15,
+        _OTHER_:        12
+    }
+
     SMK.TYPE.SearchTool.prototype.afterInitialize.push( function ( smk ) {
+        var self = this
+
         var vw = smk.$viewer
 
         vw.searchHighlights = L.layerGroup( { pane: 'markerPane' } ).addTo( vw.map )
@@ -23,26 +33,27 @@ include.module( 'tool-search-leaflet', [ 'leaflet', 'tool-search' ], function ( 
 
                     // } )
                 } )
+                .bindPopup( function () {
+                    return self.popupVm.$el
+                }, {
+                    maxWidth: 200,
+                    autoPanPaddingTopLeft: L.point( 300, 100 )                                
+                } )
 
                 vw.searchHighlights.addLayer( l )
                 f.highlightLayer = l
 
-                l.bindPopup( f.properties.fullAddress, {
-                    maxWidth: 200,
-                    autoPanPaddingTopLeft: L.point( 300, 100 )
-                } )
-
                 l.on( {
                     popupopen: function ( e ) {
-                        vw.searched.pick( f.id )
+                        vw.searched.pick( f.id, { popupopen: true } )
 
                         var px = vw.map.project( e.popup._latlng )
                         px.y -= e.popup._container.clientHeight / 2
                         px.x -= 150
-                        vw.map.panTo( vw.map.unproject( px ), { animate: true } )
+                        vw.map.flyTo( vw.map.unproject( px ), precisionZoom[ f.properties.matchPrecision ] || precisionZoom._OTHER_, { animate: false } )
                     },
                     popupclose: function () {
-                        vw.searched.pick( null )
+                        vw.searched.pick( null, { popupclose: true } )
                     },
                 } )
 
@@ -52,7 +63,7 @@ include.module( 'tool-search-leaflet', [ 'leaflet', 'tool-search' ], function ( 
         vw.searched.pickedFeature( function ( ev ) {
             if ( ev.was ) {
                 var ly = ev.was.highlightLayer
-                if ( ly.isPopupOpen() ) ly.closePopup()
+                if ( ly.isPopupOpen() && !ev.popupclose ) ly.closePopup()
                 brightHighlight( ly, vw.searched.isHighlighted( ev.was.id ) )
             }
 
@@ -60,10 +71,6 @@ include.module( 'tool-search-leaflet', [ 'leaflet', 'tool-search' ], function ( 
                 var ly = ev.feature.highlightLayer
                 if ( !ly.isPopupOpen() ) ly.openPopup()
                 brightHighlight( ev.feature.highlightLayer, true )
-
-                // var ll = L.latLng( { lat: location[ 1 ], lng: location[ 0 ] } )
-                var ex = ev.feature.highlightLayer.getLatLng().toBounds( precisionSize[ ev.feature.properties.matchPrecision ] || precisionSize._OTHER_ )
-                vw.map.fitBounds( ex )
             }
         } )
 
