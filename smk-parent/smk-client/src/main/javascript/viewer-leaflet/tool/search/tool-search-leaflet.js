@@ -1,12 +1,12 @@
 include.module( 'tool-search-leaflet', [ 'leaflet', 'tool-search' ], function ( inc ) {
 
-    var precisionSize = { // meters
-        INTERSECTION:   100,
-        STREET:         1000,
-        BLOCK:          200,
-        CIVIC_NUMBER:   50,
-        _OTHER_:        10000
-    }
+    // var precisionSize = { // meters
+    //     INTERSECTION:   100,
+    //     STREET:         1000,
+    //     BLOCK:          200,
+    //     CIVIC_NUMBER:   50,
+    //     _OTHER_:        10000
+    // }
 
     var precisionZoom = {
         INTERSECTION:   15,
@@ -16,22 +16,58 @@ include.module( 'tool-search-leaflet', [ 'leaflet', 'tool-search' ], function ( 
         _OTHER_:        12
     }
 
+    var base = include.option( 'baseUrl' ) + '/tool/search'
+
+    var yellowMarker = new L.Icon( {
+        iconUrl:        base + '/marker-icon-yellow.png',
+        shadowUrl:      base + '/marker-shadow.png',
+        iconSize:       [ 25, 41 ],
+        iconAnchor:     [ 12, 41 ],
+        popupAnchor:    [ 1, -34 ],
+        shadowSize:     [ 41, 41 ]
+    } )
+
+    var yellowStar = new L.Icon( {
+        iconUrl:        base + '/star-icon-yellow.png',
+        shadowUrl:      base + '/marker-shadow.png',
+        iconSize:       [ 30, 28 ],
+        iconAnchor:     [ 15, 14 ],
+        popupAnchor:    [ 1, -24 ],
+        shadowSize:     [ 21, 21 ]
+    } )
+
+    var yellowStarBig = new L.Icon( {
+        iconUrl:        base + '/star-icon-yellow.png',
+        shadowUrl:      base + '/marker-shadow.png',
+        iconSize:       [ 40, 36 ],
+        iconAnchor:     [ 20, 18 ],
+        popupAnchor:    [ 1, -24 ],
+        shadowSize:     [ 31, 31 ]
+    } )
+
     SMK.TYPE.SearchTool.prototype.afterInitialize.push( function ( smk ) {
         var self = this
 
         var vw = smk.$viewer
 
-        vw.searchHighlights = L.layerGroup( { pane: 'markerPane' } ).addTo( vw.map )
+        searchMarkers = L.layerGroup( { pane: 'markerPane' } )
+
+        this.changedActive( function () {
+            if ( self.active ) {
+                vw.map.addLayer( searchMarkers )
+            }
+            else {
+                vw.searched.pick( null )
+                vw.map.removeLayer( searchMarkers )
+            }
+        } )
 
         vw.searched.addedFeatures( function ( ev ) {
             ev.features.forEach( function ( f ) {
-                var l = L.marker( { lat: f.geometry.coordinates[ 1 ], lng: f.geometry.coordinates[ 0 ] }, {
+                var marker = L.marker( { lat: f.geometry.coordinates[ 1 ], lng: f.geometry.coordinates[ 0 ] }, {
                     title: f.properties.fullAddress,
                     riseOnHover: true,
-                    opacity: 0.3,
-                    // icon: L.icon( {
-
-                    // } )
+                    icon: yellowStar
                 } )
                 .bindPopup( function () {
                     return self.popupVm.$el
@@ -40,10 +76,10 @@ include.module( 'tool-search-leaflet', [ 'leaflet', 'tool-search' ], function ( 
                     autoPanPaddingTopLeft: L.point( 300, 100 )
                 } )
 
-                vw.searchHighlights.addLayer( l )
-                f.highlightLayer = l
+                searchMarkers.addLayer( marker )
+                f.highlightLayer = marker
 
-                l.on( {
+                marker.on( {
                     popupopen: function ( e ) {
                         vw.searched.pick( f.id, { popupopen: true } )
 
@@ -67,34 +103,34 @@ include.module( 'tool-search-leaflet', [ 'leaflet', 'tool-search' ], function ( 
             if ( ev.was ) {
                 var ly = ev.was.highlightLayer
                 if ( ly.isPopupOpen() && !ev.popupclose ) ly.closePopup()
-                brightHighlight( ly, vw.searched.isHighlighted( ev.was.id ) )
+                brightHighlight( ly, vw.searched.isHighlighted( ev.was.id ), false )
             }
 
             if ( ev.feature ) {
                 var ly = ev.feature.highlightLayer
                 if ( !ly.isPopupOpen() ) ly.openPopup()
-                brightHighlight( ev.feature.highlightLayer, true )
+                brightHighlight( ev.feature.highlightLayer, true, true )
             }
         } )
 
         vw.searched.highlightedFeatures( function ( ev ) {
             if ( ev.features )
                 ev.features.forEach( function ( f ) {
-                    brightHighlight( f.highlightLayer, true )
+                    brightHighlight( f.highlightLayer, true, vw.searched.isPicked( f.id ) )
                 } )
 
             if ( ev.was )
                 ev.was.forEach( function ( f ) {
-                    brightHighlight( f.highlightLayer, vw.searched.isPicked( f.id ) )
+                    brightHighlight( f.highlightLayer, false, vw.searched.isPicked( f.id ) )
                 } )
         } )
 
         vw.searched.clearedFeatures( function ( ev ) {
-            vw.searchHighlights.clearLayers()
+            searchMarkers.clearLayers()
         } )
 
-        function brightHighlight( highlightLayer, bright ) {
-            highlightLayer.setOpacity( bright ? 1 : 0.3 )
+        function brightHighlight( highlightLayer, highlighted, picked ) {
+            highlightLayer.setIcon( picked ? yellowMarker : highlighted ? yellowStarBig : yellowStar )
         }
     } )
 
