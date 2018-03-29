@@ -34,7 +34,8 @@ include.module( 'tool-search', [ 'smk', 'tool', 'widgets', 'tool-search.widget-s
                 } )
             } )
     }
-
+    // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+    //
     Vue.component( 'search-widget', {
         template: inc[ 'tool-search.widget-search-html' ],
         props: [ 'title', 'visible', 'enabled', 'active', 'icon', 'type', 'initialSearch' ],
@@ -64,7 +65,6 @@ include.module( 'tool-search', [ 'smk', 'tool', 'widgets', 'tool-search.widget-s
             }
         }
     } )
-
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
     function SearchTool( option ) {
@@ -121,6 +121,7 @@ include.module( 'tool-search', [ 'smk', 'tool', 'widgets', 'tool-search.widget-s
         } )
 
         aux.panel.vm.$on( 'search-panel.pick', function ( ev ) {
+            smk.$viewer.searched.pick( null )
             smk.$viewer.searched.pick( ev.result.id )
         } )
 
@@ -139,8 +140,9 @@ include.module( 'tool-search', [ 'smk', 'tool', 'widgets', 'tool-search.widget-s
 
         smk.$viewer.searched.pickedFeature( function ( ev ) {
             self.highlightId = ev.feature && ev.feature.id
-            
-            Vue.set( self.popupModel, 'feature', ev.feature )
+
+            self.popupModel.feature = ev.feature
+            // Vue.set( self.popupModel, 'feature', ev.feature )
         } )
 
         // // smk.$viewer.selected.highlightedFeatures( function ( ev ) {
@@ -164,10 +166,6 @@ include.module( 'tool-search', [ 'smk', 'tool', 'widgets', 'tool-search.widget-s
             el: el,
             data: self.popupModel,
             methods: {
-                debug: function ( x ) {
-                    console.log( arguments )
-                    return x
-                },
                 directionsToFeature: function ( feature ) {
                     smk.$tool.directions.active = true
 

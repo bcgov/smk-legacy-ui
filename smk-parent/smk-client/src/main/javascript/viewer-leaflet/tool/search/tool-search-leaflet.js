@@ -8,8 +8,8 @@ include.module( 'tool-search-leaflet', [ 'leaflet', 'tool-search' ], function ( 
         _OTHER_:        10000
     }
 
-    var precisionZoom = { 
-        INTERSECTION:   14,
+    var precisionZoom = {
+        INTERSECTION:   15,
         STREET:         13,
         BLOCK:          14,
         CIVIC_NUMBER:   15,
@@ -37,7 +37,7 @@ include.module( 'tool-search-leaflet', [ 'leaflet', 'tool-search' ], function ( 
                     return self.popupVm.$el
                 }, {
                     maxWidth: 200,
-                    autoPanPaddingTopLeft: L.point( 300, 100 )                                
+                    autoPanPaddingTopLeft: L.point( 300, 100 )
                 } )
 
                 vw.searchHighlights.addLayer( l )
@@ -47,10 +47,13 @@ include.module( 'tool-search-leaflet', [ 'leaflet', 'tool-search' ], function ( 
                     popupopen: function ( e ) {
                         vw.searched.pick( f.id, { popupopen: true } )
 
-                        var px = vw.map.project( e.popup._latlng )
+                        var zoom = precisionZoom[ f.properties.matchPrecision ] || precisionZoom._OTHER_
+
+                        var px = vw.map.project( e.popup._latlng, zoom )
                         px.y -= e.popup._container.clientHeight / 2
                         px.x -= 150
-                        vw.map.flyTo( vw.map.unproject( px ), precisionZoom[ f.properties.matchPrecision ] || precisionZoom._OTHER_, { animate: false } )
+
+                        vw.map.flyTo( vw.map.unproject( px, zoom ), zoom, { animate: true } )
                     },
                     popupclose: function () {
                         vw.searched.pick( null, { popupclose: true } )
