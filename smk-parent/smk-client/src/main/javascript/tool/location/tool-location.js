@@ -71,7 +71,7 @@ include.module( 'tool-location', [ 'smk', 'tool', 'widgets', 'tool-location.popu
         } )
 
         smk.$viewer.changedView( function () {
-            self.coordinate = {}
+            self.location = {}
         } )
 
         self.changedEnabled( function () {
