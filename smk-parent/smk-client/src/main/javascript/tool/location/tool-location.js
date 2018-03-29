@@ -22,11 +22,11 @@ include.module( 'tool-location', [ 'smk', 'tool', 'widgets', 'tool-location.popu
     LocationTool.prototype.afterInitialize.push( function ( smk, aux ) {
         var self = this
 
-        if ( smk.$tool.identify )
-            this.tool.identify = true
+        // if ( smk.$tool.identify )
+        //     this.tool.identify = true
 
-        if ( smk.$tool.measure )
-            this.tool.measure = true
+        // if ( smk.$tool.measure )
+        //     this.tool.measure = true
 
         if ( smk.$tool.directions )
             this.tool.directions = true
