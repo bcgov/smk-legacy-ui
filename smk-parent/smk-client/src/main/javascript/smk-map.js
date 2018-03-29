@@ -115,7 +115,7 @@ include.module( 'smk-map', [ 'smk', 'jquery', 'util', 'viewer', 'layer' ], funct
 
             self.tools.push( { type: 'menu' }, { type: 'location' } )
 
-            return SMK.UTIL.waitAll( self.tools.map( function ( t ) {
+            return SMK.UTIL.waitAll( self.tools.filter( function ( t ) { return t.enabled !== false } ).map( function ( t ) {
                 var tag = 'tool-' + t.type
                 return include( tag )
                     .then( function ( inc ) {
