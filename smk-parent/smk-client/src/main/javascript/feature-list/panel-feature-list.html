@@ -1,32 +1,30 @@
-<feature-list-panel class="smk-identify-panel"
-    v-bind:busy="busy"
-    v-bind:layers="layers"
-    v-bind:highlightId="highlightId"
->
+<side-panel class="smk-identify-panel" v-bind:class="{ 'smk-busy': busy }">
     <template slot="header">
-        <h1>Identify Results</h1>
-        <!-- <div class="smk-spinner"></div> -->
+        <slot name="header"></slot>
+        <!-- <h1>Identify Results</h1> -->
+        <div class="smk-spinner"></div>
     </template>
 
     <template slot="commands">
-        <!-- <span class="smk-command"
+        <span class="smk-command"
             v-bind:class="{ 'smk-disabled': isEmpty() }"
             v-on:click="$$emit( 'clear' )"
-        >Clear</span> -->
+        >Clear</span>
 
+        <slot name="commands"></slot>
+<!--
         <span class="smk-command"
             v-bind:class="{ 'smk-disabled': isEmpty() }"
             v-on:click="$$emit( 'add-all' )"
-        >Add all to selection</span>
+        >Add all to selection</span> -->
     </template>
 
-    <template slot="placeholder">
-    <!-- <div v-if="isEmpty()" class="smk-placeholder"> -->
-        Click on map to identify features.
-    <!-- </div> -->
-    </template>
+    <div v-if="isEmpty()" class="smk-placeholder">
+        <slot name="placeholder"></slot>
+        <!-- Click on map to identify features. -->
+    </div>
 
-    <!-- <div class="smk-identify-layer"
+    <div class="smk-identify-layer"
         v-for="layer in layers"
         v-if="layer && layer.features.length > 0"
         v-on:mouseenter="$$emit( 'hover', { features: layer.features } )"
@@ -41,9 +39,9 @@
             <span >{{ feature.title }}</span>
             <i class="smk-highlight material-icons">speaker_notes</i>
         </div>
-        <a class="smk-layer-metadata" target="_metadata"
+        <!-- <a class="smk-layer-metadata" target="_metadata"
             v-if="layer.metadataUrl"
             v-bind:href="layer.metadataUrl"
-        >Layer information</a>
-    </div> -->
-</feature-list-panel>
+        >Layer information</a> -->
+    </div>
+</side-panel>

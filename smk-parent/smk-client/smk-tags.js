@@ -36,6 +36,9 @@ exports.gen = function () {
     t.group( 'menu' )
         .dir( 'menu/**/*', { cwd: baseDir } )
 
+    t.group( 'feature-list' )
+        .dir( 'feature-list/**/*', { cwd: baseDir } )
+
 
     t.group( 'tool-menu' )
         .dir( 'tool/menu/**/*', { cwd: baseDir } )

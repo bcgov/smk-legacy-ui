@@ -142,10 +142,15 @@
                     Vue.mixin( {
                         methods: {
                             $$emit: function ( event, arg ) {
-                                if ( this.$options._componentTag )
-                                    event = this.$options._componentTag + '.' + event
+                                var op = this.$options
+                                while ( op && op._componentTag ) {
+                                    var componentEvent = op._componentTag + '.' + event
+                                    console.log( componentEvent )
 
-                                this.$root.$emit( event, arg, this )
+                                    this.$root.$emit( componentEvent, arg, this )
+
+                                    op = op.parent.$options
+                                }
                             }
                         }
                     } )
