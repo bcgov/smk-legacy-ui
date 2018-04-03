@@ -16,7 +16,7 @@
     <div v-for="layer in layers" v-if="layer && layer.features.length > 0" class="smk-identify-layer" v-on:mouseenter="$$emit( 'hover', { features: layer.features } )" v-on:mouseleave="$$emit( 'hover', { features: null } )">
         <h2>{{ layer.title }}</h2>
         <div v-for="feature in layer.features" class="smk-identify-feature" v-bind:class="{ 'smk-highlighted': feature.id == highlightId }">
-            <span v-on:click="$$emit( 'active', { feature: feature } )">{{ feature.title }}</span>
+            <span class="smk-command" v-on:click="$$emit( 'active', { feature: feature } )">{{ feature.title }}</span>
         </div>
         <a class="smk-layer-metadata" v-if="layer.metadataUrl" v-bind:href="layer.metadataUrl" target="_metadata">Layer information</a>
     </div>
