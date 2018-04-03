@@ -91,8 +91,8 @@ include.module( 'tool-baseMaps', [ 'smk', 'tool', 'widgets', 'viewer', 'leaflet'
                 return Object.assign( { id: id }, smk.$viewer.basemap[ id ] )
             } )
             .filter( function ( bm ) {
-                if ( !this.choices || this.choices.length == 0 ) return true
-                if ( this.choices.indexOf( bm.id ) > -1 ) return true
+                if ( !self.choices || self.choices.length == 0 ) return true
+                if ( self.choices.indexOf( bm.id ) > -1 ) return true
                 if ( smk.viewer.baseMap == bm.id ) return true
 
                 return false
