@@ -82,7 +82,6 @@ include.module( 'tool-identify', [ 'smk', 'tool', 'widgets', 'tool-identify.pane
 
         smk.$viewer.identified.addedFeatures( function ( ev ) {
             self.active = true
-            // sb.vm.$emit( 'activate-tool', { active: true, id: 'identify' } )
 
             var ly = smk.$viewer.layerId[ ev.layerId ]
 
@@ -140,8 +139,6 @@ include.module( 'tool-identify', [ 'smk', 'tool', 'widgets', 'tool-identify.pane
             popupModel.feature = ev.feature
             popupModel.layer = smk.$viewer.layerId[ ev.feature.layerId ]
         } )
-
-        smk.$viewer.getIdentifyPopupEl = function () { return self.popupVm.$el }
     } )
 
     return IdentifyTool

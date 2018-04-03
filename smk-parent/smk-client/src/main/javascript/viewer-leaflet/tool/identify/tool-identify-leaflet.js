@@ -5,11 +5,14 @@ include.module( 'tool-identify-leaflet', [ 'leaflet', 'tool-identify' ], functio
 
         var vw = smk.$viewer
 
-        this.highlights = L.layerGroup( { pane: 'markerPane' } ).addTo( vw.map )
+        this.featureHighlights = L.layerGroup( { pane: 'markerPane' } ).addTo( vw.map )
 
         vw.identified.addedFeatures( function ( ev ) {
             ev.features.forEach( function ( f ) {
-                var l = L.geoJSON( f.geometry, {
+                var feature = L.geoJSON( f.geometry, {
+                    pointToLayer: function ( geojson, latlng ) {
+                        return L.circleMarker( latlng, { radius: 20 } )
+                    },
                     style: {
                         color:       '#ffff00',
                         weight:      2,
@@ -18,16 +21,17 @@ include.module( 'tool-identify-leaflet', [ 'leaflet', 'tool-identify' ], functio
                         fillOpacity: 0.1,
                     }
                 } )
-
-                self.highlights.addLayer( l )
-                f.highlightLayer = l
-
-                l.bindPopup( vw.getIdentifyPopupEl, {
+                .bindPopup( function () {
+                    return self.popupVm.$el
+                }, {
                     maxWidth: 400,
                     autoPanPaddingTopLeft: L.point( 300, 100 )
                 } )
 
-                l.on( {
+                self.featureHighlights.addLayer( feature )
+                f.highlightLayer = feature
+
+                feature.on( {
                     popupopen: function ( e ) {
                         vw.identified.pick( f.id, { popupopen: true } )
 
@@ -71,7 +75,7 @@ include.module( 'tool-identify-leaflet', [ 'leaflet', 'tool-identify' ], functio
         } )
 
         vw.identified.clearedFeatures( function ( ev ) {
-            self.highlights.clearLayers()
+            self.featureHighlights.clearLayers()
         } )
 
         function brightHighlight( highlightLayer, bright ) {
