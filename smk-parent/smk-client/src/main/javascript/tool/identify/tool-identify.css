@@ -17,14 +17,9 @@
 
 .smk-identify-layer {
     position: relative;
-    border: 1px solid transparent;
     margin-bottom: 5px;
     border-radius: 5px;
     padding: 5px;
-}
-
-.smk-identify-layer:hover {
-    border: 1px solid black;
 }
 
 .smk-identify-layer h2 {
@@ -36,25 +31,33 @@
 
 .smk-identify-layer .smk-identify-feature {
     font-size: 12px;
-    padding-left: 20px;
+    margin-left: 10px;
     cursor: pointer;
+
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
 }
 
 .smk-identify-layer .smk-identify-feature.smk-highlighted {
     font-weight: bold;
 }
 
-.smk-identify-layer .smk-identify-feature.smk-highlighted span::before {
-    content: '•';
+.smk-identify-layer .smk-identify-feature .smk-highlight {
+    opacity: 0.0;
 }
 
-.smk-identify-layer .smk-identify-feature span {
-    margin-left: -10px;
+.smk-identify-layer .smk-identify-feature:hover .smk-highlight {
+    opacity: 0.3;
 }
 
-.smk-identify-layer .smk-identify-feature:hover {
-    color: blue;
+.smk-identify-layer .smk-identify-feature.smk-highlighted .smk-highlight {
+    opacity: 1.0;
 }
+
+/* _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+*/
 
 .smk-identify-popup .smk-header {
     border-bottom: 1px solid gray;
