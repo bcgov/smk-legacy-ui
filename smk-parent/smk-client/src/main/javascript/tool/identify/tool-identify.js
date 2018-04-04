@@ -42,6 +42,9 @@ include.module( 'tool-identify', [ 'smk', 'feature-list', 'widgets', 'tool-ident
         } )
 
         aux.panel.vm.$on( 'identify-panel.add-all', function ( ev ) {
+            self.layers.forEach( function ( ly ) {
+                smk.$viewer.selected.add( ly.id, ly.features )
+            } )
         } )
 
         smk.$viewer.startedIdentify( function ( ev ) {
