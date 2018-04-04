@@ -14,11 +14,11 @@ include.module( 'tool-identify', [ 'smk', 'feature-list', 'widgets', 'tool-ident
         this.makePropWidget( 'icon', 'info_outline' )
 
         SMK.TYPE.FeatureList.prototype.constructor.call( this, $.extend( {
-            order:          4,
-            title:          'Identify',
-            featureSetProperty: 'identified',
-            widgetComponent:'identify-widget',
-            panelComponent: 'identify-panel',
+            order:              4,
+            title:              'Identify',
+            widgetComponent:    'identify-widget',
+            panelComponent:     'identify-panel',
+            featureSetProperty: 'identified'
         }, option ) )
     }
 
@@ -67,53 +67,6 @@ include.module( 'tool-identify', [ 'smk', 'feature-list', 'widgets', 'tool-ident
             } )
         } )
 
-        // smk.$viewer.identified.removedFeatures( function ( ev ) {
-        // } )
-
-        // smk.$viewer.identified.pickedFeature( function ( ev ) {
-        //     self.highlightId = ev.feature && ev.feature.id
-        // } )
-
-        // smk.$viewer.identified.highlightedFeatures( function ( ev ) {
-        // } )
-
-        // smk.$viewer.identified.clearedFeatures( function ( ev ) {
-        //     self.layers = []
-        // } )
-
-        // var el = smk.addToContainer( inc[ 'tool-identify.popup-identify-html' ] )
-
-        // var popupModel = {
-        //     feature: null,
-        //     layer: null
-        // }
-
-        // this.popupVm = new Vue( {
-        //     el: el,
-        //     data: popupModel,
-        //     methods: {
-        //         debug: function ( x ) {
-        //             console.log( arguments )
-        //             return x
-        //         },
-        //         zoomToFeature: function ( layer, feature ) {
-        //             return smk.$viewer.zoomToFeature( layer, feature )
-        //         },
-        //         directionsToFeature: function ( layer, feature ) {
-        //             return smk.$viewer.directionsToFeature( layer, feature )
-        //         },
-        //         selectFeature: function ( layer, feature ) {
-        //             smk.$viewer.selected.add( layer.config.id, [ feature ] )
-        //         }
-        //     }
-        // } )
-
-        // smk.$viewer.identified.pickedFeature( function ( ev ) {
-        //     if ( !ev.feature ) return
-
-        //     popupModel.feature = ev.feature
-        //     popupModel.layer = smk.$viewer.layerId[ ev.feature.layerId ]
-        // } )
     } )
 
     return IdentifyTool

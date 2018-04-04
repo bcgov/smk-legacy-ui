@@ -1,7 +1,8 @@
-<side-panel class="smk-identify-panel" v-bind:class="{ 'smk-busy': busy }">
+<side-panel class="smk-feature-list-panel" v-bind:class="{ 'smk-busy': busy }">
     <template slot="header">
-        <slot name="header"></slot>
         <div class="smk-spinner"></div>
+
+        <slot name="header"></slot>
     </template>
 
     <template slot="commands">
@@ -17,14 +18,14 @@
         <slot name="placeholder"></slot>
     </div>
 
-    <div class="smk-identify-layer"
+    <div class="smk-layer"
         v-for="layer in layers"
         v-if="layer && layer.features.length > 0"
         v-on:mouseenter="$$emit( 'hover', { features: layer.features } )"
         v-on:mouseleave="$$emit( 'hover', { features: null } )"
     >
         <h2>{{ layer.title }}</h2>
-        <div class="smk-identify-feature smk-command" title="Click to see attributes"
+        <div class="smk-feature smk-command" title="Click to see attributes"
             v-for="feature in layer.features"
             v-bind:class="{ 'smk-highlighted': feature.id == highlightId }"
             v-on:click="$$emit( 'active', { feature: feature } )"

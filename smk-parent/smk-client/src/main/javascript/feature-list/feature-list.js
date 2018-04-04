@@ -6,7 +6,7 @@ include.module( 'feature-list', [ 'smk', 'tool', 'widgets', 'feature-list.panel-
         computed: {
             isEmpty: {
                 get: function () {
-                    return !this.layers || this.layers.length == 0 
+                    return !this.layers || this.layers.length == 0
                 }
             }
         },
@@ -55,22 +55,26 @@ include.module( 'feature-list', [ 'smk', 'tool', 'widgets', 'feature-list.panel-
 
         this.popupModel = {
             feature: null,
-            layer: null
+            layer: null,
+            tool: {}
         }
+
+        if ( smk.$tool.select )
+            this.popupModel.tool.select = true
+
+        if ( smk.$tool.zoom )
+            this.popupModel.tool.zoom = true
 
         this.popupVm = new Vue( {
             el: smk.addToContainer( inc[ 'feature-list.popup-feature-html' ] ),
             data: this.popupModel,
             methods: {
-                debug: function ( x ) {
-                    console.log( arguments )
-                    return x
-                },
+                // debug: function ( x ) {
+                //     console.log( arguments )
+                //     return x
+                // },
                 zoomToFeature: function ( layer, feature ) {
                     return smk.$viewer.zoomToFeature( layer, feature )
-                },
-                directionsToFeature: function ( layer, feature ) {
-                    return smk.$viewer.directionsToFeature( layer, feature )
                 },
                 selectFeature: function ( layer, feature ) {
                     smk.$viewer.selected.add( layer.config.id, [ feature ] )

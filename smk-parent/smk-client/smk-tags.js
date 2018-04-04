@@ -132,11 +132,14 @@ exports.gen = function () {
 
     t.script( 'layer-leaflet', 'viewer-leaflet/layer-leaflet.js' )
 
+    t.script( 'feature-list-leaflet', 'viewer-leaflet/feature-list-leaflet.js' )
+
     t.group( 'viewer-leaflet' )
         .script( 'viewer-leaflet/viewer-leaflet.js' )
         .tag( 'layer-leaflet' )
         .style( 'viewer-leaflet/viewer-leaflet.css' )
         .tag( 'leaflet-extensions' )
+        .tag( 'feature-list-leaflet' )
 
     t.sequence( 'leaflet' )
         .script( 'https://unpkg.com/leaflet@1.2.0/dist/leaflet.js', { 'integrity': 'sha512-lInM/apFSqyy1o6s89K4iQUKg6ppXEgsVxT35HbzUupEVRh2Eu9Wdl4tHj7dZO0s1uvplcYGmt3498TtHq+log==' } )

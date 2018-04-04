@@ -16,24 +16,4 @@
         Click on map to identify features.
     </template>
 
-    <!-- <div class="smk-identify-layer"
-        v-for="layer in layers"
-        v-if="layer && layer.features.length > 0"
-        v-on:mouseenter="$$emit( 'hover', { features: layer.features } )"
-        v-on:mouseleave="$$emit( 'hover', { features: null } )"
-    >
-        <h2>{{ layer.title }}</h2>
-        <div class="smk-identify-feature smk-command" title="Click to see attributes"
-            v-for="feature in layer.features"
-            v-bind:class="{ 'smk-highlighted': feature.id == highlightId }"
-            v-on:click="$$emit( 'active', { feature: feature } )"
-        >
-            <span >{{ feature.title }}</span>
-            <i class="smk-highlight material-icons">speaker_notes</i>
-        </div>
-        <a class="smk-layer-metadata" target="_metadata"
-            v-if="layer.metadataUrl"
-            v-bind:href="layer.metadataUrl"
-        >Layer information</a>
-    </div> -->
 </feature-list-panel>
