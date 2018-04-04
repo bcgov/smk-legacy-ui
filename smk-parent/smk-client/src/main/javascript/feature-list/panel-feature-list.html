@@ -1,27 +1,20 @@
 <side-panel class="smk-identify-panel" v-bind:class="{ 'smk-busy': busy }">
     <template slot="header">
         <slot name="header"></slot>
-        <!-- <h1>Identify Results</h1> -->
         <div class="smk-spinner"></div>
     </template>
 
     <template slot="commands">
         <span class="smk-command"
-            v-bind:class="{ 'smk-disabled': isEmpty() }"
+            v-bind:class="{ 'smk-disabled': isEmpty }"
             v-on:click="$$emit( 'clear' )"
         >Clear</span>
 
-        <slot name="commands"></slot>
-<!--
-        <span class="smk-command"
-            v-bind:class="{ 'smk-disabled': isEmpty() }"
-            v-on:click="$$emit( 'add-all' )"
-        >Add all to selection</span> -->
+        <slot name="commands" v-bind:isEmpty="isEmpty"></slot>
     </template>
 
-    <div v-if="isEmpty()" class="smk-placeholder">
+    <div v-if="isEmpty" class="smk-placeholder">
         <slot name="placeholder"></slot>
-        <!-- Click on map to identify features. -->
     </div>
 
     <div class="smk-identify-layer"

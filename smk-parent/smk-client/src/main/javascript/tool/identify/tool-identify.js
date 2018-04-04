@@ -1,4 +1,3 @@
-// include.module( 'tool-identify', [ 'smk', 'tool', 'widgets', 'tool-identify.panel-identify-html', 'tool-identify.popup-identify-html' ], function ( inc ) {
 include.module( 'tool-identify', [ 'smk', 'feature-list', 'widgets', 'tool-identify.panel-identify-html' ], function ( inc ) {
 
     Vue.component( 'identify-widget', {
@@ -8,19 +7,11 @@ include.module( 'tool-identify', [ 'smk', 'feature-list', 'widgets', 'tool-ident
     Vue.component( 'identify-panel', {
         template: inc[ 'tool-identify.panel-identify-html' ],
         props: [ 'busy', 'layers', 'highlightId' ],
-        methods: {
-            isEmpty: function () {
-                return !this.layers || this.layers.length == 0
-            }
-        },
     } )
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
     function IdentifyTool( option ) {
         this.makePropWidget( 'icon', 'info_outline' )
-        // this.makePropPanel( 'busy', false )
-        // this.makePropPanel( 'layers', [] )
-        // this.makePropPanel( 'highlightId', null )
 
         SMK.TYPE.FeatureList.prototype.constructor.call( this, $.extend( {
             order:          4,
@@ -50,26 +41,8 @@ include.module( 'tool-identify', [ 'smk', 'feature-list', 'widgets', 'tool-ident
             self.active = !self.active
         } )
 
-        // aux.panel.vm.$on( 'identify-panel.active', function ( ev ) {
-        //     smk.$viewer.identified.pick( ev.feature.id )
-        // } )
-
-        // aux.panel.vm.$on( 'identify-panel.hover', function ( ev ) {
-        //     smk.$viewer.identified.highlight( ev.features && ev.features.map( function ( f ) { return f.id } ) )
-        // } )
-
         aux.panel.vm.$on( 'identify-panel.add-all', function ( ev ) {
         } )
-
-        // aux.panel.vm.$on( 'identify-panel.clear', function ( ev ) {
-        //     smk.$viewer.identified.clear()
-        // } )
-
-        // smk.$viewer.pickedLocation( function () {
-        //     var enabledTools = Object.values( smk.$tool ).filter( function ( t ) { t.enabled } )
-
-
-        // } )
 
         smk.$viewer.startedIdentify( function ( ev ) {
             self.busy = true
@@ -87,11 +60,11 @@ include.module( 'tool-identify', [ 'smk', 'feature-list', 'widgets', 'tool-ident
 
             var ly = smk.$viewer.layerId[ ev.layerId ]
 
-            self.layers[ ly.index ] = {
+            Vue.set( self.layers, ly.index, {
                 id: ly.config.id,
                 title: ly.config.title,
                 features: ev.features
-            }
+            } )
         } )
 
         // smk.$viewer.identified.removedFeatures( function ( ev ) {
