@@ -39,6 +39,10 @@
     align-items: flex-start;
 }
 
+.smk-feature-list-panel .smk-layer .smk-feature span {
+    flex-basis: 100%;
+}
+
 .smk-feature-list-panel .smk-layer .smk-feature.smk-highlighted {
     font-weight: bold;
 }

@@ -1,6 +1,6 @@
 <div class="smk-feature-popup" v-if="layer">
     <div class="smk-header">
-        <h3>{{ layer.config.title }}</h2>
+        <h3>{{ layer.title }}</h2>
         <h2>{{ feature.title }}</h2>
     </div>
 
@@ -13,8 +13,8 @@
         v-if="!feature.properties.description"
     >
         <div class="smk-attribute"
-            v-for="attr in layer.config.attributes"
-            v-if="layer.config.attributes && attr.visible !== false"
+            v-for="attr in layer.attributes"
+            v-if="layer.attributes && attr.visible !== false"
         >
             <span class="smk-title">{{ attr.title }}</span>
             <span class="smk-value">{{ feature.properties[ attr.name ] }}</span>
@@ -22,7 +22,7 @@
 
         <div class="smk-attribute"
             v-for="(val, attr) in feature.properties"
-            v-if="!layer.config.attributes || layer.config.attributes.length == 0"
+            v-if="!layer.attributes || layer.attributes.length == 0"
         >
             <span class="smk-title">{{ attr }}</span>
             <span class="smk-value">{{ val }}</span>
@@ -32,12 +32,12 @@
     <div class="smk-commands">
         <span class="smk-command"
             v-if="tool.zoom"
-            v-on:click="zoomToFeature( layer, feature )"
+            v-on:click="zoomToFeature( layer.id, feature.id )"
         >Zoom to</span>
 
         <span class="smk-command"
             v-if="tool.select"
-            v-on:click="selectFeature( layer, feature )"
+            v-on:click="selectFeature( layer.id, feature.id )"
         >Add to selection</span>
     </div>
 </div>

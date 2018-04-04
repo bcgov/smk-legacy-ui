@@ -145,7 +145,7 @@
                                 var op = this.$options
                                 while ( op && op._componentTag ) {
                                     var componentEvent = op._componentTag + '.' + event
-                                    console.log( componentEvent )
+                                    // console.log( componentEvent )
 
                                     this.$root.$emit( componentEvent, arg, this )
 

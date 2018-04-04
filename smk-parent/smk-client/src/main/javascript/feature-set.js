@@ -60,7 +60,7 @@ include.module( 'feature-set', [ 'smk', 'jquery', 'util', 'event' ], function ()
     FeatureSet.prototype.remove = function ( featureIds ) {
         var self = this
 
-        var fs = featuresIds.map( function ( id ) {
+        var fs = featureIds.map( function ( id ) {
             if ( !( id in self.featureSet ) ) return
 
             var f = self.featureSet[ id ]

@@ -43,7 +43,9 @@ include.module( 'tool-identify', [ 'smk', 'feature-list', 'widgets', 'tool-ident
 
         aux.panel.vm.$on( 'identify-panel.add-all', function ( ev ) {
             self.layers.forEach( function ( ly ) {
-                smk.$viewer.selected.add( ly.id, ly.features )
+                smk.$viewer.selected.add( ly.id, ly.features.map( function ( ft ) {
+                    return smk.$viewer.identified.get( ft.id )
+                } ) )
             } )
         } )
 
@@ -66,7 +68,12 @@ include.module( 'tool-identify', [ 'smk', 'feature-list', 'widgets', 'tool-ident
             Vue.set( self.layers, ly.index, {
                 id: ly.config.id,
                 title: ly.config.title,
-                features: ev.features
+                features: ev.features.map( function ( ft ) {
+                    return {
+                        id: ft.id,
+                        title: ft.title
+                    }
+                } )
             } )
         } )
 

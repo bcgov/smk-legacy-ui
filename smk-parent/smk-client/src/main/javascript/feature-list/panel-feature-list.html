@@ -28,10 +28,17 @@
         <div class="smk-feature smk-command" title="Click to see attributes"
             v-for="feature in layer.features"
             v-bind:class="{ 'smk-highlighted': feature.id == highlightId }"
-            v-on:click="$$emit( 'active', { feature: feature } )"
+            v-on:click="$$emit( 'active', { featureId: feature.id } )"
         >
             <span >{{ feature.title }}</span>
-            <i class="smk-highlight material-icons">speaker_notes</i>
+
+            <i class="smk-highlight material-icons"
+            >speaker_notes</i>
+
+            <i class="smk-remove material-icons"
+                v-if="canRemove"
+                v-on:click="$$emit( 'remove', { layerId: layer.id, featureId: feature.id } )"
+            >delete</i>
         </div>
         <!-- <a class="smk-layer-metadata" target="_metadata"
             v-if="layer.metadataUrl"

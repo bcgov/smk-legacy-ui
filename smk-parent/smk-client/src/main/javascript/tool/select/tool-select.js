@@ -45,20 +45,24 @@ include.module( 'tool-select', [ 'smk', 'feature-list', 'widgets', 'tool-select.
 
             if ( !self.layers[ ly.index ] )
                 Vue.set( self.layers, ly.index, {
-                    id: ly.config.id,
-                    title: ly.config.title,
-                    features: ev.features
+                    id:         ly.config.id,
+                    title:      ly.config.title,
+                    features: ev.features.map( function ( ft ) {
+                        return {
+                            id:     ft.id,
+                            title:  ft.title
+                        }
+                    } )
                 } )
             else
-                Vue.set( self.layers[ ly.index ], 'features', self.layers[ ly.index ].features.concat( ev.features ) )
+                Vue.set( self.layers[ ly.index ], 'features', self.layers[ ly.index ].features.concat( ev.features.map( function ( ft ) {
+                    return {
+                        id:     ft.id,
+                        title:  ft.title
+                    }
+                } ) ) )
         } )
 
-        // // smk.$viewer.selected.removedFeatures( function ( ev ) {
-        // // } )
-
-        smk.$viewer.selected.clearedFeatures( function ( ev ) {
-            self.layers = []
-        } )
     } )
 
     return SelectTool

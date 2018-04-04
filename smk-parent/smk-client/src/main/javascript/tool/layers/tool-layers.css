@@ -29,18 +29,18 @@
     opacity: .5;
 }
 
-.smk-layer {
+.smk-layers-panel .smk-layer {
     position: relative;
     border: 1px solid transparent;
     margin-bottom: 5px;
     border-radius: 5px;
 }
 
-.smk-layer:hover {
+.smk-layers-panel .smk-layer:hover {
     border: 1px solid black;
 }
 
-.smk-layer .smk-layer-visibility {
+.smk-layers-panel .smk-layer .smk-layer-visibility {
     display: inline-block;
     /* width: 20px; */
     vertical-align: top;
@@ -48,17 +48,17 @@
     opacity: .5;
 }
 
-.smk-layer.smk-layer-visible .smk-layer-visibility {
+.smk-layers-panel .smk-layer.smk-layer-visible .smk-layer-visibility {
     opacity: 1;
 }
 
-.smk-layer h2 {
+.smk-layers-panel .smk-layer h2 {
     display: inline-block;
     width: 200px;
     margin-top: 2px;
 }
 
-.smk-layer .smk-layer-expand {
+.smk-layers-panel .smk-layer .smk-layer-expand {
     position: absolute;
     top: 0;
     right: 0;
@@ -66,11 +66,11 @@
     cursor: pointer;
 }
 
-.smk-layer .smk-layer-info {
+.smk-layers-panel .smk-layer .smk-layer-info {
     padding-left: 25px;
 }
 
-.smk-layer .smk-legend span {
+.smk-layers-panel .smk-layer .smk-legend span {
     vertical-align: top;
 }
 
