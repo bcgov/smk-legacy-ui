@@ -96,8 +96,13 @@ include.module( 'feature-list', [ 'smk', 'tool', 'widgets', 'feature-list.panel-
         this.popupModel = {
             feature: null,
             layer: null,
-            tool: {}
+            tool: {},
+            hasMultiple: true,
+            position: '1 / 10'
         }
+
+        this.popupFeatureIds = null
+        this.popupCurrentIndex = null
 
         if ( smk.$tool.select && this.type != 'select' )
             this.popupModel.tool.select = true
@@ -118,7 +123,22 @@ include.module( 'feature-list', [ 'smk', 'tool', 'widgets', 'feature-list.panel-
                 },
                 selectFeature: function ( layerId, featureId ) {
                     smk.$viewer.selected.add( layerId, [ smk.$viewer[ self.featureSetProperty ].get( featureId ) ] )
-                }
+                },
+                movePrevious: function () {
+                    var l = self.popupFeatureIds.length
+                    self.popupCurrentIndex = ( self.popupCurrentIndex + l - 1 ) % l
+                    this.position = ( self.popupCurrentIndex + 1 ) + ' / ' + l
+                    smk.$viewer[ self.featureSetProperty ].pick( self.popupFeatureIds[ self.popupCurrentIndex ], { cluster: true } )                    
+                },
+                moveNext: function () {
+                    var l = self.popupFeatureIds.length
+                    self.popupCurrentIndex = ( self.popupCurrentIndex + 1 ) % l
+                    this.position = ( self.popupCurrentIndex + 1 ) + ' / ' + l
+                    smk.$viewer[ self.featureSetProperty ].pick( self.popupFeatureIds[ self.popupCurrentIndex ], { cluster: true } )                    
+                },
+                // featureIds[ ( currentIndex + featureIds.length - 1 ) % featureIds.length ] } 
+
+                // ', { featureId: featureIds[ ( currentIndex + 1 ) % featureIds.length ] } )                
             }
         } )
 

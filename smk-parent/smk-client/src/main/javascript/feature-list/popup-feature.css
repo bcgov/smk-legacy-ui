@@ -3,6 +3,36 @@
     margin-bottom: 10px;
     padding-left: 10px;
     padding-bottom: 5px;
+
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-end;
+    align-content: flex-end;
+}
+
+.smk-feature-popup .smk-title {
+    flex-basis: 100%;
+}
+
+.smk-feature-popup .smk-navigator {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    align-content: flex-end;
+}
+
+.smk-feature-popup .smk-navigator .smk-position {
+    white-space: nowrap;
+    display: inline-block;
+    font-weight: bold;
+    margin: 0 2px;
+}
+
+.smk-feature-popup .smk-navigator .smk-move {
+    cursor: pointer;
+    margin: 0;
 }
 
 .smk-feature-popup h2 {

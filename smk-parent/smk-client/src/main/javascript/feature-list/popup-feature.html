@@ -1,7 +1,24 @@
 <div class="smk-feature-popup" v-if="layer">
     <div class="smk-header">
-        <h3>{{ layer.title }}</h2>
-        <h2>{{ feature.title }}</h2>
+        <span class="smk-title">
+            <h3>{{ layer.title }}</h2>
+            <h2>{{ feature.title }}</h2>            
+        </span>
+
+        <span class="smk-navigator"
+            v-if="hasMultiple"
+        >
+            <i class="material-icons smk-move smk-command"
+                v-on:click="movePrevious()"
+            >navigate_before</i>
+            
+            <span class="smk-position"
+            >{{ position }}</span>
+
+            <i class="material-icons smk-move smk-command"
+                v-on:click="moveNext()"
+            >navigate_next</i>
+        </span>        
     </div>
 
     <div class="smk-description"

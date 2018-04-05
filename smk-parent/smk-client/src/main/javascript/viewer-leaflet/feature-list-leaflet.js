@@ -10,7 +10,21 @@ include.module( 'feature-list-leaflet', [ 'leaflet', 'feature-list' ], function 
         this.highlight = {}
         this.marker = {}
         this.markers = L.markerClusterGroup( {
-                singleMarkerMode: true
+                singleMarkerMode: true,
+                zoomToBoundsOnClick: false
+            } )
+            .on( {
+                'clusterclick': function ( ev ) {
+                    var featureIds = ev.layer.getAllChildMarkers().map( function ( m ) { 
+                        return m.options.featureId 
+                    } )
+                    
+                    featureSet.pick( featureIds[ 0 ], { cluster: true } )
+                    self.popupModel.hasMultiple = true
+                    self.popupModel.position = '1 / ' + featureIds.length
+                    self.popupFeatureIds = featureIds
+                    self.popupCurrentIndex = 0
+                }
             } )
             .addTo( vw.map )
 
@@ -21,7 +35,9 @@ include.module( 'feature-list-leaflet', [ 'leaflet', 'feature-list' ], function 
                 if ( center.geometry )
                     center = center.geometry
 
-                self.marker[ f.id ] = L.marker( [ center.coordinates[ 1 ], center.coordinates[ 0 ] ] )
+                self.marker[ f.id ] = L.marker( [ center.coordinates[ 1 ], center.coordinates[ 0 ] ], {
+                        featureId: f.id
+                    } )
                     .bindPopup( function () {
                         return self.popupVm.$el
                     }, {
@@ -75,11 +91,17 @@ include.module( 'feature-list-leaflet', [ 'leaflet', 'feature-list' ], function 
                 var ly = self.marker[ ev.feature.id ]
 
                 if ( !ly.isPopupOpen() ) {
-                    vw.map.setZoom( 1, { animate: false } )
-                    self.markers.zoomToShowLayer( ly, function () {
+                    // vw.map.setZoom( 1, { animate: false } )
+                    if ( ev.cluster ) {
+                        vw.map.addLayer( ly )
                         ly.openPopup()
-                    } )
-                }
+                    }
+                    else {
+                        self.markers.zoomToShowLayer( ly, function () {
+                            ly.openPopup()
+                        } )
+                    }
+            }
 
                 showHighlight( ev.feature.id, true )
                 // brightHighlight( ly, true )
