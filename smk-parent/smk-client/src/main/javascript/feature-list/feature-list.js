@@ -64,8 +64,8 @@ include.module( 'feature-list', [ 'smk', 'tool', 'widgets', 'feature-list.panel-
         smk.$viewer[ self.featureSetProperty ].pickedFeature( function ( ev ) {
             if ( !ev.feature ) {
                 self.highlightId = null
-                self.popupModel.feature = null
                 self.popupModel.layer = null
+                self.popupModel.feature = null
                 return
             }
 

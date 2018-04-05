@@ -154,6 +154,11 @@ exports.gen = function () {
         .script( 'https://unpkg.com/terraformer-arcgis-parser@1.0.5' )
         .script( 'https://unpkg.com/terraformer-wkt-parser@1.1.2' )
         .script( 'https://npmcdn.com/@turf/turf/turf.min.js' )
+    	.style( "https://unpkg.com/leaflet.markercluster@1.0.6/dist/MarkerCluster.css" )
+    	.style( "https://unpkg.com/leaflet.markercluster@1.0.6/dist/MarkerCluster.Default.css" )
+    	.script( "https://unpkg.com/leaflet.markercluster@1.0.6/dist/leaflet.markercluster-src.js" )
+
+    		// <h:outputScript library="js" name="leaflet-heat.js" />
 
     // esri3d
 
