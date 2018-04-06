@@ -3,15 +3,22 @@ include.module( 'tool-location-leaflet', [ 'leaflet', 'tool-location' ], functio
     SMK.TYPE.LocationTool.prototype.afterInitialize.push( function ( smk ) {
         var self = this
 
-        var locationMarker = L.marker( [0, 0], {
+        this.popup = L.popup( {
+            maxWidth: 100,
+            offset: [ 0, -10 ]
         } )
+        .setContent( function () { return self.vm.$el } )
 
+        var locationMarker = L.marker()
+            .bindPopup( this.popup )
+        
         smk.$viewer.pickedLocation( function ( location ) {
             if ( !self.enabled ) return
 
             locationMarker
                 .setLatLng( [ location.map.latitude, location.map.longitude ] )
                 .addTo( smk.$viewer.map )
+                .openPopup()
         } )
 
         smk.$viewer.changedView( function () {
