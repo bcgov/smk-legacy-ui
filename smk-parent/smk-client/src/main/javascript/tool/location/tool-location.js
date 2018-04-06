@@ -66,7 +66,7 @@ include.module( 'tool-location', [ 'smk', 'tool', 'widgets', 'tool-location.popu
                 self.site = site
             } )
             .catch( function ( err ) {
-                console.warn( err )
+                // console.warn( err )
             } )
         } )
 
@@ -81,5 +81,9 @@ include.module( 'tool-location', [ 'smk', 'tool', 'widgets', 'tool-location.popu
 
     } )
 
+    LocationTool.prototype.reset = function () {
+        this.location = {}        
+    }
+    
     return LocationTool
 } )

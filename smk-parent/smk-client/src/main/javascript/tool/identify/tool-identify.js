@@ -60,7 +60,7 @@ include.module( 'tool-identify', [ 'smk', 'feature-list', 'widgets', 'tool-ident
             if ( smk.$viewer.identified.isEmpty() )
                 self.active = false
             else {
-                smk.$viewer.changedView()
+                smk.$tool.location.reset()
                 smk.$viewer.identified.pick( self.firstId )
             }
         } )
