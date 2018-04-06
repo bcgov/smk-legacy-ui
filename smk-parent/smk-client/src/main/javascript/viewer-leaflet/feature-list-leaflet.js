@@ -7,7 +7,7 @@ include.module( 'feature-list-leaflet', [ 'leaflet', 'feature-list' ], function 
         var featureSet = smk.$viewer[ self.featureSetProperty ]
 
         this.highlight = {}
-        this.featureHighlights = L.layerGroup( { pane: 'markerPane' } ) 
+        this.featureHighlights = L.layerGroup( { pane: 'markerPane' } )
 
         this.popup = L.popup( {
                 maxWidth: 400,
@@ -78,6 +78,9 @@ include.module( 'feature-list-leaflet', [ 'leaflet', 'feature-list' ], function 
 
         featureSet.removedFeatures( function ( ev ) {
             ev.features.forEach( function ( ft ) {
+                if ( featureSet.isPicked( ft.id ) )
+                    featureSet.pick( null )
+
                 self.featureHighlights.removeLayer( self.highlight[ ft.id ] )
                 delete self.highlight[ ft.id ]
             } )
