@@ -2,6 +2,7 @@ package ca.bc.gov.app.smks.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
@@ -25,6 +26,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import ca.bc.gov.app.smks.converter.DocumentConverterFactory;
+import ca.bc.gov.app.smks.converter.DocumentConverterFactory.DocumentType;
 import ca.bc.gov.app.smks.dao.CouchDAO;
 import ca.bc.gov.app.smks.model.MapConfigInfo;
 import ca.bc.gov.app.smks.model.MapConfiguration;
@@ -54,17 +57,18 @@ public class MapConfigController
 			if(request.getName() == null) throw new Exception("The SMK ID is null. This is a required field");
 			if(request.getName().length() == 0) throw new Exception("The SMK ID is empty. Please fill in a valid field");
 
-			if(request.getLmfId() == null) request.setLmfId(request.getName().toLowerCase().replaceAll(" ", "-"));
-			if(request.getLmfId().length() == 0) request.setLmfId(request.getName().toLowerCase().replaceAll(" ", "-"));
-
+			request.setLmfId(request.getName().toLowerCase().replaceAll(" ", "-").replaceAll("[^A-Za-z0-9]", "-"));
+			
 			request.setLmfRevision(1);
 
 			// validate the ID, in case it's already in use.
 			MapConfiguration existingDocID = couchDAO.getMapConfiguration(request.getLmfId());
 
-			if(existingDocID != null) throw new Exception("The SMK ID is already in use. For creating new documents, ensure the ID is unique. If you are attempting to update an existing Map Configuration, please hit the following endpoint: {PUT}/MapConfigurations/{id}");
-
-			// we have a revision of 1 and a valid lmf ID, so create the document
+			if(existingDocID != null)
+			{
+				// replace ID with a random guid
+				request.setLmfId(UUID.randomUUID().toString());
+			}
 
 			couchDAO.createResource(request);
 			logger.debug("    Success!");
@@ -258,7 +262,7 @@ public class MapConfigController
 
 	@RequestMapping(value = "/{config_id}/Attachments", headers=("content-type=multipart/form-data"), method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity<?> createAttachment(@PathVariable String config_id, @RequestParam("file") MultipartFile request, @RequestParam("id") String id)
+	public ResponseEntity<?> createAttachment(@PathVariable String config_id, @RequestParam("file") MultipartFile request, @RequestParam("id") String id, @RequestParam("type") String type)
 	{
 		logger.debug(" >> createAttachment()");
 		ResponseEntity<?> result = null;
@@ -273,7 +277,19 @@ public class MapConfigController
 
 				if(resource != null)
 				{
-					Attachment attachment = new Attachment(id, Base64.encodeBase64String(request.getBytes()), request.getContentType());
+					// convert resource to geojson if it's a vector type
+					byte[] docBytes = request.getBytes();
+					
+					String contentType = request.getContentType();
+					
+					if(type.equals("kml")) { docBytes = DocumentConverterFactory.convertDocument(request.getBytes(), DocumentType.KML); contentType = "application/octet-stream"; }
+					if(type.equals("kmz")) { docBytes = DocumentConverterFactory.convertDocument(request.getBytes(), DocumentType.KMZ); contentType = "application/octet-stream"; }
+					else if(type.equals("csv")) { docBytes = DocumentConverterFactory.convertDocument(request.getBytes(), DocumentType.CSV); contentType = "application/octet-stream"; }
+					else if(type.equals("wkt")) { docBytes = DocumentConverterFactory.convertDocument(request.getBytes(), DocumentType.WKT); contentType = "application/octet-stream"; }
+					else if(type.equals("gml")) { docBytes = DocumentConverterFactory.convertDocument(request.getBytes(), DocumentType.GML); contentType = "application/octet-stream"; }
+					else if(type.equals("shape")) { docBytes = DocumentConverterFactory.convertDocument(request.getBytes(), DocumentType.SHAPE); contentType = "application/octet-stream"; }
+					
+					Attachment attachment = new Attachment(id, Base64.encodeBase64String(docBytes), contentType);
 				    resource.addInlineAttachment(attachment);
 
 				    couchDAO.updateResource(resource);

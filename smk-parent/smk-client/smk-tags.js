@@ -37,6 +37,9 @@ exports.gen = function () {
     t.group( 'menu' )
         .dir( 'menu/**/*', { cwd: baseDir } )
 
+    t.group( 'feature-list' )
+        .dir( 'feature-list/**/*', { cwd: baseDir } )
+
 
     t.group( 'tool-menu' )
         .dir( 'tool/menu/**/*', { cwd: baseDir } )
@@ -136,11 +139,14 @@ exports.gen = function () {
 
     t.script( 'layer-leaflet', 'viewer-leaflet/layer-leaflet.js' )
 
+    t.script( 'feature-list-leaflet', 'viewer-leaflet/feature-list-leaflet.js' )
+
     t.group( 'viewer-leaflet' )
         .script( 'viewer-leaflet/viewer-leaflet.js' )
         .tag( 'layer-leaflet' )
         .style( 'viewer-leaflet/viewer-leaflet.css' )
         .tag( 'leaflet-extensions' )
+        .tag( 'feature-list-leaflet' )
 
     t.sequence( 'leaflet' )
         .script( 'https://unpkg.com/leaflet@1.2.0/dist/leaflet.js', { 'integrity': 'sha512-lInM/apFSqyy1o6s89K4iQUKg6ppXEgsVxT35HbzUupEVRh2Eu9Wdl4tHj7dZO0s1uvplcYGmt3498TtHq+log==' } )
@@ -155,6 +161,11 @@ exports.gen = function () {
         .script( 'https://unpkg.com/terraformer-arcgis-parser@1.0.5' )
         .script( 'https://unpkg.com/terraformer-wkt-parser@1.1.2' )
         .script( 'https://npmcdn.com/@turf/turf/turf.min.js' )
+    	.style( "https://unpkg.com/leaflet.markercluster@1.0.6/dist/MarkerCluster.css" )
+    	.style( "https://unpkg.com/leaflet.markercluster@1.0.6/dist/MarkerCluster.Default.css" )
+    	.script( "https://unpkg.com/leaflet.markercluster@1.0.6/dist/leaflet.markercluster-src.js" )
+
+    		// <h:outputScript library="js" name="leaflet-heat.js" />
 
     // esri3d
 

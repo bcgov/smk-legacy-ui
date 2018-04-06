@@ -1,0 +1,60 @@
+.smk-feature-list-panel .smk-placeholder {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: lightgray;
+    font-style: italic;
+    font-size: 20px;
+    padding:5px 10px;
+    text-align: center;
+}
+
+.smk-feature-list-panel .smk-layer {
+    position: relative;
+    margin-bottom: 5px;
+    border-radius: 5px;
+    padding: 5px;
+}
+
+.smk-feature-list-panel .smk-layer h2 {
+    display: inline-block;
+    width: 200px;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.smk-feature-list-panel .smk-layer .smk-feature {
+    font-size: 12px;
+    margin-left: 10px;
+    cursor: pointer;
+
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.smk-feature-list-panel .smk-layer .smk-feature span {
+    flex-basis: 100%;
+}
+
+.smk-feature-list-panel .smk-layer .smk-feature.smk-highlighted {
+    font-weight: bold;
+}
+
+.smk-feature-list-panel .smk-layer .smk-feature .smk-highlight {
+    opacity: 0.0;
+}
+
+.smk-feature-list-panel .smk-layer .smk-feature:hover .smk-highlight {
+    opacity: 0.3;
+}
+
+.smk-feature-list-panel .smk-layer .smk-feature.smk-highlighted .smk-highlight {
+    opacity: 1.0;
+}

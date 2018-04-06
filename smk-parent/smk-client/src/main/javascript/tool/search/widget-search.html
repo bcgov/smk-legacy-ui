@@ -2,7 +2,7 @@
     <input type="text" placeholder="Search keywords"
         v-model.trim="search"
         v-on:keyup="$$emit( 'input-change', { text: search } )"
-        v-on:click="$$emit( 'click' )"
+        v-on:click="$$emit( 'click', {} )"
     >
 
     <button

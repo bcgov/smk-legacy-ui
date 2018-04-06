@@ -58,7 +58,8 @@ public class Layer implements Cloneable
 	private Double opacity;
 	private Double minScale;
 	private Double maxScale;
-
+	private boolean isQueryable;
+	
 	public Layer()
 	{
 	}
@@ -161,6 +162,16 @@ public class Layer implements Cloneable
 		this.maxScale = maxScale;
 	}
 
+	public void setIsQueryable(boolean isQueryable)
+	{
+		this.isQueryable = isQueryable;
+	}
+	
+	public boolean getIsQueryable()
+	{
+		return isQueryable;
+	}
+	
 	@Override
 	public String toString()
 	{

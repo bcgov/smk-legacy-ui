@@ -13,19 +13,23 @@
                 },
                 {
                     "name": "DIAGNOSTIC_FACILITY_ID",
-                    "title": "Diagnostic Facility ID"
+                    "title": "Diagnostic Facility ID",
+                    "visible": false
                 },
                 {
                     "name": "FACILITY_NAME",
-                    "title": "Facility Name"
+                    "title": "Facility Name",
+                    "visible": false
                 },
                 {
                     "name": "OWNERSHIP_CODE_DESCRIPTION",
-                    "title": "Ownership Code Description"
+                    "title": "Ownership Code Description",
+                    "visible": false
                 },
                 {
                     "name": "ADDRESS",
-                    "title": "Address"
+                    "title": "Address",
+                    "visible": false
                 },
                 {
                     "name": "CITY",
@@ -56,8 +60,8 @@
                     "title": "Object ID"
                 }
             ],
-            "serviceUrl": "//maps.gov.bc.ca/arcgis/rest/services/mpcm/bcgw/MapServer",
-            "metadataUrl": "//catalogue.data.gov.bc.ca/dataset/diagnostic-facilities",
+            "serviceUrl": "https://maps.gov.bc.ca/arcgis/rest/services/mpcm/bcgw/MapServer",
+            "metadataUrl": "https://catalogue.data.gov.bc.ca/dataset/diagnostic-facilities",
             "opacity": 0.65,
             "scaleMin": 500000,
             "scaleMax": 0,
@@ -92,22 +96,26 @@
                 },
                 {
                     "name": "GEOMETRY",
-                    "title": "GEOMETRY"
+                    "title": "GEOMETRY",
+                    "visible": false
                 },
                 {
                     "name": "OBJECTID",
-                    "title": "OBJECTID"
+                    "title": "OBJECTID",
+                    "visible": false
                 },
                 {
                     "name": "FEATURE_AREA_SQM",
-                    "title": "FEATURE_AREA_SQM"
+                    "title": "FEATURE_AREA_SQM",
+                    "visible": false
                 },
                 {
                     "name": "FEATURE_LENGTH_M",
-                    "title": "FEATURE_LENGTH_M"
+                    "title": "FEATURE_LENGTH_M",
+                    "visible": false
                 }
             ],
-            "serviceUrl": "//maps.gov.bc.ca/arcgis/rest/services/mpcm/bcgw/MapServer",
+            "serviceUrl": "https://maps.gov.bc.ca/arcgis/rest/services/mpcm/bcgw/MapServer",
             "metadataUrl": "https://catalogue.data.gov.bc.ca/dataset/e5dd2faf-bbfc-4ed6-877f-6be0e873941e",
             "opacity": 0.65,
             "scaleMin": 5000000,

@@ -75,6 +75,36 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
     }
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
+    // for(s=1;s<25;s++){v.map.setZoom(s,{animate:false});console.log(s,v.getScale())}
+    Viewer.prototype.zoomScale = []
+    Viewer.prototype.zoomScale[  1 ] = 173451547.7127784
+    Viewer.prototype.zoomScale[  2 ] = 89690013.7670628
+    Viewer.prototype.zoomScale[  3 ] = 45203253.08071528
+    Viewer.prototype.zoomScale[  4 ] = 22617698.02495323
+    Viewer.prototype.zoomScale[  5 ] = 11314385.218894083
+    Viewer.prototype.zoomScale[  6 ] = 5659653.605577067
+    Viewer.prototype.zoomScale[  7 ] = 2829913.245708334
+    Viewer.prototype.zoomScale[  8 ] = 1414856.836779603
+    Viewer.prototype.zoomScale[  9 ] = 707429.7690058348
+    Viewer.prototype.zoomScale[ 10 ] = 353715.05331990693
+    Viewer.prototype.zoomScale[ 11 ] = 176857.5477505768
+    Viewer.prototype.zoomScale[ 12 ] = 88428.77649887519
+    Viewer.prototype.zoomScale[ 13 ] = 44214.496444883276
+    Viewer.prototype.zoomScale[ 14 ] = 22107.221783884223
+    Viewer.prototype.zoomScale[ 15 ] = 11053.61708610345
+    Viewer.prototype.zoomScale[ 16 ] = 5526.806585855153
+    Viewer.prototype.zoomScale[ 17 ] = 2763.4019883053297
+    Viewer.prototype.zoomScale[ 18 ] = 1381.6944712225031
+    Viewer.prototype.zoomScale[ 19 ] = 690.8367988270104
+
+    Viewer.prototype.getZoomBracketForScale = function ( scale ) {
+        if ( scale > this.zoomScale[ 1 ] ) return [ 0, 1 ]
+        if ( scale < this.zoomScale[ 19 ] ) return [ 19, 20 ]
+        for ( var z = 2; z < 20; z++ )
+            if ( scale > this.zoomScale[ z ] ) return [ z - 1, z ]
+    }
+    // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+    //
     Viewer.prototype.destroy = function () {
         ViewerEvent.prototype.destroy()
     }
@@ -271,8 +301,12 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
         throw new Error( 'not implemented' )
     }
 
-    Viewer.prototype.identifyFeatures = function ( location ) {
+    Viewer.prototype.identifyFeatures = function ( location, option ) {
         var self = this
+
+        option = Object.assign( {
+            tolerance: 3
+        }, option )
 
         var view = this.getView()
 
@@ -288,7 +322,9 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
             if ( ly.config.isQueryable === false ) return
             if ( !ly.inScaleRange( view ) ) return
 
-            var p = ly.getFeaturesAtPoint( location, view, self.visibleLayer[ id ] )
+            option.layer = self.visibleLayer[ id ]
+
+            var p = ly.getFeaturesAtPoint( location, view, option )
             if ( !p ) return
 
             promises.push(
@@ -296,6 +332,9 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
                     return p
                 } )
                 .then( function ( features ) {
+                    features.forEach( function ( f ) {
+                        f._identifyPoint = location.map
+                    } )
                     self.identified.add( id, features )
                 } )
                 .catch( function ( err ) {

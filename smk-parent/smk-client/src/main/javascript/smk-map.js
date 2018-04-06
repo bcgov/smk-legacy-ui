@@ -29,6 +29,7 @@ include.module( 'smk-map', [ 'smk', 'jquery', 'util', 'viewer', 'layer' ], funct
             .then( initTools )
             .catch( function ( e ) {
                 console.error( 'smk viewer #' + self.$option.containerId + ' failed to initialize:', e )
+                window.alert( 'smk viewer #' + self.$option.containerId + ' failed to initialize' )
             } )
 
         function loadConfigs() {
@@ -60,7 +61,8 @@ include.module( 'smk-map', [ 'smk', 'jquery', 'util', 'viewer', 'layer' ], funct
             try {
                 configs.forEach( function ( cfg ) {
                     if ( typeof( cfg ) == 'string' ) {
-                        var parsed = include.parseJSONC( cfg )
+                        // var parsed = include.parseJSONC( cfg )
+                        var parsed = JSON.parse( cfg )
                         SMK.UTIL.mergeConfig( config, parsed )
                     }
                     else {
@@ -115,7 +117,7 @@ include.module( 'smk-map', [ 'smk', 'jquery', 'util', 'viewer', 'layer' ], funct
 
             self.tools.push( { type: 'menu' }, { type: 'location' } )
 
-            return SMK.UTIL.waitAll( self.tools.map( function ( t ) {
+            return SMK.UTIL.waitAll( self.tools.filter( function ( t ) { return t.enabled !== false } ).map( function ( t ) {
                 var tag = 'tool-' + t.type
                 return include( tag )
                     .then( function ( inc ) {

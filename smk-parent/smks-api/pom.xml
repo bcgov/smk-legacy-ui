@@ -127,6 +127,63 @@
 		    <artifactId>commons-io</artifactId>
 		    <version>2.6</version>
 		</dependency>
+		<!-- GeoTools (unfortunately) -->
+		<dependency>
+		    <groupId>org.geotools</groupId>
+		    <artifactId>gt-main</artifactId>
+		    <version>19.0</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.geotools</groupId>
+		    <artifactId>gt-api</artifactId>
+		    <version>19.0</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.geotools</groupId>
+		    <artifactId>gt-data</artifactId>
+		    <version>19.0</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.geotools</groupId>
+		    <artifactId>gt-metadata</artifactId>
+		    <version>19.0</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.geotools</groupId>
+		    <artifactId>gt-opengis</artifactId>
+		    <version>19.0</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.geotools</groupId>
+		    <artifactId>gt-referencing</artifactId>
+		    <version>19.0</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.geotools</groupId>
+		    <artifactId>gt-shapefile</artifactId>
+		    <version>19.0</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.geotools</groupId>
+		    <artifactId>gt-main</artifactId>
+		    <version>19.0</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.geotools</groupId>
+		    <artifactId>gt-geojson</artifactId>
+		    <version>19.0</version>
+		</dependency>		
+		<!-- jts -->
+		<dependency>
+		    <groupId>com.vividsolutions</groupId>
+		    <artifactId>jts-core</artifactId>
+		    <version>1.14.0</version>
+		</dependency>
+		<dependency>
+		    <groupId>com.vividsolutions</groupId>
+		    <artifactId>jts-io</artifactId>
+		    <version>1.14.0</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<finalName>smks-api</finalName>

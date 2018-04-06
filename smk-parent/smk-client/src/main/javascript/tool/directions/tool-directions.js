@@ -385,7 +385,7 @@ include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.
             self.setMessage( 'Route travels ' + data.distance + ' km in ' + data.timeText, 'summary' )
 
             self.directions = data.directions.map( function ( dir ) {
-                dir.instruction = dir.text.replace( /\sfor\s(\d+.?\d*\sk?m)\s[(](\d+).+?((\d+).+)?$/, function ( m, a, b, c, d ) {
+                dir.instruction = dir.text.replace( /^"|"$/g, '' ).replace( /\sfor\s(\d+.?\d*\sk?m)\s[(](\d+).+?((\d+).+)?$/, function ( m, a, b, c, d ) {
                     dir.distance = a
                     if ( d )
                         dir.time = ( '0' + b ).substr( -2 ) + ':' + ( '0' + d ).substr( -2 )
@@ -403,6 +403,7 @@ include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.
         .catch( function ( err ) {
             console.warn( err )
             self.setMessage( 'Unable to find route', 'error' )
+            self.displayWaypoints()
         } )
     }
 
