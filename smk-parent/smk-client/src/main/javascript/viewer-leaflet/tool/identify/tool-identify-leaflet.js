@@ -48,7 +48,15 @@ include.module( 'tool-identify-leaflet', [ 'leaflet', 'tool-identify' ], functio
                     featureSet.pick( ev.layer.options.featureId, { cluster: true, position: ev.latlng } )
                 },
             } )
-            .addTo( vw.map )
+
+        self.changedActive( function () {
+            if ( self.active ) {
+                self.cluster.addTo( vw.map )
+            }
+            else {
+                vw.map.removeLayer( self.cluster )
+            }
+        } )                
                 
         featureSet.addedFeatures( function ( ev ) {
             ev.features.forEach( function ( f ) {

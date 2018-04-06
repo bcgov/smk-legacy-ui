@@ -6,6 +6,9 @@ include.module( 'feature-list-leaflet', [ 'leaflet', 'feature-list' ], function 
         var vw = smk.$viewer
         var featureSet = smk.$viewer[ self.featureSetProperty ]
 
+        this.highlight = {}
+        this.featureHighlights = L.layerGroup( { pane: 'markerPane' } ) 
+
         this.popup = L.popup( {
                 maxWidth: 400,
                 autoPanPaddingTopLeft: L.point( 300, 100 ),
@@ -30,8 +33,15 @@ include.module( 'feature-list-leaflet', [ 'leaflet', 'feature-list' ], function 
             },
         } )
 
-        this.highlight = {}
-        this.featureHighlights = L.layerGroup( { pane: 'markerPane' } ).addTo( vw.map )
+        self.changedActive( function () {
+            if ( self.active ) {
+                self.featureHighlights.addTo( vw.map )
+            }
+            else {
+                vw.map.removeLayer( self.featureHighlights )
+                self.popup.remove()
+            }
+        } )
 
         featureSet.pickedFeature( function ( ev ) {
             if ( ev.was ) {
