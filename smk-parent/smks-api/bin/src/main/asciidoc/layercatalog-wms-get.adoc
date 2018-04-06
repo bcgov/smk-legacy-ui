@@ -1,0 +1,77 @@
+== {GET} LayerLibrary/wms - Retrieve WMS Details
+
+DataBC also host a GeoServer for WMS layer feeds. Many of the same layer that can be found in the MPCM ArcGIS Layer Library are also found in WMS.
+
+NOTE: DataBC's WMS layers do NOT use the same ID as the MPCM layers. Instead, they use the database Schema and table name (WHSE_WATER_MANAGEMENT.WLS_PWD_APPLICATIONS_SVW)
+
+NOTE: DataBC's WMS layers styles use in integer ID for the style name. A textual representation is available in the style title.
+
+Example of curl command:
+
+include::{snippets}/layercatalog-wms-get/curl-request.adoc[]
+
+Path Parameters:
+
+include::{snippets}/layercatalog-wms-get/path-parameters.adoc[]
+
+Example of http request:
+
+include::{snippets}/layercatalog-wms-get/http-request.adoc[]
+
+Example of http response:
+
+include::{snippets}/layercatalog-wms-get/http-response.adoc[]
+
+Response body:
+
+include::{snippets}/layercatalog-wms-get/response-body.adoc[]
+
+WMSInfoLayer fields:
+
+|===
+|Path|Type|Description
+
+|`title`
+|`String`
+|The title of the layer
+
+|`name`
+|`String`
+|The identifying name of the layer used by GeoServer
+
+|`serviceUrl`
+|`String`
+|The URL used for referencing this layer in GeoServer
+
+|`wmsVersion`
+|`String`
+|The WMS version used
+
+|`metadataUrl`
+|`String`
+|The layer metadata link in the DataBC Catalog
+
+|`styles`
+|`Array[WMSInfoStyle]`
+|The layers map service URL
+
+|===
+
+WMSInfoStyle fields:
+
+|===
+|Path|Type|Description
+
+|`name`
+|`String`
+|The identifying name of the style
+
+|`title`
+|`String`
+|The title of the style, used for labels
+
+|`legendUrl`
+|`String`
+|The url location of the legend image
+
+|===

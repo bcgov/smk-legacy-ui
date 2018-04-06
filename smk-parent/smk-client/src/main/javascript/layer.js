@@ -142,7 +142,6 @@ include.module( 'layer', [ 'smk', 'jquery', 'util', 'event' ], function () {
             var serviceUrl  = this.config.serviceUrl
             var layerName   = this.config.layerName
             var styleName   = this.config.styleName
-            // var version     = this.config.version || '1.1.1'
             var version     = '1.1.1'
 
             var params = {

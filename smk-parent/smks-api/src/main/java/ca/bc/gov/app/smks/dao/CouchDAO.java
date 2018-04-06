@@ -86,6 +86,16 @@ public class CouchDAO
 		logger.info("     Complete");
 	}
 
+	public CouchDbInstance getCouchInstance()
+	{
+		return db;
+	}
+	
+	public CouchDbConnector getCouchConnection()
+	{
+		return dbc;
+	}
+	
 	public MapConfiguration getPublishedConfig(String lmfId)
 	{
 		MapConfiguration result = null;

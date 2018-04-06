@@ -6,7 +6,7 @@
     var TAG = {}
     var OPTION = {
         baseUrl: document.location,
-        timeout: 30 * 1000
+        timeout: 60 * 1000
     }
 
     function includeTag( tag, attr ) {

@@ -1,0 +1,343 @@
+== {POST} MapConfiguration - Create a new LMF Map Configuration (not for publishing)
+
+Executing a POST at the MapConfiguration endpoint with a body containing the required Map Configuration json will create a new, unpublished Map Configuration that can be used for editing. All newly created documents will have their LMF Version set to '1'
+
+Example of curl command:
+
+include::{snippets}/mapconfig-crt/curl-request.adoc[]
+
+Example of http request:
+
+include::{snippets}/mapconfig-crt/http-request.adoc[]
+
+Example of http response:
+
+include::{snippets}/mapconfig-crt/http-response.adoc[]
+
+Response body:
+
+include::{snippets}/mapconfig-crt/response-body.adoc[]
+
+To create a new configuration, the following model must be adhered to:
+
+== Map Configuration Model:
+
+|===
+|Path|Type|Required|Description
+
+|`lmfId`
+|`String`
+|`True`
+|The LMF identifer for the Map Configuration
+
+|`lmfRevision`
+|`Integer`
+|`True`
+|The current version of the Map Configuration. This will increment when a version is published and a new edit version created 
+
+|`name`
+|`String`
+|`True`
+|The name of an LMF application. This name is used for labels and display purposes 
+
+|`project`
+|`String`
+|`False`
+|An optional 'namespace' used to track Map Configurations together in a single project 
+
+|`createdBy`
+|`String`
+|`True`
+|The name of the user (BCeID or IDIR) that created this Map Configuration
+
+|`viewerType`
+|`String`
+|`True`
+|The type of viewer that will be used when displaying this Map Configuration to the user (leaflet, esri2d, esri3d)
+
+|`showHeader`
+|`Boolean`
+|`True`
+|An indicator that will either hide or show the header within the viewer
+
+|`headerImage`
+|`String`
+|`False`
+|The attachment ID for the header image, or the URL if the header image is not stored as an attachment with the Map Configuration	
+	
+|`aboutPage`
+|`String`
+|`False`
+|The HTML content that will be displayed in the viewer `about` section
+	
+|`defaultBasemap`
+|`String`
+|`True`
+|The basemap to use with the Map Configuration, by default
+	
+|`bbox`
+|`Array[Double]`
+|`False`
+|The default bounding box where the Map Configuration will be initially zoomed to
+
+|`allowMouseWheelZoom`
+|`Boolean`
+|`True`
+|An indicator that will allow or prevent using the mouse wheel to trigger a zoom operation when the mouse pointer is in the viewer map pane
+
+|`isPublished`
+|`Boolean`
+|`True`
+|An indicator for identifying if a Map Configuration is published, and therefore publicly accessible to view
+
+|`tools`
+|`Array[String]`
+|`True`
+|The list of tools this Map Configuration will activate (Pan, Zoom, Directions, Markup, Measure, Print)
+
+|`layers`
+|`Array[Layer]`
+|`True`
+|The list of configured Layers that will be displayed in the viewer
+	
+|===
+
+== Layer Configurations:
+
+Layers have many different types. Each type is an extension of the root 'Layer' type.
+
+=== Layer Model:
+
+|===
+|Path|Type|Required|Description
+
+|`type`
+|`String`
+|`True`
+|Identifies which type of layer this is. Must be one of dynamicServiceLayer, wmsLayer, kmlLayer, jsonLayer, groupLayer, folder, or featureLayer
+
+|`id`
+|`Integer`
+|`True`
+|The identifer for a Layer
+
+|`label`
+|`String`
+|`True`
+|The Layers label, used for display in the viewer
+
+|`isVisible`
+|`Boolean`
+|`True`
+|Indicates if the layer will be visible in the viewer by default
+
+|`attribution`
+|`String`
+|`True`
+|Copyright details and attribution to be displayed in the map viewer container
+
+|`serviceUrl`
+|`String`
+|`True`
+|The URL used for ArcGIS Dynamic Service and Feature layers, WMS services, or attachment layers
+
+|`format`
+|`String`
+|`True`
+|The default image format used for the layer (PNG, JPG)
+
+|`opacity`
+|`Double`
+|`True`
+|The default opacity the layer is displayed at. This will not override existing WMS congigured values, and may result in very hard to see layers
+
+|`isTransparent`
+|`Boolean`
+|`True`
+|Indicates if the layers background is transparent. Defaults to TRUE
+
+|`minScale`
+|`Double`
+|`True`
+|The minimum visible scale for the layer
+
+|`maxScale`
+|`Double`
+|`True`
+|The maximum visible scale for the layer
+
+|`attributes`
+|`Array[Attribute]`
+|`True`
+|An array of attribute values. Used to override what is displayed with Dynamic, Feature, and WMS layers.
+	
+|===
+
+=== Attribute fields:
+
+|===
+|Path|Type|Required|Description
+
+|`name`
+|`String`
+|`True`
+|The database name of the attribute
+
+|`alias`
+|`String`
+|`True`
+|The label alias of the attribute
+
+|`visible`
+|`Boolean`
+|`True`
+|Indicates if the attribute is visible by default
+
+|===
+
+One of the following models is required for each layer
+
+=== Dynamic Service Layer Model:
+
+|===
+|Path|Type|Required|Description
+
+|`mpcmId`
+|`Integer`
+|`True`
+|The ID used for this layer in the DataBC Layer Catalog
+
+|`mpcmWorkspace`
+|`String`
+|`True`
+|The workspace used for this layer in the DataBC Layer Catalog
+
+|`metadataUrl`
+|`String`
+|`True`
+|The DataBC Catalog metadata URL
+
+|`dynamicLayers`
+|`Array[String]`
+|`True`
+|A listing of dynamic layer configurations. This will typically only contain one dynamic feature, which can be derived from the MPCM Layer Catalog
+
+|===
+	
+=== Feature Layer Model:
+
+|===
+|Path|Type|Required|Description
+
+|`layers`
+|`Array[String]`
+|`True`
+|A listing of feature layer configuration ID's. These ID's are found in the feature layer Map Service endpoint. 
+
+|===
+
+=== WMS Layer Model:
+
+|===
+|Path|Type|Required|Description
+
+|`wmsVersion`
+|`String`
+|`True`
+|The WMS version used for get map,  get feature info and get capabilities wms requests
+
+|`wmsStyleId`
+|`String`
+|`True`
+|The ID of the style to use when making get map requests for the WMS layer 
+
+|`wmsStyleName`
+|`String`
+|`True`
+|The name of the style to use when making get map requests for the WMS layer 
+
+|`wmsLegendUrl`
+|`String`
+|`True`
+|The URL for the WMS layer legend icons
+
+|`metadataUrl`
+|`String`
+|`False`
+|The DataBC Catalog metadata URL (if available)
+
+|`layers`
+|`Array[String]`
+|`False`
+|A listing of layer ids to display with this WMS Layer 
+	
+|===
+
+=== KML/JSON Vector Layer Model:
+
+|===
+|Path|Type|Required|Description
+
+|`useClustering`
+|`Boolean`
+|`false`
+|Indicates if the layer should also include point clustering
+
+|`useHeatmapping`
+|`Boolean`
+|`false`
+|Indicates if the layer should also include heatmap clustering
+
+|`strokeWidth`
+|`Double`
+|`false`
+|Width of a line or polygon outline
+
+|`strokeStyle`
+|`String`
+|`false`
+|Display style for a line or polygon outline (solid, dashed, dotted)
+
+|`strokeColor`
+|`String`
+|`false`
+|The RGB color code for the line or polygon outline
+
+|`strokeOpacity`
+|`Double`
+|`false`
+|The opacity of the line or polygon outline
+
+|`fillColor`
+|`String`
+|`false`
+|The RGB color code for the polygon fill
+
+|`fillOpacity`
+|`String`
+|`false`
+|The opacity for the polygon fill
+
+|`markerSymbolPath`
+|`String`
+|`false`
+|The URL or attachment ID to use for custom point marker symbols
+
+|===
+
+It is possible to create layer collections, via a Folder or a Group. 
+A Folder allows the viewer to interact with each object contained within it (including other folders). Individual layers can be displayed.
+Group layers cannot contain folders, and are only collections of layers. When in a group, all layers are controlled by the single group layer. 
+
+=== Folder/Group Layer Model:
+
+|===
+|Path|Type|Required|Description
+
+|`sublayers`
+|`Array[Layer]`
+|`true`
+|A listing of layers stored within this folder 
+
+|===
+

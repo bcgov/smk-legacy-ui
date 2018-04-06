@@ -189,7 +189,7 @@ public class LayerCatalogDAO
 		return id;
 	}
 
-	public EsriDynamic createCatalogLayer(String id) throws SAXException, IOException, ParserConfigurationException
+	public EsriDynamic createCatalogLayer(String id) throws Exception
 	{
 		logger.debug(" >> createCatalogLayer()");
 		EsriDynamic layer = new EsriDynamic();
@@ -214,6 +214,7 @@ public class LayerCatalogDAO
         layer.setAttribution("Copyright " + Calendar.getInstance().get(Calendar.YEAR) + " DataBC, Government of British Columbia" );
         layer.setMinScale(new Double(doc.getElementsByTagName("minScale").item(0).getTextContent()));
         layer.setMaxScale(new Double(doc.getElementsByTagName("maxScale").item(0).getTextContent()));
+        layer.setIsVisible(true);
 
         // properties from MPCM
         Element propertiesElement = (Element) doc.getElementsByTagName("properties").item(0);
@@ -272,6 +273,12 @@ public class LayerCatalogDAO
 	        }
 	    }
 
+	    if(!layer.getMpcmWorkspace().toUpperCase().equals("MPCM_ALL_PUB"))
+	    {
+	    	logger.debug(layer.getTitle() + " is not a public layer. Cancelling process...");
+	    	throw new Exception(layer.getTitle() + " is not a public layer. Cancelling process...");
+	    }
+	    
 	    logger.debug("Successfully created layer " + layer.getTitle());
 	    logger.debug(" << createCatalogLayer()");
 	    return layer;
