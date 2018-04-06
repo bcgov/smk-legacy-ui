@@ -2,11 +2,16 @@ include.module( 'tool-identify-leaflet', [ 'leaflet', 'tool-identify' ], functio
 
     SMK.TYPE.IdentifyTool.prototype.styleFeature = function () {
         return {
-            color:       '#ffff00',
-            weight:      2,
-            opacity:     0.7,
-            fillColor:   '#ffa500',
-            fillOpacity: 0.1,
+            // color:       '#ffff00',
+            // weight:      2,
+            // opacity:     0.7,
+            // fillColor:   '#ffa500',
+            // fillOpacity: 0.1,
+            color:       'black',
+            weight:      3,
+            opacity:     0.8,
+            fillColor:   'white',
+            fillOpacity: 0.5,
         }
     }
 
@@ -70,10 +75,7 @@ include.module( 'tool-identify-leaflet', [ 'leaflet', 'tool-identify' ], functio
         } )
 
         featureSet.pickedFeature( function ( ev ) {
-            if ( !ev.feature ) {
-                self.popup.remove()
-                return
-            }
+            if ( !ev.feature ) return
 
             var ly = self.marker[ ev.feature.id ]
             var parent = self.cluster.getVisibleParent( ly )
@@ -104,6 +106,28 @@ include.module( 'tool-identify-leaflet', [ 'leaflet', 'tool-identify' ], functio
         } )
 
         featureSet.zoomToFeature( function ( ev ) {
+            var old = featureSet.pick( null )            
+
+            switch ( turf.getType( ev.feature ) ) {
+            case 'Point':
+                self.cluster.zoomToShowLayer( self.marker[ ev.feature.id ], function () {
+                    if ( old )
+                        featureSet.pick( old )
+                } )
+                break;
+            
+            default:
+                if ( self.highlight[ ev.feature.id ] )
+                    smk.$viewer.map
+                        .once( 'zoomend moveend', function () {
+                            if ( old )
+                                featureSet.pick( old )
+                        } )
+                        .fitBounds( self.highlight[ ev.feature.id ].getBounds(), {
+                            paddingTopLeft: L.point( 300, 100 ),
+                            animate: true
+                        } )
+            }
         } )
 
         featureSet.clearedFeatures( function ( ev ) {

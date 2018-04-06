@@ -17,8 +17,8 @@ include.module( 'feature-list-leaflet', [ 'leaflet', 'feature-list' ], function 
             popupopen: function ( ev ) {
                 if ( ev.popup !== self.popup ) return
 
-                var px = vw.map.project( e.popup._latlng )
-                px.y -= e.popup._container.clientHeight / 2
+                var px = vw.map.project( ev.popup._latlng )
+                px.y -= ev.popup._container.clientHeight / 2
                 px.x -= 150
                 vw.map.panTo( vw.map.unproject( px ), { animate: true } )
             },
@@ -37,10 +37,10 @@ include.module( 'feature-list-leaflet', [ 'leaflet', 'feature-list' ], function 
             ev.features.forEach( function ( f ) {
                 switch ( turf.getType( f ) ) {
                 case 'Point':
-                    self.highlight[ f.id ] = L.circleMarker( L.GeoJSON.coordsToLatLng( f.geometry.coordinates ), {
-                            radius: 20
-                        } )
-                        .setStyle( self.styleFeature() )
+                    // self.highlight[ f.id ] = L.circleMarker( L.GeoJSON.coordsToLatLng( f.geometry.coordinates ), {
+                    //         radius: 20
+                    //     } )
+                    //     .setStyle( self.styleFeature() )
                     break;
 
                 case 'MultiPoint':
@@ -63,7 +63,8 @@ include.module( 'feature-list-leaflet', [ 'leaflet', 'feature-list' ], function 
                 showHighlight( ev.feature.id, true )
             }
             else {
-                self.popup.remove()
+                if ( self.popup.isOpen() && !ev.popupclose )
+                    self.popup.remove()
             }
         } )
 
