@@ -136,7 +136,7 @@ include.module( 'layer', [ 'smk', 'jquery', 'util', 'event' ], function () {
             } )
         },
 
-        getFeaturesAtPoint: function ( location, view ) {
+        getFeaturesAtPoint: function ( location, view, option ) {
             var self = this
 
             var serviceUrl  = this.config.serviceUrl
@@ -156,7 +156,8 @@ include.module( 'layer', [ 'smk', 'jquery', 'util', 'event' ], function () {
                 info_format:   'application/json',
                 layers:        layerName,
                 query_layers:  layerName,
-                styles:        styleName
+                styles:        styleName,
+                buffer:        option.tolerance
             }
 
             if ( version == '1.3.0' ) {
@@ -230,7 +231,7 @@ include.module( 'layer', [ 'smk', 'jquery', 'util', 'event' ], function () {
             } )
         },
 
-        getFeaturesAtPoint: function ( location, view ) {
+        getFeaturesAtPoint: function ( location, view, option ) {
             var self = this
 
             var serviceUrl  = this.config.serviceUrl + '/identify'
@@ -247,7 +248,8 @@ include.module( 'layer', [ 'smk', 'jquery', 'util', 'event' ], function () {
                 returnM:        false,
                 f:              'json',
                 geometry:       location.map.longitude + ',' + location.map.latitude,
-                dynamicLayers:  dynamicLayers
+                dynamicLayers:  dynamicLayers,
+                tolerance:      option.tolerance
             }
 
             return SMK.UTIL.makePromise( function ( res, rej ) {

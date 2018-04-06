@@ -1,95 +1,153 @@
 include.module( 'tool-identify-leaflet', [ 'leaflet', 'tool-identify' ], function ( inc ) {
 
+    SMK.TYPE.IdentifyTool.prototype.styleFeature = function () {
+        return {
+            // color:       '#ffff00',
+            // weight:      2,
+            // opacity:     0.7,
+            // fillColor:   '#ffa500',
+            // fillOpacity: 0.1,
+            color:       'black',
+            weight:      3,
+            opacity:     0.8,
+            fillColor:   'white',
+            fillOpacity: 0.5,
+        }
+    }
+
     SMK.TYPE.IdentifyTool.prototype.afterInitialize.push( function ( smk ) {
         var self = this
 
         var vw = smk.$viewer
+        var featureSet = smk.$viewer.identified
 
-        this.featureHighlights = L.layerGroup( { pane: 'markerPane' } ).addTo( vw.map )
+        this.marker = {}
+        this.cluster = L.markerClusterGroup( {
+                singleMarkerMode: true,
+                zoomToBoundsOnClick: false,
+                spiderfyOnMaxZoom: false,
+                iconCreateFunction: function ( cluster ) {
+                    var count = cluster.getChildCount();
 
-        vw.identified.addedFeatures( function ( ev ) {
+                    return new L.DivIcon( {
+                        html: '<div><span>' + ( count == 1 ? '' : count > 99 ? '>99' : count ) + '</span></div>',
+                        className: 'smk-identify-cluster smk-identify-cluster-' + ( count == 1 ? 'one' : 'many' ),
+                        iconSize: null
+                    } )
+                }
+            } )
+            .on( {
+                clusterclick: function ( ev ) {
+                    var featureIds = ev.layer.getAllChildMarkers().map( function ( m ) {
+                        return m.options.featureId
+                    } )
+
+                    featureSet.pick( featureIds[ 0 ], { cluster: true, position: ev.latlng } )
+                },
+                click: function ( ev ) {
+                    featureSet.pick( ev.layer.options.featureId, { cluster: true, position: ev.latlng } )
+                },
+            } )
+
+        self.changedActive( function () {
+            if ( self.active ) {
+                self.cluster.addTo( vw.map )
+            }
+            else {
+                self.cluster.remove()
+            }
+        } )
+
+        featureSet.addedFeatures( function ( ev ) {
             ev.features.forEach( function ( f ) {
-                var feature = L.geoJSON( f.geometry, {
-                    pointToLayer: function ( geojson, latlng ) {
-                        return L.circleMarker( latlng, { radius: 20 } )
-                    },
-                    style: {
-                        color:       '#ffff00',
-                        weight:      2,
-                        opacity:     0.7,
-                        fillColor:   '#ffa500',
-                        fillOpacity: 0.1,
-                    }
-                } )
-                .bindPopup( function () {
-                    return self.popupVm.$el
-                }, {
-                    maxWidth: 400,
-                    autoPanPaddingTopLeft: L.point( 300, 100 )
-                } )
+                var center
+                switch ( turf.getType( f ) ) {
+                case 'Point':
+                    center = L.GeoJSON.coordsToLatLng( f.geometry.coordinates )
+                    break;
 
-                self.featureHighlights.addLayer( feature )
-                f.highlightLayer = feature
+                case 'MultiPoint':
+                    center = [ f._identifyPoint.latitude, f._identifyPoint.longitude ]
+                    break;
 
-                feature.on( {
-                    popupopen: function ( e ) {
-                        vw.identified.pick( f.id, { popupopen: true } )
+                default:
+                    center = [ f._identifyPoint.latitude, f._identifyPoint.longitude ]
 
-                        var px = vw.map.project( e.popup._latlng )
-                        px.y -= e.popup._container.clientHeight / 2
-                        px.x -= 150
-                        vw.map.panTo( vw.map.unproject( px ), { animate: true } )
-                    },
-                    popupclose: function () {
-                        vw.identified.pick( null, { popupclose: true } )
-                    },
+                    self.highlight[ f.id ] = L.geoJSON( f.geometry, {
+                        style: self.styleFeature
+                    } )
+                }
+
+                self.marker[ f.id ] = L.marker( center, {
+                    featureId: f.id
                 } )
 
+                self.cluster.addLayer( self.marker[ f.id ] )
             } )
         } )
 
-        vw.identified.pickedFeature( function ( ev ) {
-            if ( ev.was ) {
-                var ly = ev.was.highlightLayer
-                if ( ly.isPopupOpen() && !ev.popupclose ) ly.closePopup()
-                brightHighlight( ly, vw.identified.isHighlighted( ev.was.id ) )
+        featureSet.pickedFeature( function ( ev ) {
+            if ( !ev.feature ) return
+
+            var ly = self.marker[ ev.feature.id ]
+            var parent = self.cluster.getVisibleParent( ly )
+
+            if ( ly === parent ) {
+                self.popupModel.hasMultiple = false
+                self.popupFeatureIds = null
+                self.popupCurrentIndex = null
+
+                self.popup
+                    .setLatLng( ly.getLatLng() )
+                    .openOn( vw.map )
             }
+            else {
+                var featureIds = parent.getAllChildMarkers().map( function ( m ) {
+                    return m.options.featureId
+                } )
 
-            if ( ev.feature ) {
-                var ly = ev.feature.highlightLayer
-                if ( !ly.isPopupOpen() ) ly.openPopup()
-                brightHighlight( ev.feature.highlightLayer, true )
+                self.popupModel.hasMultiple = true
+                self.popupCurrentIndex = featureIds.indexOf( ev.feature.id )
+                self.popupModel.position = ( self.popupCurrentIndex + 1 ) + ' / ' + featureIds.length
+                self.popupFeatureIds = featureIds
+
+                self.popup
+                    .setLatLng( parent.getLatLng() )
+                    .openOn( vw.map )
             }
         } )
 
-        vw.identified.highlightedFeatures( function ( ev ) {
-            if ( ev.features )
-                ev.features.forEach( function ( f ) {
-                    brightHighlight( f.highlightLayer, true )
-                } )
+        featureSet.zoomToFeature( function ( ev ) {
+            var old = featureSet.pick( null )
 
-            if ( ev.was )
-                ev.was.forEach( function ( f ) {
-                    brightHighlight( f.highlightLayer, vw.identified.isPicked( f.id ) )
+            switch ( turf.getType( ev.feature ) ) {
+            case 'Point':
+                self.cluster.zoomToShowLayer( self.marker[ ev.feature.id ], function () {
+                    if ( old )
+                        featureSet.pick( old )
                 } )
+                break;
+
+            default:
+                if ( self.highlight[ ev.feature.id ] )
+                    smk.$viewer.map
+                        .once( 'zoomend moveend', function () {
+                            if ( old )
+                                featureSet.pick( old )
+                        } )
+                        .fitBounds( self.highlight[ ev.feature.id ].getBounds(), {
+                            paddingTopLeft: L.point( 300, 100 ),
+                            animate: true
+                        } )
+            }
         } )
 
-        vw.identified.clearedFeatures( function ( ev ) {
-            self.featureHighlights.clearLayers()
+        featureSet.clearedFeatures( function ( ev ) {
+            self.cluster.clearLayers()
+            self.marker = {}
         } )
 
-        function brightHighlight( highlightLayer, bright ) {
-            if ( bright )
-                highlightLayer.setStyle( {
-                    opacity:     0.8,
-                    weight:      4,
-                    fillOpacity: 0.5,
-                } )
-            else
-                highlightLayer.eachLayer( function ( ly ) {
-                    highlightLayer.resetStyle( ly )
-                } )
-        }
     } )
+
 
 } )

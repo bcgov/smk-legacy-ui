@@ -1,89 +1,86 @@
 include.module( 'tool-select-leaflet', [ 'leaflet', 'tool-select' ], function ( inc ) {
 
+    SMK.TYPE.SelectTool.prototype.styleFeature = function () {
+        return {
+            color:       'blue',
+            weight:      3,
+            opacity:     0.7,
+            dashArray:   '6,6',
+            lineCap:     'butt',
+            // fillColor:   '#00a5ff',
+            fillOpacity: 0.0,
+        }
+    }
+
     SMK.TYPE.SelectTool.prototype.afterInitialize.push( function ( smk ) {
-        var vw = smk.$viewer
+        var self = this
 
-        vw.selectHighlights = L.layerGroup( { pane: 'markerPane' } ).addTo( vw.map )
-
-        vw.selected.addedFeatures( function ( ev ) {
+        smk.$viewer.selected.addedFeatures( function ( ev ) {
             ev.features.forEach( function ( f ) {
-                var l = L.geoJSON( f.geometry, {
-                    style: {
-                        color:       '#00ffff',
-                        weight:      2,
-                        opacity:     0.7,
-                        fillColor:   '#00a5ff',
-                        fillOpacity: 0.1,
-                    }
-                } )
+                switch ( turf.getType( f ) ) {
+                case 'Point':
+                    self.highlight[ f.id ] = L.circleMarker( L.GeoJSON.coordsToLatLng( f.geometry.coordinates ), {
+                            radius: 20
+                        } )
+                        .setStyle( self.styleFeature() )
+                    break;
 
-                vw.selectHighlights.addLayer( l )
-                f.selectLayer = l
+                case 'MultiPoint':
+                    break;
 
-                l.bindPopup( vw.getIdentifyPopupEl, {
-                    maxWidth: 400,
-                    autoPanPaddingTopLeft: L.point( 300, 100 )
-                } )
-
-                l.on( {
-                    popupopen: function ( e ) {
-                        vw.selected.pick( f.id )
-
-                        var px = vw.map.project( e.popup._latlng )
-                        px.y -= e.popup._container.clientHeight / 2
-                        px.x -= 150
-                        vw.map.panTo( vw.map.unproject( px ), { animate: true } )
-                    },
-                    popupclose: function () {
-                        vw.selected.pick( null )
-                    },
-                } )
-
+                default:
+                    self.highlight[ f.id ] = L.geoJSON( f.geometry, {
+                        style: self.styleFeature
+                    } )
+                }
             } )
         } )
+    
+        smk.$viewer.selected.pickedFeature( function ( ev ) {
+            if ( !ev.feature ) return
 
-        vw.selected.pickedFeature( function ( ev ) {
-            if ( ev.was ) {
-                var ly = ev.was.selectLayer
-                if ( ly.isPopupOpen() ) ly.closePopup()
-                brightHighlight( ly, vw.selected.isHighlighted( ev.was.id ) )
+            if ( !ev.feature.center ) {
+                var center = turf.centerOfMass( ev.feature.geometry )
+
+                if ( center.geometry )
+                    ev.feature.center = L.GeoJSON.coordsToLatLng( center.geometry.coordinates )
+                else
+                    ev.feature.center = L.GeoJSON.coordsToLatLng( center.coordinates )
             }
 
-            if ( ev.feature ) {
-                var ly = ev.feature.selectLayer
-                if ( !ly.isPopupOpen() ) ly.openPopup()
-                brightHighlight( ev.feature.selectLayer, true )
-            }
+            self.popup
+                .setLatLng( ev.feature.center )
+                .openOn( smk.$viewer.map )
         } )
 
-        vw.selected.highlightedFeatures( function ( ev ) {
-            if ( ev.features )
-                ev.features.forEach( function ( f ) {
-                    brightHighlight( f.selectLayer, true )
-                } )
+        smk.$viewer.selected.zoomToFeature( function ( ev ) {
+            if ( !self.highlight[ ev.feature.id ] ) return
 
-            if ( ev.was )
-                ev.was.forEach( function ( f ) {
-                    brightHighlight( f.selectLayer, vw.selected.isPicked( f.id ) )
-                } )
+            var old = smk.$viewer.selected.pick( null )            
+
+            if ( self.highlight[ ev.feature.id ].getBounds ) 
+                smk.$viewer.map
+                    .once( 'zoomend moveend', function () {
+                        if ( old )
+                            smk.$viewer.selected.pick( old )
+                    } )
+                    .fitBounds( self.highlight[ ev.feature.id ].getBounds(), {
+                        paddingTopLeft: L.point( 300, 100 ),
+                        animate: true
+                    } )
+
+            if ( self.highlight[ ev.feature.id ].getLatLng ) 
+                smk.$viewer.map
+                    .once( 'zoomend moveend', function () {
+                        if ( old )
+                            smk.$viewer.selected.pick( old )
+                    } )
+                    .setView( self.highlight[ ev.feature.id ].getLatLng(), 12, {
+                        paddingTopLeft: L.point( 300, 100 ),
+                        animate: true
+                    } )
         } )
 
-        vw.selected.clearedFeatures( function ( ev ) {
-            vw.selectHighlights.clearLayers()
-        } )
-
-        function brightHighlight( highlightLayer, bright ) {
-            if ( bright )
-                highlightLayer.setStyle( {
-                    opacity:     0.8,
-                    weight:      4,
-                    fillOpacity: 0.5,
-                } )
-            else
-                highlightLayer.eachLayer( function ( ly ) {
-                    highlightLayer.resetStyle( ly )
-                } )
-        }
     } )
 
 } )

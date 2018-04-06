@@ -1,23 +1,19 @@
-<side-panel class="smk-identify-panel" v-bind:class="{ 'smk-busy': busy }">
+<feature-list-panel class="smk-identify-panel"
+    v-bind="$props"
+>
     <template slot="header">
         <h1>Identify Results</h1>
-        <div class="smk-spinner"></div>
     </template>
 
-    <template slot="commands">
-        <span class="smk-command" v-bind:class="{ 'smk-disabled': isEmpty() }" v-on:click="$$emit( 'clear' )">Clear</span>
-        <span class="smk-command" v-bind:class="{ 'smk-disabled': isEmpty() }" v-on:click="$$emit( 'add-all' )">Add all to selection</span>
+    <template slot="commands" slot-scope="list">
+        <span class="smk-command"
+            v-bind:class="{ 'smk-disabled': list.isEmpty }"
+            v-on:click="$$emit( 'add-all' )"
+        >Add all to selection</span>
     </template>
 
-    <div v-if="isEmpty()" class="smk-placeholder">
+    <template slot="placeholder">
         Click on map to identify features.
-    </div>
+    </template>
 
-    <div v-for="layer in layers" v-if="layer && layer.features.length > 0" class="smk-identify-layer" v-on:mouseenter="$$emit( 'hover', { features: layer.features } )" v-on:mouseleave="$$emit( 'hover', { features: null } )">
-        <h2>{{ layer.title }}</h2>
-        <div v-for="feature in layer.features" class="smk-identify-feature" v-bind:class="{ 'smk-highlighted': feature.id == highlightId }">
-            <span class="smk-command" v-on:click="$$emit( 'active', { feature: feature } )">{{ feature.title }}</span>
-        </div>
-        <a class="smk-layer-metadata" v-if="layer.metadataUrl" v-bind:href="layer.metadataUrl" target="_metadata">Layer information</a>
-    </div>
-</side-panel>
+</feature-list-panel>

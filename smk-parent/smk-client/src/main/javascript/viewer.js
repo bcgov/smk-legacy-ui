@@ -291,8 +291,12 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
         throw new Error( 'not implemented' )
     }
 
-    Viewer.prototype.identifyFeatures = function ( location ) {
+    Viewer.prototype.identifyFeatures = function ( location, option ) {
         var self = this
+
+        option = Object.assign( {
+            tolerance: 3
+        }, option )
 
         var view = this.getView()
 
@@ -308,7 +312,9 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
             if ( ly.config.isQueryable === false ) return
             if ( !ly.inScaleRange( view ) ) return
 
-            var p = ly.getFeaturesAtPoint( location, view, self.visibleLayer[ id ] )
+            option.layer = self.visibleLayer[ id ]
+
+            var p = ly.getFeaturesAtPoint( location, view, option )
             if ( !p ) return
 
             promises.push(
@@ -316,6 +322,9 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
                     return p
                 } )
                 .then( function ( features ) {
+                    features.forEach( function ( f ) {
+                        f._identifyPoint = location.map
+                    } )
                     self.identified.add( id, features )
                 } )
                 .catch( function ( err ) {
