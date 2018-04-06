@@ -91,9 +91,7 @@ function setToolActivation(toolType)
 	    		$("#GrayMini").prop('checked', tool.baseMap == "Gray");
 	    		$("#DarkGrayMini").prop('checked', tool.baseMap == "DarkGray");
 	    		$("#ImageryMini").prop('checked', tool.baseMap == "Imagery");
-	    		$("#ImageryClarityMini").prop('checked', tool.baseMap == "ImageryClarity");
 	    		$("#ShadedReliefMini").prop('checked', tool.baseMap == "ShadedRelief");
-	    		$("#TerrainMini").prop('checked', tool.baseMap == "Terrain");
     		}
 	    	else if(tool.type == "minimap" && tool.enabled == false) $("#minimapOptions").hide();
 	    	else if(tool.type == "about" && tool.enabled == true)
@@ -115,9 +113,7 @@ function setToolActivation(toolType)
 		    		$("#GrayBml").prop('checked', tool.choices.indexOf("Gray") > -1);
 		    		$("#DarkGrayBml").prop('checked', tool.choices.indexOf("DarkGray") > -1);
 		    		$("#ImageryBml").prop('checked', tool.choices.indexOf("Imagery") > -1);
-		    		$("#ImageryClarityBml").prop('checked', tool.choices.indexOf("ImageryClarity") > -1);
 		    		$("#ShadedReliefBml").prop('checked', tool.choices.indexOf("ShadedRelief") > -1);
-		    		$("#TerrainBml").prop('checked', tool.choices.indexOf("Terrain") > -1);
 	           	});
     		}
 	    	else if(tool.type == "baseMaps" && tool.enabled == false) $("#basemapPanelOptions").hide();
@@ -340,9 +336,7 @@ function setupMapConfigToolsUI()
 	    		$("#GrayMini").prop('checked', tool.baseMap == "Gray");
 	    		$("#DarkGrayMini").prop('checked', tool.baseMap == "DarkGray");
 	    		$("#ImageryMini").prop('checked', tool.baseMap == "Imagery");
-	    		$("#ImageryClarityMini").prop('checked', tool.baseMap == "ImageryClarity");
 	    		$("#ShadedReliefMini").prop('checked', tool.baseMap == "ShadedRelief");
-	    		$("#TerrainMini").prop('checked', tool.baseMap == "Terrain")
 			}
 		}
     	else if(tool.type == "about")
@@ -370,9 +364,7 @@ function setupMapConfigToolsUI()
 		    		$("#GrayBml").prop('checked', tool.choices.indexOf("Gray") > -1);
 		    		$("#DarkGrayBml").prop('checked', tool.choices.indexOf("DarkGray") > -1);
 		    		$("#ImageryBml").prop('checked', tool.choices.indexOf("Imagery") > -1);
-		    		$("#ImageryClarityBml").prop('checked', tool.choices.indexOf("ImageryClarity") > -1);
 		    		$("#ShadedReliefBml").prop('checked', tool.choices.indexOf("ShadedRelief") > -1);
-		    		$("#TerrainBml").prop('checked', tool.choices.indexOf("Terrain") > -1);
 	           	});
 			}
 		}
