@@ -1,15 +1,27 @@
-.smk-location-popup {
-    /* position: absolute; */
-    /* top: 0; */
-    /* right: 0; */
-
-    /* padding: 2px; */
-
-    /* z-index: 1; */
-    /* background-color: white; */
-    /* border-radius: 3px; */
-    /* box-shadow: 0 1px 5px rgba(0, 0, 0, 0.65); */
-    /* pointer-events: auto; */
-    /* user-select: none; */
+.smk-location-popup .smk-address {
+    margin-bottom: 10px;
 }
 
+.smk-location-popup .smk-street {
+    font-size: 15px;
+}
+
+.smk-location-popup .smk-locality-type {
+    font-size: 10px;
+}
+
+.smk-location-popup .smk-ordinate label {
+    display: inline-block;
+    font-size: 10px;
+    margin-right: 10px;
+}
+
+.smk-location-popup .smk-ordinate div {
+    font-size: 14px;
+}
+
+.smk-location-popup .smk-commands {
+    border-top: 1px solid gray;
+    margin-top: 10px;
+    padding-top: 5px;
+}

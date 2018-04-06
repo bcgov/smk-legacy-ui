@@ -39,12 +39,14 @@ include.module( 'tool-location', [ 'smk', 'tool', 'widgets', 'tool-location.popu
                     return dd.toFixed( 4 )
                 },
                 identifyFeatures: function ( location ) {
+                    self.reset()
                     smk.$viewer.identifyFeatures( location )
                 },
                 startMeasurement: function ( location ) {
 
                 },
                 startDirections: function ( location, site ) {
+                    self.reset()
                     smk.$tool.directions.active = true
 
                     smk.$tool.directions.activating.then( function () {
@@ -80,8 +82,8 @@ include.module( 'tool-location', [ 'smk', 'tool', 'widgets', 'tool-location.popu
     } )
 
     LocationTool.prototype.reset = function () {
-        this.location = {}        
+        this.location = {}
     }
-    
+
     return LocationTool
 } )

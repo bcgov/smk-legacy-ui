@@ -12,11 +12,12 @@
     </div>
 
     <div class="smk-coordinate">
-        <span class="smk-coordinate-label">lat</span>
-        <span class="smk-coordinate-value">{{ formatDD( location.map.latitude ) }}</span>
-        ,
-        <span class="smk-coordinate-label">long</span>
-        <span class="smk-coordinate-value">{{ formatDD( location.map.longitude ) }}</span>
+        <span class="smk-ordinate">
+            <label>latitude<div>{{ formatDD( location.map.latitude ) }}</div></label>
+        </span>
+        <span class="smk-ordinate">
+            <label>longitude<div>{{ formatDD( location.map.longitude ) }}</div></label>
+        </span>
     </div>
 
     <div class="smk-commands">

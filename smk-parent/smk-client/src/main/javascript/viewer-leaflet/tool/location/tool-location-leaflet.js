@@ -5,30 +5,36 @@ include.module( 'tool-location-leaflet', [ 'leaflet', 'tool-location' ], functio
 
         this.popup = L.popup( {
             maxWidth: 100,
-            offset: [ 0, -10 ]
+            closeButton: false,
         } )
         .setContent( function () { return self.vm.$el } )
 
-        var locationMarker = L.marker()
+        this.locationMarker = L.marker()
             .bindPopup( this.popup )
-        
+
         smk.$viewer.pickedLocation( function ( location ) {
             if ( !self.enabled ) return
 
-            locationMarker
+            self.locationMarker
                 .setLatLng( [ location.map.latitude, location.map.longitude ] )
                 .addTo( smk.$viewer.map )
                 .openPopup()
         } )
 
         smk.$viewer.changedView( function () {
-            smk.$viewer.map.removeLayer( locationMarker )
+            self.reset()
         } )
 
         self.changedEnabled( function () {
             if ( !self.enabled )
-                smk.$viewer.map.removeLayer( locationMarker )
+                self.reset()
         } )
     } )
+
+    SMK.TYPE.LocationTool.prototype.reset = function () {
+        this.popup.remove()
+        this.locationMarker.remove()
+        this.location = {}
+    }
 
 } )

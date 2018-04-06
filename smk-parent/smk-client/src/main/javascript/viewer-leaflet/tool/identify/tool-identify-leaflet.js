@@ -54,10 +54,10 @@ include.module( 'tool-identify-leaflet', [ 'leaflet', 'tool-identify' ], functio
                 self.cluster.addTo( vw.map )
             }
             else {
-                vw.map.removeLayer( self.cluster )
+                self.cluster.remove()
             }
-        } )                
-                
+        } )
+
         featureSet.addedFeatures( function ( ev ) {
             ev.features.forEach( function ( f ) {
                 var center
@@ -75,7 +75,7 @@ include.module( 'tool-identify-leaflet', [ 'leaflet', 'tool-identify' ], functio
 
                     self.highlight[ f.id ] = L.geoJSON( f.geometry, {
                         style: self.styleFeature
-                    } )                
+                    } )
                 }
 
                 self.marker[ f.id ] = L.marker( center, {
@@ -118,7 +118,7 @@ include.module( 'tool-identify-leaflet', [ 'leaflet', 'tool-identify' ], functio
         } )
 
         featureSet.zoomToFeature( function ( ev ) {
-            var old = featureSet.pick( null )            
+            var old = featureSet.pick( null )
 
             switch ( turf.getType( ev.feature ) ) {
             case 'Point':
@@ -127,7 +127,7 @@ include.module( 'tool-identify-leaflet', [ 'leaflet', 'tool-identify' ], functio
                         featureSet.pick( old )
                 } )
                 break;
-            
+
             default:
                 if ( self.highlight[ ev.feature.id ] )
                     smk.$viewer.map
