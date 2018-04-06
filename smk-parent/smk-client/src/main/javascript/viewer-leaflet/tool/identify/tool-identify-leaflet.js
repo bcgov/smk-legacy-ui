@@ -49,7 +49,7 @@ include.module( 'tool-identify-leaflet', [ 'leaflet', 'tool-identify' ], functio
                 },
             } )
             .addTo( vw.map )
-
+                
         featureSet.addedFeatures( function ( ev ) {
             ev.features.forEach( function ( f ) {
                 var center
@@ -64,6 +64,10 @@ include.module( 'tool-identify-leaflet', [ 'leaflet', 'tool-identify' ], functio
 
                 default:
                     center = [ f._identifyPoint.latitude, f._identifyPoint.longitude ]
+
+                    self.highlight[ f.id ] = L.geoJSON( f.geometry, {
+                        style: self.styleFeature
+                    } )                
                 }
 
                 self.marker[ f.id ] = L.marker( center, {

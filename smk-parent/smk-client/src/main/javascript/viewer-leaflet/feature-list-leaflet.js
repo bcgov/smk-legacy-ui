@@ -33,27 +33,6 @@ include.module( 'feature-list-leaflet', [ 'leaflet', 'feature-list' ], function 
         this.highlight = {}
         this.featureHighlights = L.layerGroup( { pane: 'markerPane' } ).addTo( vw.map )
 
-        featureSet.addedFeatures( function ( ev ) {
-            ev.features.forEach( function ( f ) {
-                switch ( turf.getType( f ) ) {
-                case 'Point':
-                    // self.highlight[ f.id ] = L.circleMarker( L.GeoJSON.coordsToLatLng( f.geometry.coordinates ), {
-                    //         radius: 20
-                    //     } )
-                    //     .setStyle( self.styleFeature() )
-                    break;
-
-                case 'MultiPoint':
-                    break;
-
-                default:
-                    self.highlight[ f.id ] = L.geoJSON( f.geometry, {
-                        style: self.styleFeature
-                    } )
-                }
-            } )
-        } )
-
         featureSet.pickedFeature( function ( ev ) {
             if ( ev.was ) {
                 showHighlight( ev.was.id, false )
