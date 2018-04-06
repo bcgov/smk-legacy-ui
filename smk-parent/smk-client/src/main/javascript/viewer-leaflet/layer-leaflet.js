@@ -226,13 +226,13 @@ include.module( 'layer-leaflet', [ 'smk', 'layer', 'util' ], function () {
             }
     }
 
-    function getVectorFeaturesAtPoint( location, view, leafletLayer ) {
+    function getVectorFeaturesAtPoint( location, view, option ) {
         var self = this
 
-        if ( !leafletLayer ) return
+        if ( !option.layer ) return
 
         var fs = []
-        leafletLayer.eachLayer( function ( sly ) {
+        option.layer.eachLayer( function ( sly ) {
             var geoj = sly.toGeoJSON()
             if ( geoj.geometry.type == 'Polygon' || geoj.geometry.type == 'MultiPolygon' ) {
                 var inp = turf.booleanPointInPolygon( [ location.map.longitude, location.map.latitude ] , geoj )

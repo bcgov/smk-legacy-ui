@@ -61,7 +61,8 @@ include.module( 'smk-map', [ 'smk', 'jquery', 'util', 'viewer', 'layer' ], funct
             try {
                 configs.forEach( function ( cfg ) {
                     if ( typeof( cfg ) == 'string' ) {
-                        var parsed = include.parseJSONC( cfg )
+                        // var parsed = include.parseJSONC( cfg )
+                        var parsed = JSON.parse( cfg )
                         SMK.UTIL.mergeConfig( config, parsed )
                     }
                     else {
