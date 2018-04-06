@@ -130,41 +130,36 @@ function setToolActivation(toolType)
 
 function setupQuillEditor(tool)
 {
-	$("#about-toolbar").empty();
+	
+	$('#about-content').trumbowyg(
+	{
+		resetCss: true,
+		btns: [
+		        ['viewHTML'],
+		        ['undo', 'redo'], // Only supported in Blink browsers
+		        ['formatting'],
+		        ['strong', 'em', 'del'],
+		        ['superscript', 'subscript'],
+		        ['foreColor', 'backColor'],
+		        ['justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull'],
+		        ['unorderedList', 'orderedList'],
+		        ['horizontalRule'],
+		        ['preformatted'],
+		        ['template'],
+		        ['removeformat'],
+		        ['link'],
+		        ['insertImage', 'base64'],
+		        ['noembed'],
+		        ['fullscreen']
+		    ]
+	});
+	$('#about-content').on('tbwchange', function(delta, oldDelta, source)
+	{
+		tool.content = $("#about-content").trumbowyg('html');
+	});
+
 	$("#about-content").empty();
-	$(".ql-toolbar").remove();
-
-	var toolbarOptions = [
-	                      ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
-	                      ['blockquote', 'code-block'],
-	                      [{ 'header': 1 }, { 'header': 2 }],               // custom button values
-	                      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-	                      [{ 'script': 'sub'}, { 'script': 'super' }],      // superscript/subscript
-	                      [{ 'indent': '-1'}, { 'indent': '+1' }],          // outdent/indent
-	                      [{ 'direction': 'rtl' }],                         // text direction
-	                      [{ 'size': ['small', false, 'large', 'huge'] }],  // custom dropdown
-	                      [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-	                      [{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
-	                      [{ 'font': [] }],
-	                      [{ 'align': [] }],
-	                      ['clean'],                                        // remove formatting button
-	                      ['image', 'video']								// embedd options
-	                    ];
-
-	aboutEditor = new Quill('#about-content',
-	{
-		modules:
-		{
-	    	toolbar: toolbarOptions
-	  	},
-	  	theme: 'snow'
-	});
-	aboutEditor.on('text-change', function(delta, oldDelta, source)
-	{
-		tool.content = document.querySelector(".ql-editor").innerHTML;
-	});
-
-	document.querySelector(".ql-editor").innerHTML = tool.content;
+	$("#about-content").trumbowyg('html', tool.content);
 }
 
 function setBasemapSelector(basemap)
@@ -224,6 +219,8 @@ function setMinimapBasemap(id)
 
 function closeEditPanel()
 {
+	finishLayerEdits(selectedLayerNode != null);
+	
 	$("#editor-content").hide("fast");
 	$("#menu-content").show("fast");
 	$("#loadingBar").show();
@@ -941,12 +938,14 @@ function editSelectedLayer()
 	
 				if(node.data.attributes == null) node.data.attributes = [];
 				$("#attributePanel").empty();
-				node.data.attributes.forEach(function (attribute)
-				{
+				
+				var i;
+				for (i = 0; i < node.data.attributes.length; i++) { 
+					var attribute = node.data.attributes[i];
 					$("#attributePanel").append('<div class="row"><div class="col s4"><p><input type="checkbox" id="' + attribute.id + '_visible" /><label class="black-text" for="' + attribute.id + '_visible">Visible</label></p></div><div class="col s8 input-field"><input id="' + attribute.id + '_label" type="text"><label for="' + attribute.id + '_label">Label</label></div></div>');
 					$("#" + attribute.id + "_visible").prop('checked', attribute.visible);
 					$("#" + attribute.id + "_label").val(attribute.title);
-				});
+				}
 			}
 			else if(node.data.type == "esri-dynamic")
 			{
@@ -970,12 +969,14 @@ function editSelectedLayer()
 	
 				if(node.data.attributes == null) node.data.attributes = [];
 				$("#attributePanel").empty();
-				node.data.attributes.forEach(function (attribute)
-				{
+				
+				var i;
+				for (i = 0; i < node.data.attributes.length; i++) { 
+					var attribute = node.data.attributes[i];
 					$("#attributePanel").append('<div class="row"><div class="col s4"><p><input type="checkbox" id="' + attribute.id + '_visible" /><label class="black-text" for="' + attribute.id + '_visible">Visible</label></p></div><div class="col s8 input-field"><input id="' + attribute.id + '_label" type="text"><label for="' + attribute.id + '_label">Label</label></div></div>');
 					$("#" + attribute.id + "_visible").prop('checked', attribute.visible);
 					$("#" + attribute.id + "_label").val(attribute.title);
-				});
+				}
 			}
 			else
 			{
@@ -996,12 +997,14 @@ function editSelectedLayer()
 	
 			    if(node.data.attributes == null) node.data.attributes = [];
 			    $("#attributePanel").empty();
-				node.data.attributes.forEach(function (attribute)
-				{
+
+			    var i;
+				for (i = 0; i < node.data.attributes.length; i++) { 
+					var attribute = node.data.attributes[i];
 					$("#attributePanel").append('<div class="row"><div class="col s4"><p><input type="checkbox" id="' + attribute.id + '_visible" /><label class="black-text" for="' + attribute.id + '_visible">Visible</label></p></div><div class="col s8 input-field"><input id="' + attribute.id + '_label" type="text"><label for="' + attribute.id + '_label">Label</label></div></div>');
 					$("#" + attribute.id + "_visible").prop('checked', attribute.visible);
 					$("#" + attribute.id + "_label").val(attribute.title);
-				});
+				}
 			}
 	
 			Materialize.updateTextFields();
@@ -1178,17 +1181,6 @@ function addSelectedWmsLayer()
 			tree.reload(layerSource);
 		}
    	});
-}
-
-function uploadSurroundHeader()
-{
-	unsavedAttachments.push(
-	{
-		type: "header_upload",
-		contents: fileContents
-	});
-
-	document.getElementById("themesForm").reset();
 }
 
 function addSelectedDataBCLayer()
@@ -1710,12 +1702,26 @@ $(document).ready(function()
 
 	//init the file upload components
 	document.getElementById('vectorFileUpload').addEventListener('change', readFile, false);
-	document.getElementById('headerImageFileUpload').addEventListener('change', readFile, false);
+	document.getElementById('headerImageFileUpload').addEventListener('change', readHeaderFile, false);
 	document.getElementById('replaceVectorFileUpload').addEventListener('change', readFile, false);
+	
+	// init modals
+	$('.modal').modal();
 });
 
 var fileContents;
 var unsavedAttachments = [];
+
+function readHeaderFile(e)
+{
+	readFile(e);
+	
+	unsavedAttachments.push(
+	{
+		type: "header_upload",
+		contents: fileContents
+	});
+}
 
 function readFile(e)
 {

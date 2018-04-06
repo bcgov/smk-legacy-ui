@@ -19,9 +19,26 @@
 		    integrity="sha512-pijLQd2FbV/7+Jwa86Mk3ACxnasfIMzJRrIlVQsuPKPCfUBCDMDUoLiBQRg7dAQY6D1rkmCcR8286hVTn/wlIg=="
 		    crossorigin=""></script>
     <link rel="stylesheet" href="https://js.arcgis.com/4.4/esri/css/main.css" />
-    <!-- Quill for text editor -->
-    <script src="https://cdn.quilljs.com/1.3.5/quill.js"></script>
-    <link href="https://cdn.quilljs.com/1.3.5/quill.snow.css" rel="stylesheet">
+    <!-- text editor -->
+    <script src="resources/js/trumbowyg/trumbowyg.min.js"></script>
+    <link rel="stylesheet" href="resources/js/trumbowyg/ui/trumbowyg.min.css">
+    
+    <script src="resources/js/trumbowyg/plugins/allowtagsfrompaste/trumbowyg.allowtagsfrompaste.min.js"></script>
+    <script src="resources/js/trumbowyg/plugins/base64/trumbowyg.base64.min.js"></script>
+    <!-- script src="resources/js/trumbowyg/plugins/cleanpaste/trumbowyg.cleanpaste.min.js"></script -->
+    <script src="resources/js/trumbowyg/plugins/colors/trumbowyg.colors.min.js"></script>
+    <script src="resources/js/trumbowyg/plugins/fontfamily/trumbowyg.fontfamily.min.js"></script>
+    <script src="resources/js/trumbowyg/plugins/fontsize/trumbowyg.fontsize.min.js"></script>
+    <script src="resources/js/trumbowyg/plugins/lineheight/trumbowyg.lineheight.min.js"></script>
+    <script src="resources/js/trumbowyg/plugins/mathml/trumbowyg.mathml.min.js"></script>
+    <script src="resources/js/trumbowyg/plugins/mention/trumbowyg.mention.min.js"></script>
+    <script src="resources/js/trumbowyg/plugins/noembed/trumbowyg.noembed.min.js"></script>
+    <script src="resources/js/trumbowyg/plugins/pasteimage/trumbowyg.pasteimage.min.js"></script>
+    <script src="resources/js/trumbowyg/plugins/preformatted/trumbowyg.preformatted.min.js"></script>
+    <script src="resources/js/trumbowyg/plugins/table/trumbowyg.table.min.js"></script>
+    <script src="resources/js/trumbowyg/plugins/template/trumbowyg.template.min.js"></script>
+    <script src="resources/js/trumbowyg/plugins/upload/trumbowyg.upload.min.js"></script>
+    
     <!-- Tree manager for layer viewers -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.fancytree/2.28.0/jquery.fancytree-all-deps.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/jquery.fancytree/2.28.0/skin-lion/ui.fancytree.min.css"  rel="stylesheet">
@@ -240,7 +257,6 @@
 						</form>
 					</div>
 					<div class="card-action">
-				    	<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="previewEdits();" style="width: 170px;"><i class="material-icons left">cached</i>Preview</a>
 		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="saveMapConfig();" style="width: 170px;"><i class="material-icons left">save</i>Save</a>
 		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="closeEditPanel();" style="width: 170px;"><i class="material-icons left">cancel</i>Close</a>
 		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="$('#editorTabs').tabs('select_tab', 'basemap')" style="width: 170px; position: absolute; right: 30px;"><i class="material-icons right">keyboard_arrow_right</i>Next</a>
@@ -309,7 +325,6 @@
 						</form>
 					</div>
 					<div class="card-action">
-				    	<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="previewEdits();" style="width: 170px;"><i class="material-icons left">cached</i>Preview</a>
 		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="saveMapConfig();" style="width: 170px;"><i class="material-icons left">save</i>Save</a>
 		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="closeEditPanel();" style="width: 170px;"><i class="material-icons left">cancel</i>Close</a>
 		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="$('#editorTabs').tabs('select_tab', 'identity')" style="width: 170px; position: absolute; right: 204px;"><i class="material-icons left">keyboard_arrow_left</i>Back</a>
@@ -322,11 +337,11 @@
 					<div class="card-content black-text" style="height: calc(100vh - 280px); overflow: auto;">
 						<form id="layersForm" style="padding: 0px; margin: 0px;">
 							<div id="editLayerPanel" class="row" style="height: 100%; display: none; padding: 0px; margin: 0px;">
-								<div style="position: absolute; bottom: 14px; right: 30px; z-index: 1100;">
+								<div style="position: absolute; bottom: 14px; right: 30px; z-index: 1000;">
 									<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="finishLayerEdits(true);" style="width: 343px; height: 56px;"><i class="material-icons left">backup</i>Done Edits</a>
 								</div>
 								<div style="height: 100%;">
-									<div id="layerEditDataBCPanel" class="col s6" style="display: none; overflow: auto; height: 100%;">
+									<div id="layerEditDataBCPanel" class="col s9" style="display: none; overflow: auto; height: 100%;">
 										<div class="row">
 											<h5>DataBC Catalog Layer</h5>
 										</div>
@@ -359,7 +374,7 @@
 											</div>
 										</div>
 									</div>
-									<div id="layerEditWMSPanel" class="col s6" style="display: none; overflow: auto; height: 100%;">
+									<div id="layerEditWMSPanel" class="col s9" style="display: none; overflow: auto; height: 100%;">
 										<div class="row">
 											<h5>WMS Service Layer</h5>
 										</div>
@@ -392,7 +407,7 @@
 											</div>
 										</div>
 									</div>
-									<div id="layerEditVectorPanel" class="col s6" style="display: none; overflow: auto; height: 100%;">
+									<div id="layerEditVectorPanel" class="col s9" style="display: none; overflow: auto; height: 100%;">
 										<div class="row">
 											<h5>File Upload Layer</h5>
 										</div>
@@ -471,14 +486,9 @@
 												<input id="vectorFillColor" type="color">
 											</div>
 						      			</div>
-						      			
 									</div>
-									<div class="col s6" style="height: 100%;">
-										<div class="row">
-											<h5>Attributes</h5>
-										</div>
-										<div id="attributePanel" style="overflow:  auto; height: calc(100% - 50px);;">
-										</div>
+									<div class="col s3">
+										<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="$('#attributesModal').modal('open');" style="width: 170px;">Attributes</a>
 									</div>
 								</div>
 							</div>
@@ -697,7 +707,6 @@
 						</form>
 					</div>
 					<div class="card-action">
-				    	<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="previewEdits();" style="width: 170px;"><i class="material-icons left">cached</i>Preview</a>
 		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="saveMapConfig();" style="width: 170px;"><i class="material-icons left">save</i>Save</a>
 		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="closeEditPanel();" style="width: 170px;"><i class="material-icons left">cancel</i>Close</a>
 		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="$('#editorTabs').tabs('select_tab', 'basemap')" style="width: 170px; position: absolute; right: 204px;"><i class="material-icons left">keyboard_arrow_left</i>Back</a>
@@ -787,7 +796,6 @@
 										      <div class="collapsible-header"><i class="material-icons">home</i>About Panel Options</div>
 										      <div class="collapsible-body">
 										      	<div class="row" >
-										      		<div id="about-toolbar"></div>
 										      		<div id="about-content" style="height: 75%"></div>
 										      	</div>
 											  </div>
@@ -935,7 +943,6 @@
 						</form>
 					</div>
 					<div class="card-action">
-				    	<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="previewEdits();" style="width: 170px;"><i class="material-icons left">cached</i>Preview</a>
 		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="saveMapConfig();" style="width: 170px;"><i class="material-icons left">save</i>Save</a>
 		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="closeEditPanel();" style="width: 170px;"><i class="material-icons left">cancel</i>Close</a>
 		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="$('#editorTabs').tabs('select_tab', 'layers')" style="width: 170px; position: absolute; right: 204px;"><i class="material-icons left">keyboard_arrow_left</i>Back</a>
@@ -966,12 +973,89 @@
 								</div>
 							</div>
 							<div class="row">
-								<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="uploadSurroundHeader();"><i class="material-icons left">backup</i>Upload Changes</a>
+								<h5 style="border-bottom: 2px solid #fcba19;">Identify Style</h5>
 							</div>
+							<div class="row">
+								<p>This will set the colors identified features will display will. This has no effect if identify is disabled.</p>
+							</div>
+							<div class="row" >
+								<div class="col s4 input-field">
+									<input id="identifyStyleOpacity" type="text">
+	          						<label for="identifyStyleOpacity">Opacity</label>
+								</div>
+								<div class="col s4 input-field">
+									<input id="identifyStyleStrokeOpacity" type="text">
+	          						<label for="identifyStyleStrokeOpacity">Stroke Opacity</label>
+								</div>
+								<div class="col s4 input-field">
+									<input id="identifyStyleFillOpacity" type="text">
+	          						<label for="identifyStyleFillOpacity">Fill Opacity</label>
+								</div>
+			      			</div>
+			      			<div class="row" >
+			      				<div class="col s4 input-field">
+									<input id="identifyStyleStrokeWidth" type="text">
+	          						<label for="identifyStyleStrokeWidth">Stroke Width</label>
+								</div>
+								<div class="col s4 input-field">
+									<input id="identifyStyleStrokeStyle" type="text">
+	          						<label for="identifyStyleStrokeStyle">Stroke Style</label>
+								</div>
+							</div>
+							<div class="row" >
+			    				<div class="col s4">
+									<label for="identifyStyleStrokeColor" class="black-text">Stroke Color</label>
+									<input id="identifyStyleStrokeColor" type="color">
+								</div>
+								<div class="col s4">
+			    					<label for="identifyStyleFillColor" class="black-text">Fill Color</label>
+									<input id="identifyStyleFillColor" type="color">
+								</div>
+			      			</div>
+							<div class="row">
+								<h5 style="border-bottom: 2px solid #fcba19;">Selection Style</h5>
+							</div>
+							<div class="row">
+								<p>This will set the colors selected features will display will. This has no effect if selection is disabled.</p>
+							</div>
+							<div class="row" >
+								<div class="col s4 input-field">
+									<input id="selectStyleOpacity" type="text">
+	          						<label for="selectStyleOpacity">Opacity</label>
+								</div>
+								<div class="col s4 input-field">
+									<input id="selectStyleStrokeOpacity" type="text">
+	          						<label for="selectStyleStrokeOpacity">Stroke Opacity</label>
+								</div>
+								<div class="col s4 input-field">
+									<input id="selectStyleFillOpacity" type="text">
+	          						<label for="selectStyleFillOpacity">Fill Opacity</label>
+								</div>
+			      			</div>
+			      			<div class="row" >
+			      				<div class="col s4 input-field">
+									<input id="selectStyleStrokeWidth" type="text">
+	          						<label for="selectStyleStrokeWidth">Stroke Width</label>
+								</div>
+								<div class="col s4 input-field">
+									<input id="selectStyleStrokeStyle" type="text">
+	          						<label for="selectStyleStrokeStyle">Stroke Style</label>
+								</div>
+							</div>
+							<div class="row" >
+			    				<div class="col s4">
+									<label for="selectStyleStrokeColor" class="black-text">Stroke Color</label>
+									<input id="selectStyleStrokeColor" type="color">
+								</div>
+								<div class="col s4">
+			    					<label for="selectStyleFillColor" class="black-text">Fill Color</label>
+									<input id="selectStyleFillColor" type="color">
+								</div>
+								<div style="height: 100px;"></div>
+			      			</div>
 						</form>
 					</div>
 					<div class="card-action">
-				    	<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="previewEdits();" style="width: 170px;"><i class="material-icons left">cached</i>Preview</a>
 		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="saveMapConfig();" style="width: 170px;"><i class="material-icons left">save</i>Save</a>
 		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="closeEditPanel();" style="width: 170px;"><i class="material-icons left">cancel</i>Close</a>
 		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="$('#editorTabs').tabs('select_tab', 'tools')" style="width: 170px; position: absolute; right: 30px;"><i class="material-icons left">keyboard_arrow_left</i>Back</a>
@@ -982,8 +1066,22 @@
 	    </div>
 		<!-- Footer -->
 		<div id="footer" class="footer nrpp-blue-dark">
-		</div>
+		</div>  
 	</div>
+	<!-- modal dialogs -->
+    <div id="attributesModal" class="modal modal-fixed-footer">
+      <div class="modal-content">
+		<div class="row">
+			<h5>Attributes</h5>
+		</div>
+		<div id="attributePanel" class="row" style="overflow: auto; height: calc(100% - 70px);">
+		</div>
+      </div>
+      <div class="modal-footer">
+        <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat">Done</a>
+      </div>
+    </div>
+  
 	<script type="text/javascript">
 	</script>
   </body>
