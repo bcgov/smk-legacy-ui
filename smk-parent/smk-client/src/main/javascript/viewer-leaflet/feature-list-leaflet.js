@@ -55,7 +55,8 @@ include.module( 'feature-list-leaflet', [ 'leaflet', 'feature-list' ], function 
 
             if ( ev.was )
                 ev.was.forEach( function ( f ) {
-                    showHighlight( f.id, featureSet.isPicked( f.id ) )
+                    if ( f && f.id )
+                        showHighlight( f.id, featureSet.isPicked( f.id ) )
                 } )
         } )
 
@@ -68,6 +69,7 @@ include.module( 'feature-list-leaflet', [ 'leaflet', 'feature-list' ], function 
         featureSet.removedFeatures( function ( ev ) {
             ev.features.forEach( function ( ft ) {
                 self.featureHighlights.removeLayer( self.highlight[ ft.id ] )
+                delete self.highlight[ ft.id ]
             } )
         } )
 
