@@ -219,7 +219,7 @@ function setMinimapBasemap(id)
 
 function closeEditPanel()
 {
-	finishLayerEdits(selectedLayerNode != null);
+	finishLayerEdits(false);
 	
 	$("#editor-content").hide("fast");
 	$("#menu-content").show("fast");
@@ -939,13 +939,12 @@ function editSelectedLayer()
 				if(node.data.attributes == null) node.data.attributes = [];
 				$("#attributePanel").empty();
 				
-				var i;
-				for (i = 0; i < node.data.attributes.length; i++) { 
-					var attribute = node.data.attributes[i];
-					$("#attributePanel").append('<div class="row"><div class="col s4"><p><input type="checkbox" id="' + attribute.id + '_visible" /><label class="black-text" for="' + attribute.id + '_visible">Visible</label></p></div><div class="col s8 input-field"><input id="' + attribute.id + '_label" type="text"><label for="' + attribute.id + '_label">Label</label></div></div>');
+				node.data.attributes.forEach(function (attribute)
+				{
+					$("#attributePanel").append('<div class="row"><div class="col s4"><p><input type="checkbox" id="' + attribute.id + '_visible" /><label class="black-text" for="' + attribute.id + '_visible">Visible</label></p></div><div class="col s8 input-field"><input id="' + attribute.id + '_label" type="text"><label for="' + attribute.id + '_label">' + attribute.name + '</label></div></div>');
 					$("#" + attribute.id + "_visible").prop('checked', attribute.visible);
 					$("#" + attribute.id + "_label").val(attribute.title);
-				}
+				}); 
 			}
 			else if(node.data.type == "esri-dynamic")
 			{
@@ -970,13 +969,12 @@ function editSelectedLayer()
 				if(node.data.attributes == null) node.data.attributes = [];
 				$("#attributePanel").empty();
 				
-				var i;
-				for (i = 0; i < node.data.attributes.length; i++) { 
-					var attribute = node.data.attributes[i];
-					$("#attributePanel").append('<div class="row"><div class="col s4"><p><input type="checkbox" id="' + attribute.id + '_visible" /><label class="black-text" for="' + attribute.id + '_visible">Visible</label></p></div><div class="col s8 input-field"><input id="' + attribute.id + '_label" type="text"><label for="' + attribute.id + '_label">Label</label></div></div>');
+				node.data.attributes.forEach(function (attribute)
+				{
+					$("#attributePanel").append('<div class="row"><div class="col s4"><p><input type="checkbox" id="' + attribute.id + '_visible" /><label class="black-text" for="' + attribute.id + '_visible">Visible</label></p></div><div class="col s8 input-field"><input id="' + attribute.id + '_label" type="text"><label for="' + attribute.id + '_label">' + attribute.name + '</label></div></div>');
 					$("#" + attribute.id + "_visible").prop('checked', attribute.visible);
 					$("#" + attribute.id + "_label").val(attribute.title);
-				}
+				}); 
 			}
 			else
 			{
@@ -998,13 +996,12 @@ function editSelectedLayer()
 			    if(node.data.attributes == null) node.data.attributes = [];
 			    $("#attributePanel").empty();
 
-			    var i;
-				for (i = 0; i < node.data.attributes.length; i++) { 
-					var attribute = node.data.attributes[i];
-					$("#attributePanel").append('<div class="row"><div class="col s4"><p><input type="checkbox" id="' + attribute.id + '_visible" /><label class="black-text" for="' + attribute.id + '_visible">Visible</label></p></div><div class="col s8 input-field"><input id="' + attribute.id + '_label" type="text"><label for="' + attribute.id + '_label">Label</label></div></div>');
+			    node.data.attributes.forEach(function (attribute)
+				{
+					$("#attributePanel").append('<div class="row"><div class="col s4"><p><input type="checkbox" id="' + attribute.id + '_visible" /><label class="black-text" for="' + attribute.id + '_visible">Visible</label></p></div><div class="col s8 input-field"><input id="' + attribute.id + '_label" type="text"><label for="' + attribute.id + '_label">' + attribute.name + '</label></div></div>');
 					$("#" + attribute.id + "_visible").prop('checked', attribute.visible);
 					$("#" + attribute.id + "_label").val(attribute.title);
-				}
+				}); 
 			}
 	
 			Materialize.updateTextFields();
