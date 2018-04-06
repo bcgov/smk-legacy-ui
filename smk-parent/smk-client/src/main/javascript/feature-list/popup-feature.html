@@ -1,24 +1,7 @@
 <div class="smk-feature-popup" v-if="layer">
     <div class="smk-header">
-        <span class="smk-title">
-            <h3>{{ layer.title }}</h2>
-            <h2>{{ feature.title }}</h2>            
-        </span>
-
-        <span class="smk-navigator"
-            v-if="hasMultiple"
-        >
-            <i class="material-icons smk-move smk-command"
-                v-on:click="movePrevious()"
-            >navigate_before</i>
-            
-            <span class="smk-position"
-            >{{ position }}</span>
-
-            <i class="material-icons smk-move smk-command"
-                v-on:click="moveNext()"
-            >navigate_next</i>
-        </span>        
+        <h3>{{ layer.title }}</h2>
+        <h2>{{ feature.title }}</h2>
     </div>
 
     <div class="smk-description"
@@ -33,7 +16,7 @@
             v-for="attr in layer.attributes"
             v-if="layer.attributes && attr.visible !== false"
         >
-            <span class="smk-title">{{ attr.title }}</span>
+            <span class="smk-title" v-html="attr.title.replace( /_/g, '<' + 'wbr' + '>_' )"></span>
             <span class="smk-value">{{ feature.properties[ attr.name ] }}</span>
         </div>
 
@@ -41,7 +24,7 @@
             v-for="(val, attr) in feature.properties"
             v-if="!layer.attributes || layer.attributes.length == 0"
         >
-            <span class="smk-title">{{ attr }}</span>
+            <span class="smk-title" v-html="attr.replace( /_/g, '<' + 'wbr' + '>_' )"></span>
             <span class="smk-value">{{ val }}</span>
         </div>
     </div>
@@ -56,5 +39,20 @@
             v-if="tool.select"
             v-on:click="selectFeature( layer.id, feature.id )"
         >Add to selection</span>
+
+        <span class="smk-navigator"
+            v-bind:class="{ 'smk-hidden': !hasMultiple }"
+        >
+            <i class="material-icons smk-move smk-command"
+                v-on:click="movePrevious()"
+            >navigate_before</i>
+
+            <span class="smk-position"
+            >{{ position }}</span>
+
+            <i class="material-icons smk-move smk-command"
+                v-on:click="moveNext()"
+            >navigate_next</i>
+        </span>
     </div>
 </div>

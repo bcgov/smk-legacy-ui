@@ -22,8 +22,8 @@ include.module( 'tool-location', [ 'smk', 'tool', 'widgets', 'tool-location.popu
     LocationTool.prototype.afterInitialize.push( function ( smk, aux ) {
         var self = this
 
-        // if ( smk.$tool.identify )
-        //     this.tool.identify = true
+        if ( smk.$tool.identify )
+            this.tool.identify = true
 
         // if ( smk.$tool.measure )
         //     this.tool.measure = true
@@ -41,7 +41,7 @@ include.module( 'tool-location', [ 'smk', 'tool', 'widgets', 'tool-location.popu
                     return dd.toFixed( 4 )
                 },
                 identifyFeatures: function ( location ) {
-
+                    smk.$viewer.identifyFeatures( location )
                 },
                 startMeasurement: function ( location ) {
 
@@ -50,7 +50,7 @@ include.module( 'tool-location', [ 'smk', 'tool', 'widgets', 'tool-location.popu
                     smk.$tool.directions.active = true
 
                     smk.$tool.directions.activating.then( function () {
-                        return smk.$tool.directions.startAtCurrentLocation( location, site.fullAddress )
+                        return smk.$tool.directions.startAtCurrentLocation( location.map, site.fullAddress )
                     } )
                 },
             }
@@ -59,7 +59,7 @@ include.module( 'tool-location', [ 'smk', 'tool', 'widgets', 'tool-location.popu
         smk.$viewer.pickedLocation( function ( location ) {
             if ( !self.enabled ) return
 
-            self.location = location.map
+            self.location = location
             self.site = {}
 
             smk.$viewer.findNearestSite( location.map ).then( function ( site ) {

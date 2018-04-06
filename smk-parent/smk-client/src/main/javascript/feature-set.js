@@ -4,6 +4,7 @@ include.module( 'feature-set', [ 'smk', 'jquery', 'util', 'event' ], function ()
         'addedFeatures',
         'removedFeatures',
         'pickedFeature',
+        'zoomToFeature',
         'highlightedFeatures',
         'clearedFeatures'
     ] )
@@ -92,6 +93,15 @@ include.module( 'feature-set', [ 'smk', 'jquery', 'util', 'event' ], function ()
         }, option ) )
 
         return old
+    }
+
+    FeatureSet.prototype.zoomTo = function ( featureId ) {
+        if ( featureId && !this.has( featureId ) )
+            throw new Error( 'feature id ' + featureId + ' not present' )
+
+        this.zoomToFeature( {
+            feature: featureId && this.featureSet[ featureId ],
+        } )
     }
 
     FeatureSet.prototype.highlight = function ( featureIds ) {

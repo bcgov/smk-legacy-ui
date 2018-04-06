@@ -322,6 +322,9 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
                     return p
                 } )
                 .then( function ( features ) {
+                    features.forEach( function ( f ) {
+                        f._identifyPoint = location.map
+                    } )
                     self.identified.add( id, features )
                 } )
                 .catch( function ( err ) {

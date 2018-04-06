@@ -10,4 +10,108 @@ include.module( 'tool-identify-leaflet', [ 'leaflet', 'tool-identify' ], functio
         }
     }
 
+    SMK.TYPE.IdentifyTool.prototype.afterInitialize.push( function ( smk ) {
+        var self = this
+
+        var vw = smk.$viewer
+        var featureSet = smk.$viewer.identified
+
+        this.marker = {}
+        this.cluster = L.markerClusterGroup( {
+                singleMarkerMode: true,
+                zoomToBoundsOnClick: false,
+                spiderfyOnMaxZoom: false,
+                iconCreateFunction: function ( cluster ) {
+                    var count = cluster.getChildCount();
+
+                    return new L.DivIcon( {
+                        html: '<div><span>' + ( count == 1 ? '' : count > 99 ? '>99' : count ) + '</span></div>',
+                        className: 'smk-identify-cluster smk-identify-cluster-' + ( count == 1 ? 'one' : 'many' ),
+                        iconSize: null
+                    } )
+                }
+            } )
+            .on( {
+                clusterclick: function ( ev ) {
+                    var featureIds = ev.layer.getAllChildMarkers().map( function ( m ) {
+                        return m.options.featureId
+                    } )
+
+                    featureSet.pick( featureIds[ 0 ], { cluster: true, position: ev.latlng } )
+                },
+                click: function ( ev ) {
+                    featureSet.pick( ev.layer.options.featureId, { cluster: true, position: ev.latlng } )
+                },
+            } )
+            .addTo( vw.map )
+
+        featureSet.addedFeatures( function ( ev ) {
+            ev.features.forEach( function ( f ) {
+                var center
+                switch ( turf.getType( f ) ) {
+                case 'Point':
+                    center = L.GeoJSON.coordsToLatLng( f.geometry.coordinates )
+                    break;
+
+                case 'MultiPoint':
+                    center = [ f._identifyPoint.latitude, f._identifyPoint.longitude ]
+                    break;
+
+                default:
+                    center = [ f._identifyPoint.latitude, f._identifyPoint.longitude ]
+                }
+
+                self.marker[ f.id ] = L.marker( center, {
+                    featureId: f.id
+                } )
+
+                self.cluster.addLayer( self.marker[ f.id ] )
+            } )
+        } )
+
+        featureSet.pickedFeature( function ( ev ) {
+            if ( !ev.feature ) {
+                self.popup.remove()
+                return
+            }
+
+            var ly = self.marker[ ev.feature.id ]
+            var parent = self.cluster.getVisibleParent( ly )
+
+            if ( ly === parent ) {
+                self.popupModel.hasMultiple = false
+                self.popupFeatureIds = null
+                self.popupCurrentIndex = null
+
+                self.popup
+                    .setLatLng( ly.getLatLng() )
+                    .openOn( vw.map )
+            }
+            else {
+                var featureIds = parent.getAllChildMarkers().map( function ( m ) {
+                    return m.options.featureId
+                } )
+
+                self.popupModel.hasMultiple = true
+                self.popupCurrentIndex = featureIds.indexOf( ev.feature.id )
+                self.popupModel.position = ( self.popupCurrentIndex + 1 ) + ' / ' + featureIds.length
+                self.popupFeatureIds = featureIds
+
+                self.popup
+                    .setLatLng( parent.getLatLng() )
+                    .openOn( vw.map )
+            }
+        } )
+
+        featureSet.zoomToFeature( function ( ev ) {
+        } )
+
+        featureSet.clearedFeatures( function ( ev ) {
+            self.cluster.clearLayers()
+            self.marker = {}
+        } )
+
+    } )
+
+
 } )

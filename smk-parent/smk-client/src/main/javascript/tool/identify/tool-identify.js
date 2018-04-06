@@ -31,9 +31,9 @@ include.module( 'tool-identify', [ 'smk', 'feature-list', 'widgets', 'tool-ident
     IdentifyTool.prototype.afterInitialize.push( function ( smk, aux ) {
         var self = this
 
-        smk.$viewer.handlePick( this, function ( location ) {
-            smk.$viewer.identifyFeatures( location )
-        } )
+        // smk.$viewer.handlePick( this, function ( location ) {
+        //     smk.$viewer.identifyFeatures( location )
+        // } )
 
         aux.widget.vm.$on( 'identify-widget.click', function () {
             if ( !self.visible || !self.enabled ) return
@@ -51,13 +51,18 @@ include.module( 'tool-identify', [ 'smk', 'feature-list', 'widgets', 'tool-ident
 
         smk.$viewer.startedIdentify( function ( ev ) {
             self.busy = true
+            self.firstId = null
         } )
 
         smk.$viewer.finishedIdentify( function ( ev ) {
             self.busy = false
 
-            if ( self.active && smk.$viewer.identified.isEmpty() )
+            if ( smk.$viewer.identified.isEmpty() )
                 self.active = false
+            else {
+                smk.$viewer.changedView()
+                smk.$viewer.identified.pick( self.firstId )
+            }
         } )
 
         smk.$viewer.identified.addedFeatures( function ( ev ) {
@@ -69,6 +74,7 @@ include.module( 'tool-identify', [ 'smk', 'feature-list', 'widgets', 'tool-ident
                 id: ly.config.id,
                 title: ly.config.title,
                 features: ev.features.map( function ( ft ) {
+                    if ( !self.firstId ) self.firstId = ft.id
                     return {
                         id: ft.id,
                         title: ft.title

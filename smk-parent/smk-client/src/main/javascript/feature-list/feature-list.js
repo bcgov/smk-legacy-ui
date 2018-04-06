@@ -97,8 +97,8 @@ include.module( 'feature-list', [ 'smk', 'tool', 'widgets', 'feature-list.panel-
             feature: null,
             layer: null,
             tool: {},
-            hasMultiple: true,
-            position: '1 / 10'
+            hasMultiple: false,
+            position: null
         }
 
         this.popupFeatureIds = null
@@ -119,26 +119,26 @@ include.module( 'feature-list', [ 'smk', 'tool', 'widgets', 'feature-list.panel-
                 //     return x
                 // },
                 zoomToFeature: function ( layerId, featureId ) {
-                    return smk.$viewer.zoomToFeature( layerId, smk.$viewer[ self.featureSetProperty ].get( featureId ) )
+                    return smk.$viewer[ self.featureSetProperty ].zoomTo( featureId )
                 },
+
                 selectFeature: function ( layerId, featureId ) {
                     smk.$viewer.selected.add( layerId, [ smk.$viewer[ self.featureSetProperty ].get( featureId ) ] )
                 },
+
                 movePrevious: function () {
                     var l = self.popupFeatureIds.length
                     self.popupCurrentIndex = ( self.popupCurrentIndex + l - 1 ) % l
                     this.position = ( self.popupCurrentIndex + 1 ) + ' / ' + l
-                    smk.$viewer[ self.featureSetProperty ].pick( self.popupFeatureIds[ self.popupCurrentIndex ], { cluster: true } )                    
+                    smk.$viewer[ self.featureSetProperty ].pick( self.popupFeatureIds[ self.popupCurrentIndex ] )
                 },
+
                 moveNext: function () {
                     var l = self.popupFeatureIds.length
                     self.popupCurrentIndex = ( self.popupCurrentIndex + 1 ) % l
                     this.position = ( self.popupCurrentIndex + 1 ) + ' / ' + l
-                    smk.$viewer[ self.featureSetProperty ].pick( self.popupFeatureIds[ self.popupCurrentIndex ], { cluster: true } )                    
+                    smk.$viewer[ self.featureSetProperty ].pick( self.popupFeatureIds[ self.popupCurrentIndex ] )
                 },
-                // featureIds[ ( currentIndex + featureIds.length - 1 ) % featureIds.length ] } 
-
-                // ', { featureId: featureIds[ ( currentIndex + 1 ) % featureIds.length ] } )                
             }
         } )
 
