@@ -52,6 +52,7 @@ include.module( 'tool-identify', [ 'smk', 'feature-list', 'widgets', 'tool-ident
         smk.$viewer.startedIdentify( function ( ev ) {
             self.busy = true
             self.firstId = null
+            self.active = true
         } )
 
         smk.$viewer.finishedIdentify( function ( ev ) {
