@@ -93,24 +93,32 @@ include.module( 'query', [ 'smk', 'jquery', 'util', 'event' ], function () {
 
             var whereClause = makeWhereClause( this.clause, param )
 
-            var param = {
-                layer:          JSON.stringify( dynamicLayer ).replace( /^"|"$/g, '' ),
-                where:          whereClause,
-                outSR:          4326,
-                returnGeometry: true,
-                returnZ:        false,
-                returnM:        false,
-                returnIdsOnly:  false,
-                returnCountOnly:false,
-                f:              'json',
+            var attrs = this.layer.config.attributes.filter( function ( a ) { return a.visible !== false } ).map( function ( a ) { return a.name } )
+
+            var data = {
+                f:                  'geojson',
+                layer:              JSON.stringify( dynamicLayer ).replace( /^"|"$/g, '' ),
+                where:              whereClause,
+                outFields:          attrs.join( ',' ),
+                inSR:               4326,
+                outSR:              4326,
+                returnGeometry:     true,
+                returnZ:            false,
+                returnM:            false,
+                returnIdsOnly:      false,
+                returnCountOnly:    false,
+                returnDistinctValues:   false,
+                // geometry: '-129.56,48.01,-122.41,51.91',
+                // geometryType: 'esriGeometryEnvelope',
+                // spatialRel: 'esriSpatialRelIntersects'
             }
 
             return SMK.UTIL.makePromise( function ( res, rej ) {
                 $.ajax( {
-                    url:            serviceUrl,
-                    method:         'POST',
-                    data:           param,
-                    // dataType:       'json',
+                    url:        serviceUrl,
+                    method:     'POST',
+                    data:       data,
+                    dataType:   'json',
                     // contentType:    'application/json',
                     // crossDomain:    true,
                     // withCredentials: true,
@@ -120,7 +128,16 @@ include.module( 'query', [ 'smk', 'jquery', 'util', 'event' ], function () {
                 console.log( data )
 
                 if ( !data ) throw new Error( 'no features' )
-                if ( !data.results || data.results.length == 0 ) throw new Error( 'no features' )
+                if ( !data.features || data.features.length == 0 ) throw new Error( 'no features' )
+
+                return data.features.map( function ( f, i ) {
+                    if ( self.layer.config.titleAttribute )
+                        f.title = f.properties[ self.layer.config.titleAttribute ]
+                    else
+                        f.title = 'Feature #' + ( i + 1 )
+
+                    return f
+                } )
 
                 // return data.results.map( function ( r, i ) {
                 //     var f = {}
@@ -185,16 +202,28 @@ include.module( 'query', [ 'smk', 'jquery', 'util', 'event' ], function () {
             return handleWhereOperand( args[ 0 ], param ) + ' = ' + handleWhereOperand( args[ 1 ], param )
         },
 
+        'less-than': function ( args, param ) {
+            if ( args.length != 2 ) throw new Error( 'LESS-THAN needs exactly 2 arguments' )
+
+            return handleWhereOperand( args[ 0 ], param ) + ' < ' + handleWhereOperand( args[ 1 ], param )
+        },
+
+        'greater-than': function ( args, param ) {
+            if ( args.length != 2 ) throw new Error( 'GREATER-THAN needs exactly 2 arguments' )
+
+            return handleWhereOperand( args[ 0 ], param ) + ' > ' + handleWhereOperand( args[ 1 ], param )
+        },
+
         contains: function ( args, param ) {
             if ( args.length != 2 ) throw new Error( 'CONTAINS needs exactly 2 arguments' )
 
-            return handleWhereOperand( args[ 0 ], param ) + ' LIKE "*' + handleWhereOperand( args[ 1 ], param, false ) + '*"'
+            return handleWhereOperand( args[ 0 ], param ) + ' LIKE "%' + handleWhereOperand( args[ 1 ], param, false ) + '%"'
         },
 
         not: function ( args, param ) {
             if ( args.length != 1 ) throw new Error( 'NOT needs exactly 1 argument' )
 
-            return 'NOT ' + handleWhereOperand( args[ 0 ], param )
+            return 'NOT ' + handleWhereOperator( args[ 0 ], param )
         }
     }
 

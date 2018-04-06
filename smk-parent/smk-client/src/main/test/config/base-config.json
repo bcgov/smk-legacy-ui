@@ -44,6 +44,7 @@
         { "type": "layers", "position": "toolbar" },
         { "type": "search" },
         { "type": "identify" },
-        { "type": "select" }
+        { "type": "select" },
+        { "type": "query" }
     ]
 }

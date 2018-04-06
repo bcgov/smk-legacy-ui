@@ -30,7 +30,7 @@ include.module( 'tool-identify-leaflet', [ 'leaflet', 'tool-identify' ], functio
                     var count = cluster.getChildCount();
 
                     return new L.DivIcon( {
-                        html: '<div><span>' + ( count == 1 ? '' : count > 99 ? '>99' : count ) + '</span></div>',
+                        html: '<div><span>' + ( count == 1 ? '' : count > 999 ? 'lots' : count ) + '</span></div>',
                         className: 'smk-identify-cluster smk-identify-cluster-' + ( count == 1 ? 'one' : 'many' ),
                         iconSize: null
                     } )

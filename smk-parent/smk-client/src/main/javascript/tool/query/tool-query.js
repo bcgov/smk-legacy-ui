@@ -44,10 +44,13 @@ include.module( 'tool-query', [ 'smk', 'tool', 'widgets', 'tool-query.panel-quer
 
     Vue.component( 'query-panel', {
         template: inc[ 'tool-query.panel-query-html' ],
-        props: [ 'busy', 'queries', 'description', 'parameters', 'layerTitle', 'features', 'highlightId', 'pickId' ],
-        methods: {
-            isEmpty: function () {
-                return !this.parameters
+        props: [ 'busy', 'layers', 'highlightId', 'queries', 'description', 'parameters' ],
+        // props: [ 'busy', 'queries', 'description', 'parameters', 'layerTitle', 'features', 'highlightId', 'pickId' ],
+        computed: {
+            isEmpty: {
+                get: function () {
+                    return !this.parameters
+                }
             }
         },
     } )
@@ -57,14 +60,18 @@ include.module( 'tool-query', [ 'smk', 'tool', 'widgets', 'tool-query.panel-quer
         this.makePropWidget( 'icon', 'question_answer' )
 
         this.makePropPanel( 'busy', false )
+        this.makePropPanel( 'layers', [] )
+        this.makePropPanel( 'highlightId', null )
+
+        // this.makePropPanel( 'busy', false )
         this.makePropPanel( 'queries', [] )
         this.makePropPanel( 'selectedQueryId', null )
         this.makePropPanel( 'description', null )
         this.makePropPanel( 'parameters', null )
-        this.makePropPanel( 'layerTitle', null )
-        this.makePropPanel( 'features', {} )
-        this.makePropPanel( 'highlightId', null )
-        this.makePropPanel( 'pickId', null )
+        // this.makePropPanel( 'layerTitle', null )
+        // this.makePropPanel( 'features', {} )
+        // this.makePropPanel( 'highlightId', null )
+        // this.makePropPanel( 'pickId', null )
 
         SMK.TYPE.Tool.prototype.constructor.call( this, $.extend( {
             order:          4,
@@ -108,6 +115,14 @@ include.module( 'tool-query', [ 'smk', 'tool', 'widgets', 'tool-query.panel-quer
             self.parameters[ ev.index ].prop.value = ev.value
         } )
 
+        // aux.panel.vm.$on( 'query-panel.active', function ( ev ) {
+        //     smk.$viewer[ self.featureSetProperty ].pick( ev.featureId )
+        // } )
+
+        // aux.panel.vm.$on( 'query-panel.hover', function ( ev ) {
+        //     smk.$viewer[ self.featureSetProperty ].highlight( ev.features && ev.features.map( function ( f ) { return f.id } ) )
+        // } )
+
         aux.panel.vm.$on( 'query-panel.clear', function ( ev ) {
             smk.$viewer.queried[ self.selectedQueryId ].clear()
 
@@ -126,6 +141,9 @@ include.module( 'tool-query', [ 'smk', 'tool', 'widgets', 'tool-query.panel-quer
             } )
 
             return smk.$viewer.query[ self.selectedQueryId ].queryLayer( param )
+                .then( function ( features ) {
+                    smk.$viewer.queried[ self.selectedQueryId ].add( smk.$viewer.query[ self.selectedQueryId ].layer.config.id, features )
+                } )
                 .finally( function () {
                     self.busy = false
                 } )
@@ -134,13 +152,53 @@ include.module( 'tool-query', [ 'smk', 'tool', 'widgets', 'tool-query.panel-quer
         this.queries.forEach( function ( q ) {
             smk.$viewer.queried[ q.id ]
                 .addedFeatures( function ( ev ) {
-                    self.features[ q.id ] = ev.features
+                    var ly = smk.$viewer.layerId[ ev.layerId ]
+
+                    Vue.set( self.layers, ly.index, {
+                        id: ly.config.id,
+                        title: ly.config.title,
+                        features: ev.features.map( function ( ft ) {
+                            // if ( !self.firstId ) self.firstId = ft.id
+                            return {
+                                id: ft.id,
+                                title: ft.title
+                            }
+                        } )
+                    } )
+
+                    // self.features[ q.id ] = ev.features
                 } )
                 .pickedFeature( function ( ev ) {
-                    self.pickId = ev.feature && ev.feature.id
+                    if ( !ev.feature ) {
+                        self.highlightId = null
+                        self.popupModel.layer = null
+                        self.popupModel.feature = null
+                        return
+                    }
+
+                    self.highlightId = ev.feature.id
+
+                    var ly = smk.$viewer.layerId[ ev.feature.layerId ]
+                    self.popupModel.layer = {
+                        id:         ev.feature.layerId,
+                        title:      ly.config.title,
+                        attributes: ly.config.attributes.map( function ( at ) {
+                            return {
+                                visible:at.visible,
+                                title:  at.title,
+                                name:   at.name
+                            }
+                        } )
+                    }
+
+                    self.popupModel.feature = {
+                        id:         ev.feature.id,
+                        title:      ev.feature.title,
+                        properties: Object.assign( {}, ev.feature.properties )
+                    }
                 } )
                 .clearedFeatures( function ( ev ) {
-                    self.features[ q.id ] = null
+                    // self.features[ q.id ] = null
                 } )
         } )
 

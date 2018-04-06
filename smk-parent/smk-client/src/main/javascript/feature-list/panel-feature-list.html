@@ -6,12 +6,16 @@
     </template>
 
     <template slot="commands">
-        <span class="smk-command"
-            v-bind:class="{ 'smk-disabled': isEmpty }"
-            v-on:click="$$emit( 'clear' )"
-        >Clear</span>
-
         <slot name="commands" v-bind:isEmpty="isEmpty"></slot>
+
+        <div class="smk-command-row">
+            <span class="smk-command"
+                v-bind:class="{ 'smk-disabled': isEmpty }"
+                v-on:click="$$emit( 'clear' )"
+            >Clear</span>
+
+            <slot name="command-row" v-bind:isEmpty="isEmpty"></slot>
+        </div>
     </template>
 
     <div v-if="isEmpty" class="smk-placeholder">
