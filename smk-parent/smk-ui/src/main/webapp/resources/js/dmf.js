@@ -569,6 +569,11 @@ function saveMapConfig()
     				attchId = "surroundImage";
     				attchType = "image";
     			}
+        		else if(attachment.type == "marker_upload") 
+    			{
+    				attchId = attachment.layer.id + "_marker";
+    				attchType = "image";
+    			}
         		else 
     			{
         			attchId = attachment.layer.id;
@@ -809,6 +814,14 @@ function finishLayerEdits(save)
 			selectedLayerNode.data.attribution = $("#dbcAttribution").val();
 			selectedLayerNode.data.opacity = $("#dbcOpacity").val();
 			selectedLayerNode.title = $("#dbcName").val();
+			
+			// update definition expression
+			if($("#dbcDefinitionExpression").val() != null)
+			{
+				var dynamicJson = JSON.parse(selectedLayerNode.data.dynamicLayers[0]);
+				dynamicJson.definitionExpression = $("#dbcDefinitionExpression").val();
+				selectedLayerNode.data.dynamicLayers[0] = JSON.stringify(dynamicJson);
+			}
 
 			selectedLayerNode.data.attributes.forEach(function (attribute)
 			{
@@ -957,7 +970,17 @@ function editSelectedLayer()
 				$("#dbcName").val(node.data.title);
 				$("#dbcAttribution").val(node.data.attribution);
 				$("#dbcOpacity").val(node.data.opacity);
-	
+				
+				// get the deifnition expression
+				if(node.data.dynamicLayers != null && node.data.dynamicLayers[0] != null)
+				{
+					var dynamicJson = JSON.parse(node.data.dynamicLayers[0]);
+					if(dynamicJson.hasOwnProperty('definitionExpression'))
+					{
+						$("#dbcDefinitionExpression").val(dynamicJson.definitionExpression);
+					}
+				}
+				
 				if(node.data.attributes == null) node.data.attributes = [];
 				$("#attributePanel").empty();
 				
@@ -1090,6 +1113,16 @@ function uploadVectorLayer()
 			type: $("#vectorType").val(),
 			layer: layer,
 			contents: fileContents
+		});
+		
+		// if a marker has been updloaded, set the layer
+		
+		unsavedAttachments.forEach(function(attch)
+		{
+			if(attch.type == "marker_upload")
+			{
+				attch.layer = layer;
+			}
 		});
 	}
 
@@ -1693,6 +1726,7 @@ $(document).ready(function()
 	document.getElementById('vectorFileUpload').addEventListener('change', readFile, false);
 	document.getElementById('headerImageFileUpload').addEventListener('change', readHeaderFile, false);
 	document.getElementById('replaceVectorFileUpload').addEventListener('change', readFile, false);
+	document.getElementById('customMarkerFileUpload').addEventListener('change', readMarkerFile, false);
 	
 	// init modals
 	$('.modal').modal();
@@ -1708,6 +1742,18 @@ function readHeaderFile(e)
 	unsavedAttachments.push(
 	{
 		type: "header_upload",
+		contents: fileContents
+	});
+}
+
+function readMarkerFile(e)
+{
+	readFile(e);
+	
+	unsavedAttachments.push(
+	{
+		type: "marker_upload",
+		layer: selectedLayerNode.data,
 		contents: fileContents
 	});
 }
