@@ -18,7 +18,7 @@ include.module( 'tool-identify', [ 'smk', 'feature-list', 'widgets', 'tool-ident
             title:              'Identify',
             widgetComponent:    'identify-widget',
             panelComponent:     'identify-panel',
-            featureSetProperty: 'identified'
+            // featureSetProperty: 'identified'
         }, option ) )
     }
 
@@ -28,6 +28,10 @@ include.module( 'tool-identify', [ 'smk', 'feature-list', 'widgets', 'tool-ident
     IdentifyTool.prototype.afterInitialize = SMK.TYPE.FeatureList.prototype.afterInitialize.concat( [] )
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
+    IdentifyTool.prototype.afterInitialize.unshift( function ( smk, aux ) {
+        this.featureSet = smk.$viewer.identified
+    } )
+
     IdentifyTool.prototype.afterInitialize.push( function ( smk, aux ) {
         var self = this
 
@@ -64,24 +68,6 @@ include.module( 'tool-identify', [ 'smk', 'feature-list', 'widgets', 'tool-ident
                 smk.$tool.location.reset()
                 smk.$viewer.identified.pick( self.firstId )
             }
-        } )
-
-        smk.$viewer.identified.addedFeatures( function ( ev ) {
-            self.active = true
-
-            var ly = smk.$viewer.layerId[ ev.layerId ]
-
-            Vue.set( self.layers, ly.index, {
-                id: ly.config.id,
-                title: ly.config.title,
-                features: ev.features.map( function ( ft ) {
-                    if ( !self.firstId ) self.firstId = ft.id
-                    return {
-                        id: ft.id,
-                        title: ft.title
-                    }
-                } )
-            } )
         } )
 
     } )

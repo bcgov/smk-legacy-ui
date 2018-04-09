@@ -3,11 +3,11 @@
 >
 <!-- <side-panel class="smk-query-panel" v-bind:class="{ 'smk-busy': busy }"> -->
     <template slot="header">
-        <h1>{{ title }}</h1>
+        <h1>Query Layer</h1>
     </template>
 
     <template slot="commands">
-        <!-- <select class="smk-command smk-select-query"
+        <select class="smk-command smk-select-query"
             v-on:change="$$emit( 'select-query', { id: $event.target.value } )"
         >
             <option selected disabled>Pick a query</option>
@@ -15,7 +15,7 @@
                 v-for="query in queries"
                 v-bind:value="query.id"
             >{{ query.title }}</option>
-        </select> -->
+        </select>
 
         <div class="smk-description">{{ description }}</div>
 
@@ -43,7 +43,7 @@
     </template>
 
     <template slot="placeholder">
-        Configure parameters and click Execute.
+        Select a query.
     </template>
 
     <!-- <h2>{{ layerTitle }}</h2>

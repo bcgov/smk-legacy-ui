@@ -266,7 +266,7 @@
                 {
                     "id": "query1",
                     "title": "Test query 1",
-                    "description": "Query BCTS Name",
+                    "description": "Query FISH_OBSERVATION_POINT_ID",
                     "parameters": [
                         {
                             "id": "param2",
@@ -293,7 +293,108 @@
                             }
                         ]
                     }
+                },
+                {
+                    "id": "query2",
+                    "title": "Test query 2",
+                    "description": "species & type",
+                    "parameters": [
+                        {
+                            "id": "param1",
+                            "type": "input",
+                            "title": "Species",
+                            "value": "salmon"
+                        },
+                        {
+                            "id": "param2",
+                            "type": "input",
+                            "title": "type code",
+                            "value": "Observation"
+                        }
+                    ],
+                    "clause": {
+                        "operator": "and",
+                        "arguments": [
+                            {
+                                "operator": "contains",
+                                "arguments": [
+                                    {
+                                        "operand": "attribute",
+                                        "name": "SPECIES_NAME"
+                                    },
+                                    {
+                                        "operand": "parameter",
+                                        "id": "param1"
+                                    }
+                                ]
+                            },
+                            {
+                                "operator": "equals",
+                                "arguments": [
+                                    {
+                                        "operand": "attribute",
+                                        "name": "POINT_TYPE_CODE"
+                                    },
+                                    {
+                                        "operand": "parameter",
+                                        "id": "param2"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "query3",
+                    "title": "Test query 3",
+                    "description": "species | type",
+                    "parameters": [
+                        {
+                            "id": "param1",
+                            "type": "input",
+                            "title": "Species",
+                            "value": "salmon"
+                        },
+                        {
+                            "id": "param2",
+                            "type": "input",
+                            "title": "type code",
+                            "value": "Observation"
+                        }
+                    ],
+                    "clause": {
+                        "operator": "or",
+                        "arguments": [
+                            {
+                                "operator": "contains",
+                                "arguments": [
+                                    {
+                                        "operand": "attribute",
+                                        "name": "SPECIES_NAME"
+                                    },
+                                    {
+                                        "operand": "parameter",
+                                        "id": "param1"
+                                    }
+                                ]
+                            },
+                            {
+                                "operator": "equals",
+                                "arguments": [
+                                    {
+                                        "operand": "attribute",
+                                        "name": "POINT_TYPE_CODE"
+                                    },
+                                    {
+                                        "operand": "parameter",
+                                        "id": "param2"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
                 }
+
             ]
         }
     ]

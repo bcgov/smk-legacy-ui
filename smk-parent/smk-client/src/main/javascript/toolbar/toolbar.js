@@ -23,6 +23,7 @@ include.module( 'toolbar', [ 'vue', 'toolbar.toolbar-html' ], function ( inc ) {
 
     Toolbar.prototype.add = function ( tool ) {
         this.model.tools.push( {
+            id: tool.id,
             type: tool.type,
             widgetComponent: tool.widgetComponent,
             widget: tool.widget

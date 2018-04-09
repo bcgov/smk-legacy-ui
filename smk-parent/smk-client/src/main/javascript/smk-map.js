@@ -130,7 +130,9 @@ include.module( 'smk-map', [ 'smk', 'jquery', 'util', 'viewer', 'layer' ], funct
                             } )
                     } )
                     .then( function ( inc ) {
-                        self.$tool[ t.type ] = new inc[ tag ]( t )
+                        var id = t.type + ( t.instance ? '--' + t.instance : '' )
+                        self.$tool[ id ] = new inc[ tag ]( t )
+                        self.$tool[ id ].id = id
                     } )
                     .catch( function ( e ) {
                         console.warn( 'tool "' + t.type + '" failed to create:', e )

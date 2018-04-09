@@ -18,8 +18,7 @@ include.module( 'tool-select', [ 'smk', 'feature-list', 'widgets', 'tool-select.
             position:           'menu',
             title:              'Selection',
             widgetComponent:    'select-widget',
-            panelComponent:     'select-panel',
-            featureSetProperty: 'selected'
+            panelComponent:     'select-panel'
         }, option ) )
     }
 
@@ -29,6 +28,10 @@ include.module( 'tool-select', [ 'smk', 'feature-list', 'widgets', 'tool-select.
     SelectTool.prototype.afterInitialize = SMK.TYPE.FeatureList.prototype.afterInitialize.concat( [] )
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
+    SelectTool.prototype.afterInitialize.unshift( function ( smk, aux ) {
+        this.featureSet = smk.$viewer.selected
+    } )
+
     SelectTool.prototype.afterInitialize.push( function ( smk, aux ) {
         var self = this
 
@@ -36,31 +39,6 @@ include.module( 'tool-select', [ 'smk', 'feature-list', 'widgets', 'tool-select.
             if ( !self.visible || !self.enabled ) return
 
             self.active = !self.active
-        } )
-
-        smk.$viewer.selected.addedFeatures( function ( ev ) {
-            self.active = true
-
-            var ly = smk.$viewer.layerId[ ev.layerId ]
-
-            if ( !self.layers[ ly.index ] )
-                Vue.set( self.layers, ly.index, {
-                    id:         ly.config.id,
-                    title:      ly.config.title,
-                    features: ev.features.map( function ( ft ) {
-                        return {
-                            id:     ft.id,
-                            title:  ft.title
-                        }
-                    } )
-                } )
-            else
-                Vue.set( self.layers[ ly.index ], 'features', self.layers[ ly.index ].features.concat( ev.features.map( function ( ft ) {
-                    return {
-                        id:     ft.id,
-                        title:  ft.title
-                    }
-                } ) ) )
         } )
 
     } )

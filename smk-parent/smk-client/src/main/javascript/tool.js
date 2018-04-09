@@ -10,6 +10,7 @@ include.module( 'tool', [ 'smk', 'jquery', 'event' ], function () {
     function Tool( option ) {
         ToolEvent.prototype.constructor.call( this )
 
+        this.makeProp( 'id', null )
         this.makeProp( 'title', null )
         this.makeProp( 'visible', true, 'changedVisible' )
         this.makeProp( 'enabled', true, 'changedEnabled' )
@@ -109,6 +110,17 @@ include.module( 'tool', [ 'smk', 'jquery', 'event' ], function () {
                 aux.widget = aux.panel
                 break;
             }
+
+            // aux.on = function ( source, event, handler ) {
+            //     if ( typeof handler != 'function' && typeof event == 'function' ) {
+            //         handler = event
+            //         event = source
+            //         source = 'panel'
+            //     }
+
+            //     aux[ source ].vm.$on( '')
+
+            // }
 
             return self.afterInitialize.forEach( function ( init ) {
                 init.call( self, smk, aux )

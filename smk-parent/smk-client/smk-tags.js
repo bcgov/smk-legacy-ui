@@ -79,6 +79,9 @@ exports.gen = function () {
     t.group( 'tool-pan' )
         .dir( 'tool/pan/**/*', { cwd: baseDir } )
 
+    t.group( 'tool-queries' )
+        .dir( 'tool/queries/**/*', { cwd: baseDir } )
+
     t.group( 'tool-query' )
         .dir( 'tool/query/**/*', { cwd: baseDir } )
 
@@ -125,6 +128,9 @@ exports.gen = function () {
         .style( 'https://unpkg.com/leaflet.pm@0.17.3/dist/leaflet.pm.css' )
         .script( 'https://unpkg.com/leaflet.pm@0.17.3/dist/leaflet.pm.min.js' )
 
+    t.group( 'tool-queries-leaflet' )
+        .dir( 'viewer-leaflet/tool/queries/**/*', { cwd: baseDir } )
+
     t.group( 'tool-query-leaflet' )
         .dir( 'viewer-leaflet/tool/query/**/*', { cwd: baseDir } )
 
@@ -147,6 +153,8 @@ exports.gen = function () {
         .style( 'viewer-leaflet/viewer-leaflet.css' )
         .tag( 'leaflet-extensions' )
         .tag( 'feature-list-leaflet' )
+
+    t.script( 'feature-list-clustering-leaflet', 'viewer-leaflet/feature-list-clustering-leaflet.js' )
 
     t.sequence( 'leaflet' )
         .script( 'https://unpkg.com/leaflet@1.2.0/dist/leaflet.js', { 'integrity': 'sha512-lInM/apFSqyy1o6s89K4iQUKg6ppXEgsVxT35HbzUupEVRh2Eu9Wdl4tHj7dZO0s1uvplcYGmt3498TtHq+log==' } )

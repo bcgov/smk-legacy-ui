@@ -142,6 +142,12 @@
                     Vue.mixin( {
                         methods: {
                             $$emit: function ( event, arg ) {
+                                // console.log( this );
+
+                                arg = Object.assign( {
+                                    id: this.id
+                                }, arg )
+
                                 var op = this.$options
                                 while ( op && op._componentTag ) {
                                     var componentEvent = op._componentTag + '.' + event

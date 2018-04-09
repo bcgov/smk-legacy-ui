@@ -32,28 +32,55 @@ include.module( 'feature-list', [ 'smk', 'tool', 'widgets', 'feature-list.panel-
         var self = this
 
         aux.panel.vm.$on( this.panelComponent + '.active', function ( ev ) {
-            smk.$viewer[ self.featureSetProperty ].pick( ev.featureId )
+            self.featureSet.pick( ev.featureId )
         } )
 
         aux.panel.vm.$on( this.panelComponent + '.hover', function ( ev ) {
-            smk.$viewer[ self.featureSetProperty ].highlight( ev.features && ev.features.map( function ( f ) { return f.id } ) )
+            self.featureSet.highlight( ev.features && ev.features.map( function ( f ) { return f.id } ) )
         } )
 
         aux.panel.vm.$on( this.panelComponent + '.clear', function ( ev ) {
-            smk.$viewer[ self.featureSetProperty ].clear()
+            self.featureSet.clear()
         } )
 
         aux.panel.vm.$on( this.panelComponent + '.remove', function ( ev ) {
-            smk.$viewer[ self.featureSetProperty ].remove( [ ev.featureId ] )
+            self.featureSet.remove( [ ev.featureId ] )
         } )
 
         // = : = : = : = : = : = : = : = : = : = : = : = : = : = : = : = : = : = : =
 
-        smk.$viewer[ self.featureSetProperty ].clearedFeatures( function ( ev ) {
+        self.featureSet.addedFeatures( function ( ev ) {
+            self.active = true
+
+            var ly = smk.$viewer.layerId[ ev.layerId ]
+
+            if ( !self.layers[ ly.index ] )
+                Vue.set( self.layers, ly.index, {
+                    id:         ly.config.id,
+                    title:      ly.config.title,
+                    features:   []
+                } )
+                //     ev.features.map( function ( ft ) {
+                //         return {
+                //             id:     ft.id,
+                //             title:  ft.title
+                //         }
+                //     } )
+            // else
+
+            Vue.set( self.layers[ ly.index ], 'features', self.layers[ ly.index ].features.concat( ev.features.map( function ( ft ) {
+                return {
+                    id:     ft.id,
+                    title:  ft.title
+                }
+            } ) ) )
+        } )
+
+        self.featureSet.clearedFeatures( function ( ev ) {
             self.layers = []
         } )
 
-        smk.$viewer[ self.featureSetProperty ].removedFeatures( function ( ev ) {
+        self.featureSet.removedFeatures( function ( ev ) {
             var ly = smk.$viewer.layerId[ ev.features[ 0 ].layerId ]
 
             self.layers[ ly.index ].features = self.layers[ ly.index ].features.filter( function ( ft ) {
@@ -61,7 +88,7 @@ include.module( 'feature-list', [ 'smk', 'tool', 'widgets', 'feature-list.panel-
             } )
         } )
 
-        smk.$viewer[ self.featureSetProperty ].pickedFeature( function ( ev ) {
+        self.featureSet.pickedFeature( function ( ev ) {
             if ( !ev.feature ) {
                 self.highlightId = null
                 self.popupModel.layer = null
@@ -119,25 +146,25 @@ include.module( 'feature-list', [ 'smk', 'tool', 'widgets', 'feature-list.panel-
                 //     return x
                 // },
                 zoomToFeature: function ( layerId, featureId ) {
-                    return smk.$viewer[ self.featureSetProperty ].zoomTo( featureId )
+                    return self.featureSet.zoomTo( featureId )
                 },
 
                 selectFeature: function ( layerId, featureId ) {
-                    smk.$viewer.selected.add( layerId, [ smk.$viewer[ self.featureSetProperty ].get( featureId ) ] )
+                    smk.$viewer.selected.add( layerId, [ self.featureSet.get( featureId ) ] )
                 },
 
                 movePrevious: function () {
                     var l = self.popupFeatureIds.length
                     self.popupCurrentIndex = ( self.popupCurrentIndex + l - 1 ) % l
                     this.position = ( self.popupCurrentIndex + 1 ) + ' / ' + l
-                    smk.$viewer[ self.featureSetProperty ].pick( self.popupFeatureIds[ self.popupCurrentIndex ] )
+                    self.featureSet.pick( self.popupFeatureIds[ self.popupCurrentIndex ] )
                 },
 
                 moveNext: function () {
                     var l = self.popupFeatureIds.length
                     self.popupCurrentIndex = ( self.popupCurrentIndex + 1 ) % l
                     this.position = ( self.popupCurrentIndex + 1 ) + ' / ' + l
-                    smk.$viewer[ self.featureSetProperty ].pick( self.popupFeatureIds[ self.popupCurrentIndex ] )
+                    self.featureSet.pick( self.popupFeatureIds[ self.popupCurrentIndex ] )
                 },
             }
         } )
