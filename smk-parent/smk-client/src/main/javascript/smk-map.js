@@ -6,6 +6,8 @@ include.module( 'smk-map', [ 'smk', 'jquery', 'util', 'viewer', 'layer' ], funct
         this.$option.container = $( '#' + this.$option.containerId ).get( 0 )
         if ( !this.$option.container )
             throw new Error( 'Unable to find container #' + this.$option.containerId )
+
+        this.dispatcher = new Vue()
     }
 
     SMK.TYPE.SmkMap = SmkMap
@@ -215,4 +217,25 @@ include.module( 'smk-map', [ 'smk', 'jquery', 'util', 'viewer', 'layer' ], funct
             } )
     }
 
+    SmkMap.prototype.emit = function () { 
+        this.dispatcher.$emit.apply( this.dispatcher, arguments ) 
+
+        return this
+    }
+
+    SmkMap.prototype.on = function () { 
+        var self = this
+
+        var args = [].slice.call( arguments )
+
+        if ( args.length == 1 ) {
+            Object.keys( args[ 0 ] ).forEach( function ( k ) {
+                self.dispatcher.$on( k, args[ 0 ][ k ] )
+            } )
+            return this
+        }
+
+        this.dispatcher.$on.apply( this.dispatcher, args )
+        return this
+    }
 } )

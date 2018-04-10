@@ -15,8 +15,14 @@ include.module( 'sidepanel', [ 'vue', 'sidepanel.sidepanel-html', 'sidepanel.pan
 
         this.vm = new Vue( {
             el: el,
-            data: this.model
-        } )
+            data: this.model,
+            methods: {
+                trigger: function ( event, arg ) {
+                    smk.emit( event, arg )
+                    // console.log( arguments )
+                }
+            }
+    } )
 
         this.container = $( smk.$option.container )
     }

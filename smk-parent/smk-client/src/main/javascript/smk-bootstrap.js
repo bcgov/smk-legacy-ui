@@ -139,27 +139,27 @@
                     include.tag( 'vue' ).exported = Vue
 
                     // may not be a good idea
-                    Vue.mixin( {
-                        methods: {
-                            $$emit: function ( event, arg ) {
-                                // console.log( this );
+                    // Vue.mixin( {
+                    //     methods: {
+                    //         $$emit: function ( event, arg ) {
+                    //             // console.log( this );
 
-                                arg = Object.assign( {
-                                    id: this.id
-                                }, arg )
+                    //             arg = Object.assign( {
+                    //                 id: this.id
+                    //             }, arg )
 
-                                var op = this.$options
-                                while ( op && op._componentTag ) {
-                                    var componentEvent = op._componentTag + '.' + event
-                                    // console.log( componentEvent )
+                    //             var op = this.$options
+                    //             while ( op && op._componentTag ) {
+                    //                 var componentEvent = op._componentTag + '.' + event
+                    //                 // console.log( componentEvent )
 
-                                    this.$root.$emit( componentEvent, arg, this )
+                    //                 this.$root.$emit( componentEvent, arg, this )   
 
-                                    op = op.parent.$options
-                                }
-                            }
-                        }
-                    } )
+                    //                 op = op.parent.$options
+                    //             }
+                    //         }
+                    //     }
+                    // } )
                 } )
 
                 include( 'smk', 'smk-map' ).then( function ( inc ) {

@@ -12,12 +12,16 @@ include.module( 'toolbar', [ 'vue', 'toolbar.toolbar-html' ], function ( inc ) {
         this.vm = new Vue( {
             el: el,
             data: this.model,
-            // methods: {
+            methods: {
             //     debug: function ( x ) { console.log( arguments ); return x },
             // },
             // beforeUpdate: function () {
             //     console.log( this )
-            // }
+                trigger: function ( event, arg ) {
+                    smk.emit( event, arg )
+                    // console.log( arguments )
+                }
+            }
         } )
     }
 
