@@ -46,6 +46,11 @@ include.module( 'tool-query', [ 'smk', 'tool', 'widgets', 'tool-query.panel-quer
         extends: inc.widgets.toolPanel,
         template: inc[ 'tool-query.panel-query-html' ],
         props: [ 'busy', 'layers', 'highlightId', 'description', 'parameters' ],
+        data: function () {
+            return {
+                'within': true
+            }
+        },
         methods: {
             featureListProps: function () {
                 var self = this
