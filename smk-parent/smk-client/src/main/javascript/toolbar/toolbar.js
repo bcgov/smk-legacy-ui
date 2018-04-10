@@ -13,13 +13,8 @@ include.module( 'toolbar', [ 'vue', 'toolbar.toolbar-html' ], function ( inc ) {
             el: el,
             data: this.model,
             methods: {
-            //     debug: function ( x ) { console.log( arguments ); return x },
-            // },
-            // beforeUpdate: function () {
-            //     console.log( this )
-                trigger: function ( event, arg ) {
-                    smk.emit( event, arg )
-                    // console.log( arguments )
+                trigger: function ( toolId, event, arg ) {
+                    smk.emit( toolId, event, arg )
                 }
             }
         } )

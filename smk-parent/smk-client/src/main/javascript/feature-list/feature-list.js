@@ -1,6 +1,7 @@
 include.module( 'feature-list', [ 'smk', 'tool', 'widgets', 'feature-list.panel-feature-list-html', 'feature-list.popup-feature-html' ], function ( inc ) {
 
     Vue.component( 'feature-list-panel', {
+        extends: inc.widgets.toolPanel,
         template: inc[ 'feature-list.panel-feature-list-html' ],
         props: [ 'busy', 'layers', 'highlightId', 'canRemove' ],
         computed: {
@@ -31,20 +32,22 @@ include.module( 'feature-list', [ 'smk', 'tool', 'widgets', 'feature-list.panel-
     FeatureList.prototype.afterInitialize.push( function ( smk, aux ) {
         var self = this
 
-        aux.panel.vm.$on( this.panelComponent + '.active', function ( ev ) {
-            self.featureSet.pick( ev.featureId )
-        } )
+        smk.on( this.id, {
+            'active': function ( ev ) {
+                self.featureSet.pick( ev.featureId )
+            },
 
-        aux.panel.vm.$on( this.panelComponent + '.hover', function ( ev ) {
-            self.featureSet.highlight( ev.features && ev.features.map( function ( f ) { return f.id } ) )
-        } )
+            'hover': function ( ev ) {
+                self.featureSet.highlight( ev.features && ev.features.map( function ( f ) { return f.id } ) )
+            },
 
-        aux.panel.vm.$on( this.panelComponent + '.clear', function ( ev ) {
-            self.featureSet.clear()
-        } )
+            'clear': function ( ev ) {
+                self.featureSet.clear()
+            },
 
-        aux.panel.vm.$on( this.panelComponent + '.remove', function ( ev ) {
-            self.featureSet.remove( [ ev.featureId ] )
+            'remove': function ( ev ) {
+                self.featureSet.remove( [ ev.featureId ] )
+            }
         } )
 
         // = : = : = : = : = : = : = : = : = : = : = : = : = : = : = : = : = : = : =
@@ -60,13 +63,6 @@ include.module( 'feature-list', [ 'smk', 'tool', 'widgets', 'feature-list.panel-
                     title:      ly.config.title,
                     features:   []
                 } )
-                //     ev.features.map( function ( ft ) {
-                //         return {
-                //             id:     ft.id,
-                //             title:  ft.title
-                //         }
-                //     } )
-            // else
 
             Vue.set( self.layers[ ly.index ], 'features', self.layers[ ly.index ].features.concat( ev.features.map( function ( ft ) {
                 return {

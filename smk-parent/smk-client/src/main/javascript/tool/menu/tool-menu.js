@@ -5,13 +5,15 @@ include.module( 'tool-menu', [ 'smk', 'tool', 'widgets', 'tool-menu.panel-menu-h
     } )
 
     Vue.component( 'menu-panel', {
+        extends: inc.widgets.toolPanel,
         template: inc[ 'tool-menu.panel-menu-html' ],
-        props: [ 'title', 'visible', 'enabled', 'active', 'subWidgets', 'subPanels', 'activeToolId' ]
+        props: [ 'visible', 'enabled', 'active', 'subWidgets', 'subPanels', 'activeToolId' ]
     } )
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
     function MenuTool( option ) {
         this.makePropWidget( 'icon', 'menu' )
+
         this.makePropPanel( 'subWidgets', [] )
         this.makePropPanel( 'subPanels', {} )
         this.makePropPanel( 'activeToolId', null )
@@ -32,10 +34,12 @@ include.module( 'tool-menu', [ 'smk', 'tool', 'widgets', 'tool-menu.panel-menu-h
     MenuTool.prototype.afterInitialize.push( function ( smk, aux ) {
         var self = this
 
-        aux.toolbar.vm.$on( 'menu-widget.click', function () {
-            if ( !self.visible || !self.enabled ) return
+        smk.on( this.id, {
+            'activate': function () {
+                if ( !self.visible || !self.enabled ) return
 
-            self.active = !self.active
+                self.active = !self.active
+            }
         } )
 
         self.changedActive( function () {

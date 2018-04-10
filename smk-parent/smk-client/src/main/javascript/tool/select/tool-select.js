@@ -5,6 +5,7 @@ include.module( 'tool-select', [ 'smk', 'feature-list', 'widgets', 'tool-select.
     } )
 
     Vue.component( 'select-panel', {
+        extends: inc.widgets.toolPanel,
         template: inc[ 'tool-select.panel-select-html' ],
         props: [ 'busy', 'layers', 'highlightId' ],
     } )
@@ -35,10 +36,12 @@ include.module( 'tool-select', [ 'smk', 'feature-list', 'widgets', 'tool-select.
     SelectTool.prototype.afterInitialize.push( function ( smk, aux ) {
         var self = this
 
-        aux.widget.vm.$on( 'select-widget.click', function () {
-            if ( !self.visible || !self.enabled ) return
+        smk.on( this.id, {
+            'activate': function () {
+                if ( !self.visible || !self.enabled ) return
 
-            self.active = !self.active
+                self.active = !self.active
+            }
         } )
 
     } )

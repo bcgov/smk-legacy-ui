@@ -2,22 +2,12 @@ include.module( 'tool-identify', [ 'smk', 'feature-list', 'widgets', 'tool-ident
 
     Vue.component( 'identify-widget', {
         extends: inc.widgets.toolButton,
-        // methods: {
-        //     $$emit: function ( event, arg ) {
-        //         this.$root.trigger( this.id + '.' + event, arg )
-        //     }
-        // }
     } )
 
     Vue.component( 'identify-panel', {
         extends: inc.widgets.toolPanel,
         template: inc[ 'tool-identify.panel-identify-html' ],
         props: [ 'busy', 'layers', 'highlightId' ],
-        // methods: {
-        //     $$emit: function ( event, arg ) {
-        //         this.$root.trigger( this.id + '.' + event, arg )
-        //     }
-        // }
     } )
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
@@ -50,16 +40,16 @@ include.module( 'tool-identify', [ 'smk', 'feature-list', 'widgets', 'tool-ident
         //     smk.$viewer.identifyFeatures( location )
         // } )
 
-        smk.on( { 
-            'identify.activate': function () {
+        smk.on( this.id, {
+            'activate': function () {
                 if ( !self.visible || !self.enabled ) return
 
                 self.active = !self.active
             },
 
-            'identify.add-all': function ( ev ) {
+            'add-all': function ( ev ) {
                 console.log(ev);
-                
+
                 self.layers.forEach( function ( ly ) {
                     smk.$viewer.selected.add( ly.id, ly.features.map( function ( ft ) {
                         return smk.$viewer.identified.get( ft.id )
@@ -67,20 +57,6 @@ include.module( 'tool-identify', [ 'smk', 'feature-list', 'widgets', 'tool-ident
                 } )
             }
         } )
-
-        // aux.widget.vm.$on( 'identify-widget.click', function () {
-        //     if ( !self.visible || !self.enabled ) return
-
-        //     self.active = !self.active
-        // } )
-
-        // aux.panel.vm.$on( 'identify-panel.add-all', function ( ev ) {
-        //     self.layers.forEach( function ( ly ) {
-        //         smk.$viewer.selected.add( ly.id, ly.features.map( function ( ft ) {
-        //             return smk.$viewer.identified.get( ft.id )
-        //         } ) )
-        //     } )
-        // } )
 
         smk.$viewer.startedIdentify( function ( ev ) {
             self.busy = true

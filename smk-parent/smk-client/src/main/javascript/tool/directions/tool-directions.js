@@ -133,6 +133,7 @@ include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.
     } )
 
     Vue.component( 'directions-panel', {
+        extends: inc.widgets.toolPanel,
         template: inc[ 'tool-directions.panel-directions-html' ],
         props: [ 'busy', 'waypoints', 'directions', 'directionHighlight', 'directionPick', 'message', 'messageClass' ],
         data: function () {
@@ -247,59 +248,61 @@ include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.
             } )
         } )
 
-        aux.widget.vm.$on( 'directions-widget.click', function () {
-            if ( !self.visible || !self.enabled ) return
+        smk.on( this.id, {
+            'activate': function () {
+                if ( !self.visible || !self.enabled ) return
 
-            self.active = !self.active
-        } )
+                self.active = !self.active
+            },
 
-        aux.panel.vm.$on( 'directions-panel.option', function ( ev, comp ) {
-            self.routeOption.optimal = comp.optimal
-            self.routeOption.roundTrip = comp.roundTrip
-            self.routeOption.criteria = comp.criteria
+            'option': function ( ev, comp ) {
+                self.routeOption.optimal = comp.optimal
+                self.routeOption.roundTrip = comp.roundTrip
+                self.routeOption.criteria = comp.criteria
 
-            self.findRoute()
-        } )
+                self.findRoute()
+            },
 
-        aux.panel.vm.$on( 'directions-panel.reverse', function ( ev ) {
-            self.waypoints.reverse()
-            self.findRoute()
-        } )
+            'reverse': function ( ev ) {
+                self.waypoints.reverse()
+                self.findRoute()
+            },
 
-        aux.panel.vm.$on( 'directions-panel.clear', function ( ev ) {
-            self.startAtCurrentLocation()
-        } )
+            'clear': function ( ev ) {
+                self.startAtCurrentLocation()
+            },
 
-        aux.panel.vm.$on( 'directions-panel.hover-direction', function ( ev ) {
-            self.directionHighlight = ev.highlight
-        } )
+            'hover-direction': function ( ev ) {
+                self.directionHighlight = ev.highlight
+            },
 
-        aux.panel.vm.$on( 'directions-panel.pick-direction', function ( ev ) {
-            self.directionPick = ev.pick
-        } )
+            'pick-direction': function ( ev ) {
+                self.directionPick = ev.pick
+            },
 
-        aux.panel.vm.$on( 'directions-panel.changed-waypoints', function ( ev ) {
-            self.findRoute()
-        } )
+            'changed-waypoints': function ( ev ) {
+                self.findRoute()
+            },
 
-        aux.panel.vm.$on( 'directions-panel.remove-waypoint', function ( ev ) {
-            self.waypoints.splice( ev.index, 1 )
+            'remove-waypoint': function ( ev ) {
+                self.waypoints.splice( ev.index, 1 )
 
-            self.findRoute()
-        } )
+                self.findRoute()
+            },
 
-        aux.panel.vm.$on( 'directions-panel.update-waypoint', function ( ev ) {
-            var empty = self.waypoints.findIndex( function ( w ) { return !w.location } )
+            'update-waypoint': function ( ev ) {
+                var empty = self.waypoints.findIndex( function ( w ) { return !w.location } )
 
-            self.waypoints[ ev.index ] = ev.item
+                self.waypoints[ ev.index ] = ev.item
 
-            if ( !ev.item.location && ev.index != empty )
-                self.waypoints.splice( empty, 1 )
+                if ( !ev.item.location && ev.index != empty )
+                    self.waypoints.splice( empty, 1 )
 
-            if ( ev.item.location && ev.index == empty )
-                self.addWaypoint()
+                if ( ev.item.location && ev.index == empty )
+                    self.addWaypoint()
 
-            self.findRoute()
+                self.findRoute()
+            }
         } )
 
     } )

@@ -6,6 +6,7 @@ include.module( 'tool-baseMaps', [ 'smk', 'tool', 'widgets', 'viewer', 'leaflet'
     } )
 
     Vue.component( 'baseMaps-panel', {
+        extends: inc.widgets.toolPanel,
         template: inc[ 'tool-baseMaps.panel-base-maps-html' ],
         props: [ 'center', 'zoom', 'current', 'basemaps', 'mapStyle' ]
     } )
@@ -101,8 +102,16 @@ include.module( 'tool-baseMaps', [ 'smk', 'tool', 'widgets', 'viewer', 'leaflet'
 
         this.current = smk.viewer.baseMap
 
-        aux.panel.vm.$on( 'baseMaps-panel.set-base-map', function ( ev ) {
-            smk.$viewer.setBasemap( ev.id )
+        smk.on( this.id, {
+            'activate': function () {
+                if ( !self.visible || !self.enabled ) return
+
+                self.active = !self.active
+            },
+
+            'set-base-map': function ( ev ) {
+                smk.$viewer.setBasemap( ev.id )
+            }
         } )
 
         smk.$viewer.changedBaseMap( function ( ev ) {
@@ -120,11 +129,6 @@ include.module( 'tool-baseMaps', [ 'smk', 'tool', 'widgets', 'viewer', 'leaflet'
             self.zoom = v.zoom
         }
 
-        aux.widget.vm.$on( 'baseMaps-widget.click', function () {
-            if ( !self.visible || !self.enabled ) return
-
-            self.active = !self.active
-        } )
     } )
 
     return BaseMapsTool

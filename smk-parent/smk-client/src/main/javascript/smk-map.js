@@ -217,25 +217,19 @@ include.module( 'smk-map', [ 'smk', 'jquery', 'util', 'viewer', 'layer' ], funct
             } )
     }
 
-    SmkMap.prototype.emit = function () { 
-        this.dispatcher.$emit.apply( this.dispatcher, arguments ) 
+    SmkMap.prototype.emit = function ( toolId, event, arg ) {
+        this.dispatcher.$emit( toolId + '.' + event, arg )
 
         return this
     }
 
-    SmkMap.prototype.on = function () { 
+    SmkMap.prototype.on = function ( toolId, handler ) {
         var self = this
 
-        var args = [].slice.call( arguments )
+        Object.keys( handler ).forEach( function ( k ) {
+            self.dispatcher.$on( toolId + '.' + k, handler[ k ] )
+        } )
 
-        if ( args.length == 1 ) {
-            Object.keys( args[ 0 ] ).forEach( function ( k ) {
-                self.dispatcher.$on( k, args[ 0 ][ k ] )
-            } )
-            return this
-        }
-
-        this.dispatcher.$on.apply( this.dispatcher, args )
         return this
     }
 } )

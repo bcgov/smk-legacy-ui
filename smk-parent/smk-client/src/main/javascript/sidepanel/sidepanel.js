@@ -17,9 +17,8 @@ include.module( 'sidepanel', [ 'vue', 'sidepanel.sidepanel-html', 'sidepanel.pan
             el: el,
             data: this.model,
             methods: {
-                trigger: function ( event, arg ) {
-                    smk.emit( event, arg )
-                    // console.log( arguments )
+                trigger: function ( toolId, event, arg ) {
+                    smk.emit( toolId, event, arg )
                 }
             }
     } )
