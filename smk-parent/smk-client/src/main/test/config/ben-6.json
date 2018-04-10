@@ -21,7 +21,10 @@
         "baseMap": "Imagery"
     },
     "tools": [
-        {
+       { "type": "query", "instance": "746--query1", "position": "menu", "icon": "account_balance" },
+        { "type": "query", "instance": "746--query2", "position": "toolbar", "icon": "account_box" },
+        { "type": "query", "instance": "746--query3", "icon": "bug_report" },
+         {
             "type": "coordinate",
             "enabled": true
         },
@@ -79,7 +82,8 @@
         {
             "type": "about",
             "enabled": true,
-            "content": ""
+            "title": "Ben 6 Test",
+            "content": "This application is a demonstration of Simple Mapping Kit (SMK).<p>It is a standalone web app."
         },
         {
             "type": "baseMaps",
