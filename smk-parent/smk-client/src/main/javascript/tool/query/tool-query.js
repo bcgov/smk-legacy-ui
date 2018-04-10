@@ -46,7 +46,6 @@ include.module( 'tool-query', [ 'smk', 'tool', 'widgets', 'tool-query.panel-quer
         extends: inc.widgets.toolPanel,
         template: inc[ 'tool-query.panel-query-html' ],
         props: [ 'busy', 'layers', 'highlightId', 'description', 'parameters' ],
-        // props: [ 'busy', 'queries', 'description', 'parameters', 'layerTitle', 'features', 'highlightId', 'pickId' ],
         methods: {
             featureListProps: function () {
                 var self = this
@@ -72,10 +71,6 @@ include.module( 'tool-query', [ 'smk', 'tool', 'widgets', 'tool-query.panel-quer
 
         this.makePropPanel( 'description', null )
         this.makePropPanel( 'parameters', null )
-        // this.makePropPanel( 'layerTitle', null )
-        // this.makePropPanel( 'features', {} )
-        // this.makePropPanel( 'highlightId', null )
-        // this.makePropPanel( 'pickId', null )
 
         SMK.TYPE.FeatureList.prototype.constructor.call( this, $.extend( {
             order:          4,
@@ -89,7 +84,6 @@ include.module( 'tool-query', [ 'smk', 'tool', 'widgets', 'tool-query.panel-quer
 
     $.extend( QueryTool.prototype, SMK.TYPE.FeatureList.prototype )
     QueryTool.prototype.afterInitialize = SMK.TYPE.FeatureList.prototype.afterInitialize.concat( [] )
-    // QueryTool.prototype.afterInitialize = []
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
     QueryTool.prototype.afterInitialize.unshift( function ( smk ) {

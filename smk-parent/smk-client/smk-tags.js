@@ -58,6 +58,9 @@ exports.gen = function () {
         .script( '//cdn.jsdelivr.net/npm/sortablejs@1.7.0/Sortable.min.js' )
         .script( '//cdnjs.cloudflare.com/ajax/libs/Vue.Draggable/2.16.0/vuedraggable.min.js' )
 
+    t.group( 'tool-dropdown' )
+        .dir( 'tool/dropdown/**/*', { cwd: baseDir } )
+
     t.group( 'tool-layers' )
         .dir( 'tool/layers/**/*', { cwd: baseDir } )
 
