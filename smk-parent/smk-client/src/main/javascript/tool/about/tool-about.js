@@ -30,7 +30,7 @@ include.module( 'tool-about', [ 'smk', 'tool', 'widgets', 'tool-about.panel-abou
     AboutTool.prototype.afterInitialize = []
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
-    AboutTool.prototype.afterInitialize.push( function ( smk, aux ) {
+    AboutTool.prototype.afterInitialize.push( function ( smk ) {
         var self = this
 
         smk.on( this.id, {

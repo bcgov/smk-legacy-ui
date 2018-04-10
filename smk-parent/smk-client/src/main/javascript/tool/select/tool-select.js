@@ -29,11 +29,11 @@ include.module( 'tool-select', [ 'smk', 'feature-list', 'widgets', 'tool-select.
     SelectTool.prototype.afterInitialize = SMK.TYPE.FeatureList.prototype.afterInitialize.concat( [] )
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
-    SelectTool.prototype.afterInitialize.unshift( function ( smk, aux ) {
+    SelectTool.prototype.afterInitialize.unshift( function ( smk ) {
         this.featureSet = smk.$viewer.selected
     } )
 
-    SelectTool.prototype.afterInitialize.push( function ( smk, aux ) {
+    SelectTool.prototype.afterInitialize.push( function ( smk ) {
         var self = this
 
         smk.on( this.id, {

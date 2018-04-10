@@ -29,7 +29,7 @@ include.module( 'feature-list', [ 'smk', 'tool', 'widgets', 'feature-list.panel-
     FeatureList.prototype.afterInitialize = []
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
-    FeatureList.prototype.afterInitialize.push( function ( smk, aux ) {
+    FeatureList.prototype.afterInitialize.push( function ( smk ) {
         var self = this
 
         smk.on( this.id, {

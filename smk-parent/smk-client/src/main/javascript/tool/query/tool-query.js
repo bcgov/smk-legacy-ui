@@ -92,7 +92,7 @@ include.module( 'tool-query', [ 'smk', 'tool', 'widgets', 'tool-query.panel-quer
     // QueryTool.prototype.afterInitialize = []
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
-    QueryTool.prototype.afterInitialize.unshift( function ( smk, aux ) {
+    QueryTool.prototype.afterInitialize.unshift( function ( smk ) {
         if ( !( this.instance in smk.$viewer.query ) )
             throw new Error( '"' + this.instance + '" is not a defined query' )
 
@@ -105,7 +105,7 @@ include.module( 'tool-query', [ 'smk', 'tool', 'widgets', 'tool-query.panel-quer
         this.parameters = this.query.getParameters()
     } )
 
-    QueryTool.prototype.afterInitialize.push( function ( smk, aux ) {
+    QueryTool.prototype.afterInitialize.push( function ( smk ) {
         var self = this
 
         smk.on( this.id, {

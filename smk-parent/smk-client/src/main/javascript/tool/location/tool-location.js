@@ -19,7 +19,7 @@ include.module( 'tool-location', [ 'smk', 'tool', 'widgets', 'tool-location.popu
     LocationTool.prototype.afterInitialize = []
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
-    LocationTool.prototype.afterInitialize.push( function ( smk, aux ) {
+    LocationTool.prototype.afterInitialize.push( function ( smk ) {
         var self = this
 
         if ( smk.$tool.identify )

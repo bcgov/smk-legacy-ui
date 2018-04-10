@@ -29,11 +29,11 @@ include.module( 'tool-identify', [ 'smk', 'feature-list', 'widgets', 'tool-ident
     IdentifyTool.prototype.afterInitialize = SMK.TYPE.FeatureList.prototype.afterInitialize.concat( [] )
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
-    IdentifyTool.prototype.afterInitialize.unshift( function ( smk, aux ) {
+    IdentifyTool.prototype.afterInitialize.unshift( function ( smk ) {
         this.featureSet = smk.$viewer.identified
     } )
 
-    IdentifyTool.prototype.afterInitialize.push( function ( smk, aux ) {
+    IdentifyTool.prototype.afterInitialize.push( function ( smk ) {
         var self = this
 
         // smk.$viewer.handlePick( this, function ( location ) {

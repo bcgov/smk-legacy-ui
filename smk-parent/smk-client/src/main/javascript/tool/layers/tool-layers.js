@@ -59,7 +59,7 @@ include.module( 'tool-layers', [ 'smk', 'tool', 'widgets', 'tool-layers.panel-la
     LayersTool.prototype.afterInitialize = []
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
-    LayersTool.prototype.afterInitialize.push( function ( smk, aux ) {
+    LayersTool.prototype.afterInitialize.push( function ( smk ) {
         var self = this
 
         smk.on( this.id, {

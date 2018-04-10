@@ -45,7 +45,7 @@ include.module( 'tool-directions-leaflet', [ 'leaflet', 'tool-directions' ], fun
     } )
 
 
-    SMK.TYPE.DirectionsTool.prototype.afterInitialize.push( function ( smk, aux ) {
+    SMK.TYPE.DirectionsTool.prototype.afterInitialize.push( function ( smk ) {
         var self = this
 
         this.changedActive( function () {

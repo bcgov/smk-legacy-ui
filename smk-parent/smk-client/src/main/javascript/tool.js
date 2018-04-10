@@ -89,41 +89,28 @@ include.module( 'tool', [ 'smk', 'jquery', 'event' ], function () {
 
         var aux = {}
         return SMK.UTIL.waitAll( [
-            smk.getToolbar().then( function ( toolbar ) { aux.toolbar = toolbar } ),
-            smk.getSidepanel().then( function ( panel ) { aux.panel = panel } ),
-            smk.getMenu().then( function ( menu ) { aux.menu = menu } ),
+            smk.getToolbar(),
+            smk.getSidepanel()
         ] )
-        .then( function () {
-            switch ( self.position ) {
-            case 'toolbar':
-                if ( self.widgetComponent )
-                    aux.toolbar.add( self )
-
-                if ( self.panelComponent )
-                    aux.panel.add( self )
-
-                aux.widget = aux.toolbar
-                break;
-
-            case 'menu':
-                aux.menu.add( self )
-                aux.widget = aux.panel
-                break;
+        .then( function ( objs ) {
+            if ( self.position != 'toolbar' && ( !( self.position in smk.$tool ) || !( 'addTool' in smk.$tool[ self.position ] ) ) ) {
+                console.warn( 'position "' + self.position + '" not defined' )
+                self.position = 'toolbar'
             }
 
-            // aux.on = function ( source, event, handler ) {
-            //     if ( typeof handler != 'function' && typeof event == 'function' ) {
-            //         handler = event
-            //         event = source
-            //         source = 'panel'
-            //     }
+            if ( self.position == 'toolbar' ) {
+                if ( self.widgetComponent )
+                    objs[ 0 ].add( self )
 
-            //     aux[ source ].vm.$on( '')
-
-            // }
+                if ( self.panelComponent )
+                    objs[ 1 ].add( self )
+            }
+            else {
+                smk.$tool[ self.position ].addTool( self )
+            }
 
             return self.afterInitialize.forEach( function ( init ) {
-                init.call( self, smk, aux )
+                init.call( self, smk )
             } )
         } )
     }

@@ -90,7 +90,7 @@ include.module( 'tool-search', [ 'smk', 'tool', 'widgets', 'tool-search.widget-s
     SearchTool.prototype.afterInitialize = []
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
-    SearchTool.prototype.afterInitialize.push( function ( smk, aux ) {
+    SearchTool.prototype.afterInitialize.push( function ( smk ) {
         var self = this
 
         smk.on( this.id, {

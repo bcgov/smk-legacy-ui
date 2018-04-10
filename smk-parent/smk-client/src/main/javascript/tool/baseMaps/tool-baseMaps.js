@@ -84,7 +84,7 @@ include.module( 'tool-baseMaps', [ 'smk', 'tool', 'widgets', 'viewer', 'leaflet'
     BaseMapsTool.prototype.afterInitialize = []
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
-    BaseMapsTool.prototype.afterInitialize.push( function ( smk, aux ) {
+    BaseMapsTool.prototype.afterInitialize.push( function ( smk ) {
         var self = this
 
         this.basemaps = Object.keys( smk.$viewer.basemap )

@@ -87,7 +87,7 @@ include.module( 'tool-query', [ 'smk', 'tool', 'widgets', 'tool-query.panel-quer
     QueryTool.prototype.afterInitialize = []
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
-    QueryTool.prototype.afterInitialize.push( function ( smk, aux ) {
+    QueryTool.prototype.afterInitialize.push( function ( smk ) {
         var self = this
 
         this.queries = Object.values( smk.$viewer.query ).map( function ( q ) {

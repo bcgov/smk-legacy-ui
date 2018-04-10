@@ -191,7 +191,7 @@ include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.
     DirectionsTool.prototype.afterInitialize = []
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
-    DirectionsTool.prototype.afterInitialize.push( function ( smk, aux ) {
+    DirectionsTool.prototype.afterInitialize.push( function ( smk ) {
         var self = this
 
         self.changedActive( function () {

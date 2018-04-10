@@ -31,7 +31,7 @@ include.module( 'tool-menu', [ 'smk', 'tool', 'widgets', 'tool-menu.panel-menu-h
     MenuTool.prototype.afterInitialize = []
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
-    MenuTool.prototype.afterInitialize.push( function ( smk, aux ) {
+    MenuTool.prototype.afterInitialize.push( function ( smk ) {
         var self = this
 
         smk.on( this.id, {
@@ -46,12 +46,10 @@ include.module( 'tool-menu', [ 'smk', 'tool', 'widgets', 'tool-menu.panel-menu-h
             if ( self.selectedTool )
                 self.selectedTool.active = self.active
         } )
-
-        aux.menu.setContainer( this )
     } )
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
-    MenuTool.prototype.add = function ( tool ) {
+    MenuTool.prototype.addTool = function ( tool ) {
         var self = this
 
         this.subWidgets.push( {

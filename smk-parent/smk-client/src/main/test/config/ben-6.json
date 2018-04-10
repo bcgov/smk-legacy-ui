@@ -21,6 +21,7 @@
         "baseMap": "Imagery"
     },
     "tools": [
+       { "type": "menu" },
        { "type": "query", "instance": "746--query1", "position": "menu", "icon": "account_balance" },
         { "type": "query", "instance": "746--query2", "position": "toolbar", "icon": "account_box" },
         { "type": "query", "instance": "746--query3", "icon": "bug_report" },
