@@ -20,8 +20,13 @@
 
     <template slot="command-row" slot-scope="list">
         <span class="smk-command"
-            v-bind:class="{ 'smk-disabled': list.isEmpty }"
-            v-on:click="$$emit( 'execute' )"
+            v-bind:class="{ 'smk-disabled': list.isEmpty && !isModified }"
+            v-on:click="( !list.isEmpty || isModified ) && $$emit( 'reset' )"
+        >Reset</span>
+
+        <span class="smk-command"
+            v-bind:class="{ 'smk-disabled': !isReady }"
+            v-on:click="isReady && $$emit( 'execute' )"
         >Execute</span>
     </template>
 

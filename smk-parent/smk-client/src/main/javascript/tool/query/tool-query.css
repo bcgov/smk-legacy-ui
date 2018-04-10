@@ -8,13 +8,13 @@
 }
 
 .smk-parameter {
-    margin-top: 5px;
+    margin-top: 10px;
 }
 
 .smk-parameter label {
     font-size: 12px;
     display: block;
-    width: calc( 100% - 5px );
+    width: calc( 100% - 10px );
 }
 
 .smk-parameter input, .smk-parameter select, .smk-parameter span {

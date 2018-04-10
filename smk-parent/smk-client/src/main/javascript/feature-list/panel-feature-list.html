@@ -9,7 +9,7 @@
         <slot name="commands" v-bind:isEmpty="isEmpty"></slot>
 
         <div class="smk-command-row">
-            <span class="smk-command"
+            <span class="smk-command" v-if="canClear"
                 v-bind:class="{ 'smk-disabled': isEmpty }"
                 v-on:click="$$emit( 'clear' )"
             >Clear</span>

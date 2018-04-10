@@ -57,9 +57,19 @@ include.module( 'tool-query', [ 'smk', 'tool', 'widgets', 'tool-query.panel-quer
             }
         },
         computed: {
-            isEmpty: {
+            isReady: {
                 get: function () {
-                    return !this.parameters
+                    return this.parameters.every( function ( p ) {
+                        return p.prop.value != null
+                    } )
+                }
+            },
+
+            isModified: {
+                get: function () {
+                    return !this.parameters.every( function ( p ) {
+                        return p.prop.value == p.initial
+                    } )
                 }
             }
         },
@@ -121,7 +131,9 @@ include.module( 'tool-query', [ 'smk', 'tool', 'widgets', 'tool-query.panel-quer
             //     smk.$viewer[ self.featureSetProperty ].highlight( ev.features && ev.features.map( function ( f ) { return f.id } ) )
             // } )
 
-            'clear': function ( ev ) {
+            'reset': function ( ev ) {
+                self.featureSet.clear()
+
                 self.parameters.forEach( function ( p, i ) {
                     p.prop.value = self.query.parameters[ i ].value
                 } )

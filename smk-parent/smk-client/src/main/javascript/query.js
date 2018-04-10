@@ -40,7 +40,8 @@ include.module( 'query', [ 'smk', 'jquery', 'util', 'event' ], function () {
             return {
                 id: self.id + '--' + p.id,
                 component: 'parameter-' + p.type,
-                prop: $.extend( true, { value: null }, p )
+                prop: $.extend( true, { value: null }, p ),
+                initial: p.value
             }
         } )
     }

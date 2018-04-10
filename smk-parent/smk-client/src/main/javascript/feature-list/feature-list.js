@@ -3,7 +3,7 @@ include.module( 'feature-list', [ 'smk', 'tool', 'widgets', 'feature-list.panel-
     Vue.component( 'feature-list-panel', {
         extends: inc.widgets.toolPanel,
         template: inc[ 'feature-list.panel-feature-list-html' ],
-        props: [ 'busy', 'layers', 'highlightId', 'canRemove' ],
+        props: [ 'busy', 'layers', 'highlightId', 'canRemove', 'canClear' ],
         computed: {
             isEmpty: {
                 get: function () {
