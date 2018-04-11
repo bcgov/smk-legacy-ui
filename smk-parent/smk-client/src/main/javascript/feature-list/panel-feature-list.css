@@ -18,14 +18,24 @@
     position: relative;
     margin-bottom: 5px;
     border-radius: 5px;
-    padding: 5px;
 }
 
 .smk-feature-list-panel .smk-layer h2 {
     display: inline-block;
-    width: 200px;
+    width: calc( 100% - 10px );
     font-size: 13px;
     font-weight: bold;
+    position: sticky;
+    top: 0;
+    background-color: lightgray;
+    padding: 5px;
+    border-radius: 3px;
+}
+
+.smk-feature-list-panel .smk-layer h2 .smk-count{
+    display: inline-block;
+    font-size: 10px;
+    float: right;
 }
 
 .smk-feature-list-panel .smk-layer .smk-feature {
