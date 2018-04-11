@@ -25,6 +25,8 @@
        { "type": "dropdown" },
        { "type": "query", "instance": "746--query1", "position": "dropdown", "icon": "account_balance" },
         { "type": "query", "instance": "746--query2", "position": "dropdown", "icon": "account_box" },
+        { "type": "query", "instance": "746--query4", "position": "dropdown", "icon": "account_box" },
+        { "type": "query", "instance": "746--query5", "position": "dropdown", "icon": "account_box" },
         { "type": "query", "instance": "746--query3", "icon": "bug_report" },
          {
             "type": "coordinate",
@@ -270,6 +272,63 @@
             ],
             "queries": [
                 {
+                    "id": "query4",
+                    "title": "Test CONTAINS",
+                    "description": "Find features that contain text in Agency, Source or Source Reference",
+                    "parameters": [
+                        {
+                            "id": "param1",
+                            "type": "input",
+                            "title": "Matching text",
+                            "value": "kamloops"
+                        }
+                    ],
+                    "clause": {
+                        "operator": "or",
+                        "arguments": [
+                            {
+                                "operator": "contains",
+                                "arguments": [
+                                    {
+                                        "operand": "attribute",
+                                        "name": "AGENCY_NAME"
+                                    },
+                                    {
+                                        "operand": "parameter",
+                                        "id": "param1"
+                                    }
+                                ]
+                            },
+                            {
+                                "operator": "contains",
+                                "arguments": [
+                                    {
+                                        "operand": "attribute",
+                                        "name": "SOURCE"
+                                    },
+                                    {
+                                        "operand": "parameter",
+                                        "id": "param1"
+                                    }
+                                ]
+                            },
+                            {
+                                "operator": "contains",
+                                "arguments": [
+                                    {
+                                        "operand": "attribute",
+                                        "name": "SOURCE_REF"
+                                    },
+                                    {
+                                        "operand": "parameter",
+                                        "id": "param1"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                },
+                {
                     "id": "query1",
                     "title": "Test query 1",
                     "description": "Query FISH_OBSERVATION_POINT_ID",
@@ -394,6 +453,101 @@
                                     {
                                         "operand": "parameter",
                                         "id": "param2"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "query5",
+                    "title": "Test Select",
+                    "description": "Find features by Species",
+                    "parameters": [
+                        {
+                            "id": "param1",
+                            "type": "select",
+                            "title": "Species",
+                            "value": "ABT",
+                            "choices": [
+                                { "value":"ABT", "title":"Anadromous Bull Trout" },
+                                { "value":"ACT", "title":"Cutthroat Trout (Anadromous)" },
+                                { "value":"BB",  "title":"Burbot" },
+                                { "value":"BCB", "title":"Black Crappie" },
+                                { "value":"BH",  "title":"Bullhead (General)" },
+                                { "value":"BL",  "title":"Western Brook Lamprey" },
+                                { "value":"BNH", "title":"Brown Catfish (formerly Brown Bullhead)" },
+                                { "value":"BSU", "title":"Bridgelip Sucker" },
+                                { "value":"BT",  "title":"Bull Trout" },
+                                { "value":"C",   "title":"Minnow (General)" },
+                                { "value":"CAL", "title":"Coastrange Sculpin (formerly Aleutian Sculpin)" },
+                                { "value":"CAS", "title":"Prickly Sculpin" },
+                                { "value":"CBA", "title":"Mottled Sculpin" },
+                                { "value":"CBC", "title":"Chub (General)" },
+                                { "value":"CC",  "title":"Sculpin (General)" },
+                                { "value":"CCA", "title":"Sharpnose Sculpin" },
+                                { "value":"CCG", "title":"Slimy Sculpin" },
+                                { "value":"CCL", "title":"Cultus Lake Sculpin" },
+                                { "value":"CCT", "title":"Coastal Cutthroat Trout" },
+                                { "value":"CH",  "title":"Chinook Salmon" },
+                                { "value":"CLA", "title":"Staghorn Sculpin" },
+                                { "value":"CM",  "title":"Chum Salmon" },
+                                { "value":"CO",  "title":"Coho Salmon" },
+                                { "value":"CRH", "title":"Torrent Sculpin" },
+                                { "value":"CSU", "title":"Largescale Sucker" },
+                                { "value":"CT",  "title":"Cutthroat Trout" },
+                                { "value":"DV",  "title":"Dolly Varden" },
+                                { "value":"EB",  "title":"Brook Trout" },
+                                { "value":"GB",  "title":"Brown Trout" },
+                                { "value":"IN",  "title":"Inconnu" },
+                                { "value":"KO",  "title":"Kokanee" },
+                                { "value":"LKC", "title":"Lake Chub" },
+                                { "value":"LMB", "title":"Largemouth Bass" },
+                                { "value":"LSU", "title":"Longnose Sucker" },
+                                { "value":"LT",  "title":"Lake Trout" },
+                                { "value":"LW",  "title":"Lake Whitefish" },
+                                { "value":"MW",  "title":"Mountain Whitefish" },
+                                { "value":"NP",  "title":"Northern Pike" },
+                                { "value":"NSB", "title":"Ninespine Stickleback" },
+                                { "value":"NSC", "title":"Northern Pikeminnow" },
+                                { "value":"PCC", "title":"Peamouth Chub" },
+                                { "value":"PK",  "title":"Pink Salmon" },
+                                { "value":"PL",  "title":"Pacific Lamprey" },
+                                { "value":"PMB", "title":"Pumpkinseed" },
+                                { "value":"PW",  "title":"Pygmy Whitefish" },
+                                { "value":"RB",  "title":"Rainbow Trout" },
+                                { "value":"RSC", "title":"Redside Shiner" },
+                                { "value":"RSM", "title":"Rainbow Smelt" },
+                                { "value":"SA",  "title":"Salmon (General)" },
+                                { "value":"SB",  "title":"Stickleback (General)" },
+                                { "value":"SFL", "title":"Starry Flounder" },
+                                { "value":"SG",  "title":"Sturgeon (General)" },
+                                { "value":"SK",  "title":"Sockeye Salmon" },
+                                { "value":"SMB", "title":"Smallmouth Bass" },
+                                { "value":"SP",  "title":"Fish Unidentified Species" },
+                                { "value":"ST",  "title":"Steelhead" },
+                                { "value":"SU",  "title":"Sucker (General)" },
+                                { "value":"TR",  "title":"Unidentifiable Trout - only fry <70mm in length " },
+                                { "value":"TSB", "title":"Threespine Stickleback" },
+                                { "value":"WCT", "title":"Westslope (Yellowstone) Cutthroat Trout" },
+                                { "value":"WF",  "title":"Whitefish (General)" },
+                                { "value":"WSU", "title":"White Sucker" }
+                            ]
+                        }
+                    ],
+                    "clause": {
+                        "operator": "or",
+                        "arguments": [
+                            {
+                                "operator": "equals",
+                                "arguments": [
+                                    {
+                                        "operand": "attribute",
+                                        "name": "SPECIES_CODE"
+                                    },
+                                    {
+                                        "operand": "parameter",
+                                        "id": "param1"
                                     }
                                 ]
                             }

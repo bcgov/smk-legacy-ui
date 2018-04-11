@@ -204,7 +204,19 @@ include.module( 'query', [ 'smk', 'jquery', 'util', 'event' ], function () {
         'contains': function ( args, param ) {
             if ( args.length != 2 ) throw new Error( 'CONTAINS needs exactly 2 arguments' )
 
-            return handleWhereOperand( args[ 0 ], param ) + ' LIKE "%' + handleWhereOperand( args[ 1 ], param, false ) + '%"'
+            return handleWhereOperand( args[ 0 ], param ) + ' LIKE \'%' + handleWhereOperand( args[ 1 ], param, false ) + '%\''
+        },
+
+        'starts-with': function ( args, param ) {
+            if ( args.length != 2 ) throw new Error( 'STARTS-WITH needs exactly 2 arguments' )
+
+            return handleWhereOperand( args[ 0 ], param ) + ' LIKE \'' + handleWhereOperand( args[ 1 ], param, false ) + '%\''
+        },
+
+        'ends-with': function ( args, param ) {
+            if ( args.length != 2 ) throw new Error( 'ENDS-WITH needs exactly 2 arguments' )
+
+            return handleWhereOperand( args[ 0 ], param ) + ' LIKE \'%' + handleWhereOperand( args[ 1 ], param, false ) + '\''
         },
 
         'not': function ( args, param ) {
@@ -224,13 +236,13 @@ include.module( 'query', [ 'smk', 'jquery', 'util', 'event' ], function () {
     var whereOperand = {
         'attribute': function ( arg, param, quote ) {
             if ( quote === false  )
-                return '" || ' + arg.name + ' || "'
+                return '\' || ' + arg.name + ' || \''
 
             return arg.name
         },
 
         'parameter': function ( arg, param, quote ) {
-            return ( quote === false ? '' : '"' ) + escapeWhereParameter( param[ arg.id ].value ) + ( quote === false ? '' : '"' )
+            return ( quote === false ? '' : '\'' ) + escapeWhereParameter( param[ arg.id ].value ) + ( quote === false ? '' : '\'' )
         }
     }
 
