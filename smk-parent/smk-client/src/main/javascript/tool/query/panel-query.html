@@ -33,7 +33,7 @@
             v-bind:class="{ 'smk-disabled': busy }"
         ><input type="checkbox"
             v-model="within"
-            v-on:change="$$emit( 'option' )"
+            v-on:change="$$emit( 'config', getConfigState() )"
         >Within current extent</label><br/>
     </template>
 

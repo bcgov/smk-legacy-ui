@@ -13,6 +13,7 @@
     <component class="smk-panel"
         v-if="activeToolId && subPanels[ activeToolId ]"
         v-bind:is="subPanels[ activeToolId ].panelComponent"
+        v-bind:key="activeToolId"
         v-bind="removeTitle( subPanels[ activeToolId ].panel )"
     ></component>
 

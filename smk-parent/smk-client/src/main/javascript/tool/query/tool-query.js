@@ -45,20 +45,36 @@ include.module( 'tool-query', [ 'smk', 'tool', 'widgets', 'tool-query.panel-quer
     Vue.component( 'query-panel', {
         extends: inc.widgets.toolPanel,
         template: inc[ 'tool-query.panel-query-html' ],
-        props: [ 'busy', 'layers', 'highlightId', 'description', 'parameters' ],
+        props: [ 'busy', 'layers', 'highlightId', 'description', 'parameters', 'config' ],
         data: function () {
-            return {
-                'within': true
+            return Object.assign( {}, this.config )
+        },
+        watch: {
+            config: function ( val ) {
+                Object.keys( val ).forEach( function ( k ) {
+                    this[ k ] = val[ k ]
+                } )
             }
         },
         methods: {
             featureListProps: function () {
                 var self = this
+
                 var prop = {}
                 Object.keys( Vue.component( 'feature-list-panel' ).options.props ).forEach( function ( p ) {
                     prop[ p ] = self[ p ]
                 } )
                 return prop
+            },
+
+            getConfigState: function () {
+                var self = this
+
+                var state = {}
+                Object.keys( this.config ).forEach( function ( k ) {
+                    state[ k ] = self[ k ]
+                } )
+                return state
             }
         },
         computed: {
@@ -86,6 +102,7 @@ include.module( 'tool-query', [ 'smk', 'tool', 'widgets', 'tool-query.panel-quer
 
         this.makePropPanel( 'description', null )
         this.makePropPanel( 'parameters', null )
+        this.makePropPanel( 'config', { within: true } )
 
         SMK.TYPE.FeatureList.prototype.constructor.call( this, $.extend( {
             order:          4,
@@ -153,13 +170,17 @@ include.module( 'tool-query', [ 'smk', 'tool', 'widgets', 'tool-query.panel-quer
                     param[ p.prop.id ] = $.extend( {}, p.prop )
                 } )
 
-                return self.query.queryLayer( param )
+                return self.query.queryLayer( param, self.config, smk.$viewer )
                     .then( function ( features ) {
                         self.featureSet.add( self.query.layer.config.id, features )
                     } )
                     .finally( function () {
                         self.busy = false
                     } )
+            },
+
+            'config': function ( ev ) {
+                Object.assign( self.config, ev )
             }
 
         } )

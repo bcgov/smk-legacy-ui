@@ -81,7 +81,7 @@ include.module( 'query', [ 'smk', 'jquery', 'util', 'event' ], function () {
 
     defineQueryType( 'esri-dynamic', {
 
-        queryLayer: function ( param ) {
+        queryLayer: function ( param, config, viewer ) {
             var self = this
 
             if ( this.layer.config.dynamicLayers.length != 1 )
@@ -109,9 +109,12 @@ include.module( 'query', [ 'smk', 'jquery', 'util', 'event' ], function () {
                 returnIdsOnly:      false,
                 returnCountOnly:    false,
                 returnDistinctValues:   false,
-                // geometry: '-129.56,48.01,-122.41,51.91',
-                // geometryType: 'esriGeometryEnvelope',
-                // spatialRel: 'esriSpatialRelIntersects'
+            }
+
+            if ( config.within ) {
+                data.geometry = viewer.getView().extent.join( ',' )
+                data.geometryType = 'esriGeometryEnvelope'
+                data.spatialRel = 'esriSpatialRelIntersects'
             }
 
             return SMK.UTIL.makePromise( function ( res, rej ) {
@@ -139,24 +142,7 @@ include.module( 'query', [ 'smk', 'jquery', 'util', 'event' ], function () {
 
                     return f
                 } )
-
-                // return data.results.map( function ( r, i ) {
-                //     var f = {}
-
-                //     if ( self.config.titleAttribute )
-                //         f.title = r.attributes[ self.config.titleAttribute ]
-                //     else if ( r.displayFieldName )
-                //         f.title = r.attributes[ r.displayFieldName ]
-                //     else
-                //         f.title = 'Feature #' + ( i + 1 )
-
-                //     f.geometry = Terraformer.ArcGIS.parse( r.geometry )
-                //     f.properties = r.attributes
-
-                //     return f
-                // } )
             } )
-
         }
 
     } )
@@ -185,19 +171,19 @@ include.module( 'query', [ 'smk', 'jquery', 'util', 'event' ], function () {
     }
 
     var whereOperator = {
-        and: function ( args, param ) {
+        'and': function ( args, param ) {
             if ( args.length == 0 ) throw new Error( 'AND needs at least 1 argument' )
 
             return args.map( function ( a ) { return '( ' + handleWhereOperator( a, param ) + ' )' } ).join( ' AND ' )
         },
 
-        or: function ( args, param ) {
+        'or': function ( args, param ) {
             if ( args.length == 0 ) throw new Error( 'OR needs at least 1 argument' )
 
             return args.map( function ( a ) { return '( ' + handleWhereOperator( a, param ) + ' )' } ).join( ' OR ' )
         },
 
-        equals: function ( args, param ) {
+        'equals': function ( args, param ) {
             if ( args.length != 2 ) throw new Error( 'EQUALS needs exactly 2 arguments' )
 
             return handleWhereOperand( args[ 0 ], param ) + ' = ' + handleWhereOperand( args[ 1 ], param )
@@ -215,13 +201,13 @@ include.module( 'query', [ 'smk', 'jquery', 'util', 'event' ], function () {
             return handleWhereOperand( args[ 0 ], param ) + ' > ' + handleWhereOperand( args[ 1 ], param )
         },
 
-        contains: function ( args, param ) {
+        'contains': function ( args, param ) {
             if ( args.length != 2 ) throw new Error( 'CONTAINS needs exactly 2 arguments' )
 
             return handleWhereOperand( args[ 0 ], param ) + ' LIKE "%' + handleWhereOperand( args[ 1 ], param, false ) + '%"'
         },
 
-        not: function ( args, param ) {
+        'not': function ( args, param ) {
             if ( args.length != 1 ) throw new Error( 'NOT needs exactly 1 argument' )
 
             return 'NOT ' + handleWhereOperator( args[ 0 ], param )
@@ -236,14 +222,14 @@ include.module( 'query', [ 'smk', 'jquery', 'util', 'event' ], function () {
     }
 
     var whereOperand = {
-        attribute: function ( arg, param, quote ) {
+        'attribute': function ( arg, param, quote ) {
             if ( quote === false  )
                 return '" || ' + arg.name + ' || "'
 
             return arg.name
         },
 
-        parameter: function ( arg, param, quote ) {
+        'parameter': function ( arg, param, quote ) {
             return ( quote === false ? '' : '"' ) + escapeWhereParameter( param[ arg.id ].value ) + ( quote === false ? '' : '"' )
         }
     }
