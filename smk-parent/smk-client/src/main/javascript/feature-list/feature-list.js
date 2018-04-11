@@ -3,7 +3,7 @@ include.module( 'feature-list', [ 'smk', 'tool', 'widgets', 'feature-list.panel-
     Vue.component( 'feature-list-panel', {
         extends: inc.widgets.toolPanel,
         template: inc[ 'feature-list.panel-feature-list-html' ],
-        props: [ 'busy', 'layers', 'highlightId', 'canRemove', 'canClear' ],
+        props: [ 'busy', 'layers', 'highlightId', 'canRemove', 'canClear', 'message', 'messageClass' ],
         computed: {
             isEmpty: {
                 get: function () {
@@ -18,6 +18,8 @@ include.module( 'feature-list', [ 'smk', 'tool', 'widgets', 'feature-list.panel-
         this.makePropPanel( 'busy', false )
         this.makePropPanel( 'layers', [] )
         this.makePropPanel( 'highlightId', null )
+        this.makePropPanel( 'message', null )
+        this.makePropPanel( 'messageClass', null )
 
         SMK.TYPE.Tool.prototype.constructor.call( this, $.extend( {
         }, option ) )
@@ -166,6 +168,17 @@ include.module( 'feature-list', [ 'smk', 'tool', 'widgets', 'feature-list.panel-
         } )
 
     } )
+
+    FeatureList.prototype.setMessage = function ( message, Class, delay ) {
+        this.message = message
+
+        this.messageClass = {}
+        if ( Class )
+            this.messageClass[ 'smk-' + Class ] = true
+
+        if ( delay )
+            return SMK.UTIL.makePromise( function ( res ) { setTimeout( res, delay ) } )
+    }
 
     return FeatureList
 } )

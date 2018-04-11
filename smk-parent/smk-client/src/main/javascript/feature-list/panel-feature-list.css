@@ -68,3 +68,28 @@
 .smk-feature-list-panel .smk-layer .smk-feature.smk-highlighted .smk-highlight {
     opacity: 1.0;
 }
+
+.smk-feature-list-panel div.smk-message {
+    font-weight: bold;
+    font-size: 15px;
+    margin-bottom: 5px;
+    margin-top: -5px;
+    text-align: center;
+    min-height: 40px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.smk-feature-list-panel .smk-message.smk-error {
+    color: red;
+}
+
+.smk-feature-list-panel .smk-message.smk-summary {
+}
+
+.smk-feature-list-panel .smk-message.smk-progress {
+    color: blue;
+}
