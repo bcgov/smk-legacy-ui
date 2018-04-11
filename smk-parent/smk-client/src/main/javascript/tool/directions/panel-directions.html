@@ -5,24 +5,48 @@
     </template>
 
     <template slot="commands">
-        <div class="smk-command-col">
+        <span class="smk-command-col">
             <div class="smk-command"
                 v-bind:class="{ 'smk-disabled': busy }"
-                v-on:click="$$emit( 'reverse' )"
+                v-on:click="!busy && $$emit( 'reverse' )"
             >Reverse</div>
 
             <div class="smk-command"
                 v-bind:class="{ 'smk-disabled': busy }"
-                v-on:click="$$emit( 'clear' )"
+                v-on:click="!busy && $$emit( 'clear' )"
             >Reset</div>
-        </div>
-        <span class="smk-command-col">
-            <label class="smk-command" v-bind:class="{ 'smk-disabled': busy }"><input type="checkbox" v-model="optimal" v-on:change="$$emit( 'option' )">Optimal order</label><br/>
-            <label class="smk-command" v-bind:class="{ 'smk-disabled': busy }"><input type="checkbox" v-model="roundTrip" v-on:change="$$emit( 'option' )">Round trip</label>
         </span>
+
         <span class="smk-command-col">
-            <label class="smk-command" v-bind:class="{ 'smk-disabled': busy }"><input type="radio" v-model="criteria" value="shortest" v-on:change="$$emit( 'option' )">Shortest</label><br/>
-            <label class="smk-command" v-bind:class="{ 'smk-disabled': busy }"><input type="radio" v-model="criteria" value="fastest" v-on:change="$$emit( 'option' )">Fastest</label>
+            <label class="smk-command"
+                v-bind:class="{ 'smk-disabled': busy }"
+            ><input type="checkbox"
+                v-model="optimal"
+                v-on:change="!busy && $$emit( 'config', getConfigState() )"
+            >Optimal order</label>
+
+            <label class="smk-command"
+                v-bind:class="{ 'smk-disabled': busy }"
+            ><input type="checkbox"
+                v-model="roundTrip"
+                v-on:change="!busy && $$emit( 'config', getConfigState() )"
+            >Round trip</label>
+        </span>
+
+        <span class="smk-command-col">
+            <label class="smk-command"
+                v-bind:class="{ 'smk-disabled': busy }"
+            ><input type="radio" value="shortest"
+                v-model="criteria"
+                v-on:change="!busy && $$emit( 'config', getConfigState() )"
+            >Shortest</label>
+
+            <label class="smk-command"
+                v-bind:class="{ 'smk-disabled': busy }"
+            ><input type="radio" value="fastest"
+                v-model="criteria"
+                v-on:change="!busy && $$emit( 'config', getConfigState() )"
+            >Fastest</label>
         </span>
     </template>
 

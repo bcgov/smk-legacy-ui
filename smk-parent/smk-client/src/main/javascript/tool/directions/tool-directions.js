@@ -135,12 +135,26 @@ include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.
     Vue.component( 'directions-panel', {
         extends: inc.widgets.toolPanel,
         template: inc[ 'tool-directions.panel-directions-html' ],
-        props: [ 'busy', 'waypoints', 'directions', 'directionHighlight', 'directionPick', 'message', 'messageClass' ],
+        props: [ 'busy', 'waypoints', 'directions', 'directionHighlight', 'directionPick', 'message', 'messageClass', 'config' ],
         data: function () {
-            return {
-                optimal:    false,
-                roundTrip:  false,
-                criteria:   'shortest'
+            return Object.assign( {}, this.config )
+        },
+        watch: {
+            config: function ( val ) {
+                Object.keys( val ).forEach( function ( k ) {
+                    this[ k ] = val[ k ]
+                } )
+            }
+        },
+        methods: {
+            getConfigState: function () {
+                var self = this
+
+                var state = {}
+                Object.keys( this.config ).forEach( function ( k ) {
+                    state[ k ] = self[ k ]
+                } )
+                return state
             }
         },
         computed: {
@@ -149,6 +163,7 @@ include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.
                     if ( this.waypoints[ i ].location )
                         return i
             },
+
             lastWaypointIndex: function () {
                 for ( var i = this.waypoints.length - 1; i >= 0 ; i-- )
                     if ( this.waypoints[ i ].location )
@@ -168,6 +183,11 @@ include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.
         this.makePropPanel( 'directionPick', null )
         this.makePropPanel( 'message', null )
         this.makePropPanel( 'messageClass', null )
+        this.makePropPanel( 'config', {
+            optimal:    false,
+            roundTrip:  false,
+            criteria:   'shortest'
+        } )
 
         SMK.TYPE.Tool.prototype.constructor.call( this, $.extend( {
             order:          4,
@@ -175,12 +195,6 @@ include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.
             widgetComponent:'directions-widget',
             panelComponent: 'directions-panel',
         }, option ) )
-
-        this.routeOption = {
-            optimal:    false,
-            roundTrip:  false,
-            criteria:   'shortest'
-        }
 
         this.activating = SMK.UTIL.resolved()
     }
@@ -255,10 +269,8 @@ include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.
                 self.active = !self.active
             },
 
-            'option': function ( ev, comp ) {
-                self.routeOption.optimal = comp.optimal
-                self.routeOption.roundTrip = comp.roundTrip
-                self.routeOption.criteria = comp.criteria
+            'config': function ( ev ) {
+                Object.assign( self.config, ev )
 
                 self.findRoute()
             },
@@ -370,7 +382,7 @@ include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.
         this.setMessage( 'Calculating...', 'progress' )
         this.busy = true
 
-        return findRoute( points, this.routeOption ).then( function ( data ) {
+        return findRoute( points, this.config ).then( function ( data ) {
             self.displayRoute( data.route )
 
             if ( data.visitOrder && data.visitOrder.findIndex( function ( v, i ) { return points[ v ].index != i } ) != -1 ) {

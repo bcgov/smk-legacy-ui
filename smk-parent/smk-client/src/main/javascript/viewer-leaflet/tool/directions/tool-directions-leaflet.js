@@ -178,7 +178,7 @@ include.module( 'tool-directions-leaflet', [ 'leaflet', 'tool-directions' ], fun
             },
 
             'zoom-waypoint': function ( ev ) {
-                smk.$viewer.map.panTo( [ ev.location.latitude, ev.location.longitude ] )
+                smk.$viewer.map.flyTo( [ ev.location.latitude, ev.location.longitude ], 12 )
                 self.waypointLayers[ ev.index ].openPopup()
             }
         } )
