@@ -1,3 +1,4 @@
+[![Build Status](https://cis.data.gov.bc.ca/job/smk/job/smk-maven/badge/icon)](https://cis.data.gov.bc.ca/job/smk/job/smk-maven/)
 # smk
 Simple Map Kit - AKA MapSDK, a versatile and lightweight toolkit for building simple web map
 
