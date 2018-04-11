@@ -468,7 +468,7 @@
                             "id": "param1",
                             "type": "select",
                             "title": "Species",
-                            "value": "ABT",
+                            "value": null,
                             "choices": [
                                 { "value":"ABT", "title":"Anadromous Bull Trout" },
                                 { "value":"ACT", "title":"Cutthroat Trout (Anadromous)" },

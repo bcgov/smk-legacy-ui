@@ -26,13 +26,13 @@ include.module( 'tool-query', [ 'smk', 'tool', 'widgets', 'tool-query.panel-quer
         data: function () {
             // console.log( 'data', this.value )
             return {
-                selected: this.value
+                selected: this.value || ''
             }
         },
         watch: {
             value: function ( val ) {
                 // console.log( 'watch', val )
-                this.selected = val
+                this.selected = val || ''
             }
         }
     } )
