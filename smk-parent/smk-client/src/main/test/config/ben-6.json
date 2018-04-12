@@ -27,6 +27,7 @@
         { "type": "query", "instance": "746--query2", "position": "dropdown", "icon": "account_box" },
         { "type": "query", "instance": "746--query4", "position": "dropdown", "icon": "account_box" },
         { "type": "query", "instance": "746--query5", "position": "dropdown", "icon": "account_box" },
+        { "type": "query", "instance": "746--query6", "position": "dropdown", "icon": "account_box" },
         { "type": "query", "instance": "746--query3", "icon": "bug_report" },
          {
             "type": "coordinate",
@@ -273,7 +274,7 @@
             "queries": [
                 {
                     "id": "query4",
-                    "title": "Test CONTAINS",
+                    "title": "contains",
                     "description": "Find features that contain text in Agency, Source or Source Reference",
                     "parameters": [
                         {
@@ -328,9 +329,10 @@
                         ]
                     }
                 },
+
                 {
                     "id": "query1",
-                    "title": "Test query 1",
+                    "title": "less than",
                     "description": "Query FISH_OBSERVATION_POINT_ID",
                     "parameters": [
                         {
@@ -359,21 +361,22 @@
                         ]
                     }
                 },
+
                 {
                     "id": "query2",
-                    "title": "Test query 2",
+                    "title": "contains and equals",
                     "description": "species & type",
                     "parameters": [
                         {
                             "id": "param1",
                             "type": "input",
-                            "title": "Species",
+                            "title": "Species contains",
                             "value": "salmon"
                         },
                         {
                             "id": "param2",
                             "type": "input",
-                            "title": "type code",
+                            "title": "type code equals",
                             "value": "Observation"
                         }
                     ],
@@ -409,21 +412,22 @@
                         ]
                     }
                 },
+
                 {
                     "id": "query3",
                     "title": "Test query 3",
-                    "description": "species | type",
+                    "description": "contains or equals",
                     "parameters": [
                         {
                             "id": "param1",
                             "type": "input",
-                            "title": "Species",
+                            "title": "Species contains",
                             "value": "salmon"
                         },
                         {
                             "id": "param2",
                             "type": "input",
-                            "title": "type code",
+                            "title": "type code equals",
                             "value": "Observation"
                         }
                     ],
@@ -459,9 +463,10 @@
                         ]
                     }
                 },
+
                 {
                     "id": "query5",
-                    "title": "Test Select",
+                    "title": "select species",
                     "description": "Find features by Species",
                     "parameters": [
                         {
@@ -548,6 +553,136 @@
                                     {
                                         "operand": "parameter",
                                         "id": "param1"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                },
+
+                {
+                    "id": "query6",
+                    "title": "complex",
+                    "description": "complex query ",
+                    "parameters": [
+                        {
+                            "id": "param2",
+                            "type": "input",
+                            "title": "name contains",
+                            "value": null
+                        },
+                        {
+                            "id": "param1",
+                            "type": "input",
+                            "title": "waterbody id less than",
+                            "value": 400000
+                        },
+                        {
+                            "id": "param3",
+                            "type": "constant",
+                            "title": "waterbody id greater than",
+                            "value": 100000
+                        },
+                        {
+                            "id": "param4",
+                            "type": "input",
+                            "title": "point type code is not",
+                            "value": "foo"
+                        }
+                    ],
+                    "clause": {
+                        "operator": "and",
+                        "arguments": [
+                            {
+                                "operator": "or",
+                                "arguments": [
+                                    {
+                                        "operator": "contains",
+                                        "arguments": [
+                                            {
+                                                "operand": "attribute",
+                                                "name": "SPECIES_NAME"
+                                            },
+                                            {
+                                                "operand": "parameter",
+                                                "id": "param2"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "operator": "starts-with",
+                                        "arguments": [
+                                            {
+                                                "operand": "attribute",
+                                                "name": "GAZETTED_NAME"
+                                            },
+                                            {
+                                                "operand": "parameter",
+                                                "id": "param2"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "operator": "ends-with",
+                                        "arguments": [
+                                            {
+                                                "operand": "attribute",
+                                                "name": "AGENCY_NAME"
+                                            },
+                                            {
+                                                "operand": "parameter",
+                                                "id": "param2"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "operator": "and",
+                                        "arguments": [
+                                            {
+                                                "operator": "less-than",
+                                                "arguments": [
+                                                    {
+                                                        "operand": "attribute",
+                                                        "name": "WBODY_ID"
+                                                    },
+                                                    {
+                                                        "operand": "parameter",
+                                                        "id": "param1"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "operator": "greater-than",
+                                                "arguments": [
+                                                    {
+                                                        "operand": "attribute",
+                                                        "name": "WBODY_ID"
+                                                    },
+                                                    {
+                                                        "operand": "parameter",
+                                                        "id": "param3"
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "operator": "not",
+                                "arguments": [
+                                    {
+                                        "operator": "equals",
+                                        "arguments": [
+                                            {
+                                                "operand": "attribute",
+                                                "name": "POINT_TYPE_CODE"
+                                            },
+                                            {
+                                                "operand": "parameter",
+                                                "id": "param4"
+                                            }
+                                        ]
                                     }
                                 ]
                             }
