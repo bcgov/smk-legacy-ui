@@ -45,6 +45,7 @@ include.module( 'feature-list', [ 'smk', 'tool', 'widgets', 'feature-list.panel-
 
             'clear': function ( ev ) {
                 self.featureSet.clear()
+                self.setMessage()
             },
 
             'remove': function ( ev ) {

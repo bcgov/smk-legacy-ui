@@ -7,7 +7,7 @@ include.module( 'tool-identify', [ 'smk', 'feature-list', 'widgets', 'tool-ident
     Vue.component( 'identify-panel', {
         extends: inc.widgets.toolPanel,
         template: inc[ 'tool-identify.panel-identify-html' ],
-        props: [ 'busy', 'layers', 'highlightId' ],
+        props: [ 'busy', 'layers', 'highlightId', 'message', 'messageClass' ],
     } )
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
@@ -48,8 +48,6 @@ include.module( 'tool-identify', [ 'smk', 'feature-list', 'widgets', 'tool-ident
             },
 
             'add-all': function ( ev ) {
-                console.log(ev);
-
                 self.layers.forEach( function ( ly ) {
                     smk.$viewer.selected.add( ly.id, ly.features.map( function ( ft ) {
                         return smk.$viewer.identified.get( ft.id )
@@ -62,16 +60,21 @@ include.module( 'tool-identify', [ 'smk', 'feature-list', 'widgets', 'tool-ident
             self.busy = true
             self.firstId = null
             self.active = true
+            self.setMessage( 'Fetching features', 'progress' )
         } )
 
         smk.$viewer.finishedIdentify( function ( ev ) {
             self.busy = false
 
-            if ( smk.$viewer.identified.isEmpty() )
+            if ( smk.$viewer.identified.isEmpty() ) {
                 self.active = false
+                self.setMessage( 'No features found', 'warning' )
+            }
             else {
                 smk.$tool.location.reset()
                 smk.$viewer.identified.pick( self.firstId )
+                var stat = smk.$viewer.identified.getStats()
+                self.setMessage( 'Found ' + stat.featureCount + ' features, on ' + stat.layerCount + ' layers, with ' + stat.vertexCount + ' vertices.' )
             }
         } )
 

@@ -93,3 +93,7 @@
 .smk-feature-list-panel .smk-message.smk-progress {
     color: blue;
 }
+
+.smk-feature-list-panel .smk-message.smk-warning {
+    color: orange;
+}

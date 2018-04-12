@@ -45,7 +45,7 @@ include.module( 'tool-query', [ 'smk', 'tool', 'widgets', 'tool-query.panel-quer
     Vue.component( 'query-panel', {
         extends: inc.widgets.toolPanel,
         template: inc[ 'tool-query.panel-query-html' ],
-        props: [ 'busy', 'layers', 'highlightId', 'description', 'parameters', 'config' ],
+        props: [ 'busy', 'layers', 'highlightId', 'description', 'parameters', 'config', 'message', 'messageClass' ],
         data: function () {
             return Object.assign( {}, this.config )
         },
@@ -155,6 +155,7 @@ include.module( 'tool-query', [ 'smk', 'tool', 'widgets', 'tool-query.panel-quer
 
             'reset': function ( ev ) {
                 self.featureSet.clear()
+                self.setMessage()
 
                 self.parameters.forEach( function ( p, i ) {
                     p.prop.value = self.query.parameters[ i ].value
@@ -164,6 +165,7 @@ include.module( 'tool-query', [ 'smk', 'tool', 'widgets', 'tool-query.panel-quer
             'execute': function ( ev ) {
                 self.featureSet.clear()
                 self.busy = true
+                self.setMessage( 'Executing query', 'progress' )
 
                 var param = {}
                 self.parameters.forEach( function ( p, i ) {
@@ -174,6 +176,9 @@ include.module( 'tool-query', [ 'smk', 'tool', 'widgets', 'tool-query.panel-quer
                     .then( function ( features ) {
                         self.featureSet.add( self.query.layer.config.id, features )
                     } )
+                    .catch( function ( err ) {
+                        self.setMessage( 'Query returned no results', 'warning' )
+                    } )
                     .finally( function () {
                         self.busy = false
                     } )
@@ -181,9 +186,21 @@ include.module( 'tool-query', [ 'smk', 'tool', 'widgets', 'tool-query.panel-quer
 
             'config': function ( ev ) {
                 Object.assign( self.config, ev )
-            }
+            },
 
+            'add-all': function ( ev ) {
+                self.layers.forEach( function ( ly ) {
+                    smk.$viewer.selected.add( ly.id, ly.features.map( function ( ft ) {
+                        return self.featureSet.get( ft.id )
+                    } ) )
+                } )
+            }
         } )
+
+        self.featureSet.addedFeatures( function ( ev ) {
+            var stat = self.featureSet.getStats()
+            self.setMessage( 'Found ' + stat.featureCount + ' features.' )
+        } )        
 
     } )
 

@@ -7,7 +7,7 @@ include.module( 'tool-select', [ 'smk', 'feature-list', 'widgets', 'tool-select.
     Vue.component( 'select-panel', {
         extends: inc.widgets.toolPanel,
         template: inc[ 'tool-select.panel-select-html' ],
-        props: [ 'busy', 'layers', 'highlightId' ],
+        props: [ 'busy', 'layers', 'highlightId', 'message', 'messageClass' ],
     } )
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
@@ -44,6 +44,14 @@ include.module( 'tool-select', [ 'smk', 'feature-list', 'widgets', 'tool-select.
             }
         } )
 
+        self.featureSet
+            .addedFeatures( updateMessage )
+            .removedFeatures( updateMessage )
+
+        function updateMessage() {
+            var stat = self.featureSet.getStats()
+            self.setMessage( 'Selected ' + stat.featureCount + ' features.' )        
+        }
     } )
 
     return SelectTool
