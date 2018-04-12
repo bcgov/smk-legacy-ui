@@ -136,6 +136,16 @@ include.module( 'util', [ 'jquery', 'smk' ], function ( inc ) {
             throw new Error( 'not supposed to be here' )
         },
 
+        grammaticalNumber: function ( num, zero, one, many ) {
+            if ( one == null ) one = zero
+            if ( many == null ) many = one
+            switch ( num ) {
+                case 0: return zero == null ? '' : zero.replace( '{}', num )
+                case 1: return one == null ? '' : one.replace( '{}', num )
+                default: return many == null ? '' : many.replace( '{}', num )
+            }
+        },
+
         extractCRS: function ( obj ) {
             if ( obj.properties )
                 if ( obj.properties.name )

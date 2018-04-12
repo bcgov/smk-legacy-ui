@@ -49,8 +49,13 @@ include.module( 'tool-select', [ 'smk', 'feature-list', 'widgets', 'tool-select.
             .removedFeatures( updateMessage )
 
         function updateMessage() {
-            var stat = self.featureSet.getStats()
-            self.setMessage( 'Selected ' + stat.featureCount + ' features.' )        
+            var stat = smk.$viewer.identified.getStats()
+
+            var sub = ''
+            if ( stat.vertexCount > stat.featureCount )
+                sub = '<div class="smk-submessage">' + SMK.UTIL.grammaticalNumber( stat.vertexCount, null, null, 'with {} vertices' ) + '</div>'
+
+            self.setMessage( '<div>Selection contains ' + SMK.UTIL.grammaticalNumber( stat.featureCount, null, 'a feature', '{} features' ) + '</div>' + sub )
         }
     } )
 

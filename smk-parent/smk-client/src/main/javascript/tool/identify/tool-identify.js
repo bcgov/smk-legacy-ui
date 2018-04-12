@@ -73,8 +73,15 @@ include.module( 'tool-identify', [ 'smk', 'feature-list', 'widgets', 'tool-ident
             else {
                 smk.$tool.location.reset()
                 smk.$viewer.identified.pick( self.firstId )
+
                 var stat = smk.$viewer.identified.getStats()
-                self.setMessage( 'Found ' + stat.featureCount + ' features, on ' + stat.layerCount + ' layers, with ' + stat.vertexCount + ' vertices.' )
+
+                var sub = SMK.UTIL.grammaticalNumber( stat.layerCount, null, null, 'on {} layers' )
+                if ( stat.vertexCount > stat.featureCount )
+                    sub += ( sub == '' ? '' : ', ' ) + SMK.UTIL.grammaticalNumber( stat.vertexCount, null, null, 'with {} vertices' )
+                if ( sub != '' ) sub = '<div class="smk-submessage">' + sub + '</div>'
+
+                self.setMessage( '<div>Identified ' + SMK.UTIL.grammaticalNumber( stat.featureCount, null, 'a feature', '{} features' ) + '</div>' + sub )
             }
         } )
 

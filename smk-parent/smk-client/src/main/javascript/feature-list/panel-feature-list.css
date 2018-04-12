@@ -97,3 +97,7 @@
 .smk-feature-list-panel .smk-message.smk-warning {
     color: orange;
 }
+
+.smk-feature-list-panel .smk-submessage {
+    font-size: 12px;
+}

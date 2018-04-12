@@ -199,8 +199,9 @@ include.module( 'tool-query', [ 'smk', 'tool', 'widgets', 'tool-query.panel-quer
 
         self.featureSet.addedFeatures( function ( ev ) {
             var stat = self.featureSet.getStats()
-            self.setMessage( 'Found ' + stat.featureCount + ' features.' )
-        } )        
+
+            self.setMessage( '<div>Found ' + SMK.UTIL.grammaticalNumber( stat.featureCount, null, 'a feature', '{} features' ) + '</div>' )
+        } )
 
     } )
 

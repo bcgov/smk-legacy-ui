@@ -173,20 +173,25 @@ include.module( 'feature-set', [ 'smk', 'jquery', 'util', 'event' ], function ()
         var self = this
 
         var ids = Object.keys( this.featureSet )
+        var v, l
         return {
-            featureCount: ids.length,
-            vertexCount: ids.reduce( function ( accum, id ) {
-                return accum + turf.coordReduce( self.featureSet[ id ].geometry, function ( accum ) {
-                    return accum + 1
-                }, 0 )
-            }, 0 ),
-            layerCount: Object.keys( ids.reduce( function ( accum, id ) {
-                accum[ self.featureSet[ id ].layerId ] = ( accum[ self.featureSet[ id ].layerId ] || 0 ) + 1
-                return accum
-            }, {} ) ).length
+            get featureCount() { return ids.length },
+            get vertexCount() {
+                return v || ( v = ids.reduce( function ( accum, id ) {
+                    return accum + turf.coordReduce( self.featureSet[ id ].geometry, function ( accum ) {
+                        return accum + 1
+                    }, 0 )
+                }, 0 ) )
+            },
+            get layerCount() {
+                return l || ( l = Object.keys( ids.reduce( function ( accum, id ) {
+                    accum[ self.featureSet[ id ].layerId ] = ( accum[ self.featureSet[ id ].layerId ] || 0 ) + 1
+                    return accum
+                }, {} ) ).length )
+            }
         }
     }
-    
+
     function featureId( feature, keyAttribute, nonce ) {
         if ( keyAttribute in feature.properties )
             return include.hash( [ feature.properties[ keyAttribute ], nonce ] )

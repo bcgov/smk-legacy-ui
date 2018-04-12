@@ -18,11 +18,7 @@
         </div>
     </template>
 
-    <div class="smk-message"
-        v-bind:class="messageClass"
-    >
-        <span>{{ message }}</span>
-    </div>
+    <div class="smk-message" v-bind:class="messageClass"><span v-html="message"></span></div>
 
     <div v-if="isEmpty" class="smk-placeholder">
         <slot name="placeholder"></slot>
