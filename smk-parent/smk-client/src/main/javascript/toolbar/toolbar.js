@@ -12,17 +12,17 @@ include.module( 'toolbar', [ 'vue', 'toolbar.toolbar-html' ], function ( inc ) {
         this.vm = new Vue( {
             el: el,
             data: this.model,
-            // methods: {
-            //     debug: function ( x ) { console.log( arguments ); return x },
-            // },
-            // beforeUpdate: function () {
-            //     console.log( this )
-            // }
+            methods: {
+                trigger: function ( toolId, event, arg ) {
+                    smk.emit( toolId, event, arg )
+                }
+            }
         } )
     }
 
     Toolbar.prototype.add = function ( tool ) {
         this.model.tools.push( {
+            id: tool.id,
             type: tool.type,
             widgetComponent: tool.widgetComponent,
             widget: tool.widget

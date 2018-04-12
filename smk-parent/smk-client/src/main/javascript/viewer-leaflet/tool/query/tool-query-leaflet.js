@@ -1,6 +1,6 @@
-include.module( 'tool-identify-leaflet', [ 'leaflet', 'tool-identify', 'feature-list-clustering-leaflet' ], function ( inc ) {
+include.module( 'tool-query-leaflet', [ 'leaflet', 'tool-query', 'feature-list-clustering-leaflet' ], function ( inc ) {
 
-    SMK.TYPE.IdentifyTool.prototype.styleFeature = function () {
+    SMK.TYPE.QueryTool.prototype.styleFeature = function () {
         return {
             // color:       '#ffff00',
             // weight:      2,
@@ -15,7 +15,7 @@ include.module( 'tool-identify-leaflet', [ 'leaflet', 'tool-identify', 'feature-
         }
     }
 
-    SMK.TYPE.IdentifyTool.prototype.afterInitialize.push( inc[ 'feature-list-clustering-leaflet' ] )
+    SMK.TYPE.QueryTool.prototype.afterInitialize.push( inc[ 'feature-list-clustering-leaflet' ] )
 
     // SMK.TYPE.IdentifyTool.prototype.afterInitialize.push( function ( smk ) {
     //     var self = this

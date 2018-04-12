@@ -6,6 +6,8 @@ include.module( 'smk-map', [ 'smk', 'jquery', 'util', 'viewer', 'layer' ], funct
         this.$option.container = $( '#' + this.$option.containerId ).get( 0 )
         if ( !this.$option.container )
             throw new Error( 'Unable to find container #' + this.$option.containerId )
+
+        this.dispatcher = new Vue()
     }
 
     SMK.TYPE.SmkMap = SmkMap
@@ -115,7 +117,7 @@ include.module( 'smk-map', [ 'smk', 'jquery', 'util', 'viewer', 'layer' ], funct
 
             if ( !self.tools || self.tools.length == 0 ) return
 
-            self.tools.push( { type: 'menu' }, { type: 'location' } )
+            self.tools.push( { type: 'location' } )
 
             return SMK.UTIL.waitAll( self.tools.filter( function ( t ) { return t.enabled !== false } ).map( function ( t ) {
                 var tag = 'tool-' + t.type
@@ -130,7 +132,9 @@ include.module( 'smk-map', [ 'smk', 'jquery', 'util', 'viewer', 'layer' ], funct
                             } )
                     } )
                     .then( function ( inc ) {
-                        self.$tool[ t.type ] = new inc[ tag ]( t )
+                        var id = t.type + ( t.instance ? '--' + t.instance : '' )
+                        self.$tool[ id ] = new inc[ tag ]( t )
+                        self.$tool[ id ].id = id
                     } )
                     .catch( function ( e ) {
                         console.warn( 'tool "' + t.type + '" failed to create:', e )
@@ -213,4 +217,30 @@ include.module( 'smk-map', [ 'smk', 'jquery', 'util', 'viewer', 'layer' ], funct
             } )
     }
 
+    SmkMap.prototype.getSelect = function () {
+        var self = this
+
+        if ( this.$select ) return this.$select
+
+        return this.$select = include( 'select' )
+            .then( function ( inc ) {
+                return new SMK.TYPE.Select( self )
+            } )
+    }
+
+    SmkMap.prototype.emit = function ( toolId, event, arg ) {
+        this.dispatcher.$emit( toolId + '.' + event, arg )
+
+        return this
+    }
+
+    SmkMap.prototype.on = function ( toolId, handler ) {
+        var self = this
+
+        Object.keys( handler ).forEach( function ( k ) {
+            self.dispatcher.$on( toolId + '.' + k, handler[ k ] )
+        } )
+
+        return this
+    }
 } )

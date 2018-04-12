@@ -20,10 +20,11 @@ include.module( 'viewer-leaflet', [ 'viewer', 'leaflet' ], function () {
         var el = smk.addToContainer( '<div class="smk-viewer">' )
 
         self.map = L.map( el, {
-            dragging:       false,
-            zoomControl:    false,
-            boxZoom:        false,
-            doubleClickZoom:false
+            dragging:           false,
+            zoomControl:        false,
+            boxZoom:            false,
+            doubleClickZoom:    false,
+            zoomSnap:           0,
         } )
 
         self.map.scrollWheelZoom.disable()

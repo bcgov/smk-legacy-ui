@@ -45,7 +45,7 @@ include.module( 'tool-directions-leaflet', [ 'leaflet', 'tool-directions' ], fun
     } )
 
 
-    SMK.TYPE.DirectionsTool.prototype.afterInitialize.push( function ( smk, aux ) {
+    SMK.TYPE.DirectionsTool.prototype.afterInitialize.push( function ( smk ) {
         var self = this
 
         this.changedActive( function () {
@@ -138,49 +138,50 @@ include.module( 'tool-directions-leaflet', [ 'leaflet', 'tool-directions' ], fun
             self.waypointLayers = null
         }
 
-        aux.panel.vm.$on( 'directions-panel.hover-direction', function ( ev ) {
-            if ( self.directionHighlightLayer ) {
-                smk.$viewer.map.removeLayer( self.directionHighlightLayer )
-                self.directionHighlightLayer = null
+        smk.on( this.id, {
+            'hover-direction': function ( ev ) {
+                if ( self.directionHighlightLayer ) {
+                    smk.$viewer.map.removeLayer( self.directionHighlightLayer )
+                    self.directionHighlightLayer = null
+                }
+
+                if ( !ev.highlight )
+                    return
+
+                var p = self.directions[ ev.highlight ].point
+                self.directionHighlightLayer = L.circleMarker( [ p[ 1 ], p[ 0 ] ] )
+                    .bindPopup( self.directions[ ev.highlight ].instruction, { closeButton: false } )
+                    .addTo( smk.$viewer.map )
+                    .openPopup()
+            },
+
+            'pick-direction': function ( ev ) {
+                if ( self.directionPickLayer ) {
+                    smk.$viewer.map.removeLayer( self.directionPickLayer )
+                    self.directionPickLayer = null
+                }
+
+                if ( !ev.pick )
+                    return
+
+                var p = self.directions[ ev.pick ].point
+                self.directionPickLayer = L.circleMarker( [ p[ 1 ], p[ 0 ] ], { radius: 15 } )
+                    .bindPopup( self.directions[ ev.pick ].instruction )
+                    .addTo( smk.$viewer.map )
+                    .openPopup()
+
+                smk.$viewer.map.panTo( [ p[ 1 ], p[ 0 ] ] )
+            },
+
+            'clear': function ( ev ) {
+                reset()
+            },
+
+            'zoom-waypoint': function ( ev ) {
+                smk.$viewer.map.flyTo( [ ev.location.latitude, ev.location.longitude ], 12 )
+                self.waypointLayers[ ev.index ].openPopup()
             }
-
-            if ( !ev.highlight )
-                return
-
-            var p = self.directions[ ev.highlight ].point
-            self.directionHighlightLayer = L.circleMarker( [ p[ 1 ], p[ 0 ] ] )
-                .bindPopup( self.directions[ ev.highlight ].instruction, { closeButton: false } )
-                .addTo( smk.$viewer.map )
-                .openPopup()
         } )
-
-        aux.panel.vm.$on( 'directions-panel.pick-direction', function ( ev ) {
-            if ( self.directionPickLayer ) {
-                smk.$viewer.map.removeLayer( self.directionPickLayer )
-                self.directionPickLayer = null
-            }
-
-            if ( !ev.pick )
-                return
-
-            var p = self.directions[ ev.pick ].point
-            self.directionPickLayer = L.circleMarker( [ p[ 1 ], p[ 0 ] ], { radius: 15 } )
-                .bindPopup( self.directions[ ev.pick ].instruction )
-                .addTo( smk.$viewer.map )
-                .openPopup()
-
-            smk.$viewer.map.panTo( [ p[ 1 ], p[ 0 ] ] )
-        } )
-
-        aux.panel.vm.$on( 'directions-panel.clear', function ( ev ) {
-            reset()
-        } )
-
-        aux.panel.vm.$on( 'directions-panel.zoom-waypoint', function ( ev ) {
-            smk.$viewer.map.panTo( [ ev.location.latitude, ev.location.longitude ] )
-            self.waypointLayers[ ev.index ].openPopup()
-        } )
-
     } )
 
 

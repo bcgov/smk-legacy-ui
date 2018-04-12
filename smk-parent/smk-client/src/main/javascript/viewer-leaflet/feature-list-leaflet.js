@@ -4,7 +4,7 @@ include.module( 'feature-list-leaflet', [ 'leaflet', 'feature-list' ], function 
         var self = this
 
         var vw = smk.$viewer
-        var featureSet = smk.$viewer[ self.featureSetProperty ]
+        // var self.featureSet = smk.$viewer[ self.featureSetProperty ]
 
         this.highlight = {}
         this.featureHighlights = L.layerGroup( { pane: 'markerPane' } )
@@ -29,7 +29,7 @@ include.module( 'feature-list-leaflet', [ 'leaflet', 'feature-list' ], function 
             popupclose: function ( ev ) {
                 if ( ev.popup !== self.popup ) return
 
-                featureSet.pick( null, { popupclose: true } )
+                self.featureSet.pick( null, { popupclose: true } )
             },
         } )
 
@@ -43,7 +43,7 @@ include.module( 'feature-list-leaflet', [ 'leaflet', 'feature-list' ], function 
             }
         } )
 
-        featureSet.pickedFeature( function ( ev ) {
+        self.featureSet.pickedFeature( function ( ev ) {
             if ( ev.was ) {
                 showHighlight( ev.was.id, false )
             }
@@ -57,7 +57,7 @@ include.module( 'feature-list-leaflet', [ 'leaflet', 'feature-list' ], function 
             }
         } )
 
-        featureSet.highlightedFeatures( function ( ev ) {
+        self.featureSet.highlightedFeatures( function ( ev ) {
             if ( ev.features )
                 ev.features.forEach( function ( f ) {
                     showHighlight( f.id, true )
@@ -66,20 +66,20 @@ include.module( 'feature-list-leaflet', [ 'leaflet', 'feature-list' ], function 
             if ( ev.was )
                 ev.was.forEach( function ( f ) {
                     if ( f && f.id )
-                        showHighlight( f.id, featureSet.isPicked( f.id ) )
+                        showHighlight( f.id, self.featureSet.isPicked( f.id ) )
                 } )
         } )
 
-        featureSet.clearedFeatures( function ( ev ) {
+        self.featureSet.clearedFeatures( function ( ev ) {
             self.featureHighlights.clearLayers()
             self.popup.remove()
             self.highlight = {}
         } )
 
-        featureSet.removedFeatures( function ( ev ) {
+        self.featureSet.removedFeatures( function ( ev ) {
             ev.features.forEach( function ( ft ) {
-                if ( featureSet.isPicked( ft.id ) )
-                    featureSet.pick( null )
+                if ( self.featureSet.isPicked( ft.id ) )
+                    self.featureSet.pick( null )
 
                 self.featureHighlights.removeLayer( self.highlight[ ft.id ] )
                 delete self.highlight[ ft.id ]

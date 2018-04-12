@@ -5,8 +5,9 @@ include.module( 'tool-identify', [ 'smk', 'feature-list', 'widgets', 'tool-ident
     } )
 
     Vue.component( 'identify-panel', {
+        extends: inc.widgets.toolPanel,
         template: inc[ 'tool-identify.panel-identify-html' ],
-        props: [ 'busy', 'layers', 'highlightId' ],
+        props: [ 'busy', 'layers', 'highlightId', 'message', 'messageClass' ],
     } )
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
@@ -18,7 +19,7 @@ include.module( 'tool-identify', [ 'smk', 'feature-list', 'widgets', 'tool-ident
             title:              'Identify',
             widgetComponent:    'identify-widget',
             panelComponent:     'identify-panel',
-            featureSetProperty: 'identified'
+            // featureSetProperty: 'identified'
         }, option ) )
     }
 
@@ -28,60 +29,60 @@ include.module( 'tool-identify', [ 'smk', 'feature-list', 'widgets', 'tool-ident
     IdentifyTool.prototype.afterInitialize = SMK.TYPE.FeatureList.prototype.afterInitialize.concat( [] )
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
-    IdentifyTool.prototype.afterInitialize.push( function ( smk, aux ) {
+    IdentifyTool.prototype.afterInitialize.unshift( function ( smk ) {
+        this.featureSet = smk.$viewer.identified
+    } )
+
+    IdentifyTool.prototype.afterInitialize.push( function ( smk ) {
         var self = this
 
         // smk.$viewer.handlePick( this, function ( location ) {
         //     smk.$viewer.identifyFeatures( location )
         // } )
 
-        aux.widget.vm.$on( 'identify-widget.click', function () {
-            if ( !self.visible || !self.enabled ) return
+        smk.on( this.id, {
+            'activate': function () {
+                if ( !self.visible || !self.enabled ) return
 
-            self.active = !self.active
-        } )
+                self.active = !self.active
+            },
 
-        aux.panel.vm.$on( 'identify-panel.add-all', function ( ev ) {
-            self.layers.forEach( function ( ly ) {
-                smk.$viewer.selected.add( ly.id, ly.features.map( function ( ft ) {
-                    return smk.$viewer.identified.get( ft.id )
-                } ) )
-            } )
+            'add-all': function ( ev ) {
+                self.layers.forEach( function ( ly ) {
+                    smk.$viewer.selected.add( ly.id, ly.features.map( function ( ft ) {
+                        return smk.$viewer.identified.get( ft.id )
+                    } ) )
+                } )
+            }
         } )
 
         smk.$viewer.startedIdentify( function ( ev ) {
             self.busy = true
             self.firstId = null
             self.active = true
+            self.setMessage( 'Fetching features', 'progress' )
         } )
 
         smk.$viewer.finishedIdentify( function ( ev ) {
             self.busy = false
 
-            if ( smk.$viewer.identified.isEmpty() )
+            if ( smk.$viewer.identified.isEmpty() ) {
                 self.active = false
+                self.setMessage( 'No features found', 'warning' )
+            }
             else {
                 smk.$tool.location.reset()
                 smk.$viewer.identified.pick( self.firstId )
+
+                var stat = smk.$viewer.identified.getStats()
+
+                var sub = SMK.UTIL.grammaticalNumber( stat.layerCount, null, null, 'on {} layers' )
+                if ( stat.vertexCount > stat.featureCount )
+                    sub += ( sub == '' ? '' : ', ' ) + SMK.UTIL.grammaticalNumber( stat.vertexCount, null, null, 'with {} vertices' )
+                if ( sub != '' ) sub = '<div class="smk-submessage">' + sub + '</div>'
+
+                self.setMessage( '<div>Identified ' + SMK.UTIL.grammaticalNumber( stat.featureCount, null, 'a feature', '{} features' ) + '</div>' + sub )
             }
-        } )
-
-        smk.$viewer.identified.addedFeatures( function ( ev ) {
-            self.active = true
-
-            var ly = smk.$viewer.layerId[ ev.layerId ]
-
-            Vue.set( self.layers, ly.index, {
-                id: ly.config.id,
-                title: ly.config.title,
-                features: ev.features.map( function ( ft ) {
-                    if ( !self.firstId ) self.firstId = ft.id
-                    return {
-                        id: ft.id,
-                        title: ft.title
-                    }
-                } )
-            } )
         } )
 
     } )

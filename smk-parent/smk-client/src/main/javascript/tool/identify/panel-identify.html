@@ -1,11 +1,12 @@
 <feature-list-panel class="smk-identify-panel"
     v-bind="$props"
+    canClear="true"
 >
     <template slot="header">
         <h1>Identify Results</h1>
     </template>
 
-    <template slot="commands" slot-scope="list">
+    <template slot="command-row" slot-scope="list">
         <span class="smk-command"
             v-bind:class="{ 'smk-disabled': list.isEmpty }"
             v-on:click="$$emit( 'add-all' )"

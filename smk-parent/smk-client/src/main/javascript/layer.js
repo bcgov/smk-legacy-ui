@@ -28,6 +28,10 @@ include.module( 'layer', [ 'smk', 'jquery', 'util', 'event' ], function () {
                     self.finishedLoading()
             }
         } )
+
+        Object.defineProperty( this, 'id', {
+            get: function () { return config.id }
+        } )
     }
 
     $.extend( Layer.prototype, LayerEvent.prototype )

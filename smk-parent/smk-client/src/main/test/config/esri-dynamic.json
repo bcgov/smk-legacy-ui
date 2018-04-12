@@ -124,6 +124,70 @@
             "mpcmWorkspace": "MPCM_ALL_PUB",
             "dynamicLayers": [
                 "{\"id\":6,\"minScale\":5000000,\"maxScale\":0,\"source\":{\"type\":\"dataLayer\",\"dataSource\":{\"type\":\"table\",\"workspaceId\":\"MPCM_ALL_PUB\",\"dataSourceName\":\"WHSE_ADMIN_BOUNDARIES.FADM_BCTS_AREA_SP\",\"gdbVersion\":\"\"}},\"drawingInfo\":{\"renderer\":{\"type\":\"simple\",\"symbol\":{\"type\":\"esriSFS\",\"style\":\"esriSFSSolid\",\"color\":[211,255,190,255],\"outline\":{\"type\":\"esriSLS\",\"style\":\"esriSLSSolid\",\"color\":[104,104,104,255],\"width\":0.4}},\"label\":\"BC Timber Sale Areas\",\"description\":\"\"},\"transparency\":20,\"labelingInfo\":null}}"
+            ],
+            "queries": [
+                {
+                    "id": "query1",
+                    "title": "Test query 1",
+                    "description": "Query BCTS Name",
+                    "parameters": [
+                        {
+                            "id": "param2",
+                            "type": "input",
+                            "title": "Name matches",
+                            "value": "Area"
+                        }
+                    ],
+                    "clause": {
+                        "operator": "and",
+                        "arguments": [
+                            {
+                                "operator": "contains",
+                                "arguments": [
+                                    {
+                                        "operand": "attribute",
+                                        "name": "BCTS_NAME"
+                                    },
+                                    {
+                                        "operand": "parameter",
+                                        "id": "param2"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "query2",
+                    "title": "Test query 2",
+                    "description": "Query Feature Code",
+                    "parameters": [
+                        {
+                            "id": "param2",
+                            "type": "input",
+                            "title": "Feature Code",
+                            "value": "FM90410000"
+                        }
+                    ],
+                    "clause": {
+                        "operator": "and",
+                        "arguments": [
+                            {
+                                "operator": "equals",
+                                "arguments": [
+                                    {
+                                        "operand": "attribute",
+                                        "name": "FEATURE_CODE"
+                                    },
+                                    {
+                                        "operand": "parameter",
+                                        "id": "param2"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
             ]
         }
     ]

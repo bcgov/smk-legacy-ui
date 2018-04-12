@@ -15,7 +15,7 @@ include.module( 'tool-select-leaflet', [ 'leaflet', 'tool-select' ], function ( 
     SMK.TYPE.SelectTool.prototype.afterInitialize.push( function ( smk ) {
         var self = this
 
-        smk.$viewer.selected.addedFeatures( function ( ev ) {
+        self.featureSet.addedFeatures( function ( ev ) {
             ev.features.forEach( function ( f ) {
                 switch ( turf.getType( f ) ) {
                 case 'Point':
@@ -35,8 +35,8 @@ include.module( 'tool-select-leaflet', [ 'leaflet', 'tool-select' ], function ( 
                 }
             } )
         } )
-    
-        smk.$viewer.selected.pickedFeature( function ( ev ) {
+
+        self.featureSet.pickedFeature( function ( ev ) {
             if ( !ev.feature ) return
 
             if ( !ev.feature.center ) {
@@ -53,27 +53,27 @@ include.module( 'tool-select-leaflet', [ 'leaflet', 'tool-select' ], function ( 
                 .openOn( smk.$viewer.map )
         } )
 
-        smk.$viewer.selected.zoomToFeature( function ( ev ) {
+        self.featureSet.zoomToFeature( function ( ev ) {
             if ( !self.highlight[ ev.feature.id ] ) return
 
-            var old = smk.$viewer.selected.pick( null )            
+            var old = self.featureSet.pick( null )
 
-            if ( self.highlight[ ev.feature.id ].getBounds ) 
+            if ( self.highlight[ ev.feature.id ].getBounds )
                 smk.$viewer.map
                     .once( 'zoomend moveend', function () {
                         if ( old )
-                            smk.$viewer.selected.pick( old )
+                            self.featureSet.pick( old )
                     } )
                     .fitBounds( self.highlight[ ev.feature.id ].getBounds(), {
                         paddingTopLeft: L.point( 300, 100 ),
                         animate: true
                     } )
 
-            if ( self.highlight[ ev.feature.id ].getLatLng ) 
+            if ( self.highlight[ ev.feature.id ].getLatLng )
                 smk.$viewer.map
                     .once( 'zoomend moveend', function () {
                         if ( old )
-                            smk.$viewer.selected.pick( old )
+                            self.featureSet.pick( old )
                     } )
                     .setView( self.highlight[ ev.feature.id ].getLatLng(), 12, {
                         paddingTopLeft: L.point( 300, 100 ),

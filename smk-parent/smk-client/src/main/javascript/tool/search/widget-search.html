@@ -2,11 +2,11 @@
     <input type="text" placeholder="Search keywords"
         v-model.trim="search"
         v-on:keyup="$$emit( 'input-change', { text: search } )"
-        v-on:click="$$emit( 'click', {} )"
+        v-on:click="$$emit( 'activate', {} )"
     >
 
     <button
-        v-on:click="$$emit( 'click', { toggle: true } )"
+        v-on:click="$$emit( 'activate', { toggle: true } )"
         v-bind:title="title"
     ><i class="material-icons">{{ icon }}</i>
     </button>
