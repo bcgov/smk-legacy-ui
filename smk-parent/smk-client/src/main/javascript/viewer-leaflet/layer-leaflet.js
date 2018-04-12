@@ -156,13 +156,19 @@ include.module( 'layer-leaflet', [ 'smk', 'layer', 'util' ], function () {
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+    defineLayerType( 'vector', {
+
+        getFeaturesAtPoint: getVectorFeaturesAtPoint
+
+    } )
+
     defineLayerType( 'geojson', {
 
         getFeaturesAtPoint: getVectorFeaturesAtPoint
 
     } )
 
-    SMK.TYPE.Layer[ 'geojson' ].leaflet.create = function ( layers, zIndex ) {
+    SMK.TYPE.Layer[ 'vector' ].leaflet.create = SMK.TYPE.Layer[ 'geojson' ].leaflet.create = function ( layers, zIndex ) {
         if ( layers.length != 1 ) throw new Error( 'only 1 config allowed' )
 
         var layer = new L.geoJson( null, {
@@ -184,16 +190,76 @@ include.module( 'layer-leaflet', [ 'smk', 'layer', 'util' ], function () {
         } )
 
         if ( !layers[ 0 ].config.dataUrl )
-            layers[ 0 ].config.dataUrl = this.resolveAttachmentUrl( layers[ 0 ].config.id, layers[ 0 ].config.type )
+            layers[ 0 ].config.dataUrl = this.resolveAttachmentUrl( layers[ 0 ].config.id, 'geojson' )
+        else if ( layers[ 0 ].config.dataUrl.startsWith( '@' ) )
+            layers[ 0 ].config.dataUrl = this.resolveAttachmentUrl( layers[ 0 ].config.dataUrl.substr( 1 ), 'geojson' )
 
         if ( !layers[ 0 ].config.CRS )
             layers[ 0 ].config.CRS = 'EPSG4326'
 
-        return $.get( layers[ 0 ].config.dataUrl, null, null, 'json' )
+        return SMK.UTIL.makePromise( function ( res, rej ) {
+                $.get( layers[ 0 ].config.dataUrl, null, null, 'json' ).then( res, rej )
+            } )
             .then( function ( data ) {
                 console.log( 'loaded', layers[ 0 ].config.dataUrl )
                 layer.addData( data )
                 return layer
+            } )
+    }
+
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    defineLayerType( 'clustered', {
+
+        getFeaturesAtPoint: getVectorFeaturesAtPoint
+
+    } )
+
+    SMK.TYPE.Layer[ 'clustered' ].leaflet.create = function ( layers, zIndex ) {
+        return SMK.TYPE.Layer[ 'vector' ].leaflet.create.call( this, layers, zIndex )
+            .then( function ( layer ) {
+                var cluster = L.markerClusterGroup( {
+                    singleMarkerMode: true,
+                    // zoomToBoundsOnClick: false,
+                    // spiderfyOnMaxZoom: false,
+                    // iconCreateFunction: function ( cluster ) {
+                    //     var count = cluster.getChildCount();
+
+                    //     return new L.DivIcon( {
+                    //         html: '<div><span>' + ( count == 1 ? '' : count > 999 ? 'lots' : count ) + '</span></div>',
+                    //         className: 'smk-identify-cluster smk-identify-cluster-' + ( count == 1 ? 'one' : 'many' ),
+                    //         iconSize: null
+                    //     } )
+                    // }
+                } )
+
+                cluster.addLayers( [ layer ] )
+
+                return cluster
+            } )
+    }
+
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    defineLayerType( 'heatmap', {
+
+        getFeaturesAtPoint: getVectorFeaturesAtPoint
+
+    } )
+
+    SMK.TYPE.Layer[ 'heatmap' ].leaflet.create = function ( layers, zIndex ) {
+        return SMK.TYPE.Layer[ 'vector' ].leaflet.create.call( this, layers, zIndex )
+            .then( function ( layer ) {
+
+				var points = [];
+				var intensity = 100;
+
+				layer.eachLayer( function ( ly ) {
+					var centroid = turf.centroid( ly.feature.geometry )
+					points.push( [ centroid.geometry.coordinates[ 1 ], centroid.geometry.coordinates[ 0 ], intensity ] )
+				});
+
+				return L.heatLayer( points, { radius: 25 } )
             } )
     }
 

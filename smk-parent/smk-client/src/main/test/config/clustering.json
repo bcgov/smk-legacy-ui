@@ -1,0 +1,51 @@
+{
+    "layers": [
+
+        {
+            "type": "geojson",
+            "id": "trailheads",
+            "title": "trailheads",
+            "isVisible": true,
+            "opacity": 0.65,
+            "style": {
+                "strokeColor": "red",
+                "strokeWidth": 8,
+                "strokeOpacity": 0.8,
+                "fillOpacity": 0.6,
+                "fillColor": "blue"
+            }
+        },
+
+        {
+            "type": "clustered",
+            "id": "trailheads-clustered",
+            "dataUrl": "@trailheads",
+            "title": "trailheads clustered",
+            "isVisible": false,
+            "opacity": 0.65,
+            "style": {
+                "strokeColor": "green",
+                "strokeWidth": 8,
+                "strokeOpacity": 0.8,
+                "fillOpacity": 0.6,
+                "fillColor": "red"
+            }
+        },
+
+        {
+            "type": "heatmap",
+            "id": "trailheads-heatmap",
+            "dataUrl": "@trailheads",
+            "title": "trailheads heatmap",
+            "isVisible": false,
+            "opacity": 0.65,
+            "style": {
+                "strokeColor": "blue",
+                "strokeWidth": 8,
+                "strokeOpacity": 0.8,
+                "fillOpacity": 0.6,
+                "fillColor": "green"
+            }
+        }
+    ]
+}

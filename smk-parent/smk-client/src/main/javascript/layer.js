@@ -307,7 +307,29 @@ include.module( 'layer', [ 'smk', 'jquery', 'util', 'event' ], function () {
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+    defineLayerType( 'vector', {
+
+        getLegends: createLegendChip,
+
+    } )
+
     defineLayerType( 'geojson', {
+
+        getLegends: createLegendChip,
+
+    } )
+
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    defineLayerType( 'clustered', {
+
+        getLegends: createLegendChip,
+
+    } )
+
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    defineLayerType( 'heatmap', {
 
         getLegends: createLegendChip,
 
