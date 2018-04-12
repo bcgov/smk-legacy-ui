@@ -2,12 +2,12 @@ include.module( 'tool-query', [ 'smk', 'tool', 'widgets', 'tool-query.panel-quer
 
     Vue.component( 'parameter-constant', {
         template: inc[ 'tool-query.parameter-constant-html' ],
-        props: [ 'title', 'value' ],
+        props: [ 'id', 'title', 'value', 'type' ],
     } )
 
     Vue.component( 'parameter-input', {
         template: inc[ 'tool-query.parameter-input-html' ],
-        props: [ 'title', 'value' ],
+        props: [ 'id', 'title', 'value', 'type' ],
         data: function () {
             return {
                 input: this.value
@@ -22,7 +22,7 @@ include.module( 'tool-query', [ 'smk', 'tool', 'widgets', 'tool-query.panel-quer
 
     Vue.component( 'parameter-select', {
         template: inc[ 'tool-query.parameter-select-html' ],
-        props: [ 'title', 'choices', 'value' ],
+        props: [ 'id', 'title', 'choices', 'value', 'type' ],
         data: function () {
             // console.log( 'data', this.value )
             return {
