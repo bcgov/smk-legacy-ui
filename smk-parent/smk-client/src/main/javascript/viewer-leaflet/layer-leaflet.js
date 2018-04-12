@@ -173,7 +173,7 @@ include.module( 'layer-leaflet', [ 'smk', 'layer', 'util' ], function () {
 
         var layer = new L.geoJson( null, {
             pointToLayer: function ( geojson, latlng ) {
-                return L.circleMarker( latlng )
+                return L.circleMarker( latlng, { interactive: false } )
             },
             onEachFeature: function ( feature, layer ) {
                 layer.setStyle( convertStyle( layers[ 0 ].config.style, feature.geometry.type ) )
@@ -243,7 +243,7 @@ include.module( 'layer-leaflet', [ 'smk', 'layer', 'util' ], function () {
 
     defineLayerType( 'heatmap', {
 
-        getFeaturesAtPoint: getVectorFeaturesAtPoint
+        // getFeaturesAtPoint: getVectorFeaturesAtPoint
 
     } )
 
@@ -297,26 +297,48 @@ include.module( 'layer-leaflet', [ 'smk', 'layer', 'util' ], function () {
 
         if ( !option.layer ) return
 
-        var fs = []
-        option.layer.eachLayer( function ( sly ) {
-            var geoj = sly.toGeoJSON()
-            if ( geoj.geometry.type == 'Polygon' || geoj.geometry.type == 'MultiPolygon' ) {
-                var inp = turf.booleanPointInPolygon( [ location.map.longitude, location.map.latitude ] , geoj )
-                if ( inp ) fs.push( geoj )
-            }
-            else {
-                console.log( 'skip', geoj.geometry.type )
+        var features = []
+        var test = [ location.map.longitude, location.map.latitude ]
+        var toleranceKm = option.tolerance * view.metersPerPixel / 1000;
+
+        option.layer.eachLayer( function ( ly ) {
+            var ft = ly.toGeoJSON()
+
+            switch ( ft.geometry.type ) {
+            case 'Polygon':
+            case 'MultiPolygon':
+                if ( turf.booleanPointInPolygon( test, ft ) ) features.push( ft )
+                break
+
+            case 'LineString':
+            case 'MultiLineString':
+                var close = turf.segmentReduce( ft, function ( accum, segment ) {
+                    return accum || turf.pointToLineDistance( test, segment ) < toleranceKm
+                }, false )
+                if ( close ) features.push( ft )
+                break
+
+            case 'Point':
+            case 'MultiPoint':
+                var close = turf.coordReduce( ft, function ( accum, coord ) {
+                    return accum || turf.distance( coord, test ) < toleranceKm
+                }, false )
+                if ( close ) features.push( ft )
+                break
+
+            default:
+                console.warn( 'skip', ft.geometry.type )
             }
         } )
 
-        fs.forEach( function ( f, i ) {
+        features.forEach( function ( f, i ) {
             if ( self.config.titleAttribute )
                 f.title = r.attributes[ self.config.titleAttribute ]
             else
                 f.title = 'Feature #' + ( i + 1 )
         } )
 
-        return fs
+        return features
     }
 
 } )

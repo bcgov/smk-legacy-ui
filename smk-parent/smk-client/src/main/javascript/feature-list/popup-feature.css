@@ -5,14 +5,14 @@
     padding-bottom: 5px;
 }
 
-.smk-feature-popup h2 {
+.smk-feature-popup .smk-header h2 {
     padding-bottom: 5px;
     font-size: 18px;
     margin-left: -10px;
     display: inline;
 }
 
-.smk-feature-popup h3 {
+.smk-feature-popup .smk-header h3 {
     margin-top: 0;
     padding-bottom: 0;
     margin-bottom: 0;
