@@ -169,14 +169,17 @@ include.module( 'layer-leaflet', [ 'smk', 'layer', 'util' ], function () {
     } )
 
     SMK.TYPE.Layer[ 'vector' ].leaflet.create = SMK.TYPE.Layer[ 'geojson' ].leaflet.create = function ( layers, zIndex ) {
+        var self = this
+
         if ( layers.length != 1 ) throw new Error( 'only 1 config allowed' )
 
         var layer = new L.geoJson( null, {
             pointToLayer: function ( geojson, latlng ) {
-                return L.circleMarker( latlng, { interactive: false } )
+                return markerForStyle.call( self, latlng, layers[ 0 ].config.style )
             },
             onEachFeature: function ( feature, layer ) {
-                layer.setStyle( convertStyle( layers[ 0 ].config.style, feature.geometry.type ) )
+                if ( layer.setStyle )
+                    layer.setStyle( convertStyle( layers[ 0 ].config.style, feature.geometry.type ) )
             },
             renderer: L.svg(),
             interactive: false
@@ -219,7 +222,7 @@ include.module( 'layer-leaflet', [ 'smk', 'layer', 'util' ], function () {
         return SMK.TYPE.Layer[ 'vector' ].leaflet.create.call( this, layers, zIndex )
             .then( function ( layer ) {
                 var cluster = L.markerClusterGroup( {
-                    singleMarkerMode: true,
+                    // singleMarkerMode: true,
                     // zoomToBoundsOnClick: false,
                     // spiderfyOnMaxZoom: false,
                     // iconCreateFunction: function ( cluster ) {
@@ -290,6 +293,24 @@ include.module( 'layer-leaflet', [ 'smk', 'layer', 'util' ], function () {
                 fillOpacity: styleConfig.fillOpacity,
                 // fillRule:    styleConfig.,
             }
+    }
+
+    function markerForStyle( latlng, styleConfig ) {
+        if ( styleConfig.markerUrl ) {
+            return L.marker( latlng, {
+                icon: styleConfig.marker || ( styleConfig.marker = L.icon( {
+                    iconUrl: this.resolveAttachmentUrl( styleConfig.markerUrl.substr( 1 ), '' ),
+                    iconSize: styleConfig.markerSize,
+                    iconAnchor: styleConfig.markerOffset,
+                } ) ),
+                interactive: false
+            } )
+        }
+        else {
+            return L.circleMarker( latlng, {
+                interactive: false
+            } )
+        }
     }
 
     function getVectorFeaturesAtPoint( location, view, option ) {

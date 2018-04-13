@@ -362,7 +362,7 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
     //
     Viewer.prototype.resolveAttachmentUrl = function ( attachmentId, type ) {
         if ( this.disconnected )
-            return 'attachments/' + attachmentId + '.' + type
+            return 'attachments/' + attachmentId + ( type ? '.' + type : '' )
         else
             return '../smks-api/MapConfigurations/' + this.lmfId + '/Attachments/' + attachmentId
     }

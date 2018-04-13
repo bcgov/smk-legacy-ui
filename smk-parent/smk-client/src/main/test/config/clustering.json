@@ -28,7 +28,10 @@
                 "strokeWidth": 8,
                 "strokeOpacity": 0.8,
                 "fillOpacity": 0.6,
-                "fillColor": "red"
+                "fillColor": "red",
+                "markerUrl": "@marker-gold.png",
+                "markerSize": [ 21, 25 ],
+                "markerOffset": [ 10, 25 ]
             }
         },
 
