@@ -175,8 +175,7 @@ exports.gen = function () {
     	.style( "https://unpkg.com/leaflet.markercluster@1.0.6/dist/MarkerCluster.css" )
     	.style( "https://unpkg.com/leaflet.markercluster@1.0.6/dist/MarkerCluster.Default.css" )
     	.script( "https://unpkg.com/leaflet.markercluster@1.0.6/dist/leaflet.markercluster-src.js" )
-
-    		// <h:outputScript library="js" name="leaflet-heat.js" />
+    	.script( "resources/js/leaflet-heat.js" )
 
     // esri3d
 

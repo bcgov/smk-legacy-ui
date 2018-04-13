@@ -21,21 +21,23 @@
 }
 
 .smk-feature-list-panel .smk-layer h2 {
-    display: inline-block;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+
     width: calc( 100% - 10px );
     font-size: 13px;
     font-weight: bold;
     position: sticky;
     top: 0;
-    background-color: lightgray;
+    background-color: white;
     padding: 5px;
-    border-radius: 3px;
+    border-bottom: 1px solid darkgrey;
 }
 
 .smk-feature-list-panel .smk-layer h2 .smk-count{
-    display: inline-block;
     font-size: 10px;
-    float: right;
+    vertical-align: bottom;
 }
 
 .smk-feature-list-panel .smk-layer .smk-feature {

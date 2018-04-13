@@ -59,6 +59,7 @@ include.module( 'layer', [ 'smk', 'jquery', 'util', 'event' ], function () {
     }
 
     Layer.prototype.getLegends = function () {
+        return SMK.UTIL.resolved()
     }
 
     Layer.prototype.getFeaturesAtPoint = function ( arg ) {
@@ -307,9 +308,37 @@ include.module( 'layer', [ 'smk', 'jquery', 'util', 'event' ], function () {
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+    defineLayerType( 'vector', {
+
+        getLegends: createLegendChip,
+
+    } )
+
     defineLayerType( 'geojson', {
 
         getLegends: createLegendChip,
+
+    } )
+
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    defineLayerType( 'clustered', {
+
+        getLegends: createLegendChip,
+
+    } )
+
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    defineLayerType( 'heatmap', {
+
+        initialize: function () {
+            Layer.prototype.initialize.apply( this, arguments )
+
+            this.config.isQueryable = false
+        },
+
+        // getLegends: createLegendChip,
 
     } )
 

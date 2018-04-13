@@ -101,7 +101,7 @@ include.module( 'feature-list', [ 'smk', 'tool', 'widgets', 'feature-list.panel-
             self.popupModel.layer = {
                 id:         ev.feature.layerId,
                 title:      ly.config.title,
-                attributes: ly.config.attributes.map( function ( at ) {
+                attributes: ly.config.attributes && ly.config.attributes.map( function ( at ) {
                     return {
                         visible:at.visible,
                         title:  at.title,
