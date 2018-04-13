@@ -138,7 +138,7 @@
                             "value": "Area"
                         }
                     ],
-                    "clause": {
+                    "predicate": {
                         "operator": "and",
                         "arguments": [
                             {
@@ -169,7 +169,7 @@
                             "value": "FM90410000"
                         }
                     ],
-                    "clause": {
+                    "predicate": {
                         "operator": "and",
                         "arguments": [
                             {

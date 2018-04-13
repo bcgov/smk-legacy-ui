@@ -92,7 +92,7 @@ include.module( 'query', [ 'smk', 'jquery', 'util', 'event' ], function () {
             var dynamicLayer = JSON.parse( this.layer.config.dynamicLayers[ 0 ] )
             delete dynamicLayer.drawingInfo
 
-            var whereClause = makeWhereClause( this.clause, param )
+            var whereClause = makeWhereClause( this.predicate, param )
 
             var attrs = this.layer.config.attributes.filter( function ( a ) { return a.visible !== false } ).map( function ( a ) { return a.name } )
 
@@ -159,15 +159,15 @@ include.module( 'query', [ 'smk', 'jquery', 'util', 'event' ], function () {
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    function makeWhereClause( clause, param ) {
-        return handleWhereOperator( clause, param )
+    function makeWhereClause( predicate, param ) {
+        return handleWhereOperator( predicate, param )
     }
 
-    function handleWhereOperator( clause, param ) {
-        if ( !( clause.operator in whereOperator ) )
-            throw new Error( 'unknown operator: ' + JSON.stringify( clause ) )
+    function handleWhereOperator( predicate, param ) {
+        if ( !( predicate.operator in whereOperator ) )
+            throw new Error( 'unknown operator: ' + JSON.stringify( predicate ) )
 
-        return whereOperator[ clause.operator ]( clause.arguments, param )
+        return whereOperator[ predicate.operator ]( predicate.arguments, param )
     }
 
     var whereOperator = {
@@ -226,11 +226,11 @@ include.module( 'query', [ 'smk', 'jquery', 'util', 'event' ], function () {
         }
     }
 
-    function handleWhereOperand( clause, param, quote ) {
-        if ( !( clause.operand in whereOperand ) )
-            throw new Error( 'unknown operand: ' + JSON.stringify( clause ) )
+    function handleWhereOperand( predicate, param, quote ) {
+        if ( !( predicate.operand in whereOperand ) )
+            throw new Error( 'unknown operand: ' + JSON.stringify( predicate ) )
 
-        return whereOperand[ clause.operand ]( clause, param, quote )
+        return whereOperand[ predicate.operand ]( predicate, param, quote )
     }
 
     var whereOperand = {
