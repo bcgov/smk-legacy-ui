@@ -6,13 +6,19 @@
     </template>
 
     <template slot="commands">
-        <span class="smk-command"
-            v-bind:class="{ 'smk-disabled': isEmpty }"
-            v-on:click="$$emit( 'clear' )"
-        >Clear</span>
-
         <slot name="commands" v-bind:isEmpty="isEmpty"></slot>
+
+        <div class="smk-command-row">
+            <span class="smk-command" v-if="canClear"
+                v-bind:class="{ 'smk-disabled': isEmpty }"
+                v-on:click="$$emit( 'clear' )"
+            >Clear</span>
+
+            <slot name="command-row" v-bind:isEmpty="isEmpty"></slot>
+        </div>
     </template>
+
+    <div class="smk-message" v-bind:class="messageClass"><span v-html="message"></span></div>
 
     <div v-if="isEmpty" class="smk-placeholder">
         <slot name="placeholder"></slot>
@@ -24,7 +30,7 @@
         v-on:mouseenter="$$emit( 'hover', { features: layer.features } )"
         v-on:mouseleave="$$emit( 'hover', { features: null } )"
     >
-        <h2>{{ layer.title }}</h2>
+        <h2>{{ layer.title }}<span class="smk-count" v-if="layer.features.length > 1">({{ layer.features.length }})</span></h2>
         <div class="smk-feature smk-command" title="Click to see attributes"
             v-for="feature in layer.features"
             v-bind:class="{ 'smk-highlighted': feature.id == highlightId }"

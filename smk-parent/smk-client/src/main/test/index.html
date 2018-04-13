@@ -15,6 +15,7 @@
 
         <div id="test-settings">
             <select id="config" data-placeholder="Config..." multiple name="config">
+                <option value="base-config">Base</option>
                 <option value="esri3d">ESRI 3D</option>
                 <option value="base-mapping">Base Mapping</option>
                 <option value="esri-dynamic">ESRI Dynamic</option>
@@ -22,6 +23,7 @@
                 <option value="land-tenures-2">Land Tenures 2</option>
                 <option value="water-management">Water Management</option>
                 <option value="geojson">GeoJson</option>
+                <option value="clustering">Clustering</option>
                 <option value="kml">Kml</option>
             </select>
 
@@ -41,7 +43,7 @@
                     script.setAttribute( 'src', '../smk-bootstrap.js' )
                     script.setAttribute( 'smk-disconnected', true )
                     script.setAttribute( 'smk-standalone', true )
-                    script.setAttribute( 'smk-config', [ 'base-config' ].concat( PARAM.config || [] ).map( function ( c ) { return 'config/' + c + '.json' } ).join( ',' ) )
+                    script.setAttribute( 'smk-config', [].concat( PARAM.config ).map( function ( c ) { return 'config/' + c + '.json' } ).join( ',' ) )
                     document.getElementsByTagName( 'head' )[ 0 ].appendChild( script );
                 }, 3000 )
             } )

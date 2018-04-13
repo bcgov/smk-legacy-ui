@@ -5,6 +5,7 @@ include.module( 'tool-layers', [ 'smk', 'tool', 'widgets', 'tool-layers.panel-la
     } )
 
     Vue.component( 'layers-panel', {
+        extends: inc.widgets.toolPanel,
         template: inc[ 'tool-layers.panel-layers-html' ],
         props: [ 'busy', 'layers' ],
         data: function () {
@@ -58,14 +59,44 @@ include.module( 'tool-layers', [ 'smk', 'tool', 'widgets', 'tool-layers.panel-la
     LayersTool.prototype.afterInitialize = []
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
-    LayersTool.prototype.afterInitialize.push( function ( smk, aux ) {
+    LayersTool.prototype.afterInitialize.push( function ( smk ) {
         var self = this
 
-        aux.widget.vm.$on( 'layers-widget.click', function () {
-            if ( !self.visible || !self.enabled ) return
+        smk.on( this.id, {
+            'activate': function () {
+                if ( !self.visible || !self.enabled ) return
 
-            self.active = !self.active
+                self.active = !self.active
+            },
+
+            'set-visible': function ( ev ) {
+                ev.ids.forEach( function ( id ) { layerModel[ id ].visible = ev.visible } )
+                smk.$viewer.setLayersVisible( ev.ids, ev.visible )
+            },
+
+            'set-expanded': function ( ev ) {
+                ev.ids.forEach( function ( id ) {
+                    var ly = layerModel[ id ]
+                    ly.expanded = ev.expanded
+
+                    if ( ly.expanded && ly.legends == null ) {
+                        ly.legends = 'waiting'
+                        smk.$viewer.layerId[ id ].getLegends()
+                            .then( function ( ls ) {
+                                ly.legends = ls
+                            }, function () {
+                                ly.legends = false
+                            } )
+                    }
+                } )
+            }
         } )
+
+        // aux.widget.vm.$on( 'layers-widget.click', function () {
+        //     if ( !self.visible || !self.enabled ) return
+
+        //     self.active = !self.active
+        // } )
 
         var layerModel = {}
         this.layers = smk.$viewer.layerIds.map( function ( id, i ) {
@@ -78,28 +109,6 @@ include.module( 'tool-layers', [ 'smk', 'tool', 'widgets', 'tool-layers.panel-la
                 expanded:       false,
                 legends:        null
             }
-        } )
-
-        aux.panel.vm.$on( 'layers-panel.set-visible', function ( ev ) {
-            ev.ids.forEach( function ( id ) { layerModel[ id ].visible = ev.visible } )
-            smk.$viewer.setLayersVisible( ev.ids, ev.visible )
-        } )
-
-        aux.panel.vm.$on( 'layers-panel.set-expanded', function ( ev ) {
-            ev.ids.forEach( function ( id ) {
-                var ly = layerModel[ id ]
-                ly.expanded = ev.expanded
-
-                if ( ly.expanded && ly.legends == null ) {
-                    ly.legends = 'waiting'
-                    smk.$viewer.layerId[ id ].getLegends()
-                        .then( function ( ls ) {
-                            ly.legends = ls
-                        }, function () {
-                            ly.legends = false
-                        } )
-                }
-            } )
         } )
 
         smk.$viewer.startedLoading( function ( ev ) {

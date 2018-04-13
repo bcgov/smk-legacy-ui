@@ -20,10 +20,11 @@ include.module( 'viewer-leaflet', [ 'viewer', 'leaflet' ], function () {
         var el = smk.addToContainer( '<div class="smk-viewer">' )
 
         self.map = L.map( el, {
-            dragging:       false,
-            zoomControl:    false,
-            boxZoom:        false,
-            doubleClickZoom:false
+            dragging:           false,
+            zoomControl:        false,
+            boxZoom:            false,
+            doubleClickZoom:    false,
+            zoomSnap:           0,
         } )
 
         self.map.scrollWheelZoom.disable()
@@ -95,11 +96,18 @@ include.module( 'viewer-leaflet', [ 'viewer', 'leaflet' ], function () {
         var size = this.map.getSize()
         var c = this.map.getCenter()
 
+        var vertical = size.y / 2,
+            mapDist = this.map.distance(
+                this.map.containerPointToLatLng( [ 0,   vertical ] ),
+                this.map.containerPointToLatLng( [ 100, vertical ] )
+            )
+
         return {
             center: { latitude: c.lat, longitude: c.lng },
             zoom: this.map.getZoom(),
             extent: [ b.getWest(), b.getSouth(), b.getEast(), b.getNorth() ],
-            scale: this.getScale(),
+            scale: mapDist / this.screenpixelsToMeters,
+            metersPerPixel: mapDist / 100,
             screen: {
                 width:  size.x,
                 height: size.y

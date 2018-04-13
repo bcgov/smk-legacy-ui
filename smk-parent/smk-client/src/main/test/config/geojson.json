@@ -63,6 +63,25 @@
 
         {
             "type": "geojson",
+            "id": "4-points-marker",
+            "title": "geojson, 4-points, marker",
+            "isVisible": false,
+            "opacity": 0.65,
+            "dataUrl": "@4-points",
+            "style": {
+                "strokeColor": "green",
+                "strokeWidth": 8,
+                "strokeOpacity": 0.8,
+                "fillOpacity": 0.6,
+                "fillColor": "blue",
+                "markerUrl": "@marker-gold.png",
+                "markerSize": [ 21, 25 ],
+                "markerOffset": [ 10, 25 ]
+            }
+        },
+
+        {
+            "type": "geojson",
             "id": "4-points",
             "title": "geojson, 4-points",
             "isVisible": false,

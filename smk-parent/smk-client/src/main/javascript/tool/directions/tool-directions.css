@@ -2,6 +2,11 @@
     display: inline-block;
 }
 
+.smk-directions-panel .smk-command-col label {
+    display: block;
+    padding: 0;
+}
+
 .smk-sidepanel .smk-panel.smk-directions-panel .smk-body {
     display: flex;
     flex-direction: column;

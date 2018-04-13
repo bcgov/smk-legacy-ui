@@ -1,8 +1,9 @@
 include.module( 'feature-list', [ 'smk', 'tool', 'widgets', 'feature-list.panel-feature-list-html', 'feature-list.popup-feature-html' ], function ( inc ) {
 
     Vue.component( 'feature-list-panel', {
+        extends: inc.widgets.toolPanel,
         template: inc[ 'feature-list.panel-feature-list-html' ],
-        props: [ 'busy', 'layers', 'highlightId', 'canRemove' ],
+        props: [ 'busy', 'layers', 'highlightId', 'canRemove', 'canClear', 'message', 'messageClass' ],
         computed: {
             isEmpty: {
                 get: function () {
@@ -17,6 +18,8 @@ include.module( 'feature-list', [ 'smk', 'tool', 'widgets', 'feature-list.panel-
         this.makePropPanel( 'busy', false )
         this.makePropPanel( 'layers', [] )
         this.makePropPanel( 'highlightId', null )
+        this.makePropPanel( 'message', null )
+        this.makePropPanel( 'messageClass', null )
 
         SMK.TYPE.Tool.prototype.constructor.call( this, $.extend( {
         }, option ) )
@@ -28,32 +31,55 @@ include.module( 'feature-list', [ 'smk', 'tool', 'widgets', 'feature-list.panel-
     FeatureList.prototype.afterInitialize = []
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
-    FeatureList.prototype.afterInitialize.push( function ( smk, aux ) {
+    FeatureList.prototype.afterInitialize.push( function ( smk ) {
         var self = this
 
-        aux.panel.vm.$on( this.panelComponent + '.active', function ( ev ) {
-            smk.$viewer[ self.featureSetProperty ].pick( ev.featureId )
-        } )
+        smk.on( this.id, {
+            'active': function ( ev ) {
+                self.featureSet.pick( ev.featureId )
+            },
 
-        aux.panel.vm.$on( this.panelComponent + '.hover', function ( ev ) {
-            smk.$viewer[ self.featureSetProperty ].highlight( ev.features && ev.features.map( function ( f ) { return f.id } ) )
-        } )
+            'hover': function ( ev ) {
+                self.featureSet.highlight( ev.features && ev.features.map( function ( f ) { return f.id } ) )
+            },
 
-        aux.panel.vm.$on( this.panelComponent + '.clear', function ( ev ) {
-            smk.$viewer[ self.featureSetProperty ].clear()
-        } )
+            'clear': function ( ev ) {
+                self.featureSet.clear()
+                self.setMessage()
+            },
 
-        aux.panel.vm.$on( this.panelComponent + '.remove', function ( ev ) {
-            smk.$viewer[ self.featureSetProperty ].remove( [ ev.featureId ] )
+            'remove': function ( ev ) {
+                self.featureSet.remove( [ ev.featureId ] )
+            }
         } )
 
         // = : = : = : = : = : = : = : = : = : = : = : = : = : = : = : = : = : = : =
 
-        smk.$viewer[ self.featureSetProperty ].clearedFeatures( function ( ev ) {
+        self.featureSet.addedFeatures( function ( ev ) {
+            self.active = true
+
+            var ly = smk.$viewer.layerId[ ev.layerId ]
+
+            if ( !self.layers[ ly.index ] )
+                Vue.set( self.layers, ly.index, {
+                    id:         ly.config.id,
+                    title:      ly.config.title,
+                    features:   []
+                } )
+
+            Vue.set( self.layers[ ly.index ], 'features', self.layers[ ly.index ].features.concat( ev.features.map( function ( ft ) {
+                return {
+                    id:     ft.id,
+                    title:  ft.title
+                }
+            } ) ) )
+        } )
+
+        self.featureSet.clearedFeatures( function ( ev ) {
             self.layers = []
         } )
 
-        smk.$viewer[ self.featureSetProperty ].removedFeatures( function ( ev ) {
+        self.featureSet.removedFeatures( function ( ev ) {
             var ly = smk.$viewer.layerId[ ev.features[ 0 ].layerId ]
 
             self.layers[ ly.index ].features = self.layers[ ly.index ].features.filter( function ( ft ) {
@@ -61,7 +87,7 @@ include.module( 'feature-list', [ 'smk', 'tool', 'widgets', 'feature-list.panel-
             } )
         } )
 
-        smk.$viewer[ self.featureSetProperty ].pickedFeature( function ( ev ) {
+        self.featureSet.pickedFeature( function ( ev ) {
             if ( !ev.feature ) {
                 self.highlightId = null
                 self.popupModel.layer = null
@@ -75,7 +101,7 @@ include.module( 'feature-list', [ 'smk', 'tool', 'widgets', 'feature-list.panel-
             self.popupModel.layer = {
                 id:         ev.feature.layerId,
                 title:      ly.config.title,
-                attributes: ly.config.attributes.map( function ( at ) {
+                attributes: ly.config.attributes && ly.config.attributes.map( function ( at ) {
                     return {
                         visible:at.visible,
                         title:  at.title,
@@ -119,30 +145,41 @@ include.module( 'feature-list', [ 'smk', 'tool', 'widgets', 'feature-list.panel-
                 //     return x
                 // },
                 zoomToFeature: function ( layerId, featureId ) {
-                    return smk.$viewer[ self.featureSetProperty ].zoomTo( featureId )
+                    return self.featureSet.zoomTo( featureId )
                 },
 
                 selectFeature: function ( layerId, featureId ) {
-                    smk.$viewer.selected.add( layerId, [ smk.$viewer[ self.featureSetProperty ].get( featureId ) ] )
+                    smk.$viewer.selected.add( layerId, [ self.featureSet.get( featureId ) ] )
                 },
 
                 movePrevious: function () {
                     var l = self.popupFeatureIds.length
                     self.popupCurrentIndex = ( self.popupCurrentIndex + l - 1 ) % l
                     this.position = ( self.popupCurrentIndex + 1 ) + ' / ' + l
-                    smk.$viewer[ self.featureSetProperty ].pick( self.popupFeatureIds[ self.popupCurrentIndex ] )
+                    self.featureSet.pick( self.popupFeatureIds[ self.popupCurrentIndex ] )
                 },
 
                 moveNext: function () {
                     var l = self.popupFeatureIds.length
                     self.popupCurrentIndex = ( self.popupCurrentIndex + 1 ) % l
                     this.position = ( self.popupCurrentIndex + 1 ) + ' / ' + l
-                    smk.$viewer[ self.featureSetProperty ].pick( self.popupFeatureIds[ self.popupCurrentIndex ] )
+                    self.featureSet.pick( self.popupFeatureIds[ self.popupCurrentIndex ] )
                 },
             }
         } )
 
     } )
+
+    FeatureList.prototype.setMessage = function ( message, Class, delay ) {
+        this.message = message
+
+        this.messageClass = {}
+        if ( Class )
+            this.messageClass[ 'smk-' + Class ] = true
+
+        if ( delay )
+            return SMK.UTIL.makePromise( function ( res ) { setTimeout( res, delay ) } )
+    }
 
     return FeatureList
 } )

@@ -15,6 +15,7 @@ exports.gen = function () {
     t.script( 'viewer', 'viewer.js' )
     t.script( 'layer', 'layer.js' )
     t.script( 'tool', 'tool.js' )
+    t.script( 'query', 'query.js' )
     t.script( 'feature-set', 'feature-set.js' )
 
     t.sequence( 'map-frame-styles' )
@@ -57,6 +58,9 @@ exports.gen = function () {
         .script( '//cdn.jsdelivr.net/npm/sortablejs@1.7.0/Sortable.min.js' )
         .script( '//cdnjs.cloudflare.com/ajax/libs/Vue.Draggable/2.16.0/vuedraggable.min.js' )
 
+    t.group( 'tool-dropdown' )
+        .dir( 'tool/dropdown/**/*', { cwd: baseDir } )
+
     t.group( 'tool-layers' )
         .dir( 'tool/layers/**/*', { cwd: baseDir } )
 
@@ -77,6 +81,12 @@ exports.gen = function () {
 
     t.group( 'tool-pan' )
         .dir( 'tool/pan/**/*', { cwd: baseDir } )
+
+    t.group( 'tool-queries' )
+        .dir( 'tool/queries/**/*', { cwd: baseDir } )
+
+    t.group( 'tool-query' )
+        .dir( 'tool/query/**/*', { cwd: baseDir } )
 
     t.group( 'tool-scale' )
         .dir( 'tool/scale/**/*', { cwd: baseDir } )
@@ -121,6 +131,12 @@ exports.gen = function () {
         .style( 'https://unpkg.com/leaflet.pm@0.17.3/dist/leaflet.pm.css' )
         .script( 'https://unpkg.com/leaflet.pm@0.17.3/dist/leaflet.pm.min.js' )
 
+    t.group( 'tool-queries-leaflet' )
+        .dir( 'viewer-leaflet/tool/queries/**/*', { cwd: baseDir } )
+
+    t.group( 'tool-query-leaflet' )
+        .dir( 'viewer-leaflet/tool/query/**/*', { cwd: baseDir } )
+
     t.group( 'tool-identify-leaflet' )
         .dir( 'viewer-leaflet/tool/identify/**/*', { cwd: baseDir } )
 
@@ -141,6 +157,8 @@ exports.gen = function () {
         .tag( 'leaflet-extensions' )
         .tag( 'feature-list-leaflet' )
 
+    t.script( 'feature-list-clustering-leaflet', 'viewer-leaflet/feature-list-clustering-leaflet.js' )
+
     t.sequence( 'leaflet' )
         .script( 'https://unpkg.com/leaflet@1.2.0/dist/leaflet.js', { 'integrity': 'sha512-lInM/apFSqyy1o6s89K4iQUKg6ppXEgsVxT35HbzUupEVRh2Eu9Wdl4tHj7dZO0s1uvplcYGmt3498TtHq+log==' } )
         .style( 'https://unpkg.com/leaflet@1.2.0/dist/leaflet.css', { 'integrity': 'sha512-M2wvCLH6DSRazYeZRIm1JnYyh22purTM+FDB5CsyxtQJYeKq83arPe5wgbNmcFXGqiSH2XR8dT/fJISVA1r/zQ==' } )
@@ -157,8 +175,7 @@ exports.gen = function () {
     	.style( "https://unpkg.com/leaflet.markercluster@1.0.6/dist/MarkerCluster.css" )
     	.style( "https://unpkg.com/leaflet.markercluster@1.0.6/dist/MarkerCluster.Default.css" )
     	.script( "https://unpkg.com/leaflet.markercluster@1.0.6/dist/leaflet.markercluster-src.js" )
-
-    		// <h:outputScript library="js" name="leaflet-heat.js" />
+    	.script( "resources/js/leaflet-heat.js" )
 
     // esri3d
 

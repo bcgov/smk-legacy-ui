@@ -1,18 +1,24 @@
-include.module( 'tool-menu', [ 'smk', 'tool', 'widgets', 'tool-menu.panel-menu-html' ], function ( inc ) {
+include.module( 'tool-dropdown', [ 'smk', 'tool', 'widgets', 'tool-dropdown.panel-dropdown-html' ], function ( inc ) {
 
-    Vue.component( 'menu-widget', {
+    Vue.component( 'dropdown-widget', {
         extends: inc.widgets.toolButton,
     } )
 
-    Vue.component( 'menu-panel', {
+    Vue.component( 'dropdown-panel', {
         extends: inc.widgets.toolPanel,
-        template: inc[ 'tool-menu.panel-menu-html' ],
-        props: [ 'visible', 'enabled', 'active', 'subWidgets', 'subPanels', 'activeToolId' ]
+        template: inc[ 'tool-dropdown.panel-dropdown-html' ],
+        props: [ 'visible', 'enabled', 'active', 'subWidgets', 'subPanels', 'activeToolId' ],
+        methods: {
+            removeTitle: function ( prop ) {
+                prop.title = null
+                return prop
+            }
+        }
     } )
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
-    function MenuTool( option ) {
-        this.makePropWidget( 'icon', 'menu' )
+    function DropdownTool( option ) {
+        this.makePropWidget( 'icon', 'arrow_drop_down_circle' )
 
         this.makePropPanel( 'subWidgets', [] )
         this.makePropPanel( 'subPanels', {} )
@@ -20,18 +26,18 @@ include.module( 'tool-menu', [ 'smk', 'tool', 'widgets', 'tool-menu.panel-menu-h
 
         SMK.TYPE.Tool.prototype.constructor.call( this, $.extend( {
             title:          null,
-            widgetComponent:'menu-widget',
-            panelComponent: 'menu-panel',
+            widgetComponent:'dropdown-widget',
+            panelComponent: 'dropdown-panel',
         }, option ) )
     }
 
-    SMK.TYPE.MenuTool = MenuTool
+    SMK.TYPE.DropdownTool = DropdownTool
 
-    $.extend( MenuTool.prototype, SMK.TYPE.Tool.prototype )
-    MenuTool.prototype.afterInitialize = []
+    $.extend( DropdownTool.prototype, SMK.TYPE.Tool.prototype )
+    DropdownTool.prototype.afterInitialize = []
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
-    MenuTool.prototype.afterInitialize.push( function ( smk ) {
+    DropdownTool.prototype.afterInitialize.push( function ( smk ) {
         var self = this
 
         smk.on( this.id, {
@@ -39,6 +45,10 @@ include.module( 'tool-menu', [ 'smk', 'tool', 'widgets', 'tool-menu.panel-menu-h
                 if ( !self.visible || !self.enabled ) return
 
                 self.active = !self.active
+            },
+
+            'select-tool': function ( ev ) {
+                smk.$tool[ ev.id ].active = true
             }
         } )
 
@@ -49,12 +59,11 @@ include.module( 'tool-menu', [ 'smk', 'tool', 'widgets', 'tool-menu.panel-menu-h
     } )
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
-    MenuTool.prototype.addTool = function ( tool ) {
+    DropdownTool.prototype.addTool = function ( tool ) {
         var self = this
 
         this.subWidgets.push( {
             id: tool.id,
-            type: tool.type,
             widgetComponent: tool.widgetComponent,
             widget: tool.widget
         } )
@@ -86,6 +95,6 @@ include.module( 'tool-menu', [ 'smk', 'tool', 'widgets', 'tool-menu.panel-menu-h
         } )
     }
 
-    return MenuTool
+    return DropdownTool
 } )
 

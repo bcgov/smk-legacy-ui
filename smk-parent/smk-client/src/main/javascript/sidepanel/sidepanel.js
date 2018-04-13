@@ -7,7 +7,7 @@ include.module( 'sidepanel', [ 'vue', 'sidepanel.sidepanel-html', 'sidepanel.pan
     function Sidepanel( smk ) {
         this.model = {
             expanded: false,
-            activeTool: null,
+            activeToolId: null,
             tool: {}
         }
 
@@ -15,8 +15,13 @@ include.module( 'sidepanel', [ 'vue', 'sidepanel.sidepanel-html', 'sidepanel.pan
 
         this.vm = new Vue( {
             el: el,
-            data: this.model
-        } )
+            data: this.model,
+            methods: {
+                trigger: function ( toolId, event, arg ) {
+                    smk.emit( toolId, event, arg )
+                }
+            }
+    } )
 
         this.container = $( smk.$option.container )
     }
@@ -29,12 +34,12 @@ include.module( 'sidepanel', [ 'vue', 'sidepanel.sidepanel-html', 'sidepanel.pan
 
         if ( this.activeTool ) {
             this.activeTool.active = true
-            this.model.activeTool = this.activeTool.type
+            this.model.activeToolId = this.activeTool.id
             this.model.expanded = true
             this.container.addClass( 'smk-panel-expanded' )
         }
         else {
-            this.model.activeTool = null
+            this.model.activeToolId = null
             this.model.expanded = false
             this.container.removeClass( 'smk-panel-expanded' )
         }
@@ -43,7 +48,7 @@ include.module( 'sidepanel', [ 'vue', 'sidepanel.sidepanel-html', 'sidepanel.pan
     Sidepanel.prototype.add = function ( tool ) {
         var self = this
 
-        this.vm.$set( this.model.tool, tool.type, {
+        this.vm.$set( this.model.tool, tool.id, {
             panelComponent: tool.panelComponent,
             panel: tool.panel
         } )
