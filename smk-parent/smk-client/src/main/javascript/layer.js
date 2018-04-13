@@ -59,6 +59,7 @@ include.module( 'layer', [ 'smk', 'jquery', 'util', 'event' ], function () {
     }
 
     Layer.prototype.getLegends = function () {
+        return SMK.UTIL.resolved()
     }
 
     Layer.prototype.getFeaturesAtPoint = function ( arg ) {
@@ -331,7 +332,13 @@ include.module( 'layer', [ 'smk', 'jquery', 'util', 'event' ], function () {
 
     defineLayerType( 'heatmap', {
 
-        getLegends: createLegendChip,
+        initialize: function () {
+            Layer.prototype.initialize.apply( this, arguments )
+
+            this.config.isQueryable = false
+        },
+
+        // getLegends: createLegendChip,
 
     } )
 
