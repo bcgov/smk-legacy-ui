@@ -32,16 +32,11 @@
     top: 0;
     background-color: white;
     padding: 5px;
-    /* border-radius: 3px; */
     border-bottom: 1px solid darkgrey;
-
-
 }
 
 .smk-feature-list-panel .smk-layer h2 .smk-count{
-    /* display: inline-block; */
     font-size: 10px;
-    /* float: right; */
     vertical-align: bottom;
 }
 
