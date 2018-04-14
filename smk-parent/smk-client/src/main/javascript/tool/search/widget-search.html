@@ -1,4 +1,4 @@
-<div class="smk-search">
+<div v-bind:class="classes">
     <input type="text" placeholder="Search keywords"
         v-model.trim="search"
         v-on:keyup="$$emit( 'input-change', { text: search } )"

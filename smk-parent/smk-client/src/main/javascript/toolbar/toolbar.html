@@ -1,7 +1,6 @@
 <div class="smk-toolbar">
 
     <component class="smk-tool"
-        v-bind:class="{ 'smk-tool-active': tool.widget.active, 'smk-tool-visible': tool.widget.visible, 'smk-tool-enabled': tool.widget.enabled }"
         v-for="tool in tools"
         v-bind:key="tool.id"
         v-bind:is="tool.widgetComponent"
@@ -9,4 +8,3 @@
     ></component>
 
 </div>
-

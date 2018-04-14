@@ -16,10 +16,12 @@ include.module( 'tool', [ 'smk', 'jquery', 'event' ], function () {
         this.makeProp( 'enabled', true, 'changedEnabled' )
         this.makeProp( 'active', false, 'changedActive' )
 
+        this.makePropWidget( 'type', 'unknown' )
+
         $.extend( this, option )
     }
 
-    Tool.prototype.type = 'unknown'
+    // Tool.prototype.type = 'unknown'
     Tool.prototype.order = 1
     Tool.prototype.position = 'toolbar'
 
