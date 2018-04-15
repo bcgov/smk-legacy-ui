@@ -9,7 +9,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import ca.bc.gov.app.smks.model.layer.EsriDynamic;
 import ca.bc.gov.app.smks.model.layer.Folder;
-import ca.bc.gov.app.smks.model.layer.Geojson;
+import ca.bc.gov.app.smks.model.layer.Vector;
 import ca.bc.gov.app.smks.model.layer.Group;
 import ca.bc.gov.app.smks.model.layer.Kml;
 import ca.bc.gov.app.smks.model.layer.Wms;
@@ -28,7 +28,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 	@Type( name = "group",        value = Group.class ),
 	@Type( name = "wms",          value = Wms.class ),
 	@Type( name = "kml",          value = Kml.class ),
-	@Type( name = "geojson",      value = Geojson.class )
+	@Type( name = "vector",      value = Vector.class )
 } )
 @JsonInclude(Include.NON_NULL)
 public class Layer implements Cloneable
@@ -39,7 +39,7 @@ public class Layer implements Cloneable
 		Group( "group" ),
 		Wms( "wms" ),
 		Kml( "kml" ),
-		Geojson( "geojson" );
+		Vector( "vector" );
 
 		private String jsonType;
 

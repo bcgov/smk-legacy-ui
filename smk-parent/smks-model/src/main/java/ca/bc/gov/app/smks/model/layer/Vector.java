@@ -8,19 +8,22 @@ import ca.bc.gov.app.smks.model.Layer;
 import ca.bc.gov.app.smks.model.LayerStyle;
 
 @JsonInclude(Include.NON_NULL)
-public class Geojson extends FeatureLayer
+// Was Geojson class
+public class Vector extends FeatureLayer
 {
 	private String dataUrl;
+	private boolean useRawVector;
 	private boolean useClustering;
 	private boolean useHeatmapping;
 	private LayerStyle style;
 
-	public Geojson() { }
+	public Vector() { }
 
-	protected Geojson( Geojson layer ) {
+	protected Vector( Vector layer ) {
 		super( layer );
 
 		this.setDataUrl(layer.getDataUrl());
+		this.setUseRawVector(layer.getUseRawVector());
 		this.setUseClustering(layer.getUseClustering());
 		this.setUseHeatmapping(layer.getUseHeatmapping());
 		this.setStyle(layer.getStyle().clone());
@@ -28,7 +31,7 @@ public class Geojson extends FeatureLayer
 
 	public String getType()
 	{
-		return Layer.Type.Geojson.getJsonType();
+		return Layer.Type.Vector.getJsonType();
 	}
 
 	public String getDataUrl()
@@ -61,6 +64,16 @@ public class Geojson extends FeatureLayer
 		this.useHeatmapping = useHeatmapping;
 	}
 
+	public boolean getUseRawVector()
+	{
+		return useRawVector;
+	}
+	
+	public void setUseRawVector(boolean useRawVector)
+	{
+		this.useRawVector = useRawVector;
+	}
+	
 	public LayerStyle getStyle()
 	{
 		if ( style == null ) style = new LayerStyle();
@@ -72,9 +85,9 @@ public class Geojson extends FeatureLayer
 		this.style = style;
 	}
 
-	public Geojson clone()
+	public Vector clone()
 	{
-		Geojson clone = new Geojson( this );
+		Vector clone = new Vector( this );
 
 		return clone;
 	}

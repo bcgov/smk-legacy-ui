@@ -100,6 +100,32 @@ function setToolActivation(toolType)
 	    		setupQuillEditor(tool);
     		}
 	    	else if(tool.type == "about" && tool.enabled == false) $("#aboutPanelOptions").hide();
+	    	else if(tool.type == "identify" && tool.enabled == true)
+    		{
+	    		$("#identifyOptions").show();
+	    		
+	    		$("#identifyStyleOpacity").val(tool.styleOpacity);
+    			$("#identifyStyleStrokeOpacity").val(tool.style.strokeOpacity);
+    			$("#identifyStyleFillOpacity").val(tool.style.fillOpacity);
+    			$("#identifyStyleStrokeWidth").val(tool.style.strokeWidth);
+    			$("#identifyStyleStrokeStyle").val(tool.style.strokeStyle);
+    			$("#identifyStyleStrokeColor").val(tool.style.strokeColor);
+    			$("#identifyStyleFillColor").val(tool.style.fillColor);
+    		}
+	    	else if(tool.type == "identify" && tool.enabled == false) $("#identifyOptions").hide();
+	    	else if(tool.type == "select" && tool.enabled == true)
+    		{
+	    		$("#selectionOptions").show();
+	    		
+	    		$("#selectStyleOpacity").val(tool.styleOpacity);
+    			$("#selectStyleStrokeOpacity").val(tool.style.strokeOpacity);
+    			$("#selectStyleFillOpacity").val(tool.style.fillOpacity);
+    			$("#selectStyleStrokeWidth").val(tool.style.strokeWidth);
+    			$("#selectStyleStrokeStyle").val(tool.style.strokeStyle);
+    			$("#selectStyleStrokeColor").val(tool.style.strokeColor);
+    			$("#selectStyleFillColor").val(tool.style.fillColor);
+    		}
+	    	else if(tool.type == "select" && tool.enabled == false) $("#selectionOptions").hide();
 	    	else if(tool.type == "baseMaps" && tool.enabled == true)
     		{
 	    		$("#basemapPanelOptions").show();
@@ -297,7 +323,6 @@ function setupMapConfigToolsUI()
     	else if(tool.type == "attribution") $("#attribution").prop('checked', tool.enabled);
     	else if(tool.type == "sidebar") $("#sidebar").prop('checked', tool.enabled);
     	else if(tool.type == "layers") $("#layerPanel").prop('checked', tool.enabled);
-    	else if(tool.type == "identify") $("#identifyPanel").prop('checked', tool.enabled);
     	else if(tool.type == "pan") $("#panning").prop('checked', tool.enabled);
     	else if(tool.type == "zoom")
 		{
@@ -368,7 +393,38 @@ function setupMapConfigToolsUI()
 	           	});
 			}
 		}
-    	else if(tool.type == "select") $("#selectionPanel").prop('checked', tool.enabled);
+    	else if(tool.type == "select") 
+		{
+    		$("#selectionPanel").prop('checked', tool.enabled);
+    		if(tool.enabled)
+			{
+    			$("#selectionOptions").show();
+    			
+    			$("#selectStyleOpacity").val(tool.styleOpacity);
+    			$("#selectStyleStrokeOpacity").val(tool.style.strokeOpacity);
+    			$("#selectStyleFillOpacity").val(tool.style.fillOpacity);
+    			$("#selectStyleStrokeWidth").val(tool.style.strokeWidth);
+    			$("#selectStyleStrokeStyle").val(tool.style.strokeStyle);
+    			$("#selectStyleStrokeColor").val(tool.style.strokeColor);
+    			$("#selectStyleFillColor").val(tool.style.fillColor);
+			}
+		}
+    	else if(tool.type == "identify") 
+		{
+    		$("#identifyPanel").prop('checked', tool.enabled);
+    		if(tool.enabled)
+			{
+    			$("#identifyOptions").show();
+    			
+    			$("#identifyStyleOpacity").val(tool.styleOpacity);
+    			$("#identifyStyleStrokeOpacity").val(tool.style.strokeOpacity);
+    			$("#identifyStyleFillOpacity").val(tool.style.fillOpacity);
+    			$("#identifyStyleStrokeWidth").val(tool.style.strokeWidth);
+    			$("#identifyStyleStrokeStyle").val(tool.style.strokeStyle);
+    			$("#identifyStyleStrokeColor").val(tool.style.strokeColor);
+    			$("#identifyStyleFillColor").val(tool.style.fillColor);
+			}
+		}
     	else if(tool.type == "search") $("#searchPanel").prop('checked', tool.enabled);
     	else if(tool.type == "directions") $("#directions").prop('checked', tool.enabled);
 	});
@@ -383,6 +439,33 @@ function setupMapConfigToolsUI()
 	$('#layerTypeTabs').tabs('select_tab', 'dbcCatalog');
 	$('.collapsible').collapsible();
 	$('#vectorType').material_select();
+}
+
+function finishToolEdits()
+{
+	data.tools.forEach(function(tool)
+	{
+		if(tool.type == "identify") 
+		{
+			tool.styleOpacity = $("#identifyStyleOpacity").val();
+			tool.style.strokeOpacity = $("#identifyStyleStrokeOpacity").val();
+			tool.style.fillOpacity = $("#identifyStyleFillOpacity").val();
+			tool.style.strokeWidth = $("#identifyStyleStrokeWidth").val();
+			tool.style.strokeStyle = $("#identifyStyleStrokeStyle").val();
+			tool.style.strokeColor = $("#identifyStyleStrokeColor").val();
+			tool.style.fillColor = $("#identifyStyleFillColor").val();
+		}
+		else if(tool.type == "select") 
+		{
+			tool.styleOpacity = $("#selectStyleOpacity").val();
+			tool.style.strokeOpacity = $("#selectStyleStrokeOpacity").val();
+			tool.style.fillOpacity = $("#selectStyleFillOpacity").val();
+			tool.style.strokeWidth = $("#selectStyleStrokeWidth").val();
+			tool.style.strokeStyle = $("#selectStyleStrokeStyle").val();
+			tool.style.strokeColor = $("#selectStyleStrokeColor").val();
+			tool.style.fillColor = $("#selectStyleFillColor").val();
+		}
+	});
 }
 
 function addNewMapConfig()
@@ -528,6 +611,8 @@ function saveMapConfig()
 {
 	finishLayerEdits(selectedLayerNode != null);
 
+	finishToolEdits();
+	
 	var requestType = "put";
 	var requestUrl = "MapConfigurations/" + data.lmfId;
 
@@ -784,6 +869,32 @@ function resetBasemapView()
 
 var selectedLayerNode;
 
+function downloadSelectedVector()
+{
+	//trigger the load for published configs
+	$.ajax
+	({
+		url: serviceUrl + 'MapConfigurations/' + data.lmfId + '/Attachments/' + selectedLayerNode.data.id,
+		method: 'GET',
+        xhrFields: {
+            responseType: 'blob'
+        },
+        success: function (data)
+        {
+        	var a = document.createElement('a');
+            var url = window.URL.createObjectURL(data);
+            a.href = url;
+            a.download = selectedLayerNode.data.title + '.json';
+            a.click();
+            window.URL.revokeObjectURL(url);
+        },
+        error: function (status)
+        {
+            Materialize.toast('Error loading JSON. Please try again later', 4000);
+        }
+	});
+}
+
 function finishLayerEdits(save)
 {
 	if(save)
@@ -829,22 +940,28 @@ function finishLayerEdits(save)
 				attribute.title = $("#" + attribute.id + "_label").val();
 			});
 		}
-		else // kml, geojson
+		else // vector
 		{
+			// if user activated clustering, change vector type
+			if(selectedLayerNode.data.type == "vector" && $("#vectorClustering").is(":checked")) selectedLayerNode.data.type == "clustered";
+			if(selectedLayerNode.data.type == "clustered" && !$("#vectorClustering").is(":checked")) selectedLayerNode.data.type == "vector";
 			selectedLayerNode.data.isVisible = $("#vectorVisible").is(":checked");
 			selectedLayerNode.data.isQueryable = $("#vectorQueryable").is(":checked");
 			selectedLayerNode.data.title = $("#vectorName").val();
 			selectedLayerNode.data.dataUrl = $("#vectorUrl").val();
 			selectedLayerNode.data.opacity = $("#vectorOpacity").val();
+			selectedLayerNode.data.useRawVector = !$("#vectorClustering").is(":checked");
 			selectedLayerNode.data.useClustering = $("#vectorClustering").is(":checked");
 			selectedLayerNode.data.useHeatmapping = $("#vectorHeatmapping").is(":checked");
 			selectedLayerNode.data.style.strokeWidth = $("#vectorStrokeWidth").val();
-			selectedLayerNode.data.style.stylestrokeStyle = $("#vectorStrokeStyle").val();
+			selectedLayerNode.data.style.strokeStyle = $("#vectorStrokeStyle").val();
 			selectedLayerNode.data.style.strokeColor = $("#vectorStrokeColor").val();
 			selectedLayerNode.data.style.strokeOpacity = $("#vectorStrokeOpacity").val();
 			selectedLayerNode.data.style.fillColor = $("#vectorFillColor").val();
 			selectedLayerNode.data.style.fillOpacity = $("#vectorFillOpacity").val();
-
+			selectedLayerNode.data.style.markerSize = [$("#vectorMarkerSizeX").val(), $("#vectorMarkerSizeY").val()];
+			selectedLayerNode.data.style.markerOffset = [$("#vectorMarkerOffsetX").val(), $("#vectorMarkerOffsetY").val()];
+			
 			// add the attachment data to the cache for upload after save
 			// currently you cannot re-upload and must create a new layer
 			if(fileContents != null)
@@ -888,6 +1005,7 @@ function finishLayerEdits(save)
 	}
 
 	$("#attributePanel").empty();
+	$("#queriesPanel").empty();
 	$("#editLayerPanel").hide();
 	$("#layerEditDataBCPanel").hide();
 	$("#layerEditWMSPanel").hide();
@@ -904,7 +1022,8 @@ function editSelectedLayer()
 {
 	var nodes = $("#layer-tree").fancytree('getTree').getSelectedNodes();
 	$("#attributePanel").empty();
-
+	$("#queriesPanel").empty();
+	
 	var firstEdited = false;
 	
 	nodes.forEach(function(node)
@@ -949,7 +1068,15 @@ function editSelectedLayer()
 					$("#attributePanel").append('<div class="row"><div class="col s4"><p><input type="checkbox" id="' + attribute.id + '_visible" /><label class="black-text" for="' + attribute.id + '_visible">Visible</label></p></div><div class="col s8 input-field"><input id="' + attribute.id + '_label" type="text"><label for="' + attribute.id + '_label">' + attribute.name + '</label></div></div>');
 					$("#" + attribute.id + "_visible").prop('checked', attribute.visible);
 					$("#" + attribute.id + "_label").val(attribute.title);
-				}); 
+				});
+				
+				if(node.data.queries == null) node.data.queries = [];
+				$("#queriesPanel").empty();
+				
+				node.data.attributes.forEach(function (attribute)
+				{
+					//$("#queriesPanel").append("");
+				});
 			}
 			else if(node.data.type == "esri-dynamic")
 			{
@@ -990,24 +1117,37 @@ function editSelectedLayer()
 					$("#" + attribute.id + "_visible").prop('checked', attribute.visible);
 					$("#" + attribute.id + "_label").val(attribute.title);
 				}); 
+				
+				if(node.data.queries == null) node.data.queries = [];
+				$("#queriesPanel").empty();
+				
+				node.data.attributes.forEach(function (attribute)
+				{
+					//$("#queriesPanel").append("");
+				});
 			}
 			else
 			{
-				$("#layerEditVectorPanel").show(); //kml, geojson
+				$("#layerEditVectorPanel").show(); // vector
 	
 				$("#vectorVisible").prop('checked', node.data.isVisible);
 				$("#vectorQueryable").prop('checked', node.data.isQueryable);
 				$("#vectorName").val(node.data.title);
 				$("#vectorOpacity").val(node.data.opacity);
+				$("#vectorRawVector").prop('checked', node.data.useRawVector);
 				$("#vectorClustering").prop('checked', node.data.useClustering);
 				$("#vectorHeatmapping").prop('checked', node.data.useHeatmapping);
 				$("#vectorStrokeWidth").val(node.data.style.strokeWidth);
-				$("#vectorStrokeStyle").val(node.data.stylestrokeStyle);
+				$("#vectorStrokeStyle").val(node.data.style.strokeStyle);
 			    $("#vectorStrokeColor").val(node.data.style.strokeColor);
 			    $("#vectorStrokeOpacity").val(node.data.style.strokeOpacity);
 			    $("#vectorFillColor").val(node.data.style.fillColor);
 			    $("#vectorFillOpacity").val(node.data.style.fillOpacity);
-	
+			    $("#vectorMarkerSizeX").val(node.data.style.markerSize[0]);
+			    $("#vectorMarkerSizeY").val(node.data.style.markerSize[1]);
+			    $("#vectorMarkerOffsetX").val(node.data.style.markerOffset[0]);
+			    $("#vectorMarkerOffsetY").val(node.data.style.markerOffset[1]);
+			    
 			    if(node.data.attributes == null) node.data.attributes = [];
 			    $("#attributePanel").empty();
 
@@ -1017,6 +1157,14 @@ function editSelectedLayer()
 					$("#" + attribute.id + "_visible").prop('checked', attribute.visible);
 					$("#" + attribute.id + "_label").val(attribute.title);
 				}); 
+			    
+			    if(node.data.queries == null) node.data.queries = [];
+				$("#queriesPanel").empty();
+				
+				node.data.attributes.forEach(function (attribute)
+				{
+					//$("#queriesPanel").append("");
+				});
 			}
 	
 			Materialize.updateTextFields();
@@ -1063,16 +1211,16 @@ function removeSelectedLayer()
 
 function uploadVectorLayer()
 {
-	// create kml doc
 	var layer =
 	{
-		type: "geojson",
+		type: "vector",
 		id: $("#kmlName").val().replace(/\s+/g, '-').toLowerCase(),
 	    title: $("#kmlName").val(),
 	    isVisible: $("#kmlIsVisible").is(":checked"),
 	    isQueryable: $("#kmlQueryable").is(":checked"),
 	    opacity: $("#kmlOpacity").val(),
 	    attributes: [],
+	    useRawVector: !$("#kmlClustering").is(":checked"),
 		useClustering: $("#kmlClustering").is(":checked"),
 		useHeatmapping: $("#kmlHeatmapping").is(":checked"),
 		dataUrl: $("#vectorUrl").val(),
@@ -1083,13 +1231,14 @@ function uploadVectorLayer()
 		    strokeColor: $("#kmlStrokeColor").val(),
 		    strokeOpacity: $("#kmlStrokeOpacity").val(),
 		    fillColor: $("#kmlFillColor").val(),
-		    fillOpacity: $("#kmlFillOpacity").val()
+		    fillOpacity: $("#kmlFillOpacity").val(),
+		    markerSize: [$("#kmlMarkerSizeX").val(), $("#kmlMarkerSizeY").val()],
+		    markerOffset: [$("#kmlMarkerOffsetX").val(), $("#kmlMarkerOffsetY").val()]
 		}
 	};
 
-	// add to data
 	data.layers.push(layer);
-
+	
 	// add to layer tree
 	var lyrNode =
 	{
@@ -1530,6 +1679,7 @@ function loadConfigs()
 	$("#appsTable > tbody").html("");
 	$("#publishedAppsTable > tbody").html("");
 	$("#attributePanel").empty();
+	$("#queriesPanel").empty();
 
 	mapConfigs = [];
 	publishedMapConfigs = [];

@@ -12,12 +12,15 @@ import ca.bc.gov.app.smks.model.tool.Attribution;
 import ca.bc.gov.app.smks.model.tool.BaseMaps;
 import ca.bc.gov.app.smks.model.tool.Coordinate;
 import ca.bc.gov.app.smks.model.tool.Directions;
+import ca.bc.gov.app.smks.model.tool.Dropdown;
 import ca.bc.gov.app.smks.model.tool.Identify;
 import ca.bc.gov.app.smks.model.tool.Layers;
 import ca.bc.gov.app.smks.model.tool.Markup;
 import ca.bc.gov.app.smks.model.tool.Measure;
+import ca.bc.gov.app.smks.model.tool.Menu;
 import ca.bc.gov.app.smks.model.tool.Minimap;
 import ca.bc.gov.app.smks.model.tool.Pan;
+import ca.bc.gov.app.smks.model.tool.Query;
 import ca.bc.gov.app.smks.model.tool.Scale;
 import ca.bc.gov.app.smks.model.tool.Search;
 import ca.bc.gov.app.smks.model.tool.Select;
@@ -48,7 +51,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
     @Type( name = "layers",			value = Layers.class ),
     @Type( name = "identify",		value = Identify.class ),
     @Type( name = "select",			value = Select.class ),
-    @Type( name = "search",			value = Search.class )
+    @Type( name = "search",			value = Search.class ),
+    @Type( name = "dropdown",		value = Dropdown.class ),
+    @Type( name = "menu",			value = Menu.class ),
+    @Type( name = "query",			value = Query.class )
 } )
 @JsonInclude(Include.NON_DEFAULT)
 public class Tool implements Cloneable
@@ -60,6 +66,9 @@ public class Tool implements Cloneable
         coordinate( Coordinate.class ),
         minimap( Minimap.class ),
         markup( Markup.class ),
+        menu( Menu.class ),
+        dropdown( Dropdown.class ),
+        query( Query.class ),
         directions( Directions.class ),
         pan( Pan.class ),
         attribution( Attribution.class ),
@@ -91,24 +100,86 @@ public class Tool implements Cloneable
     }
 
     private boolean enabled;
+    private String title;
+    private String icon;
+    private int order;
+    private String container;
+    private String instance;
 
     public Tool() {
+    	title = "Unknown"; 
         enabled = true;
     }
 
     protected Tool( Tool tool ) 
     {
+    	title = tool.title;
     	enabled = tool.enabled;
     }
 
+    
     @JsonIgnore
-    public String getType() {
-        return Type.unknown.toString();
-    }
+    public String getIcon() 
+    {
+		return icon;
+	}
 
     @JsonIgnore
-    public String getTitle() {
-        return "Unknown";
+	public void setIcon(String icon) 
+    {
+		this.icon = icon;
+	}
+
+    @JsonIgnore
+	public int getOrder() 
+    {
+		return order;
+	}
+
+    @JsonIgnore
+	public void setOrder(int order) 
+    {
+		this.order = order;
+	}
+
+	@JsonIgnore
+	public String getContainer() 
+	{
+		return container;
+	}
+	
+	@JsonIgnore
+	public void setContainer(String container) 
+	{
+		this.container = container;
+	}
+
+	@JsonIgnore
+	public String getInstance() 
+	{
+		return instance;
+	}
+
+	@JsonIgnore
+	public void setInstance(String instance) 
+	{
+		this.instance = instance;
+	}
+	
+	@JsonIgnore
+	public void setTitle(String title) 
+	{
+		this.title = title;
+	}
+    @JsonIgnore
+    public String getTitle() 
+    {
+        return title;
+    }
+    
+	@JsonIgnore
+    public String getType() {
+        return Type.unknown.toString();
     }
 
     @JsonIgnore

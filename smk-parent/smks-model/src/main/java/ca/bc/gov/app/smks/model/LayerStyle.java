@@ -12,8 +12,10 @@ public class LayerStyle implements Cloneable
 	private Double strokeOpacity;
 	private String fillColor;
 	private Double fillOpacity;
-	private String markerSymbolPath;
-
+	private String markerUrl;
+	private Integer[] markerSize = {20, 20};
+	private Integer[] markerOffset = {10, 0};
+    		
 	public LayerStyle() { }
 
 	protected LayerStyle( LayerStyle layerStyle ) {
@@ -23,7 +25,7 @@ public class LayerStyle implements Cloneable
 		this.setStrokeOpacity(layerStyle.getStrokeOpacity());
 		this.setFillColor(layerStyle.getFillColor());
 		this.setFillOpacity(layerStyle.getFillOpacity());
-		this.setMarkerSymbolPath(layerStyle.getMarkerSymbolPath());
+		this.setMarkerUrl(layerStyle.getMarkerUrl());
 	}
 
 	public Double getStrokeWidth() { return strokeWidth; }
@@ -44,9 +46,21 @@ public class LayerStyle implements Cloneable
 	public Double getFillOpacity() { return fillOpacity; }
 	public void setFillOpacity(Double fillOpacity) { this.fillOpacity = fillOpacity; }
 
-	public String getMarkerSymbolPath() { return markerSymbolPath; }
-	public void setMarkerSymbolPath(String markerSymbolPath) { this.markerSymbolPath = markerSymbolPath; }
+	public String getMarkerUrl() { return markerUrl; }
+	public void setMarkerUrl(String markerSymbolPath) { this.markerUrl = markerUrl; }
 
+	public Integer[] getMarkerSize() {
+		if ( markerSize == null ) markerSize = new Integer[2];
+		return markerSize;
+	}
+	public void setMarkerSize(Integer[] markerSize) { this.markerSize = markerSize; }
+	
+	public Integer[] getMarkerOffset() {
+		if ( markerOffset == null ) markerOffset = new Integer[4];
+		return markerOffset;
+	}
+	public void setMarkerOffset(Integer[] markerOffset) { this.markerOffset = markerOffset; }
+	
 	public LayerStyle clone()
 	{
 		LayerStyle clone = new LayerStyle( this );
