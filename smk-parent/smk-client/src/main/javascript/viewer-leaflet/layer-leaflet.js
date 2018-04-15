@@ -208,6 +208,41 @@ include.module( 'layer-leaflet', [ 'smk', 'layer', 'util' ], function () {
                 layer.addData( data )
                 return layer
             } )
+            .then( function ( layer ) {
+                if ( !layers[ 0 ].config.useClustering ) return layer
+
+                var cluster = L.markerClusterGroup( {
+                    // singleMarkerMode: true,
+                    // zoomToBoundsOnClick: false,
+                    // spiderfyOnMaxZoom: false,
+                    // iconCreateFunction: function ( cluster ) {
+                    //     var count = cluster.getChildCount();
+
+                    //     return new L.DivIcon( {
+                    //         html: '<div><span>' + ( count == 1 ? '' : count > 999 ? 'lots' : count ) + '</span></div>',
+                    //         className: 'smk-identify-cluster smk-identify-cluster-' + ( count == 1 ? 'one' : 'many' ),
+                    //         iconSize: null
+                    //     } )
+                    // }
+                } )
+
+                cluster.addLayers( [ layer ] )
+
+                return cluster
+            } )
+            .then( function ( layer ) {
+                if ( !layers[ 0 ].config.useHeatmap ) return layer
+
+				var points = [];
+				var intensity = 100;
+
+				layer.eachLayer( function ( ly ) {
+					var centroid = turf.centroid( ly.feature.geometry )
+					points.push( [ centroid.geometry.coordinates[ 1 ], centroid.geometry.coordinates[ 0 ], intensity ] )
+				});
+
+				return L.heatLayer( points, { radius: 25 } )
+            } )
     }
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

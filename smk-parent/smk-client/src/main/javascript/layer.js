@@ -29,16 +29,20 @@ include.module( 'layer', [ 'smk', 'jquery', 'util', 'event' ], function () {
             }
         } )
 
-        Object.defineProperty( this, 'id', {
-            get: function () { return config.id }
-        } )
+        // Object.defineProperty( this, 'id', {
+        //     get: function () { return config.id }
+        // } )
     }
 
     $.extend( Layer.prototype, LayerEvent.prototype )
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
-    Layer.prototype.initialize = function () {
+    Layer.prototype.initialize = function ( id, index, parentId ) {
         var self = this
+
+        this.id = id
+        this.parentId = parentId
+        this.index = index
 
         if ( this.config.attributes ) {
             this.attribute = {}
@@ -57,6 +61,10 @@ include.module( 'layer', [ 'smk', 'jquery', 'util', 'event' ], function () {
             } )
         }
     }
+
+    Layer.prototype.hasChildren = function () { return false }
+
+    Layer.prototype.isParentVisible = function () { return true }
 
     Layer.prototype.getLegends = function () {
         return SMK.UTIL.resolved()
@@ -312,6 +320,51 @@ include.module( 'layer', [ 'smk', 'jquery', 'util', 'event' ], function () {
 
         getLegends: createLegendChip,
 
+        initialize: function () {
+            if ( this.hasChildren() )
+                this.isContainer = true
+
+            Layer.prototype.initialize.apply( this, arguments )
+
+            // this.config.isQueryable = false
+        },
+        
+        hasChildren: function () { 
+            return ( this.config.useRaw + this.config.useClustering + this.config.useHeatmap ) > 1
+        },
+
+        childLayerConfigs: function () {
+            configs = []
+
+            if ( this.config.useClustering )
+                configs.push( Object.assign( {}, this.config, { 
+                    id: 'clustered',
+                    dataUrl: '@' + this.config.id,
+                    title: '(clustered)',
+                    useRaw: false,
+                    useHeatmap: false,
+                } ) )
+
+            if ( this.config.useHeatmap )
+                configs.push( Object.assign( {}, this.config, { 
+                    id: 'heatmap',
+                    dataUrl: '@' + this.config.id,
+                    title: '(heatmap)',
+                    useRaw: false,
+                    useClustering: false,
+                } ) )
+
+            if ( this.config.useRaw )
+                configs.push( Object.assign( {}, this.config, { 
+                    id: 'raw',
+                    dataUrl: '@' + this.config.id,
+                    title: '(raw)',
+                    useHeatmap: false,
+                    useClustering: false,
+                } ) )
+                
+            return configs
+        }
     } )
 
     defineLayerType( 'geojson', {

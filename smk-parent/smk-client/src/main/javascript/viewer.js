@@ -132,11 +132,11 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
         this.query = {}
 
         if ( Array.isArray( smk.layers ) )
-            self.layerIds = smk.layers.map( function ( lyConfig, i ) {
-                var ly = self.layerId[ lyConfig.id ] = new SMK.TYPE.Layer[ lyConfig.type ][ smk.viewer.type ]( lyConfig )
-
-                ly.initialize()
-                ly.index = i
+            constructLayers( smk.layers, 0, null, function ( ly, cfg ) {
+                // console.log( 'layer', ly.index, ly.id );
+                
+                self.layerIds.push( ly.id )
+                self.layerId[ ly.id ] = ly
 
                 ly.startedLoading( function () {
                     self.loading = true
@@ -146,15 +146,13 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
                     self.loading = self.anyLayersLoading()
                 } )
 
-                if ( lyConfig.queries )
-                    lyConfig.queries.forEach( function ( q ) {
-                        var query = new SMK.TYPE.Query[ lyConfig.type ]( ly, q )
+                if ( cfg.queries )
+                    cfg.queries.forEach( function ( q ) {
+                        var query = new SMK.TYPE.Query[ cfg.type ]( ly, q )
 
                         self.query[ query.id ] = query
                         self.queried[ query.id ] = new SMK.TYPE.FeatureSet()
                     } )
-
-                return lyConfig.id
             } )
 
         this.pickedLocation( function ( ev ) {
@@ -169,6 +167,29 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
 
             pickHandler[ h ].call( smk.$tool[ h ], ev )
         } )
+
+        function constructLayers( layerConfigs, index, parentId, cb ) {
+            layerConfigs.forEach( function ( layerConfig, i ) {
+                index = constructLayer( layerConfig, index, parentId, cb )
+            } )
+
+            return index
+        }        
+
+        function constructLayer( layerConfig, index, parentId, cb ) {
+            var id = ( parentId ? parentId + '==' : '' ) + layerConfig.id
+
+            var ly = new SMK.TYPE.Layer[ layerConfig.type ][ smk.viewer.type ]( layerConfig )
+    
+            ly.initialize( id, index, parentId )
+            
+            cb( ly, layerConfig )
+    
+            if ( !ly.hasChildren() ) 
+                return index + 1
+            
+            return constructLayers( ly.childLayerConfigs(), index + 1, ly.id, cb )
+        }
     }
 
     Viewer.prototype.initializeLayers = function ( smk ) {
@@ -202,7 +223,10 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
         var visibleLayers = []
         var merged
         this.layerIds.forEach( function ( id, i ) {
+            // console.log( id,self.layerId[ id ].visible,self.layerId[ id ].isContainer,self.layerId[ id ].isParentVisible(),self.layerId[ id ].config );            
             if ( !self.layerId[ id ].visible ) return
+            if ( self.layerId[ id ].isContainer ) return
+            if ( self.layerId[ id ].parentId && !self.layerId[ self.layerId[ id ].parentId ].visible ) return 
 
             ly = self.layerId[ id ]
             if ( !merged ) {
