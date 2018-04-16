@@ -62,7 +62,7 @@ include.module( 'feature-list', [ 'smk', 'tool', 'widgets', 'feature-list.panel-
 
             if ( !self.layers[ ly.index ] )
                 Vue.set( self.layers, ly.index, {
-                    id:         ly.config.id,
+                    id:         ly.id,
                     title:      ly.config.title,
                     features:   []
                 } )

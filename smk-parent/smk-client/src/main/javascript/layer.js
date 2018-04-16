@@ -324,10 +324,11 @@ include.module( 'layer', [ 'smk', 'jquery', 'util', 'event' ], function () {
 
             Layer.prototype.initialize.apply( this, arguments )
 
-            // this.config.isQueryable = false
+            if ( this.config.useHeatmap )
+                this.config.isQueryable = false
         },
-        
-        hasChildren: function () { 
+
+        hasChildren: function () {
             return ( this.config.useRaw + this.config.useClustering + this.config.useHeatmap ) > 1
         },
 
@@ -335,7 +336,7 @@ include.module( 'layer', [ 'smk', 'jquery', 'util', 'event' ], function () {
             configs = []
 
             if ( this.config.useClustering )
-                configs.push( Object.assign( {}, this.config, { 
+                configs.push( Object.assign( {}, this.config, {
                     id: 'clustered',
                     dataUrl: '@' + this.config.id,
                     title: '(clustered)',
@@ -344,7 +345,7 @@ include.module( 'layer', [ 'smk', 'jquery', 'util', 'event' ], function () {
                 } ) )
 
             if ( this.config.useHeatmap )
-                configs.push( Object.assign( {}, this.config, { 
+                configs.push( Object.assign( {}, this.config, {
                     id: 'heatmap',
                     dataUrl: '@' + this.config.id,
                     title: '(heatmap)',
@@ -353,14 +354,14 @@ include.module( 'layer', [ 'smk', 'jquery', 'util', 'event' ], function () {
                 } ) )
 
             if ( this.config.useRaw )
-                configs.push( Object.assign( {}, this.config, { 
+                configs.push( Object.assign( {}, this.config, {
                     id: 'raw',
                     dataUrl: '@' + this.config.id,
                     title: '(raw)',
                     useHeatmap: false,
                     useClustering: false,
                 } ) )
-                
+
             return configs
         }
     } )

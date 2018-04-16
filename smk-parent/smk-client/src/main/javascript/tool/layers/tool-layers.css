@@ -11,6 +11,10 @@
     cursor: pointer;
 }
 
+.smk-layers-panel .smk-all-visibility.smk-some-visible {
+    opacity: .5;
+}
+
 .smk-layers-panel .smk-all-collapse {
     position: absolute;
     top: 20px;
@@ -23,10 +27,6 @@
     top: 30px;
     right: 0px;
     cursor: pointer;
-}
-
-.smk-layers-panel .smk-all-visibility.smk-some-visible {
-    opacity: .5;
 }
 
 .smk-layers-panel .smk-layer {
@@ -50,6 +50,10 @@
 
 .smk-layers-panel .smk-layer.smk-layer-visible .smk-layer-visibility {
     opacity: 1;
+}
+
+.smk-layers-panel .smk-layer.smk-layer-visible .smk-layer-visibility.smk-some-visible {
+    opacity: .5;
 }
 
 .smk-layers-panel .smk-layer h2 {

@@ -15,9 +15,21 @@ include.module( 'tool-layers', [ 'smk', 'tool', 'widgets', 'tool-layers.panel-la
         },
         methods: {
             isAllVisible: function () {
-                return this.layers.every( isVisible ) || ( this.layers.some( isVisible ) ? null : false )
+                return this.layers.every( isLayerVisible ) || ( this.layers.some( isLayerVisible ) ? null : false )
+            },
 
-                function isVisible( ly ) { return ly.visible }
+            isChildrenVisible: function ( layerId ) {
+                var v = this.layers
+                    .filter( function ( ly ) { return ly.parentId == layerId } )
+                    .reduce( function ( accum, ly ) {
+                        // console.log( accum,ly.id,ly.visible )
+                        return accum === undefined ? ly.visible
+                            : accum == null ? null
+                            : ly.visible == accum ? accum
+                            : null
+                    }, undefined )
+                // console.log( layerId, v )
+                return v
             },
 
             matchesFilter: function ( layer ) {
@@ -37,6 +49,8 @@ include.module( 'tool-layers', [ 'smk', 'tool', 'widgets', 'tool-layers.panel-la
             }
         }
     } )
+
+    function isLayerVisible( ly ) { return ly.visible }
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
     function LayersTool( option ) {
@@ -110,7 +124,10 @@ include.module( 'tool-layers', [ 'smk', 'tool', 'widgets', 'tool-layers.panel-la
                 visible:        smk.$viewer.isLayerVisible( id ),
                 expanded:       false,
                 legends:        null,
-                indent:         ly.parentId ? 1 : 0
+                indent:         ly.parentId ? 1 : 0,
+                parentId:       ly.parentId,
+                isContainer:    ly.isContainer,
+                hasLegend:      !ly.config.useHeatmap && !ly.isContainer
             }
         } )
 

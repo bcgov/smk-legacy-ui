@@ -134,7 +134,7 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
         if ( Array.isArray( smk.layers ) )
             constructLayers( smk.layers, 0, null, function ( ly, cfg ) {
                 // console.log( 'layer', ly.index, ly.id );
-                
+
                 self.layerIds.push( ly.id )
                 self.layerId[ ly.id ] = ly
 
@@ -174,20 +174,20 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
             } )
 
             return index
-        }        
+        }
 
         function constructLayer( layerConfig, index, parentId, cb ) {
             var id = ( parentId ? parentId + '==' : '' ) + layerConfig.id
 
             var ly = new SMK.TYPE.Layer[ layerConfig.type ][ smk.viewer.type ]( layerConfig )
-    
+
             ly.initialize( id, index, parentId )
-            
+
             cb( ly, layerConfig )
-    
-            if ( !ly.hasChildren() ) 
+
+            if ( !ly.hasChildren() )
                 return index + 1
-            
+
             return constructLayers( ly.childLayerConfigs(), index + 1, ly.id, cb )
         }
     }
@@ -202,10 +202,28 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
     }
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
-    Viewer.prototype.isLayerVisible = function ( layerId ) {  
+    Viewer.prototype.filterLayers = function ( predicate ) {
+        var self = this
+
+        return this.layerIds
+            .filter( function ( id ) {
+                return predicate( self.layerId[ id ] )
+            } )
+            .map( function ( id ) {
+                return self.layerId[ id ]
+            } )
+    }
+
+    Viewer.prototype.isLayerVisible = function ( layerId ) {
         var ly = this.layerId[ layerId ]
         if ( !ly.parentId ) return ly.visible
         return this.layerId[ ly.parentId ].visible && ly.visible
+    }
+
+    Viewer.prototype.childLayers = function ( layerId ) {
+        if ( !this.layerId[ layerId ].isContainer ) return []
+
+        return this.filterLayers( function ( ly ) { return ly.parentId == layerId } )
     }
 
     Viewer.prototype.setLayersVisible = function ( layerIds, visible ) {
@@ -214,7 +232,7 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
         var layerCount = this.layerIds.length
         if ( layerCount == 0 ) return SMK.UTIL.resolved()
 
-        if ( layerIds.every( function ( id ) { return !self.layerId[ id ].visible == !visible } ) ) return SMK.UTIL.resolved()
+        if ( layerIds.every( function ( id ) { return !self.isLayerVisible( id ) == !visible } ) ) return SMK.UTIL.resolved()
 
         var pending = {}
         self.layerIds.forEach( function ( id ) {
@@ -224,20 +242,22 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
             pending[ id ] = true
         } )
 
-        layerIds.forEach( function ( id ) { 
+        layerIds.forEach( function ( id ) {
             var ly = self.layerId[ id ]
 
-            var prev = ly.visible 
-            ly.visible = !!visible 
+            var prev = ly.visible
+            ly.visible = !!visible
 
-            if ( visible && !prev && ly.parentId )
+            if ( visible && ly.parentId )
                 self.layerId[ ly.parentId ].visible = true
+
+            self.childLayers( id ).forEach( function ( ly ) { ly.visible = visible } )
         } )
 
         var visibleLayers = []
         var merged
         this.layerIds.forEach( function ( id, i ) {
-            console.log( id,self.isLayerVisible( id ),self.layerId[ id ].isContainer,self.layerId[ id ].config );            
+            // console.log( id,self.isLayerVisible( id ),self.layerId[ id ].isContainer,self.layerId[ id ].config );
             if ( !self.isLayerVisible( id )  ) return
             if ( self.layerId[ id ].isContainer ) return
 
@@ -261,7 +281,7 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
         var promises = []
         var maxZOrder = visibleLayers.length - 1
         visibleLayers.forEach( function ( lys, i ) {
-            var cid = lys.map( function ( ly ) { return ly.config.id } ).join( '--' )
+            var cid = lys.map( function ( ly ) { return ly.id } ).join( '##' )
 
             delete pending[ cid ]
             if ( self.visibleLayer[ cid ] ) {
@@ -286,7 +306,7 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
             self.finishedLoading()
 
         return SMK.UTIL.waitAll( promises )
-    }    
+    }
 
     Viewer.prototype.addViewerLayer = function ( viewerLayer ) {
     }
