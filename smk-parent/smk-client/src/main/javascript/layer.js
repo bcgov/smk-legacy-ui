@@ -64,8 +64,6 @@ include.module( 'layer', [ 'smk', 'jquery', 'util', 'event' ], function () {
 
     Layer.prototype.hasChildren = function () { return false }
 
-    Layer.prototype.isParentVisible = function () { return true }
-
     Layer.prototype.getLegends = function () {
         return SMK.UTIL.resolved()
     }

@@ -202,6 +202,12 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
     }
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
+    Viewer.prototype.isLayerVisible = function ( layerId ) {  
+        var ly = this.layerId[ layerId ]
+        if ( !ly.parentId ) return ly.visible
+        return this.layerId[ ly.parentId ].visible && ly.visible
+    }
+
     Viewer.prototype.setLayersVisible = function ( layerIds, visible ) {
         var self = this
 
@@ -218,15 +224,22 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
             pending[ id ] = true
         } )
 
-        layerIds.forEach( function ( id ) { self.layerId[ id ].visible = !!visible } )
+        layerIds.forEach( function ( id ) { 
+            var ly = self.layerId[ id ]
+
+            var prev = ly.visible 
+            ly.visible = !!visible 
+
+            if ( visible && !prev && ly.parentId )
+                self.layerId[ ly.parentId ].visible = true
+        } )
 
         var visibleLayers = []
         var merged
         this.layerIds.forEach( function ( id, i ) {
-            // console.log( id,self.layerId[ id ].visible,self.layerId[ id ].isContainer,self.layerId[ id ].isParentVisible(),self.layerId[ id ].config );            
-            if ( !self.layerId[ id ].visible ) return
+            console.log( id,self.isLayerVisible( id ),self.layerId[ id ].isContainer,self.layerId[ id ].config );            
+            if ( !self.isLayerVisible( id )  ) return
             if ( self.layerId[ id ].isContainer ) return
-            if ( self.layerId[ id ].parentId && !self.layerId[ self.layerId[ id ].parentId ].visible ) return 
 
             ly = self.layerId[ id ]
             if ( !merged ) {
@@ -273,7 +286,7 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
             self.finishedLoading()
 
         return SMK.UTIL.waitAll( promises )
-    }
+    }    
 
     Viewer.prototype.addViewerLayer = function ( viewerLayer ) {
     }

@@ -1,17 +1,46 @@
 <side-panel class="smk-layers-panel" v-bind:class="{ 'smk-busy': busy }">
     <template slot="header">
         <h1>Layers</h1>
-        <input v-model="filter" placeholder="Filter layers" class="smk-filter">
-        <i v-on:click="$$emit( 'set-visible', { ids: allLayerIds(), visible: !isAllVisible() } )" class="smk-all-visibility material-icons" v-bind:class="{ 'smk-some-visible': isAllVisible() == null }">{{ isAllVisible() !== false ? 'visibility' : 'visibility_off' }}</i>
-        <i v-on:click="$$emit( 'set-expanded', { ids: allLayerIds(), expanded: false } )" class="smk-all-collapse material-icons">arrow_drop_up</i>
-        <i v-on:click="$$emit( 'set-expanded', { ids: allLayerIds(), expanded: true } )" class="smk-all-expand material-icons">arrow_drop_down</i>
+
         <div class="smk-spinner"></div>
+        
+        <i class="smk-all-visibility material-icons" 
+            v-on:click="$$emit( 'set-visible', { ids: allLayerIds(), visible: !isAllVisible() } )"             
+            v-bind:class="{ 'smk-some-visible': isAllVisible() == null }"
+        >{{ isAllVisible() !== false ? 'visibility' : 'visibility_off' }}</i>
+
+        <i class="smk-all-collapse material-icons"
+            v-on:click="$$emit( 'set-expanded', { ids: allLayerIds(), expanded: false } )"             
+        >arrow_drop_up</i>
+
+        <i class="smk-all-expand material-icons"
+            v-on:click="$$emit( 'set-expanded', { ids: allLayerIds(), expanded: true } )" 
+        >arrow_drop_down</i>
     </template>
 
-    <div v-for="layer in layers" class="smk-layer" v-bind:class="{ 'smk-layer-visible': layer.visible, 'smk-layer-expanded': layer.expanded }" v-show="matchesFilter( layer )">
-        <i v-on:click="$$emit( 'set-visible', { ids: [ layer.id ], visible: !layer.visible } )" class="smk-layer-visibility material-icons">{{ layer.visible ? 'visibility' : 'visibility_off' }}</i>
+    <template slot="commands">
+        <input class="smk-filter" placeholder="Filter layers" v-model="filter">
+    </template>
+
+    <div class="smk-layer"
+        v-for="layer in layers"  
+        v-bind:class="{ 
+            'smk-layer-visible': layer.visible, 
+            'smk-layer-expanded': layer.expanded 
+        }"
+        v-bind:style="{ 'margin-left':( 10 * layer.indent ) + 'px' }" 
+        v-show="matchesFilter( layer )"
+    >
+        <i class="smk-layer-visibility material-icons"
+            v-on:click="$$emit( 'set-visible', { ids: [ layer.id ], visible: !layer.visible } )" 
+        >{{ layer.visible ? 'visibility' : 'visibility_off' }}</i>
+
         <h2>{{ layer.title }}</h2>
-        <i v-on:click="$$emit( 'set-expanded', { ids: [ layer.id ], expanded: !layer.expanded } )" class="smk-layer-expand material-icons">{{ layer.expanded ? 'arrow_drop_up' : 'arrow_drop_down' }}</i>
+
+        <i class="smk-layer-expand material-icons"
+            v-on:click="$$emit( 'set-expanded', { ids: [ layer.id ], expanded: !layer.expanded } )" 
+        >{{ layer.expanded ? 'arrow_drop_up' : 'arrow_drop_down' }}</i>
+
         <div class="smk-layer-info" v-if="layer.expanded">
             <div class="smk-legend">
                 <span v-if="layer.legends == 'waiting'">Requesting</span>

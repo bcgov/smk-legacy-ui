@@ -70,8 +70,10 @@ include.module( 'tool-layers', [ 'smk', 'tool', 'widgets', 'tool-layers.panel-la
             },
 
             'set-visible': function ( ev ) {
-                ev.ids.forEach( function ( id ) { layerModel[ id ].visible = ev.visible } )
                 smk.$viewer.setLayersVisible( ev.ids, ev.visible )
+                smk.$viewer.layerIds.forEach( function ( id ) {
+                    layerModel[ id ].visible = smk.$viewer.isLayerVisible( id )
+                } )
             },
 
             'set-expanded': function ( ev ) {
@@ -105,9 +107,10 @@ include.module( 'tool-layers', [ 'smk', 'tool', 'widgets', 'tool-layers.panel-la
             return layerModel[ id ] = {
                 id:             id,
                 title:          ly.config.title,
-                visible:        ly.config.isVisible,
+                visible:        smk.$viewer.isLayerVisible( id ),
                 expanded:       false,
-                legends:        null
+                legends:        null,
+                indent:         ly.parentId ? 1 : 0
             }
         } )
 

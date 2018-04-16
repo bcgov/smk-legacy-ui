@@ -172,6 +172,7 @@ include.module( 'layer-leaflet', [ 'smk', 'layer', 'util' ], function () {
         var self = this
 
         if ( layers.length != 1 ) throw new Error( 'only 1 config allowed' )
+        if ( ( layers[0].useClustering + layers[0].useHeatmap + layers[0].useRaw ) > 1 ) throw new Error( 'raw or heatmap or clustering' )
 
         var layer = new L.geoJson( null, {
             pointToLayer: function ( geojson, latlng ) {
