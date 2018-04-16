@@ -154,8 +154,77 @@ include.module( 'query', [ 'smk', 'jquery', 'util', 'event' ], function () {
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    defineQueryType( 'geojson', {
+    defineQueryType( 'vector', {
+
+        queryLayer: function ( param, config, viewer, layerId ) {
+            var self = this
+
+            var test = makeTest( this.predicate, param )
+            var res = []
+            viewer.visibleLayer[ layerId ].eachLayer( function ( ly ) {
+                if ( test( ly.feature.properties ) )
+                    res.push( ly.feature )
+            } )
+
+
+            // var whereClause = makeWhereClause( this.predicate, param )
+
+            // var attrs = this.layer.config.attributes.filter( function ( a ) { return a.visible !== false } ).map( function ( a ) { return a.name } )
+
+            // var data = {
+            //     f:                  'geojson',
+            //     layer:              JSON.stringify( dynamicLayer ).replace( /^"|"$/g, '' ),
+            //     where:              whereClause,
+            //     outFields:          attrs.join( ',' ),
+            //     inSR:               4326,
+            //     outSR:              4326,
+            //     returnGeometry:     true,
+            //     returnZ:            false,
+            //     returnM:            false,
+            //     returnIdsOnly:      false,
+            //     returnCountOnly:    false,
+            //     returnDistinctValues:   false,
+            // }
+
+            // if ( config.within ) {
+            //     data.geometry = viewer.getView().extent.join( ',' )
+            //     data.geometryType = 'esriGeometryEnvelope'
+            //     data.spatialRel = 'esriSpatialRelIntersects'
+            // }
+
+            // return SMK.UTIL.makePromise( function ( res, rej ) {
+            //     $.ajax( {
+            //         url:        serviceUrl,
+            //         method:     'POST',
+            //         data:       data,
+            //         dataType:   'json',
+            //         // contentType:    'application/json',
+            //         // crossDomain:    true,
+            //         // withCredentials: true,
+            //     } ).then( res, rej )
+            // } )
+            // .then( function ( data ) {
+            //     console.log( data )
+
+            //     if ( !data ) throw new Error( 'no features' )
+            //     if ( !data.features || data.features.length == 0 ) throw new Error( 'no features' )
+
+            //     return data.features.map( function ( f, i ) {
+            //         if ( self.layer.config.titleAttribute )
+            //             f.title = f.properties[ self.layer.config.titleAttribute ]
+            //         else
+            //             f.title = 'Feature #' + ( i + 1 )
+
+            //         return f
+            //     } )
+            // } )
+        }
+
     } )
+
+    function makeTest( predicate, param ) {
+
+    }
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 

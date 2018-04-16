@@ -172,9 +172,9 @@ include.module( 'tool-query', [ 'smk', 'tool', 'widgets', 'tool-query.panel-quer
                     param[ p.prop.id ] = $.extend( {}, p.prop )
                 } )
 
-                return self.query.queryLayer( param, self.config, smk.$viewer )
+                return self.query.queryLayer( param, self.config, smk.$viewer, self.query.layer.id )
                     .then( function ( features ) {
-                        self.featureSet.add( self.query.layer.config.id, features )
+                        self.featureSet.add( self.query.layer.id, features )
                     } )
                     .catch( function ( err ) {
                         self.setMessage( 'Query returned no results', 'warning' )
