@@ -1,21 +1,32 @@
+.smk-layers-panel .smk-header .smk-commands {
+    height: 28px;
+
+    display: flex;
+    align-items: center;
+}
 
 .smk-layers-panel input.smk-filter {
     margin-bottom: 0;
     border: 0;
+    font-size: 15px;
+    padding: 3px;
+    background-color: white;
+    vertical-align: top;
+}
+
+.smk-layers-panel input.smk-filter:focus {
+    outline: 0;
 }
 
 .smk-layers-panel .smk-all-visibility {
-    position: absolute;
-    top: 25px;
-    right: 25px;
-    cursor: pointer;
+    padding: 0;
 }
 
 .smk-layers-panel .smk-all-visibility.smk-some-visible {
     opacity: .5;
 }
 
-.smk-layers-panel .smk-all-collapse {
+/* .smk-layers-panel .smk-all-collapse {
     position: absolute;
     top: 20px;
     right: 0px;
@@ -27,25 +38,23 @@
     top: 30px;
     right: 0px;
     cursor: pointer;
-}
+} */
 
 .smk-layers-panel .smk-layer {
-    position: relative;
-    border: 1px solid transparent;
     margin-bottom: 5px;
     border-radius: 5px;
+
+    display: flex;
+    align-items: center;
 }
 
 .smk-layers-panel .smk-layer:hover {
-    border: 1px solid black;
+    /* border: 1px solid black; */
 }
 
 .smk-layers-panel .smk-layer .smk-layer-visibility {
-    display: inline-block;
-    /* width: 20px; */
-    vertical-align: top;
-    cursor: pointer;
     opacity: .5;
+    padding: 0;
 }
 
 .smk-layers-panel .smk-layer.smk-layer-visible .smk-layer-visibility {
@@ -58,8 +67,7 @@
 
 .smk-layers-panel .smk-layer h2 {
     display: inline-block;
-    width: 200px;
-    margin-top: 2px;
+    margin-left: 5px;
 }
 
 .smk-layers-panel .smk-layer .smk-layer-expand {
