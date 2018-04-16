@@ -339,7 +339,7 @@ include.module( 'layer', [ 'smk', 'jquery', 'util', 'event' ], function () {
                 configs.push( Object.assign( {}, this.config, {
                     id: 'clustered',
                     dataUrl: '@' + this.config.id,
-                    title: '(clustered)',
+                    title: 'Clustered',
                     useRaw: false,
                     useHeatmap: false,
                 } ) )
@@ -348,7 +348,7 @@ include.module( 'layer', [ 'smk', 'jquery', 'util', 'event' ], function () {
                 configs.push( Object.assign( {}, this.config, {
                     id: 'heatmap',
                     dataUrl: '@' + this.config.id,
-                    title: '(heatmap)',
+                    title: 'Heatmap',
                     useRaw: false,
                     useClustering: false,
                 } ) )
@@ -357,7 +357,7 @@ include.module( 'layer', [ 'smk', 'jquery', 'util', 'event' ], function () {
                 configs.push( Object.assign( {}, this.config, {
                     id: 'raw',
                     dataUrl: '@' + this.config.id,
-                    title: '(raw)',
+                    title: 'Raw',
                     useHeatmap: false,
                     useClustering: false,
                 } ) )

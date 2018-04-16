@@ -7,13 +7,28 @@ include.module( 'tool-layers', [ 'smk', 'tool', 'widgets', 'tool-layers.panel-la
     Vue.component( 'layers-panel', {
         extends: inc.widgets.toolPanel,
         template: inc[ 'tool-layers.panel-layers-html' ],
-        props: [ 'busy', 'layers' ],
+        props: [ 'busy', 'layers', 'config' ],
         data: function () {
-            return {
-                filter: null
+            return Object.assign( {}, this.config )
+        },
+        watch: {
+            config: function ( val ) {
+                Object.keys( val ).forEach( function ( k ) {
+                    this[ k ] = val[ k ]
+                } )
             }
         },
         methods: {
+            getConfigState: function () {
+                var self = this
+
+                var state = {}
+                Object.keys( this.config ).forEach( function ( k ) {
+                    state[ k ] = self[ k ]
+                } )
+                return state
+            },
+
             isAllVisible: function () {
                 return this.layers.every( isLayerVisible ) || ( this.layers.some( isLayerVisible ) ? null : false )
             },
@@ -57,6 +72,10 @@ include.module( 'tool-layers', [ 'smk', 'tool', 'widgets', 'tool-layers.panel-la
         this.makePropWidget( 'icon', 'layers' )
         this.makePropPanel( 'busy', false )
         this.makePropPanel( 'layers', [] )
+        this.makePropPanel( 'config', {
+            legend: false,
+            filter: null
+        } )
 
         SMK.TYPE.Tool.prototype.constructor.call( this, $.extend( {
             order:          3,
@@ -83,6 +102,25 @@ include.module( 'tool-layers', [ 'smk', 'tool', 'widgets', 'tool-layers.panel-la
                 self.active = !self.active
             },
 
+            'config': function ( ev ) {
+                Object.assign( self.config, ev )
+
+                if ( ev.legend ) {
+                    smk.$viewer.layerIds.forEach( function ( id ) {
+                        var ly = layerModel[ id ]
+                        if ( ly.legends == null ) {
+                            ly.legends = 'waiting'
+                            smk.$viewer.layerId[ id ].getLegends()
+                                .then( function ( ls ) {
+                                    ly.legends = ls
+                                }, function () {
+                                    ly.legends = false
+                                } )
+                        }
+                    } )
+                }
+            },
+
             'set-visible': function ( ev ) {
                 smk.$viewer.setLayersVisible( ev.ids, ev.visible )
                 smk.$viewer.layerIds.forEach( function ( id ) {
@@ -90,22 +128,22 @@ include.module( 'tool-layers', [ 'smk', 'tool', 'widgets', 'tool-layers.panel-la
                 } )
             },
 
-            'set-expanded': function ( ev ) {
-                ev.ids.forEach( function ( id ) {
-                    var ly = layerModel[ id ]
-                    ly.expanded = ev.expanded
+            // 'set-expanded': function ( ev ) {
+            //     ev.ids.forEach( function ( id ) {
+            //         var ly = layerModel[ id ]
+            //         ly.expanded = ev.expanded
 
-                    if ( ly.expanded && ly.legends == null ) {
-                        ly.legends = 'waiting'
-                        smk.$viewer.layerId[ id ].getLegends()
-                            .then( function ( ls ) {
-                                ly.legends = ls
-                            }, function () {
-                                ly.legends = false
-                            } )
-                    }
-                } )
-            }
+            //         if ( ly.expanded && ly.legends == null ) {
+            //             ly.legends = 'waiting'
+            //             smk.$viewer.layerId[ id ].getLegends()
+            //                 .then( function ( ls ) {
+            //                     ly.legends = ls
+            //                 }, function () {
+            //                     ly.legends = false
+            //                 } )
+            //         }
+            //     } )
+            // }
         } )
 
         // aux.widget.vm.$on( 'layers-widget.click', function () {
@@ -127,7 +165,8 @@ include.module( 'tool-layers', [ 'smk', 'tool', 'widgets', 'tool-layers.panel-la
                 indent:         ly.parentId ? 1 : 0,
                 parentId:       ly.parentId,
                 isContainer:    ly.isContainer,
-                hasLegend:      !ly.config.useHeatmap && !ly.isContainer
+                hasLegend:      !ly.config.useHeatmap && !ly.isContainer,
+                class:          ly.parentId && 'smk-sub-layer'
             }
         } )
 

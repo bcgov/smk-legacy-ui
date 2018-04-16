@@ -5,6 +5,10 @@
     align-items: center;
 }
 
+.smk-layers-panel .smk-header .smk-commands label {
+    white-space: nowrap;
+}
+
 .smk-layers-panel input.smk-filter {
     margin-bottom: 0;
     border: 0;
@@ -12,6 +16,7 @@
     padding: 3px;
     background-color: white;
     vertical-align: top;
+    flex-basis: 100%;
 }
 
 .smk-layers-panel input.smk-filter:focus {
@@ -44,6 +49,9 @@
     margin-bottom: 5px;
     border-radius: 5px;
 
+}
+
+.smk-layers-panel .smk-layer-title {
     display: flex;
     align-items: center;
 }
@@ -52,22 +60,26 @@
     /* border: 1px solid black; */
 }
 
-.smk-layers-panel .smk-layer .smk-layer-visibility {
+.smk-layers-panel .smk-layer .smk-layer-title .smk-layer-visibility {
     opacity: .5;
     padding: 0;
 }
 
-.smk-layers-panel .smk-layer.smk-layer-visible .smk-layer-visibility {
+.smk-layers-panel .smk-layer.smk-layer-visible .smk-layer-title .smk-layer-visibility {
     opacity: 1;
 }
 
-.smk-layers-panel .smk-layer.smk-layer-visible .smk-layer-visibility.smk-some-visible {
+.smk-layers-panel .smk-layer.smk-layer-visible .smk-layer-title .smk-layer-visibility.smk-some-visible {
     opacity: .5;
 }
 
-.smk-layers-panel .smk-layer h2 {
+.smk-layers-panel .smk-layer .smk-layer-title h2 {
     display: inline-block;
     margin-left: 5px;
+}
+
+.smk-layers-panel .smk-layer .smk-layer-title h2.smk-sub-layer {
+    font-style: italic;
 }
 
 .smk-layers-panel .smk-layer .smk-layer-expand {
@@ -79,7 +91,7 @@
 }
 
 .smk-layers-panel .smk-layer .smk-layer-info {
-    padding-left: 25px;
+    padding-left: 30px;
 }
 
 .smk-layers-panel .smk-layer .smk-legend span {
