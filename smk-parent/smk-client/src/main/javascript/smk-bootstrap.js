@@ -50,75 +50,167 @@
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    // var scripts = document.getElementsByTagName( 'script' );
-    // var script = scripts[ scripts.length - 1 ];
-    var script = document.currentScript
+    parseScriptElement()
+        .then( resolveConfig )
+        .then( loadInclude )
+        .then( initializeSMK )
 
-    try {
-        var inner = script.innerText.trim().replace( /^\s*\/\/.*$/mg, '' ).replace( /^\s*return\s*/mg, '' )
-        script.innerText = ''
-        if ( inner )
-            try {
-                var scriptConfig = JSON.parse( inner )
-            }
-            catch ( e ) {
-                console.warn( e )
-                scriptConfig = inner
-            }
+    // try {
+    //     var inner = script.innerText.trim().replace( /^\s*\/\/.*$/mg, '' ).replace( /^\s*return\s*/mg, '' )
+    //     script.innerText = ''
+    //     if ( inner )
+    //         try {
+    //             var scriptConfig = JSON.parse( inner )
+    //         }
+    //         catch ( e ) {
+    //             console.warn( e )
+    //             scriptConfig = inner
+    //         }
 
-    }
-    catch ( e ) {
-        console.warn( 'parsing config:', e )
-    }
+    // }
+    // catch ( e ) {
+    //     console.warn( 'parsing config:', e )
+    // }
 
-    var attr = function ( key, defalt ) {
-        if ( !script.attributes[ key ] ) return defalt
+    // var attr = function ( key, defalt ) {
+    //     if ( !script.attributes[ key ] ) return defalt
 
-        if ( defalt === false && !script.attributes[ key ].nodeValue )
-            var val = true
-        else
-            var val = script.attributes[ key ].nodeValue
+    //     if ( defalt === false && !script.attributes[ key ].nodeValue )
+    //         var val = true
+    //     else
+    //         var val = script.attributes[ key ].nodeValue
 
-        script.attributes.removeNamedItem( key )
+    //     // script.attributes.removeNamedItem( key )
 
-        return val
-    }
+    //     return val
+    // }
 
-    var arg = {
-        containerId:    attr( 'smk-container', 'smk-map-frame' ),
-        configUrls:     attr( 'smk-config', '' ).split( /\s*,\s*/ ).filter( function ( url ) { return !!url } ),
-        standalone:     eval( attr( 'smk-standalone', false ) ),
-        disconnected:   eval( attr( 'smk-disconnected', false ) ),
-        config:         scriptConfig,
-    }
+    function parseScriptElement() {
+        var script = document.currentScript
 
-    if ( arg.config && arg.config.error ) {
-        document.getElementById( arg.containerId ).innerHTML = '<h1 class="error">Startup error: ' + arg.config.error + '</h1>';
-        return
-    }
+        var smkAttr = {
+            container:    attrString( 'smk-map-frame' ),
+            config:       attrList( '?smk' ),
+            standalone:   attrBoolean( false, true ),
+            disconnected: attrBoolean( false, true ),
+            'base-url':   attrString( ( new URL( script.src.replace( 'smk-bootstrap.js', '' ), document.location ) ).toString() ),
+        }
 
-    if ( window.include ) {
-        initializeSMK( arg )
-    }
-    else {
-        var includeBase = ( new URL( script.src.replace( 'smk-bootstrap.js', '' ), document.location ) ).toString()
-
-        var el = document.createElement( 'script' )
-        el.addEventListener( 'load', function( ev ) {
-            include.option( { baseUrl: new URL( includeBase, document.location ).toString() } )
-            initializeSMK( arg )
+        Object.keys( smkAttr ).forEach( function ( k ) {
+            smkAttr[ k ] = smkAttr[ k ]( 'smk-' + k, script )
         } )
-        el.addEventListener( 'error', function( ev ) {
-            throw new Error( 'failed to load script from ' + el.src )
-        } )
-        el.setAttribute( 'src', includeBase + '/lib/include.js' )
 
-        document.getElementsByTagName( 'head' )[ 0 ].appendChild( el )
+        console.log( 'SMK attributes', smkAttr )
 
+        return Promise.resolve( smkAttr )
+
+        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+        function attrString( missingKey, missingValue ) {
+            if ( missingValue === undefined )
+                missingValue = missingKey
+
+            return function( key, el ) {
+                var val = el.attributes[ key ]
+                if ( val == null ) return missingKey
+                if ( !val.value ) return missingValue
+                return val.value
+            }
+        }
+
+        function attrList( Default ) {
+            return function( key, el ) {
+                var val = attrString( Default, null )( key, el )
+                if ( val == null ) return []
+                return val.split( /\s*,\s*/ ).filter( function ( i ) { return !!i } )
+            }
+        }
+
+        function attrBoolean( missingKey, missingValue ) {
+            return function( key, el ) {
+                var val = attrString( missingKey, missingValue )( key, el )
+                return !!eval( val )
+            }
+        }
     }
 
-    function initializeSMK( smkArg ) {
+    function resolveConfig( attr ) {
+        var param = {}
+        location.search.substr( 1 ).split( '&' ).forEach( function ( p ) {
+            var m = p.match( /(.+?)=(.*)/ )
+            if ( !m ) return
 
+            param[ m[ 1 ] ] = ( param[ m[ 1 ] ] || [] ).push( m[ 2 ] )
+        } )
+
+        var config = []
+        attr.config.forEach( function ( c ) {
+            for ( var i in configParsers ) {
+                if ( configParsers[ i ][ 0 ].test( c ) ) {
+                    config = config.concat( configParsers[ i ][ 1 ]( param, c ) )
+                    break;
+                }
+            }
+        } )
+
+        attr.config = config
+    }
+
+    var configParsers = [
+        [ /^[?]/, function ( param, config ) {
+            var paramPattern = new RegExp( '^' + config.substr( 1 ) + '-(.+)$' )
+            Object.keys( param ).forEach( function ( p ) {
+                var m = paramPattern.match( p )
+                if ( !m ) return
+
+
+            } )
+        } ],
+        [ /^{.+}$/, function ( param, config ) {
+
+        } ],
+        [ /.+/, function ( param, config ) {
+
+        } ]
+    }
+
+    // var arg = {
+    //     containerId:    attr( 'smk-container', 'smk-map-frame' ),
+    //     configUrls:     attr( 'smk-config', '' ).split( /\s*,\s*/ ).filter( function ( url ) { return !!url } ),
+    //     standalone:     eval( attr( 'smk-standalone', false ) ),
+    //     disconnected:   eval( attr( 'smk-disconnected', false ) ),
+    //     config:         scriptConfig,
+    // }
+
+    // if ( arg.config && arg.config.error ) {
+    //     document.getElementById( arg.containerId ).innerHTML = '<h1 class="error">Startup error: ' + arg.config.error + '</h1>';
+    //     return
+    // }
+
+
+    function loadInclude( attr ) {
+        return new Promise( function ( res, rej ) {
+            if ( window.include ) return res( attr )
+
+            var el = document.createElement( 'script' )
+
+            el.addEventListener( 'load', function( ev ) {
+                include.option( { baseUrl: attr[ 'base-url' ] } )
+
+                res( attr )
+            } )
+
+            el.addEventListener( 'error', function( ev ) {
+                rej( new Error( 'failed to load script from ' + el.src ) )
+            } )
+
+            el.setAttribute( 'src', attr[ 'base-url' ] + '/lib/include.js' )
+
+            document.getElementsByTagName( 'head' )[ 0 ].appendChild( el )
+        } )
+    }
+
+    function initializeSMK( attr ) {
         try {
             include.tag( 'smk-tags' )
         }
@@ -126,47 +218,52 @@
             include.tag( 'smk-tags', { loader: 'tags', url: 'smk-tags.json' } )
         }
 
-        include( 'smk-tags' ).then( function ( inc ) {
-            console.log( 'tags', inc[ 'smk-tags' ] )
-
-                include( 'jquery', 'smk' ).then( function ( inc ) {
+        return include( 'smk-tags' )
+            .then( function ( inc ) {
+                console.log( 'tags', inc[ 'smk-tags' ] )
+            } )
+            .then( function () {
+                return include( 'jquery', 'smk' ).then( function ( inc ) {
                     // inc.smk.MODULE.jQuery = $;
                     include.tag( 'jquery' ).exported = $
                 } )
-
-                include( 'vue', 'smk' ).then( function ( inc ) {
+            } )
+            .then( function () {
+                return include( 'vue', 'smk' ).then( function ( inc ) {
                     // inc.smk.MODULE.Vue = Vue;
                     include.tag( 'vue' ).exported = Vue
-
-                    // may not be a good idea
-                    // Vue.mixin( {
-                    //     methods: {
-                    //         $$emit: function ( event, arg ) {
-                    //             // console.log( this );
-
-                    //             arg = Object.assign( {
-                    //                 id: this.id
-                    //             }, arg )
-
-                    //             var op = this.$options
-                    //             while ( op && op._componentTag ) {
-                    //                 var componentEvent = op._componentTag + '.' + event
-                    //                 // console.log( componentEvent )
-
-                    //                 this.$root.$emit( componentEvent, arg, this )   
-
-                    //                 op = op.parent.$options
-                    //             }
-                    //         }
-                    //     }
-                    // } )
-                } )
-
-                include( 'smk', 'smk-map' ).then( function ( inc ) {
-                    return ( inc.smk.MAP[ smkArg.containerId ] = new inc.smk.TYPE.SmkMap( smkArg ) ).initialize()
                 } )
             } )
+            .then( function () {
+                return include( 'smk', 'smk-map' ).then( function ( inc ) {
+                    return ( inc.smk.MAP[ attr.containerId ] = new inc.smk.TYPE.SmkMap( attr ) ).initialize()
+                } )
+            } )
+            .catch( function ( e ) {
+                console.warn( e )
+            } )
     }
+
+
+    // if ( window.include )
+    //     return initializeSMK( parseScriptElement() )
+
+    //     var includeBase = ( new URL( script.src.replace( 'smk-bootstrap.js', '' ), document.location ) ).toString()
+
+    //     var el = document.createElement( 'script' )
+    //     el.addEventListener( 'load', function( ev ) {
+    //         include.option( { baseUrl: new URL( includeBase, document.location ).toString() } )
+    //         initializeSMK( arg )
+    //     } )
+    //     el.addEventListener( 'error', function( ev ) {
+    //         throw new Error( 'failed to load script from ' + el.src )
+    //     } )
+    //     el.setAttribute( 'src', includeBase + '/lib/include.js' )
+
+    //     document.getElementsByTagName( 'head' )[ 0 ].appendChild( el )
+
+    // }
+
 
 } )();
 

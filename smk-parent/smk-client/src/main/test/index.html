@@ -43,7 +43,8 @@
                     script.setAttribute( 'src', '../smk-bootstrap.js' )
                     script.setAttribute( 'smk-disconnected', true )
                     script.setAttribute( 'smk-standalone', true )
-                    script.setAttribute( 'smk-config', [].concat( PARAM.config ).map( function ( c ) { return 'config/' + c + '.json' } ).join( ',' ) )
+                    // script.setAttribute( 'smk-config', [].concat( PARAM.config ).map( function ( c ) { return 'config/' + c + '.json' } ).join( ',' ) )
+                    // script.setAttribute( 'smk-config', '@config' )
                     document.getElementsByTagName( 'head' )[ 0 ].appendChild( script );
                 }, 3000 )
             } )

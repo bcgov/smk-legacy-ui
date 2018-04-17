@@ -3,9 +3,9 @@ include.module( 'smk-map', [ 'smk', 'jquery', 'util', 'viewer', 'layer' ], funct
     function SmkMap( option ) {
         this.$option = option
 
-        this.$option.container = $( '#' + this.$option.containerId ).get( 0 )
+        this.$option.container = $( '#' + this.$option.container ).get( 0 )
         if ( !this.$option.container )
-            throw new Error( 'Unable to find container #' + this.$option.containerId )
+            throw new Error( 'Unable to find container #' + this.$option.container )
 
         this.dispatcher = new Vue()
     }
@@ -30,8 +30,8 @@ include.module( 'smk-map', [ 'smk', 'jquery', 'util', 'viewer', 'layer' ], funct
             .then( initViewer )
             .then( initTools )
             .catch( function ( e ) {
-                console.error( 'smk viewer #' + self.$option.containerId + ' failed to initialize:', e )
-                window.alert( 'smk viewer #' + self.$option.containerId + ' failed to initialize' )
+                console.error( 'smk viewer #' + self.$option.container + ' failed to initialize:', e )
+                window.alert( 'smk viewer #' + self.$option.container + ' failed to initialize' )
             } )
 
         function loadConfigs() {
