@@ -389,6 +389,31 @@ include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-
                     return p
                 } )
                 .then( function ( features ) {
+                    features.forEach( function ( f, i ) {
+                        if ( ly.config.titleAttribute ) {
+                            var m = ly.config.titleAttribute.match( /^(.+?)(:[/](.+)[/])?$/ )
+                            if ( m ) {
+                                if ( !m[ 2 ] )
+                                    f.title = f.properties[ m[ 1 ] ]
+                                else
+                                    try {
+                                        f.title = f.properties[ m[ 1 ] ].match( new RegExp( m[ 3 ] ) )[ 1 ]
+                                    }
+                                    catch ( e ) {
+                                        console.warn( e, m )
+                                    }
+                            }
+                        }
+
+                        if ( !f.title )
+                            f.title = 'Feature #' + ( i + 1 )
+
+                        return f
+                    } )
+
+                    return features
+                } )
+                .then( function ( features ) {
                     features.forEach( function ( f ) {
                         f._identifyPoint = location.map
                     } )

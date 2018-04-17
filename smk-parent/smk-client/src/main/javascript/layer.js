@@ -199,14 +199,7 @@ include.module( 'layer', [ 'smk', 'jquery', 'util', 'event' ], function () {
                 return SMK.UTIL.reproject( geojson, geojson.crs )
             } )
             .then( function ( geojson ) {
-                return geojson.features.map( function ( f, i ) {
-                    if ( self.config.titleAttribute )
-                        f.title = f.properties[ self.config.titleAttribute ]
-                    else
-                        f.title = 'Feature #' + ( i + 1 )
-
-                    return f
-                } )
+                return geojson.features
             } )
 
             // if ( queryLayer.withCreds )
@@ -280,12 +273,8 @@ include.module( 'layer', [ 'smk', 'jquery', 'util', 'event' ], function () {
                 return data.results.map( function ( r, i ) {
                     var f = {}
 
-                    if ( self.config.titleAttribute )
-                        f.title = r.attributes[ self.config.titleAttribute ]
-                    else if ( r.displayFieldName )
+                    if ( r.displayFieldName )
                         f.title = r.attributes[ r.displayFieldName ]
-                    else
-                        f.title = 'Feature #' + ( i + 1 )
 
                     f.geometry = Terraformer.ArcGIS.parse( r.geometry )
 

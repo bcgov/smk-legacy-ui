@@ -29,6 +29,7 @@
             "useClustering": false,
             "useHeatmap": false,
             "useRaw": true,
+            "titleAttribute": "description:/<h2.+?<a.+?>(.+?)<.+?a>.+?h2>/",
             "style": {
                 "strokeColor": "red",
                 "strokeWidth": 8,
@@ -56,7 +57,7 @@
                 "fillColor": "blue"
             }
         },
-        
+
         {
             "type": "vector",
             "id": "trailheads4",

@@ -388,13 +388,6 @@ include.module( 'layer-leaflet', [ 'smk', 'layer', 'util' ], function () {
             }
         } )
 
-        features.forEach( function ( f, i ) {
-            if ( self.config.titleAttribute )
-                f.title = r.attributes[ self.config.titleAttribute ]
-            else
-                f.title = 'Feature #' + ( i + 1 )
-        } )
-
         return features
     }
 
