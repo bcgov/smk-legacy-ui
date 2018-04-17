@@ -174,8 +174,10 @@ include.module( 'feature-list', [ 'smk', 'tool', 'widgets', 'feature-list.panel-
         this.message = message
 
         this.messageClass = {}
-        if ( Class )
-            this.messageClass[ 'smk-' + Class ] = true
+        if ( message && !Class)
+            Class = 'summary'
+
+        this.messageClass[ 'smk-' + Class ] = true
 
         if ( delay )
             return SMK.UTIL.makePromise( function ( res ) { setTimeout( res, delay ) } )

@@ -65,9 +65,9 @@
     font-weight: bold;
     font-size: 15px;
     margin-bottom: 5px;
-    margin-top: -5px;
     text-align: center;
     min-height: 40px;
+    border-radius: 10px;
 
     display: flex;
     flex-direction: column;
@@ -77,13 +77,16 @@
 
 .smk-directions-panel .smk-message.smk-error {
     color: red;
+    background-color: rgb(100%, 87.8%, 87.8%);
 }
 
 .smk-directions-panel .smk-message.smk-summary {
+    background-color: rgb(87.8%, 100%, 88.6%);
 }
 
 .smk-directions-panel .smk-message.smk-progress {
     color: blue;
+    background-color: rgb(87%, 96.5%, 99.1%);
 }
 
 .smk-directions-panel .smk-body .smk-directions {

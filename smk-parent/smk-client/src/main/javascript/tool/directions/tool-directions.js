@@ -426,8 +426,10 @@ include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.
         this.message = message
 
         this.messageClass = {}
-        if ( Class )
-            this.messageClass[ 'smk-' + Class ] = true
+        if ( message && !Class )
+            Class = 'summary'
+
+        this.messageClass[ 'smk-' + Class ] = true
 
         if ( delay )
             return SMK.UTIL.makePromise( function ( res ) { setTimeout( res, delay ) } )
