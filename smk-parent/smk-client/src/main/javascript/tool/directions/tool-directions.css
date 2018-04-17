@@ -17,17 +17,21 @@
     overflow-y: hidden;
 }
 
-.smk-directions-panel .smk-description {
-    width: calc( 100% - 92px );
-    height: 24px;
-    vertical-align: top;
-    margin-top: 2px;
-}
 
 .smk-directions-panel .smk-waypoint {
-    border: 1px solid gray;
-    border-radius: 5px;
-    margin-bottom: 1px;
+    display: flex;
+    align-items: center;
+}
+
+.smk-directions-panel .smk-description {
+    align-self: stretch;
+    flex-basis: 100%;
+    margin: 2px 0;
+    background-color: transparent;
+}
+
+.smk-directions-panel .smk-description input {
+    height: calc( 100% - 4px );
 }
 
 .smk-directions-panel .smk-waypoint .smk-command {

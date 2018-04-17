@@ -48,11 +48,15 @@
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    align-items: flex-start;
+    align-items: center;
 }
 
 .smk-feature-list-panel .smk-layer .smk-feature span {
     flex-basis: 100%;
+    margin-left: 5px;
+    font-size: 14px;
+    margin-top: 5px;
+    margin-bottom: 5px;
 }
 
 .smk-feature-list-panel .smk-layer .smk-feature.smk-highlighted {

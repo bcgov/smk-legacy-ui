@@ -6,7 +6,8 @@
     </template>
 
     <template slot="commands">
-        <i class="smk-all-visibility material-icons smk-command" title="Toggle visibility of all layers"
+        <i class="smk-all-visibility material-icons smk-command smk-icon"
+            title="Toggle visibility of all layers"
             v-on:click="$$emit( 'set-visible', { ids: allLayerIds(), visible: !isAllVisible() } )"
             v-bind:class="{ 'smk-some-visible': isAllVisible() == null }"
         >{{ isAllVisible() !== false ? 'visibility' : 'visibility_off' }}</i>
@@ -28,7 +29,7 @@
         >arrow_drop_down</i> -->
     </template>
 
-    <div class="smk-layer"
+    <div class="smk-layer smk-item"
         v-for="layer in layers"
         v-bind:class="{
             'smk-layer-visible': layer.visible,
@@ -38,13 +39,13 @@
         v-show="matchesFilter( layer )"
     >
         <div class="smk-layer-title">
-            <i class="smk-layer-visibility material-icons smk-command"
+            <i class="smk-layer-visibility material-icons smk-command smk-icon"
                 v-bind:title="'Toggle visibility of ' + layer.title"
                 v-on:click="$$emit( 'set-visible', { ids: [ layer.id ], visible: !layer.visible } )"
                 v-bind:class="{ 'smk-some-visible': layer.isContainer && isChildrenVisible( layer.id ) !== true }"
             >{{ layer.visible ? 'visibility' : 'visibility_off' }}</i>
 
-            <h2 v-bind:class="[ layer.class ]">{{ layer.title }}</h2>
+            <span v-bind:class="[ layer.class ]">{{ layer.title }}</span>
         </div>
 
         <!-- <i class="smk-layer-expand material-icons smk-command"

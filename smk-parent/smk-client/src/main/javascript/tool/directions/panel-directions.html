@@ -61,22 +61,20 @@
         v-bind:options="{ handle: '.smk-handle', disabled: optimal }"
         v-on:end="$$emit( 'changed-waypoints' )"
     >
-        <div class="smk-waypoint"
+        <div class="smk-waypoint smk-item"
             v-for="( node, i ) in waypoints"
         >
-            <span class="smk-command smk-handle"
+            <i class="smk-command smk-icon smk-handle material-icons"
                 v-bind:class="{ 'smk-disabled': optimal || busy }"
                 v-bind:title="optimal ? 'Optimal order' : 'Drag to reorder'"
-            >
-                <i class="material-icons">drag_handle</i>
-            </span>
+            >drag_handle</i>
 
             <address-search class="smk-description" placeholder="Click on point, or enter address"
                 v-model="node.description"
                 v-on:update="$$emit( 'update-waypoint', { index: i, item: $event } )"
             ></address-search>
 
-            <span class="smk-command smk-zoomto" title="Zoom to this waypoint"
+            <i class="smk-command smk-icon smk-zoomto material-icons" title="Zoom to this waypoint"
                 v-on:click="node.location && $$emit( 'zoom-waypoint', { location: node.location, index: i } )"
                 v-bind:class="{
                     'smk-disabled': !node.location,
@@ -84,16 +82,12 @@
                     'smk-middle':   node.location && firstWaypointIndex != i && lastWaypointIndex != i,
                     'smk-last':     lastWaypointIndex == i && firstWaypointIndex != i
                 }"
-            >
-                <i class="material-icons">location_on</i>
-            </span>
+            >location_on</i>
 
-            <span class="smk-command smk-remove" title="Remove this waypoint"
+            <i class="smk-command smk-icon smk-remove material-icons" title="Remove this waypoint"
                 v-on:click="waypoints.length > 2 && node.location && $$emit( 'remove-waypoint', { index: i } )"
                 v-bind:class="{ 'smk-disabled': !node.location || waypoints.length < 3 || busy }"
-            >
-                <i class="material-icons">delete</i>
-            </span>
+            >delete</i>
         </div>
     </draggable>
 
