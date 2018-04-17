@@ -7,13 +7,12 @@
     width: 100%;
     border: none;
     vertical-align: top;
-    border-bottom: 1px solid transparent;
     background-color: transparent;
+    padding-left: 4px;
 }
 
 .smk-address-search input:focus {
     outline: none;
-    border-bottom: 1px dashed gray;
     background-color: white;
 }
 

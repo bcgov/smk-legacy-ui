@@ -28,10 +28,12 @@
     flex-basis: 100%;
     margin: 2px 0;
     background-color: transparent;
+    margin-right: 5px;
 }
 
 .smk-directions-panel .smk-description input {
-    height: calc( 100% - 4px );
+    height: calc( 100% - 2px );
+    border-radius: 2px;
 }
 
 .smk-directions-panel .smk-waypoint .smk-command {
