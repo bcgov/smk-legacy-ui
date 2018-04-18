@@ -122,7 +122,7 @@
             return function( key, el ) {
                 var val = attrString( Default, null )( key, el )
                 if ( val == null ) return []
-                return val.split( /\s*,\s*/ ).filter( function ( i ) { return !!i } )
+                return val.split( /\s*[|]\s*/ ).filter( function ( i ) { return !!i } )
             }
         }
 
@@ -135,43 +135,68 @@
     }
 
     function resolveConfig( attr ) {
-        var param = {}
-        location.search.substr( 1 ).split( '&' ).forEach( function ( p ) {
-            var m = p.match( /(.+?)=(.*)/ )
-            if ( !m ) return
+        //     var params = {}
+        // location.search.substr( 1 ).split( '&' ).forEach( function ( p ) {
+        //     var m = p.match( /(.+?)=(.*)/ )
+        //     if ( !m ) return
 
-            param[ m[ 1 ] ] = ( param[ m[ 1 ] ] || [] ).push( m[ 2 ] )
-        } )
+        //     params[ m[ 1 ] ] = ( params[ m[ 1 ] ] || [] ).push( m[ 2 ] )
+        // } )
 
-        var config = []
+        var configs = []
         attr.config.forEach( function ( c ) {
-            for ( var i in configParsers ) {
-                if ( configParsers[ i ][ 0 ].test( c ) ) {
-                    config = config.concat( configParsers[ i ][ 1 ]( param, c ) )
-                    break;
-                }
-            }
+            configs = configs.concat( parseConfig( c ) )
         } )
 
-        attr.config = config
+        attr.config = configs
+    }
+
+    function parseConfig( config ) {
+        for ( var i in configParsers )
+            if ( configParsers[ i ][ 0 ].test( config ) )
+                return configParsers[ i ][ 1 ]( config )
     }
 
     var configParsers = [
-        [ /^[?]/, function ( param, config ) {
-            var paramPattern = new RegExp( '^' + config.substr( 1 ) + '-(.+)$' )
-            Object.keys( param ).forEach( function ( p ) {
+        [ /^[?]/, function ( config ) {
+            var paramPattern = new RegExp( '^' + config.substr( 1 ) + '([-].+)$' )
+
+            var params = location.search.substr( 1 ).split( '&' )
+            var configs = []
+            params.forEach( function ( p ) {
                 var m = paramPattern.match( p )
                 if ( !m ) return
-
-
+                
+                configs = configs.concat( parseConfig( m[ 1 ] ) )
             } )
-        } ],
-        [ /^{.+}$/, function ( param, config ) {
 
+            return configs
         } ],
-        [ /.+/, function ( param, config ) {
 
+        [ /^[{].+[}]$/, function ( config ) {
+            return JSON.parse( config )
+        } ],
+
+        [ /^[-].+$/, function ( config ) {
+            var m = config.match( /^[-](.+?)([=](.+))?$/ )
+            if ( !m ) return []
+            if ( !( m[ 1 ] in configHandler ) ) return []
+
+            return configHandler[ m[ 1 ] ]( m[ 3 ] )
+        } ],
+
+        [ /.+/, function ( config ) {
+            return config
         } ]
+    ]
+
+    var configHandler = {
+        'config': function ( arg ) {
+            if ( /^[?-]/.test( arg ) )
+                throw new Error( 'config handler argument cannot start with [?-]' )
+            
+            return parseConfig( arg )
+        }
     }
 
     // var arg = {
