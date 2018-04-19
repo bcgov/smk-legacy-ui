@@ -3,11 +3,7 @@ include.module( 'smk-map', [ 'smk', 'jquery', 'util', 'viewer', 'layer' ], funct
     function SmkMap( option ) {
         this.$option = option
 
-        this.$option.container = $( '#' + this.$option.container ).get( 0 )
-        if ( !this.$option.container )
-            throw new Error( 'Unable to find container #' + this.$option.container )
-
-        this.dispatcher = new Vue()
+        this.$dispatcher = new Vue()
     }
 
     SMK.TYPE.SmkMap = SmkMap
@@ -17,11 +13,16 @@ include.module( 'smk-map', [ 'smk', 'jquery', 'util', 'viewer', 'layer' ], funct
 
         console.log( 'smk initialize:', this.$option )
 
+        this.$option.container = document.getElementById( this.$option[ 'container-id' ] )
+        if ( !this.$option.container )
+            throw new Error( 'Unable to find container #' + this.$option[ 'container-id' ] )
+
         $( this.$option.container )
             .addClass( 'smk-hidden' )
 
-        return loadConfigs()
-            .then( parseConfigs )
+        return SMK.UTIL.resolved()
+            .then( loadConfigs )
+            .then( mergeConfigs )
             .then( initMapFrame )
             .then( initSurround )
             .then( showMap )
@@ -29,57 +30,179 @@ include.module( 'smk-map', [ 'smk', 'jquery', 'util', 'viewer', 'layer' ], funct
             .then( loadTools )
             .then( initViewer )
             .then( initTools )
-            .catch( function ( e ) {
-                console.error( 'smk viewer #' + self.$option.container + ' failed to initialize:', e )
-                window.alert( 'smk viewer #' + self.$option.container + ' failed to initialize' )
-            } )
+
+        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
         function loadConfigs() {
-            var tags = self.$option.configUrls.map( function ( url ) {
-                var tag = 'config-' + url
-                include.tag( tag, { loader: 'template', url: './' + url } )
-                return tag
-            } )
+            return SMK.UTIL.waitAll( self.$option.config.map( function ( c ) {
+                switch ( typeof c ) {
 
-            return include( tags ).then( function ( inc ) {
-                var configs = []
-                tags.forEach( function ( tag ) {
-                    configs.push( inc[ tag ] )
-                } )
+                case 'string': // assumed to be a url of config file
+                    var id = c.toLowerCase().replace( /[^a-z0-9]+/g, '-' ).replace( /^[-]|[-]$/g, '' )
+                    var tag = 'config-' + id
+                    include.tag( tag, { loader: 'template', url: c } )
 
-                if ( self.$option.config )
-                    configs.push( self.$option.config )
+                    return include( tag )
+                        .then( function ( inc ) {
+                            return JSON.parse( inc[ tag ] )
+                        } )
 
-                if ( configs.length == 0 )
-                    return SMK.UTIL.rejected( new Error( 'no config provided' ) )
+                case 'object': // assumed to be a literal config obj
+                    return SMK.UTIL.resolved( c )
 
-                return configs
-            } )
+                default:
+                    throw new Error( 'unknown type in config: ' + typeof( c ) )
+                }
+            } ) )
         }
 
-        function parseConfigs( configs ) {
-            var config = {}
+        function mergeConfigs( configs ) {
+            if ( configs.length == 0 ) return
 
-            try {
-                configs.forEach( function ( cfg ) {
-                    if ( typeof( cfg ) == 'string' ) {
-                        // var parsed = include.parseJSONC( cfg )
-                        var parsed = JSON.parse( cfg )
-                        SMK.UTIL.mergeConfig( config, parsed )
+            var config = configs.shift()
+
+            console.log( 'base', JSON.stringify( config, null, '  ' ) )
+
+            while( configs.length > 0 ) {
+                var c = configs.shift()
+
+                console.log( 'merging', JSON.stringify( c, null, '  ' ) )
+
+                mergeSurround( config, c )
+                mergeViewer( config, c )
+                mergeTools( config, c )
+                mergeLayers( config, c )
+
+                Object.assign( config, c )
+
+                console.log( 'merged', JSON.stringify( config, null, '  ' ) )
+            }
+
+            Object.assign( self, config )
+
+            // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+            function mergeSurround( base, merge ) {
+                if ( !merge.surround ) return
+
+                if ( base.surround ) {
+                    if ( base.surround.subtitles && merge.surround.subtitles ) {
+                        base.surround.subtitles = base.surround.subtitles.concat( merge.surround.subtitles )
+                        delete merge.surround.subtitles
                     }
-                    else {
-                        SMK.UTIL.mergeConfig( config, cfg )
+
+                    Object.assign( base.surround, merge.surround )
+                }
+                else {
+                    base.surround = merge.surround
+                }
+
+                delete merge.surround
+            }
+
+            function mergeViewer( base, merge ) {
+                if ( !merge.viewer ) return
+
+                if ( base.viewer ) {
+                    if ( merge.viewer.extent ) {
+                        base.viewer.extent = merge.viewer.extent
+                        delete merge.viewer.extent
                     }
-                    // console.log( cfg )
+
+                    Object.assign( base.viewer, merge.viewer )
+                }
+                else {
+                    base.viewer = merge.viewer
+                }
+
+                delete merge.viewer
+            }
+
+
+            function mergeTools( base, merge ) {
+                return mergeCollection( base, merge, 'tools', {
+                    findFn: function ( merge ) {
+                        return function ( base ) {
+                            return merge.tool == base.tool &&
+                                merge.instance == base.instance
+                        }
+                    }
                 } )
             }
-            catch ( e ) {
-                return SMK.UTIL.rejected( e )
+
+            function mergeLayers( base, merge ) {
+                return mergeCollection( base, merge, 'layers', {
+                    mergeFn: function ( baseLayer, mergeLayer ) {
+                        mergeCollection( baseLayer, mergeLayer, 'queries', {
+                            mergeFn: function ( baseQuery, mergeQuery ) {
+                                mergeCollection( baseQuery, mergeQuery, 'parameters', {} )
+
+                                Object.assign( baseQuery, mergeQuery )
+                            }
+                        } )
+
+                        mergeLayers( baseLayer, mergeLayer )
+
+                        Object.assign( baseLayer, mergeLayer )
+                    }
+                } )
             }
 
-            $.extend( self, config )
-            console.log( 'config', self )
+            function mergeCollection( base, merge, prop, arg ) {
+                var findFn = arg[ 'findFn' ] || function ( merge ) {
+                    return function ( base ) {
+                        return merge.id == base.id
+                    }
+                }
+
+                var mergeFn = arg[ 'mergeFn' ] || function ( base, merge ) {
+                    Object.assign( base, merge )
+                }
+
+                if ( !merge[ prop ] ) return
+
+                if ( base[ prop ] ) {
+                    merge[ prop ].forEach( function( m ) {
+                        var item = base[ prop ].find( findFn( m ) )
+
+                        if ( item )
+                            mergeFn( item, m )
+                        else
+                            base[ prop ].push( m )
+                    } )
+                }
+                else {
+                    base[ prop ] = merge[ prop ]
+                }
+
+                delete merge[ prop ]
+            }
+
         }
+
+        // function parseConfigs( configs ) {
+        //     var config = {}
+
+        //     try {
+        //         configs.forEach( function ( cfg ) {
+        //             if ( typeof( cfg ) == 'string' ) {
+        //                 // var parsed = include.parseJSONC( cfg )
+        //                 var parsed = JSON.parse( cfg )
+        //                 SMK.UTIL.mergeConfig( config, parsed )
+        //             }
+        //             else {
+        //                 SMK.UTIL.mergeConfig( config, cfg )
+        //             }
+        //             // console.log( cfg )
+        //         } )
+        //     }
+        //     catch ( e ) {
+        //         return SMK.UTIL.rejected( e )
+        //     }
+
+        //     $.extend( self, config )
+        //     console.log( 'config', self )
+        // }
 
         function initMapFrame() {
             return include( 'map-frame-styles' ).then( function () {
@@ -99,6 +222,9 @@ include.module( 'smk-map', [ 'smk', 'jquery', 'util', 'viewer', 'layer' ], funct
 
         function loadViewer() {
             return include( 'viewer-' + self.viewer.type )
+                .catch( function () {
+                    throw new Error( 'viewer type ' + ( self.viewer.type ? '"' + self.viewer.type + '" ' : '' ) + 'is not defined' )
+                } )
         }
 
         function initViewer() {
@@ -229,7 +355,7 @@ include.module( 'smk-map', [ 'smk', 'jquery', 'util', 'viewer', 'layer' ], funct
     }
 
     SmkMap.prototype.emit = function ( toolId, event, arg ) {
-        this.dispatcher.$emit( toolId + '.' + event, arg )
+        this.$dispatcher.$emit( toolId + '.' + event, arg )
 
         return this
     }
@@ -238,7 +364,7 @@ include.module( 'smk-map', [ 'smk', 'jquery', 'util', 'viewer', 'layer' ], funct
         var self = this
 
         Object.keys( handler ).forEach( function ( k ) {
-            self.dispatcher.$on( toolId + '.' + k, handler[ k ] )
+            self.$dispatcher.$on( toolId + '.' + k, handler[ k ] )
         } )
 
         return this

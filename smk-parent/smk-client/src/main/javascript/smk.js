@@ -1,13 +1,14 @@
 include.module( 'smk', null, function () {
 
-    if ( !window.SMK )
-        window.SMK = {
-            MAP: {},
-            VIEWER: {},
-            MODULE: {},
-            TYPE: {},
-            UTIL: {}
-        }
+    if ( !window.SMK ) window.SMK = {}
+
+    Object.assign( window.SMK, {
+        MAP: {},
+        VIEWER: {},
+        MODULE: {},
+        TYPE: {},
+        UTIL: {}
+    } )
 
     return window.SMK
 

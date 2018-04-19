@@ -19,28 +19,41 @@ body {
     height: 70px;
 	border-bottom: 2px solid #fcba19;
 	background-color: #036;
+
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
 }
 
 #smk-header-logo {
-    display: inline-block;
-    width: 180px;
-    height: 64px;
-    background-position:    6px 6px;
-    background-repeat:      no-repeat;
-    background-size:        auto 58px;
+    width:              180px;
+    height:             70px;
+    background-repeat:  no-repeat;
+    margin-left:        10px;
 }
 
-.smk-default-header-image {
+#smk-header-logo.smk-default-header-image {
+    width:                  155px;
+    height:                 52px;
     background-image:       url( 'bc_gov_logo_transparent.png' );
 }
 
 #smk-header-title {
-    color: white;
+    color:          white;
     margin-left:    20px;
+
+    display:        flex;
+    flex-direction: column;
+    justify-content:center;
+    align-items:    flex-start;
+}
+
+#smk-header-maintitle {
     font-size:      30px;
-    line-height: 64px;
-    vertical-align: bottom;
-    margin-left: 20px;
+}
+
+#smk-header-subtitle {
+    font-size:      15px;
 }
 
 .smk-viewer {

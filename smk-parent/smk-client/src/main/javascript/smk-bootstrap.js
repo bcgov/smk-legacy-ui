@@ -1,99 +1,27 @@
 ( function () {
 
-    window.dojoConfig = {
-        has: {
-            "esri-promise-compatibility": 1
-        }
-    }
+    polyfills()
 
-    // - - - - - - - - - - - - - - - - - - - - -
-    // document.currentScript polyfill for IE11
-    // - - - - - - - - - - - - - - - - - - - - -
-    if ( !document.currentScript ) ( function() {
-        var scripts = document.getElementsByTagName( 'script' )
-        // document._currentScript = document.currentScript
+    if ( !window.SMK ) window.SMK = {}
+    if ( !window.SMK.BOOT ) window.SMK.BOOT = Promise.resolve()
 
-        // return script object based off of src
-        var getScriptFromURL = function( url ) {
-            // console.log( url )
-            for ( var i = 0; i < scripts.length; i++ )
-                if ( scripts[ i ].src == url ) {
-                    // console.log( scripts[ i ] )
-                    return scripts[ i ]
-                }
-        }
-
-        var actualScript = document.actualScript = function() {
-            // if (document._currentScript)
-            //     return document._currentScript
-
-            var stack
-            try {
-                omgwtf
-            } catch( e ) {
-                stack = e.stack
-            };
-
-            if ( !stack ) return
-
-            var entries = stack.split( /\s+at\s+/ )
-            var last = entries[ entries.length - 1 ]
-
-            var m = last.match( /[(](.+?)(?:[:]\d+)+[)]/ )
-            if ( m )
-                return getScriptFromURL( m[ 1 ] )
-        }
-
-        if ( document.__defineGetter__ )
-            document.__defineGetter__( 'currentScript', actualScript )
-    } )()
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-    parseScriptElement()
+    window.SMK.BOOT = window.SMK.BOOT
+        .then( parseScriptElement )
         .then( resolveConfig )
         .then( loadInclude )
         .then( initializeSMK )
 
-    // try {
-    //     var inner = script.innerText.trim().replace( /^\s*\/\/.*$/mg, '' ).replace( /^\s*return\s*/mg, '' )
-    //     script.innerText = ''
-    //     if ( inner )
-    //         try {
-    //             var scriptConfig = JSON.parse( inner )
-    //         }
-    //         catch ( e ) {
-    //             console.warn( e )
-    //             scriptConfig = inner
-    //         }
-
-    // }
-    // catch ( e ) {
-    //     console.warn( 'parsing config:', e )
-    // }
-
-    // var attr = function ( key, defalt ) {
-    //     if ( !script.attributes[ key ] ) return defalt
-
-    //     if ( defalt === false && !script.attributes[ key ].nodeValue )
-    //         var val = true
-    //     else
-    //         var val = script.attributes[ key ].nodeValue
-
-    //     // script.attributes.removeNamedItem( key )
-
-    //     return val
-    // }
+// = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
     function parseScriptElement() {
         var script = document.currentScript
 
         var smkAttr = {
-            container:    attrString( 'smk-map-frame' ),
-            config:       attrList( '?smk' ),
-            standalone:   attrBoolean( false, true ),
-            disconnected: attrBoolean( false, true ),
-            'base-url':   attrString( ( new URL( script.src.replace( 'smk-bootstrap.js', '' ), document.location ) ).toString() ),
+            'container-id': attrString( 'smk-map-frame' ),
+            'config':       attrList( '?smk' ),
+            'standalone':   attrBoolean( false, true ),
+            'disconnected': attrBoolean( false, true ),
+            'base-url':     attrString( ( new URL( script.src.replace( 'smk-bootstrap.js', '' ), document.location ) ).toString() ),
         }
 
         Object.keys( smkAttr ).forEach( function ( k ) {
@@ -120,8 +48,8 @@
 
         function attrList( Default ) {
             return function( key, el ) {
-                var val = attrString( Default, null )( key, el )
-                if ( val == null ) return []
+                var val = attrString( Default )( key, el )
+                // if ( val == null ) return []
                 return val.split( /\s*[|]\s*/ ).filter( function ( i ) { return !!i } )
             }
         }
@@ -134,14 +62,10 @@
         }
     }
 
-    function resolveConfig( attr ) {
-        //     var params = {}
-        // location.search.substr( 1 ).split( '&' ).forEach( function ( p ) {
-        //     var m = p.match( /(.+?)=(.*)/ )
-        //     if ( !m ) return
+// = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
-        //     params[ m[ 1 ] ] = ( params[ m[ 1 ] ] || [] ).push( m[ 2 ] )
-        // } )
+    function resolveConfig( attr ) {
+        console.log( attr.config )
 
         var configs = []
         attr.config.forEach( function ( c ) {
@@ -149,6 +73,9 @@
         } )
 
         attr.config = configs
+        console.log( attr.config )
+
+        return attr
     }
 
     function parseConfig( config ) {
@@ -164,9 +91,9 @@
             var params = location.search.substr( 1 ).split( '&' )
             var configs = []
             params.forEach( function ( p ) {
-                var m = paramPattern.match( p )
+                var m = decodeURIComponent( p ).match( paramPattern )
                 if ( !m ) return
-                
+
                 configs = configs.concat( parseConfig( m[ 1 ] ) )
             } )
 
@@ -194,24 +121,12 @@
         'config': function ( arg ) {
             if ( /^[?-]/.test( arg ) )
                 throw new Error( 'config handler argument cannot start with [?-]' )
-            
+
             return parseConfig( arg )
         }
     }
 
-    // var arg = {
-    //     containerId:    attr( 'smk-container', 'smk-map-frame' ),
-    //     configUrls:     attr( 'smk-config', '' ).split( /\s*,\s*/ ).filter( function ( url ) { return !!url } ),
-    //     standalone:     eval( attr( 'smk-standalone', false ) ),
-    //     disconnected:   eval( attr( 'smk-disconnected', false ) ),
-    //     config:         scriptConfig,
-    // }
-
-    // if ( arg.config && arg.config.error ) {
-    //     document.getElementById( arg.containerId ).innerHTML = '<h1 class="error">Startup error: ' + arg.config.error + '</h1>';
-    //     return
-    // }
-
+// = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
     function loadInclude( attr ) {
         return new Promise( function ( res, rej ) {
@@ -235,6 +150,8 @@
         } )
     }
 
+// = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+
     function initializeSMK( attr ) {
         try {
             include.tag( 'smk-tags' )
@@ -248,6 +165,11 @@
                 console.log( 'tags', inc[ 'smk-tags' ] )
             } )
             .then( function () {
+                if ( window.jQuery ) {
+                    include.tag( 'jquery' ).include = Promise.resolve( window.jQuery )
+                    return
+                }
+
                 return include( 'jquery', 'smk' ).then( function ( inc ) {
                     // inc.smk.MODULE.jQuery = $;
                     include.tag( 'jquery' ).exported = $
@@ -261,34 +183,89 @@
             } )
             .then( function () {
                 return include( 'smk', 'smk-map' ).then( function ( inc ) {
-                    return ( inc.smk.MAP[ attr.containerId ] = new inc.smk.TYPE.SmkMap( attr ) ).initialize()
+                    return ( inc.smk.MAP[ attr[ 'container-id' ] ] = new inc.smk.TYPE.SmkMap( attr ) ).initialize()
                 } )
             } )
             .catch( function ( e ) {
-                console.warn( e )
+                console.error( 'smk viewer #' + attr[ 'container-id' ] + ' failed to initialize:', e )
+
+                var message = document.createElement( 'div' )
+                message.innerHTML = '\
+                    <div style="\
+                        display:flex;\
+                        flex-direction:column;\
+                        justify-content:center;\
+                        align-items:center;\
+                        border: 5px solid red;\
+                        padding: 20px;\
+                        margin: 20px;\
+                        position: absolute;\
+                        top: 0;\
+                        left: 0;\
+                        right: 0;\
+                        bottom: 0;\
+                    ">\
+                        <h1>SMK Client</h1>\
+                        <h2>Initialization failed</h2>\
+                        <pre>{}</pre>\
+                    </div>\
+                '.replace( '{}', e.stack )
+
+                document.querySelector( 'body' ).appendChild( message )
             } )
     }
 
+// = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
-    // if ( window.include )
-    //     return initializeSMK( parseScriptElement() )
+    function polyfills() {
+        window.dojoConfig = {
+            has: {
+                "esri-promise-compatibility": 1
+            }
+        }
 
-    //     var includeBase = ( new URL( script.src.replace( 'smk-bootstrap.js', '' ), document.location ) ).toString()
+        // - - - - - - - - - - - - - - - - - - - - -
+        // document.currentScript polyfill for IE11
+        // - - - - - - - - - - - - - - - - - - - - -
+        if ( !document.currentScript ) ( function() {
+            var scripts = document.getElementsByTagName( 'script' )
+            // document._currentScript = document.currentScript
 
-    //     var el = document.createElement( 'script' )
-    //     el.addEventListener( 'load', function( ev ) {
-    //         include.option( { baseUrl: new URL( includeBase, document.location ).toString() } )
-    //         initializeSMK( arg )
-    //     } )
-    //     el.addEventListener( 'error', function( ev ) {
-    //         throw new Error( 'failed to load script from ' + el.src )
-    //     } )
-    //     el.setAttribute( 'src', includeBase + '/lib/include.js' )
+            // return script object based off of src
+            var getScriptFromURL = function( url ) {
+                // console.log( url )
+                for ( var i = 0; i < scripts.length; i++ )
+                    if ( scripts[ i ].src == url ) {
+                        // console.log( scripts[ i ] )
+                        return scripts[ i ]
+                    }
+            }
 
-    //     document.getElementsByTagName( 'head' )[ 0 ].appendChild( el )
+            var actualScript = document.actualScript = function() {
+                // if (document._currentScript)
+                //     return document._currentScript
 
-    // }
+                var stack
+                try {
+                    omgwtf
+                } catch( e ) {
+                    stack = e.stack
+                };
 
+                if ( !stack ) return
+
+                var entries = stack.split( /\s+at\s+/ )
+                var last = entries[ entries.length - 1 ]
+
+                var m = last.match( /[(](.+?)(?:[:]\d+)+[)]/ )
+                if ( m )
+                    return getScriptFromURL( m[ 1 ] )
+            }
+
+            if ( document.__defineGetter__ )
+                document.__defineGetter__( 'currentScript', actualScript )
+        } )()
+    }
 
 } )();
 
