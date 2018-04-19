@@ -13,11 +13,11 @@ include.module( 'smk-map', [ 'jquery', 'util', 'viewer', 'layer' ], function () 
 
         console.log( 'smk initialize:', this.$option )
 
-        this.$option.container = document.getElementById( this.$option[ 'container-id' ] )
-        if ( !this.$option.container )
+        this.$container = document.getElementById( this.$option[ 'container-id' ] )
+        if ( !this.$container )
             throw new Error( 'Unable to find container #' + this.$option[ 'container-id' ] )
 
-        $( this.$option.container )
+        $( this.$container )
             .addClass( 'smk-hidden' )
 
         return SMK.UTIL.resolved()
@@ -25,11 +25,11 @@ include.module( 'smk-map', [ 'jquery', 'util', 'viewer', 'layer' ], function () 
             .then( mergeConfigs )
             .then( initMapFrame )
             .then( initSurround )
-            .then( showMap )
             .then( loadViewer )
             .then( loadTools )
             .then( initViewer )
             .then( initTools )
+            .then( showMap )
 
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -57,9 +57,7 @@ include.module( 'smk-map', [ 'jquery', 'util', 'viewer', 'layer' ], function () 
         }
 
         function mergeConfigs( configs ) {
-            if ( configs.length == 0 ) return
-
-            var config = configs.shift()
+            var config = Object.assign( {}, SMK.CONFIG )
 
             console.log( 'base', JSON.stringify( config, null, '  ' ) )
 
@@ -104,11 +102,6 @@ include.module( 'smk-map', [ 'jquery', 'util', 'viewer', 'layer' ], function () 
                 if ( !merge.viewer ) return
 
                 if ( base.viewer ) {
-                    if ( merge.viewer.extent ) {
-                        base.viewer.extent = merge.viewer.extent
-                        delete merge.viewer.extent
-                    }
-
                     Object.assign( base.viewer, merge.viewer )
                 }
                 else {
@@ -123,7 +116,7 @@ include.module( 'smk-map', [ 'jquery', 'util', 'viewer', 'layer' ], function () 
                 return mergeCollection( base, merge, 'tools', {
                     findFn: function ( merge ) {
                         return function ( base ) {
-                            return merge.tool == base.tool &&
+                            return merge.type == base.type &&
                                 merge.instance == base.instance
                         }
                     }
@@ -182,7 +175,7 @@ include.module( 'smk-map', [ 'jquery', 'util', 'viewer', 'layer' ], function () 
 
         function initMapFrame() {
             return include( 'map-frame-styles' ).then( function () {
-                $( self.$option.container )
+                $( self.$container )
                     .addClass( 'smk-map-frame' )
                     .addClass( 'smk-viewer-' + self.viewer.type )
             } )
@@ -263,10 +256,13 @@ include.module( 'smk-map', [ 'jquery', 'util', 'viewer', 'layer' ], function () 
         }
 
         function showMap() {
-            $( self.$option.container )
+            $( self.$container )
                 .removeClass( 'smk-hidden' )
                 .hide()
-                .fadeIn( 2000 )
+                .fadeIn( 1000 )
+
+            if ( self.viewer.activeTool in self.$tool )
+                self.$tool[ self.viewer.activeTool ].active = true
         }
     }
 
@@ -276,7 +272,7 @@ include.module( 'smk-map', [ 'jquery', 'util', 'viewer', 'layer' ], function () 
     }
 
     SmkMap.prototype.addToContainer = function ( html, attr, prepend ) {
-        return $( html )[ prepend ? 'prependTo' : 'appendTo' ]( this.$option.container ).attr( attr || {} ).get( 0 )
+        return $( html )[ prepend ? 'prependTo' : 'appendTo' ]( this.$container ).attr( attr || {} ).get( 0 )
     }
 
     SmkMap.prototype.addToOverlay = function ( html ) {

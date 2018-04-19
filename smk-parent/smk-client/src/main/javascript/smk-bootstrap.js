@@ -2,16 +2,44 @@
 
     polyfills()
 
-    if ( !window.SMK ) window.SMK = {}    
-    
+    if ( !window.SMK ) window.SMK = {}
+
     window.SMK = Object.assign( {
         MAP: {},
         VIEWER: {},
         TYPE: {},
         UTIL: {},
-        BOOT: Promise.resolve()
+        BOOT: Promise.resolve(),
+        CONFIG: {
+            surround: {
+                type: "default",
+                title: 'Simple Map Kit'
+            },
+            viewer: {
+                type: "leaflet",
+                location: {
+                    extent: [ -139.1782, 47.6039, -110.3533, 60.5939 ],
+                    zoom: 5,
+                },
+                baseMap: 'Topographic',
+            },
+            tools: [
+                {
+                    type: "search",
+                    enabled: true,
+                },
+                {
+                    type: "directions",
+                    enabled: true,
+                },
+                {
+                    type: "markup",
+                    enabled: true,
+                }
+            ]
+        }
     }, window.SMK )
-    
+
     window.SMK.BOOT = window.SMK.BOOT
         .then( parseScriptElement )
         .then( resolveConfig )
@@ -120,7 +148,7 @@
 
     var configParsers = [
         [ /^[?]/, function ( config ) {
-            var paramPattern = new RegExp( '^' + config.substr( 1 ) + '([-].+)$' )
+            var paramPattern = new RegExp( '^' + config.substr( 1 ) + '([-].+)$', 'i' )
 
             var params = location.search.substr( 1 ).split( '&' )
             var configs = []
@@ -141,9 +169,11 @@
         [ /^[-].+$/, function ( config ) {
             var m = config.match( /^[-](.+?)([=](.+))?$/ )
             if ( !m ) return []
-            if ( !( m[ 1 ] in configHandler ) ) return []
 
-            return configHandler[ m[ 1 ] ]( m[ 3 ] )
+            var option = m[ 1 ].toLowerCase()
+            if ( !( option in configHandler ) ) return []
+
+            return configHandler[ option ]( m[ 3 ] )
         } ],
 
         [ /.+/, function ( config ) {
@@ -154,9 +184,57 @@
     var configHandler = {
         'config': function ( arg ) {
             if ( /^[?-]/.test( arg ) )
-                throw new Error( 'config handler argument cannot start with [?-]' )
+                throw new Error( '-config argument cannot start with ? or -' )
 
             return parseConfig( arg )
+        },
+
+        'extent': function ( arg ) {
+            var args = arg.split( ',' )
+            if ( args.length != 4 ) throw new Error( '-extent needs 4 arguments' )
+            return {
+                viewer: {
+                    location: {
+                        extent: args
+                    }
+                }
+            }
+        },
+
+        'center': function ( arg ) {
+            var args = arg.split( ',' )
+            if ( args.length < 2 || args.length > 3 ) throw new Error( '-center needs 2 or 3 arguments' )
+            return {
+                viewer: {
+                    location: {
+                        center: [ args[ 0 ], args[ 1 ] ],
+                        zoom: args[ 2 ] || SMK.CONFIG.viewer.location.zoom
+                    }
+                }
+            }
+        },
+
+        'viewer': function ( arg ) {
+            return {
+                viewer: {
+                    type: arg
+                }
+            }
+        },
+
+        'active-tool': function ( arg ) {
+            var args = arg.split( ',' )
+            if ( args.length != 1 && args.length != 2 ) throw new Error( '-active-tool needs 1 or 2 arguments' )
+
+            var toolId = args[ 0 ]
+            if ( args[ 1 ] )
+                toolId += '--' + args[ 1 ]
+
+            return {
+                viewer: {
+                    activeTool: toolId
+                }
+            }
         }
     }
 
