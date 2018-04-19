@@ -5,9 +5,13 @@
     right: 0;
     bottom: 0;
 
-    margin-top: 50%;
-    margin-bottom: 50%;
-    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* margin-top: 50%; */
+    /* margin-bottom: 50%; */
+    /* text-align: center; */
+    font-size: 40px;
 }
 
 #test-settings {
@@ -21,15 +25,12 @@
     /* background-color: black; */
     /* padding: 2px; */
     padding: 0;
-    font-size: 10px;
-    min-width: 200px;
+    font-size: 8px;
+    /* min-width: 300px; */
 }
 
 #config {
-    width: 300px;
-}
-
-#config_chosen {
+    width: 400px;
 }
 
 #tools {

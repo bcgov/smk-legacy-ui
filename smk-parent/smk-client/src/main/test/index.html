@@ -7,24 +7,14 @@
         <script src="https://cdn.rawgit.com/harvesthq/chosen/gh-pages/chosen.jquery.min.js"></script>
         <link href="https://cdn.rawgit.com/harvesthq/chosen/gh-pages/chosen.min.css" rel="stylesheet"/>
         <link rel="stylesheet" href="test-settings.css">
-        <script src="test-settings.js"></script>
+        <!-- <script src="test-settings.js"></script> -->
         <!-- DYNAMIC LOADED -->
     </head>
     <body >
         <div id="smk-map-frame"></div>
 
         <div id="test-settings">
-            <select id="config" data-placeholder="Config..." multiple name="config">
-                <option value="base-config">Base</option>
-                <option value="esri3d">ESRI 3D</option>
-                <option value="base-mapping">Base Mapping</option>
-                <option value="esri-dynamic">ESRI Dynamic</option>
-                <option value="land-tenures-1">Land Tenures 1</option>
-                <option value="land-tenures-2">Land Tenures 2</option>
-                <option value="water-management">Water Management</option>
-                <option value="geojson">GeoJson</option>
-                <option value="clustering">Clustering</option>
-                <option value="kml">Kml</option>
+            <select id="config" data-placeholder="Config..." multiple name="smk-config" style="display:none">
             </select>
 
             <div id="tools">
@@ -32,22 +22,54 @@
             </div>
         </div>
 
-        <div id="wait">Wait...</div>
+        <div id="wait">Get Ready!</div>
+
+        <template id="smk-script">
+            <script src="../smk-bootstrap.js" smk-disconnected smk-standalone
+                smk-container-id=""
+                smk-config=""
+            ></script>
+        </template>
 
         <script>
+            var filelist = <%= filelist %>
+
             $( function () {
-                $( '#wait' ).show()
-                setTimeout( function () {
-                    $( '#wait' ).hide()
-                    var script = document.createElement( 'script' )
-                    script.setAttribute( 'src', '../smk-bootstrap.js' )
-                    script.setAttribute( 'smk-disconnected', true )
-                    script.setAttribute( 'smk-standalone', true )
-                    // script.setAttribute( 'smk-config', [].concat( PARAM.config ).map( function ( c ) { return 'config/' + c + '.json' } ).join( ',' ) )
-                    // script.setAttribute( 'smk-config', '@config' )
-                    document.getElementsByTagName( 'head' )[ 0 ].appendChild( script );
-                }, 3000 )
+                $( '#apply' ).click( function () {
+                    document.location.search = $( '#config' ).serialize()
+                } )
+
+                $( '#wait' ).fadeOut( 5000, function () {
+                    document.querySelector( 'head' ).appendChild( document.querySelector( '#smk-script' ).content )
+
+                    var id = setInterval( function () {
+                        if ( !window.SMK || !window.SMK.BOOT ) return
+                        clearInterval( id )
+
+                        window.SMK.BOOT.then( function () {
+                            smkBooted()
+                        } )
+                    }, 100 )
+                } )
             } )
+
+            function smkBooted() {
+                $( '#config' )
+                    .show()
+                    .chosen( {
+                        no_results_text: "Nothing selected"
+                    } )
+                    .append( filelist.configs.map( function ( c ) {
+                        return $( '<option>' )
+                            .attr( 'value', './config/' + c.path )
+                            .text( c.path.replace( '.json', '' ) )
+                    } ) )
+                    .change( function ( ev ) {
+                        $( '#tools' ).show()
+                    } )
+                    .val( SMK.MAP[ 'smk-map-frame' ].$option.config )
+                    .trigger( 'chosen:updated' )
+            }
         </script>
     </body>
 </html>
