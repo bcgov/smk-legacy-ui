@@ -58,6 +58,7 @@ include.module( 'smk-map', [ 'jquery', 'util', 'viewer', 'layer' ], function () 
 
         function mergeConfigs( configs ) {
             var config = Object.assign( {}, SMK.CONFIG )
+            config.$sources = []
 
             console.log( 'base', JSON.stringify( config, null, '  ' ) )
 
@@ -70,6 +71,9 @@ include.module( 'smk-map', [ 'jquery', 'util', 'viewer', 'layer' ], function () 
                 mergeViewer( config, c )
                 mergeTools( config, c )
                 mergeLayers( config, c )
+
+                config.$sources = config.$sources.concat( c.$sources || '(unknown)' )
+                delete c.$sources
 
                 Object.assign( config, c )
 

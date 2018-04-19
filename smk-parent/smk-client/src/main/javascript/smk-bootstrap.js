@@ -127,72 +127,106 @@
 // = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
     function resolveConfig( attr ) {
-        console.log( attr.config )
+        try {
+            var configs = []
+            attr.config.forEach( function ( c, i ) {
+                var source = 'attr[' + i + ']'
+                configs = configs.concat( parseDocumentArguments( c, source ) || parseLiteralJson( c, source ) || parseOption( c, source ) || parseUrl( c, source ) )
+            } )
+        }
+        catch ( e ) {
+            if ( e.parseSource )
+                e.message += ', while parsing ' + e.parseSource
 
-        var configs = []
-        attr.config.forEach( function ( c ) {
-            configs = configs.concat( parseConfig( c ) )
-        } )
+            throw e
+        }
 
         attr.config = configs
-        console.log( attr.config )
 
         return attr
     }
 
-    function parseConfig( config ) {
-        for ( var i in configParsers )
-            if ( configParsers[ i ][ 0 ].test( config ) )
-                return configParsers[ i ][ 1 ]( config )
-    }
+    function parseDocumentArguments( config, source ) {
+        if ( !/^[?]/.test( config ) ) return
 
-    var configParsers = [
-        [ /^[?]/, function ( config ) {
-            var paramPattern = new RegExp( '^' + config.substr( 1 ) + '([-].+)$', 'i' )
+        var paramPattern = new RegExp( '^' + config.substr( 1 ) + '([-].+)$', 'i' )
 
-            var params = location.search.substr( 1 ).split( '&' )
-            var configs = []
-            params.forEach( function ( p ) {
+        var params = location.search.substr( 1 ).split( '&' )
+        var configs = []
+        params.forEach( function ( p, i ) {
+            var source1 = source + '.arg[' + config + ',' + i + ']'
+            try {
                 var m = decodeURIComponent( p ).match( paramPattern )
                 if ( !m ) return
 
-                configs = configs.concat( parseConfig( m[ 1 ] ) )
-            } )
+                configs = configs.concat( parseOption( m[ 1 ], source1 ) )
+            }
+            catch ( e ) {
+                if ( !e.parseSource ) e.parseSource = source1
+                throw e
+            }
+        } )
 
-            return configs
-        } ],
+        return configs
+    }
 
-        [ /^[{].+[}]$/, function ( config ) {
-            return JSON.parse( config )
-        } ],
+    function parseLiteralJson( config, source ) {
+        if ( !/^[{].+[}]$/.test( config ) ) return
 
-        [ /^[-].+$/, function ( config ) {
-            var m = config.match( /^[-](.+?)([=](.+))?$/ )
-            if ( !m ) return []
+        source += '.json'
+        try {
+            var obj = JSON.parse( config )
+            obj.$sources = [ source ]
 
-            var option = m[ 1 ].toLowerCase()
-            if ( !( option in configHandler ) ) return []
+            return obj
+        }
+        catch ( e ) {
+            if ( !e.parseSource ) e.parseSource = source
+            throw e
+        }
+    }
 
-            return configHandler[ option ]( m[ 3 ] )
-        } ],
+    function parseOption( config, source ) {
+        if ( !/^[-].+$/.test( config ) ) return
 
-        [ /.+/, function ( config ) {
-            return config
-        } ]
-    ]
+        var m = config.match( /^[-](.+?)([=](.+))?$/ )
+        if ( !m ) return []
 
-    var configHandler = {
-        'config': function ( arg ) {
-            if ( /^[?-]/.test( arg ) )
-                throw new Error( '-config argument cannot start with ? or -' )
+        var option = m[ 1 ].toLowerCase()
+        if ( !( option in optionHandler ) ) return []
 
-            return parseConfig( arg )
+        source += '.option[' + option + ']'
+        try {
+            var obj = optionHandler[ option ]( m[ 3 ], source )
+
+            return obj
+        }
+        catch ( e ) {
+            if ( !e.parseSource ) e.parseSource = source
+            throw e
+        }
+    }
+
+    function parseUrl( config, source ) {
+        source += '.url[' + config + ']'
+        var obj = {
+            url: config,
+            $sources: [ source ]
+        }
+
+        return obj
+    }
+
+    var optionHandler = {
+        'config': function ( arg, source ) {
+            return parseLiteralJson( arg, source ) || parseUrl( arg, source )
         },
 
-        'extent': function ( arg ) {
+        'extent': function ( arg, source ) {
             var args = arg.split( ',' )
             if ( args.length != 4 ) throw new Error( '-extent needs 4 arguments' )
             return {
+                $sources: [ source ],
                 viewer: {
                     location: {
                         extent: args
@@ -201,10 +235,11 @@
             }
         },
 
-        'center': function ( arg ) {
+        'center': function ( arg, source ) {
             var args = arg.split( ',' )
             if ( args.length < 2 || args.length > 3 ) throw new Error( '-center needs 2 or 3 arguments' )
             return {
+                $sources: [ source ],
                 viewer: {
                     location: {
                         center: [ args[ 0 ], args[ 1 ] ],
@@ -214,15 +249,16 @@
             }
         },
 
-        'viewer': function ( arg ) {
+        'viewer': function ( arg, source ) {
             return {
+                $sources: [ source ],
                 viewer: {
                     type: arg
                 }
             }
         },
 
-        'active-tool': function ( arg ) {
+        'active-tool': function ( arg, source ) {
             var args = arg.split( ',' )
             if ( args.length != 1 && args.length != 2 ) throw new Error( '-active-tool needs 1 or 2 arguments' )
 
@@ -231,6 +267,7 @@
                 toolId += '--' + args[ 1 ]
 
             return {
+                $sources: [ source ],
                 viewer: {
                     activeTool: toolId
                 }
