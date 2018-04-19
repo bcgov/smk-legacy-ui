@@ -1,4 +1,4 @@
-include.module( 'tool-about', [ 'smk', 'tool', 'widgets', 'tool-about.panel-about-html' ], function ( inc ) {
+include.module( 'tool-about', [ 'tool', 'widgets', 'tool-about.panel-about-html' ], function ( inc ) {
 
     Vue.component( 'about-widget', {
         extends: inc.widgets.toolButton,

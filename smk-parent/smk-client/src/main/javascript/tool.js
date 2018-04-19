@@ -1,4 +1,4 @@
-include.module( 'tool', [ 'smk', 'jquery', 'event' ], function () {
+include.module( 'tool', [ 'jquery', 'event' ], function () {
 
     var ToolEvent = SMK.TYPE.Event.define( [
         'changedVisible',

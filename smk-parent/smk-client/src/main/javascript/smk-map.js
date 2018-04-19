@@ -1,4 +1,4 @@
-include.module( 'smk-map', [ 'smk', 'jquery', 'util', 'viewer', 'layer' ], function () {
+include.module( 'smk-map', [ 'jquery', 'util', 'viewer', 'layer' ], function () {
 
     function SmkMap( option ) {
         this.$option = option
@@ -180,30 +180,6 @@ include.module( 'smk-map', [ 'smk', 'jquery', 'util', 'viewer', 'layer' ], funct
 
         }
 
-        // function parseConfigs( configs ) {
-        //     var config = {}
-
-        //     try {
-        //         configs.forEach( function ( cfg ) {
-        //             if ( typeof( cfg ) == 'string' ) {
-        //                 // var parsed = include.parseJSONC( cfg )
-        //                 var parsed = JSON.parse( cfg )
-        //                 SMK.UTIL.mergeConfig( config, parsed )
-        //             }
-        //             else {
-        //                 SMK.UTIL.mergeConfig( config, cfg )
-        //             }
-        //             // console.log( cfg )
-        //         } )
-        //     }
-        //     catch ( e ) {
-        //         return SMK.UTIL.rejected( e )
-        //     }
-
-        //     $.extend( self, config )
-        //     console.log( 'config', self )
-        // }
-
         function initMapFrame() {
             return include( 'map-frame-styles' ).then( function () {
                 $( self.$option.container )
@@ -329,28 +305,6 @@ include.module( 'smk-map', [ 'smk', 'jquery', 'util', 'viewer', 'layer' ], funct
         return this.$sidepanel = include( 'sidepanel' )
             .then( function ( inc ) {
                 return new SMK.TYPE.Sidepanel( self )
-            } )
-    }
-
-    SmkMap.prototype.getMenu = function () {
-        var self = this
-
-        if ( this.$menu ) return this.$menu
-
-        return this.$menu = include( 'menu' )
-            .then( function ( inc ) {
-                return new SMK.TYPE.Menu( self )
-            } )
-    }
-
-    SmkMap.prototype.getSelect = function () {
-        var self = this
-
-        if ( this.$select ) return this.$select
-
-        return this.$select = include( 'select' )
-            .then( function ( inc ) {
-                return new SMK.TYPE.Select( self )
             } )
     }
 

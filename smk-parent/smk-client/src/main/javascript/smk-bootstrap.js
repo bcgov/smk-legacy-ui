@@ -2,14 +2,48 @@
 
     polyfills()
 
-    if ( !window.SMK ) window.SMK = {}
-    if ( !window.SMK.BOOT ) window.SMK.BOOT = Promise.resolve()
-
+    if ( !window.SMK ) window.SMK = {}    
+    
+    window.SMK = Object.assign( {
+        MAP: {},
+        VIEWER: {},
+        TYPE: {},
+        UTIL: {},
+        BOOT: Promise.resolve()
+    }, window.SMK )
+    
     window.SMK.BOOT = window.SMK.BOOT
         .then( parseScriptElement )
         .then( resolveConfig )
         .then( loadInclude )
         .then( initializeSMK )
+        .catch( function ( e ) {
+            console.error( e )
+
+            var message = document.createElement( 'div' )
+            message.innerHTML = '\
+                <div style="\
+                    display:flex;\
+                    flex-direction:column;\
+                    justify-content:center;\
+                    align-items:center;\
+                    border: 5px solid red;\
+                    padding: 20px;\
+                    margin: 20px;\
+                    position: absolute;\
+                    top: 0;\
+                    left: 0;\
+                    right: 0;\
+                    bottom: 0;\
+                ">\
+                    <h1>SMK Client</h1>\
+                    <h2>Initialization failed</h2>\
+                    <pre>{}</pre>\
+                </div>\
+            '.replace( /\s+/g, ' ' ).replace( '{}', e.stack )
+
+            document.querySelector( 'body' ).appendChild( message )
+        } )
 
 // = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
@@ -170,48 +204,21 @@
                     return
                 }
 
-                return include( 'jquery', 'smk' ).then( function ( inc ) {
-                    // inc.smk.MODULE.jQuery = $;
-                    include.tag( 'jquery' ).exported = $
-                } )
+                return include( 'jquery' )
             } )
             .then( function () {
-                return include( 'vue', 'smk' ).then( function ( inc ) {
-                    // inc.smk.MODULE.Vue = Vue;
-                    include.tag( 'vue' ).exported = Vue
-                } )
+                if ( window.Vue ) {
+                    include.tag( 'vue' ).include = Promise.resolve( window.Vue )
+                    return
+                }
+
+                return include( 'vue' )
             } )
             .then( function () {
-                return include( 'smk', 'smk-map' ).then( function ( inc ) {
-                    return ( inc.smk.MAP[ attr[ 'container-id' ] ] = new inc.smk.TYPE.SmkMap( attr ) ).initialize()
+                return include( 'smk-map' ).then( function ( inc ) {
+                    var map = SMK.MAP[ attr[ 'container-id' ] ] = new SMK.TYPE.SmkMap( attr )
+                    return map.initialize()
                 } )
-            } )
-            .catch( function ( e ) {
-                console.error( 'smk viewer #' + attr[ 'container-id' ] + ' failed to initialize:', e )
-
-                var message = document.createElement( 'div' )
-                message.innerHTML = '\
-                    <div style="\
-                        display:flex;\
-                        flex-direction:column;\
-                        justify-content:center;\
-                        align-items:center;\
-                        border: 5px solid red;\
-                        padding: 20px;\
-                        margin: 20px;\
-                        position: absolute;\
-                        top: 0;\
-                        left: 0;\
-                        right: 0;\
-                        bottom: 0;\
-                    ">\
-                        <h1>SMK Client</h1>\
-                        <h2>Initialization failed</h2>\
-                        <pre>{}</pre>\
-                    </div>\
-                '.replace( '{}', e.stack )
-
-                document.querySelector( 'body' ).appendChild( message )
             } )
     }
 

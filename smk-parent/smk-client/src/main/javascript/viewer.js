@@ -1,4 +1,4 @@
-include.module( 'viewer', [ 'smk', 'jquery', 'util', 'event', 'layer', 'feature-set', 'query' ], function () {
+include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', 'query' ], function () {
 
     var ViewerEvent = SMK.TYPE.Event.define( [
         'changedView',

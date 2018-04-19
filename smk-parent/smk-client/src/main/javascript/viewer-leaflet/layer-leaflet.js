@@ -1,4 +1,4 @@
-include.module( 'layer-leaflet', [ 'smk', 'layer', 'util' ], function () {
+include.module( 'layer-leaflet', [ 'layer', 'util' ], function () {
 
     function defineLayerType( name, def ) {
         var base = SMK.TYPE.Layer[ name ].base
