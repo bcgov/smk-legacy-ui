@@ -162,16 +162,11 @@ include.module( 'layer-leaflet', [ 'layer', 'util' ], function () {
 
     } )
 
-    defineLayerType( 'geojson', {
-
-        getFeaturesAtPoint: getVectorFeaturesAtPoint
-
-    } )
-
-    SMK.TYPE.Layer[ 'vector' ].leaflet.create = SMK.TYPE.Layer[ 'geojson' ].leaflet.create = function ( layers, zIndex ) {
+    SMK.TYPE.Layer[ 'vector' ].leaflet.create = function ( layers, zIndex ) {
         var self = this
 
         if ( layers.length != 1 ) throw new Error( 'only 1 config allowed' )
+        if ( ( layers[0].useClustering + layers[0].useHeatmap + layers[0].useRaw ) > 1 ) throw new Error( 'raw or heatmap or clustering' )
 
         var layer = new L.geoJson( null, {
             pointToLayer: function ( geojson, latlng ) {
@@ -208,51 +203,16 @@ include.module( 'layer-leaflet', [ 'layer', 'util' ], function () {
                 layer.addData( data )
                 return layer
             } )
-    }
-
-    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-    defineLayerType( 'clustered', {
-
-        getFeaturesAtPoint: getVectorFeaturesAtPoint
-
-    } )
-
-    SMK.TYPE.Layer[ 'clustered' ].leaflet.create = function ( layers, zIndex ) {
-        return SMK.TYPE.Layer[ 'vector' ].leaflet.create.call( this, layers, zIndex )
             .then( function ( layer ) {
-                var cluster = L.markerClusterGroup( {
-                    // singleMarkerMode: true,
-                    // zoomToBoundsOnClick: false,
-                    // spiderfyOnMaxZoom: false,
-                    // iconCreateFunction: function ( cluster ) {
-                    //     var count = cluster.getChildCount();
+                if ( !layers[ 0 ].config.useClustering ) return layer
 
-                    //     return new L.DivIcon( {
-                    //         html: '<div><span>' + ( count == 1 ? '' : count > 999 ? 'lots' : count ) + '</span></div>',
-                    //         className: 'smk-identify-cluster smk-identify-cluster-' + ( count == 1 ? 'one' : 'many' ),
-                    //         iconSize: null
-                    //     } )
-                    // }
-                } )
-
+                var cluster = L.markerClusterGroup()
                 cluster.addLayers( [ layer ] )
 
                 return cluster
             } )
-    }
-
-    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-    defineLayerType( 'heatmap', {
-
-        // getFeaturesAtPoint: getVectorFeaturesAtPoint
-
-    } )
-
-    SMK.TYPE.Layer[ 'heatmap' ].leaflet.create = function ( layers, zIndex ) {
-        return SMK.TYPE.Layer[ 'vector' ].leaflet.create.call( this, layers, zIndex )
             .then( function ( layer ) {
+                if ( !layers[ 0 ].config.useHeatmap ) return layer
 
 				var points = [];
 				var intensity = 100;
@@ -265,6 +225,8 @@ include.module( 'layer-leaflet', [ 'layer', 'util' ], function () {
 				return L.heatLayer( points, { radius: 25 } )
             } )
     }
+
+    SMK.TYPE.Layer[ 'geojson' ].leaflet = SMK.TYPE.Layer[ 'vector' ].leaflet
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -350,13 +312,6 @@ include.module( 'layer-leaflet', [ 'layer', 'util' ], function () {
             default:
                 console.warn( 'skip', ft.geometry.type )
             }
-        } )
-
-        features.forEach( function ( f, i ) {
-            if ( self.config.titleAttribute )
-                f.title = f.properties[ self.config.titleAttribute ]
-            else
-                f.title = 'Feature #' + ( i + 1 )
         } )
 
         return features

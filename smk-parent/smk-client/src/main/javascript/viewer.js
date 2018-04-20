@@ -132,11 +132,11 @@ include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', '
         this.query = {}
 
         if ( Array.isArray( smk.layers ) )
-            self.layerIds = smk.layers.map( function ( lyConfig, i ) {
-                var ly = self.layerId[ lyConfig.id ] = new SMK.TYPE.Layer[ lyConfig.type ][ smk.viewer.type ]( lyConfig )
+            constructLayers( smk.layers, 0, null, function ( ly, cfg ) {
+                // console.log( 'layer', ly.index, ly.id );
 
-                ly.initialize()
-                ly.index = i
+                self.layerIds.push( ly.id )
+                self.layerId[ ly.id ] = ly
 
                 ly.startedLoading( function () {
                     self.loading = true
@@ -146,15 +146,13 @@ include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', '
                     self.loading = self.anyLayersLoading()
                 } )
 
-                if ( lyConfig.queries )
-                    lyConfig.queries.forEach( function ( q ) {
-                        var query = new SMK.TYPE.Query[ lyConfig.type ]( ly, q )
+                if ( cfg.queries )
+                    cfg.queries.forEach( function ( q ) {
+                        var query = new SMK.TYPE.Query[ cfg.type ]( ly, q )
 
                         self.query[ query.id ] = query
                         self.queried[ query.id ] = new SMK.TYPE.FeatureSet()
                     } )
-
-                return lyConfig.id
             } )
 
         this.pickedLocation( function ( ev ) {
@@ -169,6 +167,29 @@ include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', '
 
             pickHandler[ h ].call( smk.$tool[ h ], ev )
         } )
+
+        function constructLayers( layerConfigs, index, parentId, cb ) {
+            layerConfigs.forEach( function ( layerConfig, i ) {
+                index = constructLayer( layerConfig, index, parentId, cb )
+            } )
+
+            return index
+        }
+
+        function constructLayer( layerConfig, index, parentId, cb ) {
+            var id = ( parentId ? parentId + '==' : '' ) + layerConfig.id
+
+            var ly = new SMK.TYPE.Layer[ layerConfig.type ][ smk.viewer.type ]( layerConfig )
+
+            ly.initialize( id, index, parentId )
+
+            cb( ly, layerConfig )
+
+            if ( !ly.hasChildren() )
+                return index + 1
+
+            return constructLayers( ly.childLayerConfigs(), index + 1, ly.id, cb )
+        }
     }
 
     Viewer.prototype.initializeLayers = function ( smk ) {
@@ -181,13 +202,37 @@ include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', '
     }
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
+    Viewer.prototype.filterLayers = function ( predicate ) {
+        var self = this
+
+        return this.layerIds
+            .filter( function ( id ) {
+                return predicate( self.layerId[ id ] )
+            } )
+            .map( function ( id ) {
+                return self.layerId[ id ]
+            } )
+    }
+
+    Viewer.prototype.isLayerVisible = function ( layerId ) {
+        var ly = this.layerId[ layerId ]
+        if ( !ly.parentId ) return ly.visible
+        return this.layerId[ ly.parentId ].visible && ly.visible
+    }
+
+    Viewer.prototype.childLayers = function ( layerId ) {
+        if ( !this.layerId[ layerId ].isContainer ) return []
+
+        return this.filterLayers( function ( ly ) { return ly.parentId == layerId } )
+    }
+
     Viewer.prototype.setLayersVisible = function ( layerIds, visible ) {
         var self = this
 
         var layerCount = this.layerIds.length
         if ( layerCount == 0 ) return SMK.UTIL.resolved()
 
-        if ( layerIds.every( function ( id ) { return !self.layerId[ id ].visible == !visible } ) ) return SMK.UTIL.resolved()
+        if ( layerIds.every( function ( id ) { return !self.isLayerVisible( id ) == !visible } ) ) return SMK.UTIL.resolved()
 
         var pending = {}
         self.layerIds.forEach( function ( id ) {
@@ -197,12 +242,24 @@ include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', '
             pending[ id ] = true
         } )
 
-        layerIds.forEach( function ( id ) { self.layerId[ id ].visible = !!visible } )
+        layerIds.forEach( function ( id ) {
+            var ly = self.layerId[ id ]
+
+            var prev = ly.visible
+            ly.visible = !!visible
+
+            if ( visible && ly.parentId )
+                self.layerId[ ly.parentId ].visible = true
+
+            self.childLayers( id ).forEach( function ( ly ) { ly.visible = visible } )
+        } )
 
         var visibleLayers = []
         var merged
         this.layerIds.forEach( function ( id, i ) {
-            if ( !self.layerId[ id ].visible ) return
+            // console.log( id,self.isLayerVisible( id ),self.layerId[ id ].isContainer,self.layerId[ id ].config );
+            if ( !self.isLayerVisible( id )  ) return
+            if ( self.layerId[ id ].isContainer ) return
 
             ly = self.layerId[ id ]
             if ( !merged ) {
@@ -224,7 +281,7 @@ include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', '
         var promises = []
         var maxZOrder = visibleLayers.length - 1
         visibleLayers.forEach( function ( lys, i ) {
-            var cid = lys.map( function ( ly ) { return ly.config.id } ).join( '--' )
+            var cid = lys.map( function ( ly ) { return ly.id } ).join( '##' )
 
             delete pending[ cid ]
             if ( self.visibleLayer[ cid ] ) {
@@ -330,6 +387,31 @@ include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', '
             promises.push(
                 SMK.UTIL.resolved().then( function () {
                     return p
+                } )
+                .then( function ( features ) {
+                    features.forEach( function ( f, i ) {
+                        if ( ly.config.titleAttribute ) {
+                            var m = ly.config.titleAttribute.match( /^(.+?)(:[/](.+)[/])?$/ )
+                            if ( m ) {
+                                if ( !m[ 2 ] )
+                                    f.title = f.properties[ m[ 1 ] ]
+                                else
+                                    try {
+                                        f.title = f.properties[ m[ 1 ] ].match( new RegExp( m[ 3 ] ) )[ 1 ]
+                                    }
+                                    catch ( e ) {
+                                        console.warn( e, m )
+                                    }
+                            }
+                        }
+
+                        if ( !f.title )
+                            f.title = 'Feature #' + ( i + 1 )
+
+                        return f
+                    } )
+
+                    return features
                 } )
                 .then( function ( features ) {
                     features.forEach( function ( f ) {
