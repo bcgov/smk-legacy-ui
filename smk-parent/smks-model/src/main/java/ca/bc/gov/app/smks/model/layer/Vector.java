@@ -12,9 +12,9 @@ import ca.bc.gov.app.smks.model.LayerStyle;
 public class Vector extends FeatureLayer
 {
 	private String dataUrl;
-	private boolean useRawVector;
+	private boolean useRaw;
 	private boolean useClustering;
-	private boolean useHeatmapping;
+	private boolean useHeatmap;
 	private LayerStyle style;
 
 	public Vector() { }
@@ -23,9 +23,9 @@ public class Vector extends FeatureLayer
 		super( layer );
 
 		this.setDataUrl(layer.getDataUrl());
-		this.setUseRawVector(layer.getUseRawVector());
+		this.setUseRaw(layer.getUseRaw());
 		this.setUseClustering(layer.getUseClustering());
-		this.setUseHeatmapping(layer.getUseHeatmapping());
+		this.setUseHeatmap(layer.getUseHeatmap());
 		this.setStyle(layer.getStyle().clone());
 	}
 
@@ -54,24 +54,24 @@ public class Vector extends FeatureLayer
 		this.useClustering = useClustering;
 	}
 
-	public boolean getUseHeatmapping()
+	public boolean getUseHeatmap()
 	{
-		return useHeatmapping;
+		return useHeatmap;
 	}
 
-	public void setUseHeatmapping(boolean useHeatmapping)
+	public void setUseHeatmap(boolean useHeatmapping)
 	{
-		this.useHeatmapping = useHeatmapping;
+		this.useHeatmap = useHeatmapping;
 	}
 
-	public boolean getUseRawVector()
+	public boolean getUseRaw()
 	{
-		return useRawVector;
+		return useRaw;
 	}
 	
-	public void setUseRawVector(boolean useRawVector)
+	public void setUseRaw(boolean useRawVector)
 	{
-		this.useRawVector = useRawVector;
+		this.useRaw = useRawVector;
 	}
 	
 	public LayerStyle getStyle()

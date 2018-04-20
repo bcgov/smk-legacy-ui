@@ -23,6 +23,26 @@ public class Query extends Tool
 		return "Query";
 	}
 
+    public String getInstance() 
+    {
+        return instance;
+    }
+
+    public void setInstance(String instance) 
+    {
+        this.instance = instance;
+    }
+
+    public String getIcon() 
+    {
+        return icon;
+    }
+
+    public void setIcon(String icon) 
+    {
+        this.icon = icon;
+    }
+    
 	public Query clone()
 	{
 		Query clone = new Query( this );

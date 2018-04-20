@@ -20,7 +20,7 @@ public class Dropdown extends Tool
 	}
 
 	public String getTitle() {
-		return "Dropdown";
+		return "";
 	}
 
 	public Dropdown clone()

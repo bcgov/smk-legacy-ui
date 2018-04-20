@@ -526,7 +526,7 @@
 											<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="$('#attributesModal').modal('open');" style="width: 170px;">Attributes</a>
 										</div>
 										<div class="row">
-											<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="$('#queriesModal').modal('open');" style="width: 170px;">Queries</a>
+											<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="openQueryEditor();" style="width: 170px;">Queries</a>
 										</div>
 									</div>
 								</div>
@@ -1134,19 +1134,91 @@
 		</div>
       </div>
       <div class="modal-footer">
-        <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat">Done</a>
+        <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat">Close</a>
       </div>
     </div>
     <div id="queriesModal" class="modal modal-fixed-footer">
       <div class="modal-content">
-		<div class="row">
-			<h5>Queries</h5>
+      	<div id="queryTable">
+			<div class="row">
+				<h5>Queries</h5>
+			</div>
+			<div id="queriesPanel">
+				<div class="row">
+				   <table class="bordered highlight responsive-table" id="queriesTable">
+		            <thead>
+		              <tr>
+		              	<th>ID</th>
+		                <th>Name</th>
+		                <th>Description</th>
+		                <th></th>
+		                <th></th>
+		              </tr>
+		            </thead>
+		            <tbody>
+		            </tbody>
+		          </table>
+				</div>
+			</div>
+			<div class="row">
+				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="addNewQuery();" style="width: 170px;"><i class="material-icons left">save</i>Add New</a>
+			</div>
 		</div>
-		<div id="queriesPanel" class="row">
+		<div id="queryEditor" style="display: none;">
+			<form id="queryEditorForm">
+				<div class="row">
+					<div class="col s4 input-field">
+						<input id="queryName" type="text">
+						<label for="queryName">Name</label>
+					</div>
+					<div class="col s8 input-field">
+						<input id="queryDescription" type="text">
+						<label for="queryDescription">Description</label>
+					</div>
+				</div>
+				<div class="row">
+					<!-- And/Or toggle  -->
+					<p>Select "And" to query all arguments together. Select "Or" if each argument is a separate query</p>
+					<div class="switch">
+						<label>
+							All
+	      					<input id="queryAndOrToggle" type="checkbox">
+	      					<span class="lever"></span>
+	      					Any
+	    				</label>
+	  				</div>
+				</div>
+				<div id="queryArguments">
+				</div>
+				<div class="row">
+					<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="addNewQueryArgument();" style="width: 220px;"><i class="material-icons left">add</i>Add Argument</a>
+				</div>
+				<div class="row">
+					<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="saveQuery();" style="width: 220px;"><i class="material-icons left">save</i>Save Query</a>
+				</div>
+			</form>
 		</div>
       </div>
       <div class="modal-footer">
-        <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat">Done</a>
+        <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat">Close</a>
+      </div>
+    </div>
+    <div id="queryDropdownModal" class="modal modal-fixed-footer">
+      <div class="modal-content">
+		<div class="row">
+			<h5>Dropdown Choices</h5>
+		</div>
+		<div class="row">
+			<p>Dropdown choices are seen below as a comma separated list. To add options, enter them in the text box below.</p>
+		</div>
+		<div id="dropdownOptionsPanel">
+	    </div>
+	    <div class="row">
+			<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="addNewChoice();" style="width: 220px;"><i class="material-icons left">add</i>Add Choice</a>
+		</div>
+      </div>
+      <div class="modal-footer">
+        <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat">Close</a>
       </div>
     </div>    
 	<script type="text/javascript">

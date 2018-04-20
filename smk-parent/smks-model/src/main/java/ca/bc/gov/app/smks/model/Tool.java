@@ -99,12 +99,12 @@ public class Tool implements Cloneable
         }
     }
 
-    private boolean enabled;
-    private String title;
-    private String icon;
-    private int order;
-    private String container;
-    private String instance;
+    protected boolean enabled;
+    protected String title;
+    protected String icon;
+    protected int order;
+    protected String instance;
+    protected String position;
 
     public Tool() {
     	title = "Unknown"; 
@@ -117,61 +117,43 @@ public class Tool implements Cloneable
     	enabled = tool.enabled;
     }
 
-    
-    @JsonIgnore
     public String getIcon() 
     {
 		return icon;
 	}
 
-    @JsonIgnore
 	public void setIcon(String icon) 
     {
 		this.icon = icon;
 	}
 
-    @JsonIgnore
+	@JsonIgnore
 	public int getOrder() 
     {
 		return order;
 	}
 
-    @JsonIgnore
+	@JsonIgnore
 	public void setOrder(int order) 
     {
 		this.order = order;
 	}
 
-	@JsonIgnore
-	public String getContainer() 
-	{
-		return container;
-	}
-	
-	@JsonIgnore
-	public void setContainer(String container) 
-	{
-		this.container = container;
-	}
-
-	@JsonIgnore
 	public String getInstance() 
 	{
 		return instance;
 	}
 
-	@JsonIgnore
 	public void setInstance(String instance) 
 	{
 		this.instance = instance;
 	}
 	
-	@JsonIgnore
 	public void setTitle(String title) 
 	{
 		this.title = title;
 	}
-    @JsonIgnore
+
     public String getTitle() 
     {
         return title;
@@ -200,6 +182,14 @@ public class Tool implements Cloneable
         this.enabled = enabled;
     }
 
+    public void setPosition(String position) {
+        this.position = position;
+    }
+    
+    public String getPosition() {
+        return this.position;
+    }
+    
     public Tool clone()
     {
         Tool clone = new Tool( this );
