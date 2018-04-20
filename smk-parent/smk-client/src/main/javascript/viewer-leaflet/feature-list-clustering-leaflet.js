@@ -52,16 +52,21 @@ include.module( 'feature-list-clustering-leaflet', [ 'leaflet', 'feature-list-le
                     break;
 
                 case 'MultiPoint':
-                    center = [ f._identifyPoint.latitude, f._identifyPoint.longitude ]
+                    if ( f._identifyPoint )
+                        center = [ f._identifyPoint.latitude, f._identifyPoint.longitude ]
                     break;
 
                 default:
-                    center = [ f._identifyPoint.latitude, f._identifyPoint.longitude ]
+                    if ( f._identifyPoint )
+                        center = [ f._identifyPoint.latitude, f._identifyPoint.longitude ]
 
                     self.highlight[ f.id ] = L.geoJSON( f.geometry, {
                         style: self.styleFeature
                     } )
                 }
+
+                if ( !center )
+                    center = L.GeoJSON.coordsToLatLng( turf.centerOfMass( f.geometry ).geometry.coordinates )
 
                 self.marker[ f.id ] = L.marker( center, {
                     featureId: f.id
@@ -77,7 +82,7 @@ include.module( 'feature-list-clustering-leaflet', [ 'leaflet', 'feature-list-le
             var ly = self.marker[ ev.feature.id ]
             var parent = self.cluster.getVisibleParent( ly )
 
-            if ( ly === parent ) {
+            if ( ly === parent || !parent ) {
                 self.popupModel.hasMultiple = false
                 self.popupFeatureIds = null
                 self.popupCurrentIndex = null
