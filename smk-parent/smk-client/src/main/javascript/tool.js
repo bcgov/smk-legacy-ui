@@ -1,4 +1,4 @@
-include.module( 'tool', [ 'smk', 'jquery', 'event' ], function () {
+include.module( 'tool', [ 'jquery', 'event' ], function () {
 
     var ToolEvent = SMK.TYPE.Event.define( [
         'changedVisible',
@@ -10,15 +10,18 @@ include.module( 'tool', [ 'smk', 'jquery', 'event' ], function () {
     function Tool( option ) {
         ToolEvent.prototype.constructor.call( this )
 
+        this.makeProp( 'id', null )
         this.makeProp( 'title', null )
         this.makeProp( 'visible', true, 'changedVisible' )
         this.makeProp( 'enabled', true, 'changedEnabled' )
         this.makeProp( 'active', false, 'changedActive' )
 
+        this.makePropWidget( 'type', 'unknown' )
+
         $.extend( this, option )
     }
 
-    Tool.prototype.type = 'unknown'
+    // Tool.prototype.type = 'unknown'
     Tool.prototype.order = 1
     Tool.prototype.position = 'toolbar'
 
@@ -88,30 +91,28 @@ include.module( 'tool', [ 'smk', 'jquery', 'event' ], function () {
 
         var aux = {}
         return SMK.UTIL.waitAll( [
-            smk.getToolbar().then( function ( toolbar ) { aux.toolbar = toolbar } ),
-            smk.getSidepanel().then( function ( panel ) { aux.panel = panel } ),
-            smk.getMenu().then( function ( menu ) { aux.menu = menu } ),
+            smk.getToolbar(),
+            smk.getSidepanel()
         ] )
-        .then( function () {
-            switch ( self.position ) {
-            case 'toolbar':
+        .then( function ( objs ) {
+            if ( self.position != 'toolbar' && ( !( self.position in smk.$tool ) || !( 'addTool' in smk.$tool[ self.position ] ) ) ) {
+                console.warn( 'position "' + self.position + '" not defined' )
+                self.position = 'toolbar'
+            }
+
+            if ( self.position == 'toolbar' ) {
                 if ( self.widgetComponent )
-                    aux.toolbar.add( self )
+                    objs[ 0 ].add( self )
 
                 if ( self.panelComponent )
-                    aux.panel.add( self )
-
-                aux.widget = aux.toolbar
-                break;
-
-            case 'menu':
-                aux.menu.add( self )
-                aux.widget = aux.panel
-                break;
+                    objs[ 1 ].add( self )
+            }
+            else {
+                smk.$tool[ self.position ].addTool( self )
             }
 
             return self.afterInitialize.forEach( function ( init ) {
-                init.call( self, smk, aux )
+                init.call( self, smk )
             } )
         } )
     }

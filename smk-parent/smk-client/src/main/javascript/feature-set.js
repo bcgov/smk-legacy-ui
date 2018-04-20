@@ -1,4 +1,4 @@
-include.module( 'feature-set', [ 'smk', 'jquery', 'util', 'event' ], function () {
+include.module( 'feature-set', [ 'jquery', 'util', 'event' ], function () {
 
     var FeatureSetEvent = SMK.TYPE.Event.define( [
         'addedFeatures',
@@ -29,11 +29,11 @@ include.module( 'feature-set', [ 'smk', 'jquery', 'util', 'event' ], function ()
             var id = featureId( f, keyAttribute, nonce )
 
             while ( id in self.featureSet ) {
-                console.warn( 'collision', f, id, nonce )
+                // console.warn( 'collision', f, id, nonce )
 
                 var other = self.featureSet[ id ]
                 if ( SMK.UTIL.isDeepEqual( f.properties, other.properties ) ) {
-                    console.warn( 'already present', f, other )
+                    // console.warn( 'already present', f, other )
                     return
                 }
 
@@ -167,6 +167,29 @@ include.module( 'feature-set', [ 'smk', 'jquery', 'util', 'event' ], function ()
         if ( !this.pickedFeatureId ) return
 
         return this.featureSet[ this.pickedFeatureId ]
+    }
+
+    FeatureSet.prototype.getStats = function () {
+        var self = this
+
+        var ids = Object.keys( this.featureSet )
+        var v, l
+        return {
+            get featureCount() { return ids.length },
+            get vertexCount() {
+                return v || ( v = ids.reduce( function ( accum, id ) {
+                    return accum + turf.coordReduce( self.featureSet[ id ].geometry, function ( accum ) {
+                        return accum + 1
+                    }, 0 )
+                }, 0 ) )
+            },
+            get layerCount() {
+                return l || ( l = Object.keys( ids.reduce( function ( accum, id ) {
+                    accum[ self.featureSet[ id ].layerId ] = ( accum[ self.featureSet[ id ].layerId ] || 0 ) + 1
+                    return accum
+                }, {} ) ).length )
+            }
+        }
     }
 
     function featureId( feature, keyAttribute, nonce ) {

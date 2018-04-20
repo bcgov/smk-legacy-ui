@@ -48,10 +48,13 @@ var data = {
 	    },
 	    viewer: {
 	        type: "leaflet",
-	        initialExtent: [],
+	        location:{ extent:[]},
 	        baseMap: "Imagery"
 	    },
-	    tools: [],
+	    tools: [
+			{ "type": "menu" },
+			{ "type": "dropdown" }
+	    ],
 	    layers: [],
 	    _id: null,
 	    _rev: null
@@ -91,9 +94,7 @@ function setToolActivation(toolType)
 	    		$("#GrayMini").prop('checked', tool.baseMap == "Gray");
 	    		$("#DarkGrayMini").prop('checked', tool.baseMap == "DarkGray");
 	    		$("#ImageryMini").prop('checked', tool.baseMap == "Imagery");
-	    		$("#ImageryClarityMini").prop('checked', tool.baseMap == "ImageryClarity");
 	    		$("#ShadedReliefMini").prop('checked', tool.baseMap == "ShadedRelief");
-	    		$("#TerrainMini").prop('checked', tool.baseMap == "Terrain");
     		}
 	    	else if(tool.type == "minimap" && tool.enabled == false) $("#minimapOptions").hide();
 	    	else if(tool.type == "about" && tool.enabled == true)
@@ -102,6 +103,32 @@ function setToolActivation(toolType)
 	    		setupQuillEditor(tool);
     		}
 	    	else if(tool.type == "about" && tool.enabled == false) $("#aboutPanelOptions").hide();
+	    	else if(tool.type == "identify" && tool.enabled == true)
+    		{
+	    		$("#identifyOptions").show();
+	    		
+	    		$("#identifyStyleOpacity").val(tool.styleOpacity);
+    			$("#identifyStyleStrokeOpacity").val(tool.style.strokeOpacity);
+    			$("#identifyStyleFillOpacity").val(tool.style.fillOpacity);
+    			$("#identifyStyleStrokeWidth").val(tool.style.strokeWidth);
+    			$("#identifyStyleStrokeStyle").val(tool.style.strokeStyle);
+    			$("#identifyStyleStrokeColor").val(tool.style.strokeColor);
+    			$("#identifyStyleFillColor").val(tool.style.fillColor);
+    		}
+	    	else if(tool.type == "identify" && tool.enabled == false) $("#identifyOptions").hide();
+	    	else if(tool.type == "select" && tool.enabled == true)
+    		{
+	    		$("#selectionOptions").show();
+	    		
+	    		$("#selectStyleOpacity").val(tool.styleOpacity);
+    			$("#selectStyleStrokeOpacity").val(tool.style.strokeOpacity);
+    			$("#selectStyleFillOpacity").val(tool.style.fillOpacity);
+    			$("#selectStyleStrokeWidth").val(tool.style.strokeWidth);
+    			$("#selectStyleStrokeStyle").val(tool.style.strokeStyle);
+    			$("#selectStyleStrokeColor").val(tool.style.strokeColor);
+    			$("#selectStyleFillColor").val(tool.style.fillColor);
+    		}
+	    	else if(tool.type == "select" && tool.enabled == false) $("#selectionOptions").hide();
 	    	else if(tool.type == "baseMaps" && tool.enabled == true)
     		{
 	    		$("#basemapPanelOptions").show();
@@ -115,9 +142,7 @@ function setToolActivation(toolType)
 		    		$("#GrayBml").prop('checked', tool.choices.indexOf("Gray") > -1);
 		    		$("#DarkGrayBml").prop('checked', tool.choices.indexOf("DarkGray") > -1);
 		    		$("#ImageryBml").prop('checked', tool.choices.indexOf("Imagery") > -1);
-		    		$("#ImageryClarityBml").prop('checked', tool.choices.indexOf("ImageryClarity") > -1);
 		    		$("#ShadedReliefBml").prop('checked', tool.choices.indexOf("ShadedRelief") > -1);
-		    		$("#TerrainBml").prop('checked', tool.choices.indexOf("Terrain") > -1);
 	           	});
     		}
 	    	else if(tool.type == "baseMaps" && tool.enabled == false) $("#basemapPanelOptions").hide();
@@ -130,41 +155,36 @@ function setToolActivation(toolType)
 
 function setupQuillEditor(tool)
 {
-	$("#about-toolbar").empty();
+	
+	$('#about-content').trumbowyg(
+	{
+		resetCss: true,
+		btns: [
+		        ['viewHTML'],
+		        ['undo', 'redo'], // Only supported in Blink browsers
+		        ['formatting'],
+		        ['strong', 'em', 'del'],
+		        ['superscript', 'subscript'],
+		        ['foreColor', 'backColor'],
+		        ['justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull'],
+		        ['unorderedList', 'orderedList'],
+		        ['horizontalRule'],
+		        ['preformatted'],
+		        ['template'],
+		        ['removeformat'],
+		        ['link'],
+		        ['insertImage', 'base64'],
+		        ['noembed'],
+		        ['fullscreen']
+		    ]
+	});
+	$('#about-content').on('tbwchange', function(delta, oldDelta, source)
+	{
+		tool.content = $("#about-content").trumbowyg('html');
+	});
+
 	$("#about-content").empty();
-	$(".ql-toolbar").remove();
-
-	var toolbarOptions = [
-	                      ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
-	                      ['blockquote', 'code-block'],
-	                      [{ 'header': 1 }, { 'header': 2 }],               // custom button values
-	                      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-	                      [{ 'script': 'sub'}, { 'script': 'super' }],      // superscript/subscript
-	                      [{ 'indent': '-1'}, { 'indent': '+1' }],          // outdent/indent
-	                      [{ 'direction': 'rtl' }],                         // text direction
-	                      [{ 'size': ['small', false, 'large', 'huge'] }],  // custom dropdown
-	                      [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-	                      [{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
-	                      [{ 'font': [] }],
-	                      [{ 'align': [] }],
-	                      ['clean'],                                        // remove formatting button
-	                      ['image', 'video']								// embedd options
-	                    ];
-
-	aboutEditor = new Quill('#about-content',
-	{
-		modules:
-		{
-	    	toolbar: toolbarOptions
-	  	},
-	  	theme: 'snow'
-	});
-	aboutEditor.on('text-change', function(delta, oldDelta, source)
-	{
-		tool.content = document.querySelector(".ql-editor").innerHTML;
-	});
-
-	document.querySelector(".ql-editor").innerHTML = tool.content;
+	$("#about-content").trumbowyg('html', tool.content);
 }
 
 function setBasemapSelector(basemap)
@@ -224,6 +244,8 @@ function setMinimapBasemap(id)
 
 function closeEditPanel()
 {
+	finishLayerEdits(false);
+	
 	$("#editor-content").hide("fast");
 	$("#menu-content").show("fast");
 	$("#loadingBar").show();
@@ -304,7 +326,6 @@ function setupMapConfigToolsUI()
     	else if(tool.type == "attribution") $("#attribution").prop('checked', tool.enabled);
     	else if(tool.type == "sidebar") $("#sidebar").prop('checked', tool.enabled);
     	else if(tool.type == "layers") $("#layerPanel").prop('checked', tool.enabled);
-    	else if(tool.type == "identify") $("#identifyPanel").prop('checked', tool.enabled);
     	else if(tool.type == "pan") $("#panning").prop('checked', tool.enabled);
     	else if(tool.type == "zoom")
 		{
@@ -343,9 +364,7 @@ function setupMapConfigToolsUI()
 	    		$("#GrayMini").prop('checked', tool.baseMap == "Gray");
 	    		$("#DarkGrayMini").prop('checked', tool.baseMap == "DarkGray");
 	    		$("#ImageryMini").prop('checked', tool.baseMap == "Imagery");
-	    		$("#ImageryClarityMini").prop('checked', tool.baseMap == "ImageryClarity");
 	    		$("#ShadedReliefMini").prop('checked', tool.baseMap == "ShadedRelief");
-	    		$("#TerrainMini").prop('checked', tool.baseMap == "Terrain")
 			}
 		}
     	else if(tool.type == "about")
@@ -373,13 +392,42 @@ function setupMapConfigToolsUI()
 		    		$("#GrayBml").prop('checked', tool.choices.indexOf("Gray") > -1);
 		    		$("#DarkGrayBml").prop('checked', tool.choices.indexOf("DarkGray") > -1);
 		    		$("#ImageryBml").prop('checked', tool.choices.indexOf("Imagery") > -1);
-		    		$("#ImageryClarityBml").prop('checked', tool.choices.indexOf("ImageryClarity") > -1);
 		    		$("#ShadedReliefBml").prop('checked', tool.choices.indexOf("ShadedRelief") > -1);
-		    		$("#TerrainBml").prop('checked', tool.choices.indexOf("Terrain") > -1);
 	           	});
 			}
 		}
-    	else if(tool.type == "select") $("#selectionPanel").prop('checked', tool.enabled);
+    	else if(tool.type == "select") 
+		{
+    		$("#selectionPanel").prop('checked', tool.enabled);
+    		if(tool.enabled)
+			{
+    			$("#selectionOptions").show();
+    			
+    			$("#selectStyleOpacity").val(tool.styleOpacity);
+    			$("#selectStyleStrokeOpacity").val(tool.style.strokeOpacity);
+    			$("#selectStyleFillOpacity").val(tool.style.fillOpacity);
+    			$("#selectStyleStrokeWidth").val(tool.style.strokeWidth);
+    			$("#selectStyleStrokeStyle").val(tool.style.strokeStyle);
+    			$("#selectStyleStrokeColor").val(tool.style.strokeColor);
+    			$("#selectStyleFillColor").val(tool.style.fillColor);
+			}
+		}
+    	else if(tool.type == "identify") 
+		{
+    		$("#identifyPanel").prop('checked', tool.enabled);
+    		if(tool.enabled)
+			{
+    			$("#identifyOptions").show();
+    			
+    			$("#identifyStyleOpacity").val(tool.styleOpacity);
+    			$("#identifyStyleStrokeOpacity").val(tool.style.strokeOpacity);
+    			$("#identifyStyleFillOpacity").val(tool.style.fillOpacity);
+    			$("#identifyStyleStrokeWidth").val(tool.style.strokeWidth);
+    			$("#identifyStyleStrokeStyle").val(tool.style.strokeStyle);
+    			$("#identifyStyleStrokeColor").val(tool.style.strokeColor);
+    			$("#identifyStyleFillColor").val(tool.style.fillColor);
+			}
+		}
     	else if(tool.type == "search") $("#searchPanel").prop('checked', tool.enabled);
     	else if(tool.type == "directions") $("#directions").prop('checked', tool.enabled);
 	});
@@ -394,6 +442,33 @@ function setupMapConfigToolsUI()
 	$('#layerTypeTabs').tabs('select_tab', 'dbcCatalog');
 	$('.collapsible').collapsible();
 	$('#vectorType').material_select();
+}
+
+function finishToolEdits()
+{
+	data.tools.forEach(function(tool)
+	{
+		if(tool.type == "identify") 
+		{
+			tool.styleOpacity = $("#identifyStyleOpacity").val();
+			tool.style.strokeOpacity = $("#identifyStyleStrokeOpacity").val();
+			tool.style.fillOpacity = $("#identifyStyleFillOpacity").val();
+			tool.style.strokeWidth = $("#identifyStyleStrokeWidth").val();
+			tool.style.strokeStyle = $("#identifyStyleStrokeStyle").val();
+			tool.style.strokeColor = $("#identifyStyleStrokeColor").val();
+			tool.style.fillColor = $("#identifyStyleFillColor").val();
+		}
+		else if(tool.type == "select") 
+		{
+			tool.styleOpacity = $("#selectStyleOpacity").val();
+			tool.style.strokeOpacity = $("#selectStyleStrokeOpacity").val();
+			tool.style.fillOpacity = $("#selectStyleFillOpacity").val();
+			tool.style.strokeWidth = $("#selectStyleStrokeWidth").val();
+			tool.style.strokeStyle = $("#selectStyleStrokeStyle").val();
+			tool.style.strokeColor = $("#selectStyleStrokeColor").val();
+			tool.style.fillColor = $("#selectStyleFillColor").val();
+		}
+	});
 }
 
 function addNewMapConfig()
@@ -517,8 +592,8 @@ function addNewMapConfig()
 	    Materialize.updateTextFields();
 
 	 // init basemap viewer
-	 	var ne = L.latLng(data.viewer.initialExtent[3], data.viewer.initialExtent[2]);
-		var sw = L.latLng(data.viewer.initialExtent[1], data.viewer.initialExtent[0]);
+	 	var ne = L.latLng(data.viewer.location.extent[3], data.viewer.location.extent[2]);
+		var sw = L.latLng(data.viewer.location.extent[1], data.viewer.location.extent[0]);
 		var bounds = L.latLngBounds(ne, sw);
 		var centroid = bounds.getCenter();
 		var zoom = basemapViewerMap.getBoundsZoom(bounds, true);
@@ -539,6 +614,8 @@ function saveMapConfig()
 {
 	finishLayerEdits(selectedLayerNode != null);
 
+	finishToolEdits();
+	
 	var requestType = "put";
 	var requestUrl = "MapConfigurations/" + data.lmfId;
 
@@ -578,6 +655,11 @@ function saveMapConfig()
         		if(attachment.type == "header_upload") 
     			{
     				attchId = "surroundImage";
+    				attchType = "image";
+    			}
+        		else if(attachment.type == "marker_upload") 
+    			{
+    				attchId = attachment.layer.id + "_marker";
     				attchType = "image";
     			}
         		else 
@@ -778,8 +860,8 @@ function resetBasemapView()
 	{
 		basemapViewerMap.invalidateSize();
 
-		var sw = L.latLng(data.viewer.initialExtent[1], data.viewer.initialExtent[2]);
-		var ne = L.latLng(data.viewer.initialExtent[3], data.viewer.initialExtent[0]);
+		var sw = L.latLng(data.viewer.location.extent[1], data.viewer.location.extent[2]);
+		var ne = L.latLng(data.viewer.location.extent[3], data.viewer.location.extent[0]);
 		var bounds = L.latLngBounds(sw, ne);
 
 		basemapViewerMap.fitBounds(bounds);
@@ -789,6 +871,32 @@ function resetBasemapView()
 }
 
 var selectedLayerNode;
+
+function downloadSelectedVector()
+{
+	//trigger the load for published configs
+	$.ajax
+	({
+		url: serviceUrl + 'MapConfigurations/' + data.lmfId + '/Attachments/' + selectedLayerNode.data.id,
+		method: 'GET',
+        xhrFields: {
+            responseType: 'blob'
+        },
+        success: function (data)
+        {
+        	var a = document.createElement('a');
+            var url = window.URL.createObjectURL(data);
+            a.href = url;
+            a.download = selectedLayerNode.data.title + '.json';
+            a.click();
+            window.URL.revokeObjectURL(url);
+        },
+        error: function (status)
+        {
+            Materialize.toast('Error loading JSON. Please try again later', 4000);
+        }
+	});
+}
 
 function finishLayerEdits(save)
 {
@@ -820,6 +928,14 @@ function finishLayerEdits(save)
 			selectedLayerNode.data.attribution = $("#dbcAttribution").val();
 			selectedLayerNode.data.opacity = $("#dbcOpacity").val();
 			selectedLayerNode.title = $("#dbcName").val();
+			
+			// update definition expression
+			if($("#dbcDefinitionExpression").val() != null)
+			{
+				var dynamicJson = JSON.parse(selectedLayerNode.data.dynamicLayers[0]);
+				dynamicJson.definitionExpression = $("#dbcDefinitionExpression").val();
+				selectedLayerNode.data.dynamicLayers[0] = JSON.stringify(dynamicJson);
+			}
 
 			selectedLayerNode.data.attributes.forEach(function (attribute)
 			{
@@ -827,22 +943,28 @@ function finishLayerEdits(save)
 				attribute.title = $("#" + attribute.id + "_label").val();
 			});
 		}
-		else // kml, geojson
+		else // vector
 		{
+			// if user activated clustering, change vector type
+			if(selectedLayerNode.data.type == "vector" && $("#vectorClustering").is(":checked")) selectedLayerNode.data.type == "clustered";
+			if(selectedLayerNode.data.type == "clustered" && !$("#vectorClustering").is(":checked")) selectedLayerNode.data.type == "vector";
 			selectedLayerNode.data.isVisible = $("#vectorVisible").is(":checked");
 			selectedLayerNode.data.isQueryable = $("#vectorQueryable").is(":checked");
 			selectedLayerNode.data.title = $("#vectorName").val();
 			selectedLayerNode.data.dataUrl = $("#vectorUrl").val();
 			selectedLayerNode.data.opacity = $("#vectorOpacity").val();
+			selectedLayerNode.data.useRaw = !$("#vectorClustering").is(":checked");
 			selectedLayerNode.data.useClustering = $("#vectorClustering").is(":checked");
-			selectedLayerNode.data.useHeatmapping = $("#vectorHeatmapping").is(":checked");
+			selectedLayerNode.data.useHeatmap = $("#vectorHeatmapping").is(":checked");
 			selectedLayerNode.data.style.strokeWidth = $("#vectorStrokeWidth").val();
-			selectedLayerNode.data.style.stylestrokeStyle = $("#vectorStrokeStyle").val();
+			selectedLayerNode.data.style.strokeStyle = $("#vectorStrokeStyle").val();
 			selectedLayerNode.data.style.strokeColor = $("#vectorStrokeColor").val();
 			selectedLayerNode.data.style.strokeOpacity = $("#vectorStrokeOpacity").val();
 			selectedLayerNode.data.style.fillColor = $("#vectorFillColor").val();
 			selectedLayerNode.data.style.fillOpacity = $("#vectorFillOpacity").val();
-
+			selectedLayerNode.data.style.markerSize = [$("#vectorMarkerSizeX").val(), $("#vectorMarkerSizeY").val()];
+			selectedLayerNode.data.style.markerOffset = [$("#vectorMarkerOffsetX").val(), $("#vectorMarkerOffsetY").val()];
+			
 			// add the attachment data to the cache for upload after save
 			// currently you cannot re-upload and must create a new layer
 			if(fileContents != null)
@@ -886,6 +1008,7 @@ function finishLayerEdits(save)
 	}
 
 	$("#attributePanel").empty();
+	$("#queriesTable tr").remove();
 	$("#editLayerPanel").hide();
 	$("#layerEditDataBCPanel").hide();
 	$("#layerEditWMSPanel").hide();
@@ -902,7 +1025,8 @@ function editSelectedLayer()
 {
 	var nodes = $("#layer-tree").fancytree('getTree').getSelectedNodes();
 	$("#attributePanel").empty();
-
+	$("#queriesTable tr").remove();
+	
 	var firstEdited = false;
 	
 	nodes.forEach(function(node)
@@ -941,12 +1065,16 @@ function editSelectedLayer()
 	
 				if(node.data.attributes == null) node.data.attributes = [];
 				$("#attributePanel").empty();
+				
 				node.data.attributes.forEach(function (attribute)
 				{
-					$("#attributePanel").append('<div class="row"><div class="col s4"><p><input type="checkbox" id="' + attribute.id + '_visible" /><label class="black-text" for="' + attribute.id + '_visible">Visible</label></p></div><div class="col s8 input-field"><input id="' + attribute.id + '_label" type="text"><label for="' + attribute.id + '_label">Label</label></div></div>');
+					$("#attributePanel").append('<div class="row"><div class="col s4"><p><input type="checkbox" id="' + attribute.id + '_visible" /><label class="black-text" for="' + attribute.id + '_visible">Visible</label></p></div><div class="col s8 input-field"><input id="' + attribute.id + '_label" type="text"><label for="' + attribute.id + '_label">' + attribute.name + '</label></div></div>');
 					$("#" + attribute.id + "_visible").prop('checked', attribute.visible);
 					$("#" + attribute.id + "_label").val(attribute.title);
 				});
+				
+				if(node.data.queries == null) node.data.queries = [];
+				$("#queriesTable tr").remove();
 			}
 			else if(node.data.type == "esri-dynamic")
 			{
@@ -967,41 +1095,64 @@ function editSelectedLayer()
 				$("#dbcName").val(node.data.title);
 				$("#dbcAttribution").val(node.data.attribution);
 				$("#dbcOpacity").val(node.data.opacity);
-	
+				
+				// get the defnition expression
+				if(node.data.dynamicLayers != null && node.data.dynamicLayers[0] != null)
+				{
+					var dynamicJson = JSON.parse(node.data.dynamicLayers[0]);
+					if(dynamicJson.hasOwnProperty('definitionExpression'))
+					{
+						$("#dbcDefinitionExpression").val(dynamicJson.definitionExpression);
+					}
+				}
+				
 				if(node.data.attributes == null) node.data.attributes = [];
 				$("#attributePanel").empty();
+				
 				node.data.attributes.forEach(function (attribute)
 				{
-					$("#attributePanel").append('<div class="row"><div class="col s4"><p><input type="checkbox" id="' + attribute.id + '_visible" /><label class="black-text" for="' + attribute.id + '_visible">Visible</label></p></div><div class="col s8 input-field"><input id="' + attribute.id + '_label" type="text"><label for="' + attribute.id + '_label">Label</label></div></div>');
+					$("#attributePanel").append('<div class="row"><div class="col s4"><p><input type="checkbox" id="' + attribute.id + '_visible" /><label class="black-text" for="' + attribute.id + '_visible">Visible</label></p></div><div class="col s8 input-field"><input id="' + attribute.id + '_label" type="text"><label for="' + attribute.id + '_label">' + attribute.name + '</label></div></div>');
 					$("#" + attribute.id + "_visible").prop('checked', attribute.visible);
 					$("#" + attribute.id + "_label").val(attribute.title);
-				});
+				}); 
+				
+				if(node.data.queries == null) node.data.queries = [];
+				$("#queriesTable tr").remove();
 			}
 			else
 			{
-				$("#layerEditVectorPanel").show(); //kml, geojson
+				$("#layerEditVectorPanel").show(); // vector
 	
 				$("#vectorVisible").prop('checked', node.data.isVisible);
 				$("#vectorQueryable").prop('checked', node.data.isQueryable);
 				$("#vectorName").val(node.data.title);
 				$("#vectorOpacity").val(node.data.opacity);
+				$("#vectorRawVector").prop('checked', node.data.useRaw);
 				$("#vectorClustering").prop('checked', node.data.useClustering);
-				$("#vectorHeatmapping").prop('checked', node.data.useHeatmapping);
+				$("#vectorHeatmapping").prop('checked', node.data.useHeatmap);
 				$("#vectorStrokeWidth").val(node.data.style.strokeWidth);
-				$("#vectorStrokeStyle").val(node.data.stylestrokeStyle);
+				$("#vectorStrokeStyle").val(node.data.style.strokeStyle);
 			    $("#vectorStrokeColor").val(node.data.style.strokeColor);
 			    $("#vectorStrokeOpacity").val(node.data.style.strokeOpacity);
 			    $("#vectorFillColor").val(node.data.style.fillColor);
 			    $("#vectorFillOpacity").val(node.data.style.fillOpacity);
-	
+			    $("#vectorMarkerSizeX").val(node.data.style.markerSize[0]);
+			    $("#vectorMarkerSizeY").val(node.data.style.markerSize[1]);
+			    $("#vectorMarkerOffsetX").val(node.data.style.markerOffset[0]);
+			    $("#vectorMarkerOffsetY").val(node.data.style.markerOffset[1]);
+			    
 			    if(node.data.attributes == null) node.data.attributes = [];
 			    $("#attributePanel").empty();
-				node.data.attributes.forEach(function (attribute)
+
+			    node.data.attributes.forEach(function (attribute)
 				{
-					$("#attributePanel").append('<div class="row"><div class="col s4"><p><input type="checkbox" id="' + attribute.id + '_visible" /><label class="black-text" for="' + attribute.id + '_visible">Visible</label></p></div><div class="col s8 input-field"><input id="' + attribute.id + '_label" type="text"><label for="' + attribute.id + '_label">Label</label></div></div>');
+					$("#attributePanel").append('<div class="row"><div class="col s4"><p><input type="checkbox" id="' + attribute.id + '_visible" /><label class="black-text" for="' + attribute.id + '_visible">Visible</label></p></div><div class="col s8 input-field"><input id="' + attribute.id + '_label" type="text"><label for="' + attribute.id + '_label">' + attribute.name + '</label></div></div>');
 					$("#" + attribute.id + "_visible").prop('checked', attribute.visible);
 					$("#" + attribute.id + "_label").val(attribute.title);
-				});
+				}); 
+			    
+			    if(node.data.queries == null) node.data.queries = [];
+			    $("#queriesTable tr").remove();
 			}
 	
 			Materialize.updateTextFields();
@@ -1046,20 +1197,426 @@ function removeSelectedLayer()
    	});
 }
 
+function openQueryEditor()
+{
+	queryArgumentCount = 0;
+	selectedQuery = null;
+	argumentIds = [];
+	newQuery = false;
+	dropdownOptions = [];
+	
+	$("#queryArguments").empty();
+	$("#queriesTable tr").remove();
+	document.getElementById("queryEditorForm").reset();
+	
+	if(selectedLayerNode.data.queries != null)
+	{
+		$.each(selectedLayerNode.data.queries, function (i, query) 
+		{
+			// add a row per query
+			$("#queriesTable > tbody:last-child").append("<tr id='" + query.id + "-query'><td>" + query.id + "</td><td>" + query.title + "</td><td>" + query.description + "</td><td><a href='#' onclick='editQuery(\"" + query.id + "\")' class='blue-text'>Edit</a></td><td><a href='#' onclick='deleteQuery(\"" + query.id + "\")' class='blue-text'>Delete</a></td></tr>");
+		});
+	}
+	
+	$("#queryTable").show();
+	$("#queryEditor").hide();
+	$('#queriesModal').modal('open');
+}
+
+function deleteQuery(id)
+{
+	// remove row, and trim out the query from the node data
+	$("#" + id + "-query").remove();
+	selectedLayerNode.data.queries.forEach(function(query)
+	{
+		if(query.id == id)
+		{
+			//selectedLayerNode.data.queries.pop(query);
+			var idx = selectedLayerNode.data.queries.indexOf(query);
+			if(idx > -1)
+			{
+				selectedLayerNode.data.queries.splice(idx, 1)
+			}
+			
+			// remove the tool
+			for(var i = 0; i < data.tools.length; i++)
+			{
+				var tool = data.tools[i];
+				if(tool.type == "query" && tool.instance == selectedLayerNode.data.id + "--" + id)
+				{
+					var toolIdx = data.tools.indexOf(tool);
+					if(toolIdx > -1)
+					{
+						data.tools.splice(toolIdx, 1)
+					}
+				}
+			}
+		}
+	});
+}
+
+function addNewQuery()
+{
+	selectedLayerNode.data.queries = [];
+	var query = {};
+	query.predicate = {};
+	selectedQuery = query;
+	newQuery = true;
+	dropdownOptions = [];
+	
+	$("#queryTable").hide();
+	$("#queryEditor").show();
+	
+	// we should make sure that the config includes the menu and dropdown tools
+	var menuExists = false;
+	var dropdownExists = false;
+	for(var i = 0; i < data.tools.length; i++)
+	{
+		var tool = data.tools[i];
+		if(tool.type == "menu" && menuExists == false) menuExists = true;
+		if(tool.type == "dropdown" && dropdownExists == false) dropdownExists = true;
+	}
+	
+	if(!menuExists)
+	{
+		var tool = { type: "menu" };
+		data.tools.push(tool);
+	}
+	
+	if(!dropdownExists)
+	{
+		var tool = { type: "dropdown" };
+		data.tools.push(tool);
+	}
+}
+
+function editQuery(id)
+{
+	queryArgumentCount = 0;
+	argumentIds = [];
+	dropdownOptions = [];
+	
+	selectedLayerNode.data.queries.forEach(function(query)
+	{
+		if(query.id == id)
+		{
+			selectedQuery = query;
+			
+			$("#queryName").val(query.title);
+			$("#queryDescription").val(query.description);
+			$("#queryAndOrToggle").prop('checked', query.predicate.operator == "or" ? true : false);
+			
+			// build argument chain
+	
+			for(var i = 0; i < query.predicate.arguments.length; i++)
+			{
+				var queryArgs = query.predicate.arguments[i];
+				
+				queryArgumentCount++;
+				argumentIds.push(queryArgumentCount);
+				
+				$("#queryArguments").append('<div class="row" id="' + queryArgumentCount + '_queryArg"><div class="col s4"><label>Attribute</label><select id="' + queryArgumentCount + '_queryAttributes" class="browser-default"><option value="" disabled selected>-----</option></select></div><div class="col s2"><label>Operator optionality</label><select id="' + queryArgumentCount + '_queryOptionality" class="browser-default"><option value="is" selected>Is</option><option value="not">Is Not</option></select></div><div class="col s2"><label>Operator</label><select id="' + queryArgumentCount + '_queryOperator" class="browser-default"><option value="equals" selected>Equals</option><option value="contains">Contains</option><option value="less-than">Less Than</option><option value="greater-than">Greater Than</option><option value="starts-with">Starts With</option><option value="ends-with">Ends With</option></select></div><div id="' + queryArgumentCount + '_inputTypeBox" class="col s2"><label>Input Type</label><select id="' + queryArgumentCount + '_queryInputType" class="browser-default" onchange="toggleDropdownOptionsButton(' + queryArgumentCount + ');"><option value="input" selected>Textbox</option><option value="select">Dropdown</option></select></div><div class="col s1" id="' + queryArgumentCount + '_dropdownEditButton" style="display: none;"><a class="btn-floating btn-large waves-effect waves-light nrpp-blue-dark" onclick="editQueryDropdownOptions(' + queryArgumentCount + ');"><i class="material-icons left">mode_edit</i></a></div><div class="col s1" id="' + queryArgumentCount + '_removeArgumentButton"><a class="btn-floating btn-large waves-effect waves-light nrpp-blue-dark" onclick="removeQueryArgument(' + queryArgumentCount + ');"><i class="material-icons left">delete_forever</i></a></div>');
+				
+				if(queryArgs.operator == "not")
+				{
+					// replace with the inner arguments for the rest of the details
+					queryArgs = queryArgs.arguments[0];
+					
+					$("#" + queryArgumentCount + "_queryOptionality option[value=not]").attr('selected','selected');
+				}
+				else
+				{
+					$("#" + queryArgumentCount + "_queryOptionality option[value=is]").attr('selected','selected');
+				}
+
+				// set the query operator
+				$("#" + queryArgumentCount + "_queryOperator option[value=" + queryArgs.operator + "]").attr('selected','selected');
+				
+				// get the attribute name and the param type
+				var arg1 = queryArgs.arguments[0];
+				var arg2 = queryArgs.arguments[1];
+				var name = arg1.name != null ? arg1.name : arg2.name != null ? arg2.name : null;
+				var paramId = arg1.operand == "parameter" ? arg1.id : arg2.operand == "parameter" ? arg2.id : null;
+				
+				//set the selected type
+				$.each(query.parameters, function (i, parameter) 
+				{
+					if(parameter.id == paramId)
+					{
+						$("#" + queryArgumentCount + "_inputTypeBox option[value=" + parameter.type + "]").attr('selected','selected');
+						
+						if(parameter.type == "select")
+						{
+							$("#" + queryArgumentCount + "_dropdownEditButton").show();
+							dropdownOptions[queryArgumentCount] = parameter.choices;
+						}
+					}
+				});
+				
+				// set the selected attribute
+				$.each(selectedLayerNode.data.attributes, function (i, attribute) 
+				{
+					$("#" + queryArgumentCount + "_queryAttributes").append($('<option>', 
+					{ 
+						value:  attribute.name,
+						text : attribute.title 
+					}));
+
+					if(name != null && attribute.name.toUpperCase() == name.toUpperCase())
+					{
+						$("#" + queryArgumentCount + "_queryAttributes option[value=" + name.toUpperCase() + "]").attr('selected','selected');
+					}
+				});
+			}
+			
+			Materialize.updateTextFields();
+			
+			$("#queryTable").hide();
+			$("#queryEditor").show();
+		}
+	});
+}
+
+var queryArgumentCount = 0;
+var argumentIds = [];
+function addNewQueryArgument()
+{
+	queryArgumentCount++;
+	
+	$("#queryArguments").append('<div class="row" id="' + queryArgumentCount + '_queryArg"><div class="col s4"><label>Attribute</label><select id="' + queryArgumentCount + '_queryAttributes" class="browser-default"><option value="" disabled selected>-----</option></select></div><div class="col s2"><label>Operator optionality</label><select id="' + queryArgumentCount + '_queryOptionality" class="browser-default"><option value="is" selected>Is</option><option value="not">Is Not</option></select></div><div class="col s2"><label>Operator</label><select id="' + queryArgumentCount + '_queryOperator" class="browser-default"><option value="equals" selected>Equals</option><option value="contains">Contains</option><option value="less-than">Less Than</option><option value="greater-than">Greater Than</option><option value="starts-with">Starts With</option><option value="ends-with">Ends With</option></select></div><div id="' + queryArgumentCount + '_inputTypeBox" class="col s2"><label>Input Type</label><select id="' + queryArgumentCount + '_queryInputType" class="browser-default" onchange="toggleDropdownOptionsButton(' + queryArgumentCount + ');"><option value="input" selected>Textbox</option><option value="select">Dropdown</option></select></div><div class="col s1" id="' + queryArgumentCount + '_dropdownEditButton" style="display: none;"><a class="btn-floating btn-large waves-effect waves-light nrpp-blue-dark" onclick="editQueryDropdownOptions(' + queryArgumentCount + ');"><i class="material-icons left">mode_edit</i></a></div><div class="col s1" id="' + queryArgumentCount + '_removeArgumentButton"><a class="btn-floating btn-large waves-effect waves-light nrpp-blue-dark" onclick="removeQueryArgument(' + queryArgumentCount + ');"><i class="material-icons left">delete_forever</i></a></div>');
+	
+	// add query attributes to selection
+	
+	$.each(selectedLayerNode.data.attributes, function (i, attribute) 
+	{
+		$("#" + queryArgumentCount + "_queryAttributes").append($('<option>', 
+		{ 
+			value:  attribute.name,
+			text : attribute.title 
+		}));
+	});
+	
+	argumentIds.push(queryArgumentCount);
+	dropdownOptions[queryArgumentCount] = [];
+}
+
+function toggleDropdownOptionsButton(id)
+{
+	if($("#" + id + "_queryInputType").val() == "select")
+	{
+		$("#" + id + "_dropdownEditButton").show();
+	}
+	else
+	{
+		$("#" + id + "_dropdownEditButton").hide();
+	}
+}
+
+function removeQueryArgument(id)
+{
+	$("#" + id + "_queryArg").empty();
+	$("#" + id + "_queryArg").remove();
+	
+	var idx = argumentIds.indexOf(id);
+	if(idx > -1)
+	{
+		argumentIds.splice(idx, 1)
+		dropdownOptions[id] = [];
+	}
+}
+
+var selectedQuery;
+var newQuery = false;
+
+function saveQuery()
+{
+	if(newQuery) selectedQuery.id = $("#queryName").val().replace(/\s+/g, '-').toLowerCase();
+	selectedQuery.title = $("#queryName").val();
+	selectedQuery.description = $("#queryDescription").val();
+	selectedQuery.parameters = [];
+	selectedQuery.predicate.operator =  $("#queryAndOrToggle").is(":checked") ? "or" : "and";
+	selectedQuery.predicate.arguments = [];
+	
+	// add arguments and params to query
+	for(var i = 0; i < argumentIds.length; i++)
+	{
+		var argId = argumentIds[i];
+		var mainArgument = {};
+		var not = $("#" + argId + "_queryOptionality").val();
+		
+		mainArgument = 
+		{
+            operator: $("#" + argId + "_queryOperator").val(),
+            arguments: [
+                {
+                    operand: "attribute",
+                    name: $("#" + argId + "_queryAttributes").val()
+                },
+                {
+                    operand: "parameter",
+                    id: "param" + argId
+                }
+            ]
+        };
+		
+		var paramTitle = $("#" + argId + "_queryAttributes option:selected").text();
+		if(not == "not") paramTitle += " not";
+		paramTitle += " " + mainArgument.operator.replace(/-/g, ' ');
+			
+		var param = 
+		{
+            id: "param" + argId,
+            type: $("#" + argId + "_queryInputType").val(),
+            title: paramTitle,
+            value: null
+        };
+		
+		if(param.type == "select")
+		{
+			param.choices = dropdownOptions[argId];
+		}
+		
+		selectedQuery.parameters.push(param);
+		
+		if(not == "not")
+		{
+			var notArgument = 
+			{
+	            operator: not,
+	            arguments: []
+	        };
+			
+			notArgument.arguments.push(mainArgument);
+			mainArgument = notArgument;
+		}
+		
+		selectedQuery.predicate.arguments.push(mainArgument);
+	}
+
+	if(newQuery) 
+	{
+		// push the data into the query array
+		selectedLayerNode.data.queries.push(selectedQuery);
+		// add a tool
+		
+		var tool =
+		{
+			type: "query", 
+			instance: selectedLayerNode.data.id + "--" + selectedQuery.id,
+			position: "dropdown", 
+			icon: "search"
+		};
+		
+		data.tools.push(tool);
+	}
+	
+	newQuery = false;
+	selectedQuery = null;
+	
+	$("#queryEditor").hide();
+	$("#queryArguments").empty();
+	
+	document.getElementById("queryEditorForm").reset();
+
+	queryArgumentCount = 0;
+	argumentIds = [];
+	
+	$("#queriesTable tr").remove();
+	if(selectedLayerNode.data.queries != null)
+	{
+		$.each(selectedLayerNode.data.queries, function (i, query) 
+		{
+			// add a row per query
+			$("#queriesTable > tbody:last-child").append("<tr id='" + query.id + "-query'><td>" + query.id + "</td><td>" + query.title + "</td><td>" + query.description + "</td><td><a href='#' onclick='editQuery(\"" + query.id + "\")' class='blue-text'>Edit</a></td><td><a href='#' onclick='deleteQuery(\"" + query.id + "\");' class='blue-text'>Delete</a></td></tr>");
+		});
+	}
+	
+	$("#queryTable").show();
+}
+
+var dropdownOptions = [];
+var choicesIds = [];
+var choiceId;
+var currentDropdownId;
+
+function editQueryDropdownOptions(id)
+{
+	// Build the dropdown csv for the textareas
+	$("#dropdownOptionsPanel").empty();
+	currentDropdownId = id;
+	choicesIds = [];
+	choiceId = 0;
+	var options = dropdownOptions[id]; // choices array
+	
+	options.forEach(function (option)
+	{
+		choiceId++;
+		choicesIds.push(choiceId);
+		
+		$("#dropdownOptionsPanel").append('<div id="' + choiceId + '_choice" class="row"><div class="col s5 input-field"><input id="' + choiceId + '_dropdownValue" type="text"><label for="' + choiceId + '_dropdownValue">Value</label></div><div class="col s5 input-field"><input id="' + choiceId + '_dropdownTitle" type="text"><label for="' + choiceId + '_dropdownTitle">Description Text</label></div><div class="col s2"><a class="btn-floating btn-large waves-effect waves-light nrpp-blue-dark" onclick="removeChoice(' + choiceId + ');"><i class="material-icons left">delete_forever</i></a></div></div>');
+		
+		$("#" + choiceId + "_dropdownValue").val(option.value);
+		$("#" + choiceId + "_dropdownTitle").val(option.title);
+	});
+	
+	Materialize.updateTextFields();
+	
+	// and finally, open the modal
+	$("#queryDropdownModal").modal('open');
+}
+
+function addNewChoice()
+{
+	choiceId++;
+	choicesIds.push(choiceId);
+	
+	$("#dropdownOptionsPanel").append('<div id="' + choiceId + '_choice" class="row"><div class="col s5 input-field"><input id="' + choiceId + '_dropdownValue" type="text"><label for="' + choiceId + '_dropdownValue">Value</label></div><div class="col s5 input-field"><input id="' + choiceId + '_dropdownTitle" type="text"><label for="' + choiceId + '_dropdownTitle">Description Text</label></div><div class="col s2"><a class="btn-floating btn-large waves-effect waves-light nrpp-blue-dark" onclick="removeChoice(' + choiceId + ');"><i class="material-icons left">delete_forever</i></a></div></div>');
+}
+
+function removeChoice(id)
+{
+
+	$("#" + id + "_choice").empty();
+	$("#" + id + "_choice").remove();
+	
+	var idx = choicesIds.indexOf(id);
+	if(idx > -1)
+	{
+		choicesIds.splice(idx, 1)
+	}
+}
+
+function updateDropdownList()
+{
+	dropdownOptions[currentDropdownId] = [];
+	
+	for(var i = 0; i < choicesIds.length; i++)
+	{
+		var choiceId = choicesIds[i];
+		var option = 
+		{
+			value: $("#" + choiceId + "_dropdownValue").val(),
+			title: $("#" + choiceId + "_dropdownTitle").val()
+		};
+		
+		dropdownOptions[currentDropdownId].push(option);
+	}
+}
+
 function uploadVectorLayer()
 {
-	// create kml doc
 	var layer =
 	{
-		type: "geojson",
+		type: "vector",
 		id: $("#kmlName").val().replace(/\s+/g, '-').toLowerCase(),
 	    title: $("#kmlName").val(),
 	    isVisible: $("#kmlIsVisible").is(":checked"),
 	    isQueryable: $("#kmlQueryable").is(":checked"),
 	    opacity: $("#kmlOpacity").val(),
 	    attributes: [],
+	    useRaw: !$("#kmlClustering").is(":checked"),
 		useClustering: $("#kmlClustering").is(":checked"),
-		useHeatmapping: $("#kmlHeatmapping").is(":checked"),
+		useHeatmap: $("#kmlHeatmapping").is(":checked"),
 		dataUrl: $("#vectorUrl").val(),
 		style:
 		{
@@ -1068,13 +1625,14 @@ function uploadVectorLayer()
 		    strokeColor: $("#kmlStrokeColor").val(),
 		    strokeOpacity: $("#kmlStrokeOpacity").val(),
 		    fillColor: $("#kmlFillColor").val(),
-		    fillOpacity: $("#kmlFillOpacity").val()
+		    fillOpacity: $("#kmlFillOpacity").val(),
+		    markerSize: [$("#kmlMarkerSizeX").val(), $("#kmlMarkerSizeY").val()],
+		    markerOffset: [$("#kmlMarkerOffsetX").val(), $("#kmlMarkerOffsetY").val()]
 		}
 	};
 
-	// add to data
 	data.layers.push(layer);
-
+	
 	// add to layer tree
 	var lyrNode =
 	{
@@ -1098,6 +1656,16 @@ function uploadVectorLayer()
 			type: $("#vectorType").val(),
 			layer: layer,
 			contents: fileContents
+		});
+		
+		// if a marker has been updloaded, set the layer
+		
+		unsavedAttachments.forEach(function(attch)
+		{
+			if(attch.type == "marker_upload")
+			{
+				attch.layer = layer;
+			}
 		});
 	}
 
@@ -1178,17 +1746,6 @@ function addSelectedWmsLayer()
 			tree.reload(layerSource);
 		}
    	});
-}
-
-function uploadSurroundHeader()
-{
-	unsavedAttachments.push(
-	{
-		type: "header_upload",
-		contents: fileContents
-	});
-
-	document.getElementById("themesForm").reset();
 }
 
 function addSelectedDataBCLayer()
@@ -1516,6 +2073,7 @@ function loadConfigs()
 	$("#appsTable > tbody").html("");
 	$("#publishedAppsTable > tbody").html("");
 	$("#attributePanel").empty();
+	$("#queriesTable tr").remove();
 
 	mapConfigs = [];
 	publishedMapConfigs = [];
@@ -1649,10 +2207,10 @@ $(document).ready(function()
 
 				if(bounds.getWest() != bounds.getEast() && bounds.getNorth() != bounds.getSouth())
 				{
-					data.viewer.initialExtent[0] = bounds.getWest();
-					data.viewer.initialExtent[1] = bounds.getNorth();
-					data.viewer.initialExtent[2] = bounds.getEast();
-					data.viewer.initialExtent[3] = bounds.getSouth();
+					data.viewer.location.extent[0] = bounds.getWest();
+					data.viewer.location.extent[1] = bounds.getNorth();
+					data.viewer.location.extent[2] = bounds.getEast();
+					data.viewer.location.extent[3] = bounds.getSouth();
 				}
 			}
 		});
@@ -1710,12 +2268,49 @@ $(document).ready(function()
 
 	//init the file upload components
 	document.getElementById('vectorFileUpload').addEventListener('change', readFile, false);
-	document.getElementById('headerImageFileUpload').addEventListener('change', readFile, false);
+	document.getElementById('headerImageFileUpload').addEventListener('change', readHeaderFile, false);
 	document.getElementById('replaceVectorFileUpload').addEventListener('change', readFile, false);
+	document.getElementById('customMarkerFileUpload').addEventListener('change', readMarkerFile, false);
+	
+	// init modals
+	$('.modal').modal();
+	$('#attributesModal').modal({ dismissible: false });
+	$('#queriesModal').modal({ dismissible: false });
+	$('#queryDropdownModal').modal(
+	{
+		dismissible: false,
+	    complete: function() 
+	    { 
+	    	updateDropdownList();
+	    }
+	});
 });
 
 var fileContents;
 var unsavedAttachments = [];
+
+function readHeaderFile(e)
+{
+	readFile(e);
+	
+	unsavedAttachments.push(
+	{
+		type: "header_upload",
+		contents: fileContents
+	});
+}
+
+function readMarkerFile(e)
+{
+	readFile(e);
+	
+	unsavedAttachments.push(
+	{
+		type: "marker_upload",
+		layer: selectedLayerNode.data,
+		contents: fileContents
+	});
+}
 
 function readFile(e)
 {

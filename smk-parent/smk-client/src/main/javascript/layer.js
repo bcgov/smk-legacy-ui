@@ -1,4 +1,4 @@
-include.module( 'layer', [ 'smk', 'jquery', 'util', 'event' ], function () {
+include.module( 'layer', [ 'jquery', 'util', 'event' ], function () {
 
     var LayerEvent = SMK.TYPE.Event.define( [
         'startedLoading',
@@ -28,13 +28,21 @@ include.module( 'layer', [ 'smk', 'jquery', 'util', 'event' ], function () {
                     self.finishedLoading()
             }
         } )
+
+        // Object.defineProperty( this, 'id', {
+        //     get: function () { return config.id }
+        // } )
     }
 
     $.extend( Layer.prototype, LayerEvent.prototype )
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
-    Layer.prototype.initialize = function () {
+    Layer.prototype.initialize = function ( id, index, parentId ) {
         var self = this
+
+        this.id = id
+        this.parentId = parentId
+        this.index = index
 
         if ( this.config.attributes ) {
             this.attribute = {}
@@ -54,7 +62,10 @@ include.module( 'layer', [ 'smk', 'jquery', 'util', 'event' ], function () {
         }
     }
 
+    Layer.prototype.hasChildren = function () { return false }
+
     Layer.prototype.getLegends = function () {
+        return SMK.UTIL.resolved()
     }
 
     Layer.prototype.getFeaturesAtPoint = function ( arg ) {
@@ -188,14 +199,7 @@ include.module( 'layer', [ 'smk', 'jquery', 'util', 'event' ], function () {
                 return SMK.UTIL.reproject( geojson, geojson.crs )
             } )
             .then( function ( geojson ) {
-                return geojson.features.map( function ( f, i ) {
-                    if ( self.config.titleAttribute )
-                        f.title = f.properties[ self.config.titleAttribute ]
-                    else
-                        f.title = 'Feature #' + ( i + 1 )
-
-                    return f
-                } )
+                return geojson.features
             } )
 
             // if ( queryLayer.withCreds )
@@ -269,12 +273,8 @@ include.module( 'layer', [ 'smk', 'jquery', 'util', 'event' ], function () {
                 return data.results.map( function ( r, i ) {
                     var f = {}
 
-                    if ( self.config.titleAttribute )
-                        f.title = r.attributes[ self.config.titleAttribute ]
-                    else if ( r.displayFieldName )
+                    if ( r.displayFieldName )
                         f.title = r.attributes[ r.displayFieldName ]
-                    else
-                        f.title = 'Feature #' + ( i + 1 )
 
                     f.geometry = Terraformer.ArcGIS.parse( r.geometry )
 
@@ -303,11 +303,59 @@ include.module( 'layer', [ 'smk', 'jquery', 'util', 'event' ], function () {
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    defineLayerType( 'geojson', {
+    defineLayerType( 'vector', {
 
         getLegends: createLegendChip,
 
+        initialize: function () {
+            if ( this.hasChildren() )
+                this.isContainer = true
+
+            Layer.prototype.initialize.apply( this, arguments )
+
+            if ( this.config.useHeatmap )
+                this.config.isQueryable = false
+        },
+
+        hasChildren: function () {
+            return ( this.config.useRaw + this.config.useClustering + this.config.useHeatmap ) > 1
+        },
+
+        childLayerConfigs: function () {
+            configs = []
+
+            if ( this.config.useClustering )
+                configs.push( Object.assign( {}, this.config, {
+                    id: 'clustered',
+                    dataUrl: '@' + this.config.id,
+                    title: 'Clustered',
+                    useRaw: false,
+                    useHeatmap: false,
+                } ) )
+
+            if ( this.config.useHeatmap )
+                configs.push( Object.assign( {}, this.config, {
+                    id: 'heatmap',
+                    dataUrl: '@' + this.config.id,
+                    title: 'Heatmap',
+                    useRaw: false,
+                    useClustering: false,
+                } ) )
+
+            if ( this.config.useRaw )
+                configs.push( Object.assign( {}, this.config, {
+                    id: 'raw',
+                    dataUrl: '@' + this.config.id,
+                    title: 'Raw',
+                    useHeatmap: false,
+                    useClustering: false,
+                } ) )
+
+            return configs
+        }
     } )
+
+    SMK.TYPE.Layer[ 'geojson' ] = SMK.TYPE.Layer[ 'vector' ]
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 

@@ -1,12 +1,13 @@
-include.module( 'tool-select', [ 'smk', 'feature-list', 'widgets', 'tool-select.panel-select-html' ], function ( inc ) {
+include.module( 'tool-select', [ 'feature-list', 'widgets', 'tool-select.panel-select-html' ], function ( inc ) {
 
     Vue.component( 'select-widget', {
         extends: inc.widgets.toolButton,
     } )
 
     Vue.component( 'select-panel', {
+        extends: inc.widgets.toolPanel,
         template: inc[ 'tool-select.panel-select-html' ],
-        props: [ 'busy', 'layers', 'highlightId' ],
+        props: [ 'busy', 'layers', 'highlightId', 'message', 'messageClass' ],
     } )
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
@@ -18,8 +19,7 @@ include.module( 'tool-select', [ 'smk', 'feature-list', 'widgets', 'tool-select.
             position:           'menu',
             title:              'Selection',
             widgetComponent:    'select-widget',
-            panelComponent:     'select-panel',
-            featureSetProperty: 'selected'
+            panelComponent:     'select-panel'
         }, option ) )
     }
 
@@ -29,40 +29,34 @@ include.module( 'tool-select', [ 'smk', 'feature-list', 'widgets', 'tool-select.
     SelectTool.prototype.afterInitialize = SMK.TYPE.FeatureList.prototype.afterInitialize.concat( [] )
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
-    SelectTool.prototype.afterInitialize.push( function ( smk, aux ) {
+    SelectTool.prototype.afterInitialize.unshift( function ( smk ) {
+        this.featureSet = smk.$viewer.selected
+    } )
+
+    SelectTool.prototype.afterInitialize.push( function ( smk ) {
         var self = this
 
-        aux.widget.vm.$on( 'select-widget.click', function () {
-            if ( !self.visible || !self.enabled ) return
+        smk.on( this.id, {
+            'activate': function () {
+                if ( !self.visible || !self.enabled ) return
 
-            self.active = !self.active
+                self.active = !self.active
+            }
         } )
 
-        smk.$viewer.selected.addedFeatures( function ( ev ) {
-            self.active = true
+        self.featureSet
+            .addedFeatures( updateMessage )
+            .removedFeatures( updateMessage )
 
-            var ly = smk.$viewer.layerId[ ev.layerId ]
+        function updateMessage() {
+            var stat = smk.$viewer.identified.getStats()
 
-            if ( !self.layers[ ly.index ] )
-                Vue.set( self.layers, ly.index, {
-                    id:         ly.config.id,
-                    title:      ly.config.title,
-                    features: ev.features.map( function ( ft ) {
-                        return {
-                            id:     ft.id,
-                            title:  ft.title
-                        }
-                    } )
-                } )
-            else
-                Vue.set( self.layers[ ly.index ], 'features', self.layers[ ly.index ].features.concat( ev.features.map( function ( ft ) {
-                    return {
-                        id:     ft.id,
-                        title:  ft.title
-                    }
-                } ) ) )
-        } )
+            var sub = ''
+            if ( stat.vertexCount > stat.featureCount )
+                sub = '<div class="smk-submessage">' + SMK.UTIL.grammaticalNumber( stat.vertexCount, null, null, 'with {} vertices' ) + '</div>'
 
+            self.setMessage( '<div>Selection contains ' + SMK.UTIL.grammaticalNumber( stat.featureCount, null, 'a feature', '{} features' ) + '</div>' + sub )
+        }
     } )
 
     return SelectTool

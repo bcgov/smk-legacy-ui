@@ -1,4 +1,4 @@
-include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.panel-directions-html', 'tool-directions.address-search-html' ], function ( inc ) {
+include.module( 'tool-directions', [ 'tool', 'widgets', 'tool-directions.panel-directions-html', 'tool-directions.address-search-html' ], function ( inc ) {
 
     var request
 
@@ -133,13 +133,28 @@ include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.
     } )
 
     Vue.component( 'directions-panel', {
+        extends: inc.widgets.toolPanel,
         template: inc[ 'tool-directions.panel-directions-html' ],
-        props: [ 'busy', 'waypoints', 'directions', 'directionHighlight', 'directionPick', 'message', 'messageClass' ],
+        props: [ 'busy', 'waypoints', 'directions', 'directionHighlight', 'directionPick', 'message', 'messageClass', 'config' ],
         data: function () {
-            return {
-                optimal:    false,
-                roundTrip:  false,
-                criteria:   'shortest'
+            return Object.assign( {}, this.config )
+        },
+        watch: {
+            config: function ( val ) {
+                Object.keys( val ).forEach( function ( k ) {
+                    this[ k ] = val[ k ]
+                } )
+            }
+        },
+        methods: {
+            getConfigState: function () {
+                var self = this
+
+                var state = {}
+                Object.keys( this.config ).forEach( function ( k ) {
+                    state[ k ] = self[ k ]
+                } )
+                return state
             }
         },
         computed: {
@@ -148,6 +163,7 @@ include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.
                     if ( this.waypoints[ i ].location )
                         return i
             },
+
             lastWaypointIndex: function () {
                 for ( var i = this.waypoints.length - 1; i >= 0 ; i-- )
                     if ( this.waypoints[ i ].location )
@@ -167,6 +183,11 @@ include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.
         this.makePropPanel( 'directionPick', null )
         this.makePropPanel( 'message', null )
         this.makePropPanel( 'messageClass', null )
+        this.makePropPanel( 'config', {
+            optimal:    false,
+            roundTrip:  false,
+            criteria:   'shortest'
+        } )
 
         SMK.TYPE.Tool.prototype.constructor.call( this, $.extend( {
             order:          4,
@@ -174,12 +195,6 @@ include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.
             widgetComponent:'directions-widget',
             panelComponent: 'directions-panel',
         }, option ) )
-
-        this.routeOption = {
-            optimal:    false,
-            roundTrip:  false,
-            criteria:   'shortest'
-        }
 
         this.activating = SMK.UTIL.resolved()
     }
@@ -190,7 +205,7 @@ include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.
     DirectionsTool.prototype.afterInitialize = []
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
-    DirectionsTool.prototype.afterInitialize.push( function ( smk, aux ) {
+    DirectionsTool.prototype.afterInitialize.push( function ( smk ) {
         var self = this
 
         self.changedActive( function () {
@@ -247,59 +262,59 @@ include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.
             } )
         } )
 
-        aux.widget.vm.$on( 'directions-widget.click', function () {
-            if ( !self.visible || !self.enabled ) return
+        smk.on( this.id, {
+            'activate': function () {
+                if ( !self.visible || !self.enabled ) return
 
-            self.active = !self.active
-        } )
+                self.active = !self.active
+            },
 
-        aux.panel.vm.$on( 'directions-panel.option', function ( ev, comp ) {
-            self.routeOption.optimal = comp.optimal
-            self.routeOption.roundTrip = comp.roundTrip
-            self.routeOption.criteria = comp.criteria
+            'config': function ( ev ) {
+                Object.assign( self.config, ev )
 
-            self.findRoute()
-        } )
+                self.findRoute()
+            },
 
-        aux.panel.vm.$on( 'directions-panel.reverse', function ( ev ) {
-            self.waypoints.reverse()
-            self.findRoute()
-        } )
+            'reverse': function ( ev ) {
+                self.waypoints.reverse()
+                self.findRoute()
+            },
 
-        aux.panel.vm.$on( 'directions-panel.clear', function ( ev ) {
-            self.startAtCurrentLocation()
-        } )
+            'clear': function ( ev ) {
+                self.startAtCurrentLocation()
+            },
 
-        aux.panel.vm.$on( 'directions-panel.hover-direction', function ( ev ) {
-            self.directionHighlight = ev.highlight
-        } )
+            'hover-direction': function ( ev ) {
+                self.directionHighlight = ev.highlight
+            },
 
-        aux.panel.vm.$on( 'directions-panel.pick-direction', function ( ev ) {
-            self.directionPick = ev.pick
-        } )
+            'pick-direction': function ( ev ) {
+                self.directionPick = ev.pick
+            },
 
-        aux.panel.vm.$on( 'directions-panel.changed-waypoints', function ( ev ) {
-            self.findRoute()
-        } )
+            'changed-waypoints': function ( ev ) {
+                self.findRoute()
+            },
 
-        aux.panel.vm.$on( 'directions-panel.remove-waypoint', function ( ev ) {
-            self.waypoints.splice( ev.index, 1 )
+            'remove-waypoint': function ( ev ) {
+                self.waypoints.splice( ev.index, 1 )
 
-            self.findRoute()
-        } )
+                self.findRoute()
+            },
 
-        aux.panel.vm.$on( 'directions-panel.update-waypoint', function ( ev ) {
-            var empty = self.waypoints.findIndex( function ( w ) { return !w.location } )
+            'update-waypoint': function ( ev ) {
+                var empty = self.waypoints.findIndex( function ( w ) { return !w.location } )
 
-            self.waypoints[ ev.index ] = ev.item
+                self.waypoints[ ev.index ] = ev.item
 
-            if ( !ev.item.location && ev.index != empty )
-                self.waypoints.splice( empty, 1 )
+                if ( !ev.item.location && ev.index != empty )
+                    self.waypoints.splice( empty, 1 )
 
-            if ( ev.item.location && ev.index == empty )
-                self.addWaypoint()
+                if ( ev.item.location && ev.index == empty )
+                    self.addWaypoint()
 
-            self.findRoute()
+                self.findRoute()
+            }
         } )
 
     } )
@@ -367,7 +382,7 @@ include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.
         this.setMessage( 'Calculating...', 'progress' )
         this.busy = true
 
-        return findRoute( points, this.routeOption ).then( function ( data ) {
+        return findRoute( points, this.config ).then( function ( data ) {
             self.displayRoute( data.route )
 
             if ( data.visitOrder && data.visitOrder.findIndex( function ( v, i ) { return points[ v ].index != i } ) != -1 ) {
@@ -411,8 +426,10 @@ include.module( 'tool-directions', [ 'smk', 'tool', 'widgets', 'tool-directions.
         this.message = message
 
         this.messageClass = {}
-        if ( Class )
-            this.messageClass[ 'smk-' + Class ] = true
+        if ( message && !Class )
+            Class = 'summary'
+
+        this.messageClass[ 'smk-' + Class ] = true
 
         if ( delay )
             return SMK.UTIL.makePromise( function ( res ) { setTimeout( res, delay ) } )

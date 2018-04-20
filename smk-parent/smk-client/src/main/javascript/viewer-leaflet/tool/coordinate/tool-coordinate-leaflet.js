@@ -3,12 +3,13 @@ include.module( 'tool-coordinate-leaflet', [ 'leaflet', 'tool-coordinate' ], fun
     SMK.TYPE.CoordinateTool.prototype.afterInitialize.push( function ( smk ) {
         L.control
             .coordinates( {
-                position:           "bottomleft",
+                position:           "bottomright",
                 decimals:           4,
-                labelTemplateLat:   "Lat: {y}",
-                labelTemplateLng:   "Long: {x}",
+                labelTemplateLat:   "<label>latitude<div>{y}</div></label>",
+                labelTemplateLng:   "<label>longitude<div>{x}</div></label>",
                 useDMS:             false,
-                useLatLngOrder:     false
+                useLatLngOrder:     true,
+                enableUserInput:    false,
             } )
             .addTo( smk.$viewer.map )
     } )

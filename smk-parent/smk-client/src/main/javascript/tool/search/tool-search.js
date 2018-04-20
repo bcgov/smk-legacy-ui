@@ -1,4 +1,4 @@
-include.module( 'tool-search', [ 'smk', 'tool', 'widgets', 'tool-search.widget-search-html', 'tool-search.panel-search-html', 'tool-search.popup-search-html' ], function ( inc ) {
+include.module( 'tool-search', [ 'tool', 'widgets', 'tool-search.widget-search-html', 'tool-search.panel-search-html', 'tool-search.popup-search-html' ], function ( inc ) {
 
     var request
 
@@ -37,8 +37,9 @@ include.module( 'tool-search', [ 'smk', 'tool', 'widgets', 'tool-search.widget-s
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
     Vue.component( 'search-widget', {
+        mixins: [ inc.widgets.emit ],
         template: inc[ 'tool-search.widget-search-html' ],
-        props: [ 'title', 'visible', 'enabled', 'active', 'icon', 'type', 'initialSearch' ],
+        props: [ 'id', 'type', 'title', 'visible', 'enabled', 'active', 'icon', 'type', 'initialSearch' ],
         data: function () {
             return {
                 search: null
@@ -48,10 +49,28 @@ include.module( 'tool-search', [ 'smk', 'tool', 'widgets', 'tool-search.widget-s
             initialSearch: function () {
                 this.search = null
             }
+        },
+        computed: {
+            classes: function () {
+                var c = {}
+                c[ 'smk-' + this.type + '-tool' ] = true
+                return Object.assign( c, {
+                    'smk-tool-active': this.active,
+                    'smk-tool-visible': this.visible,
+                    'smk-tool-enabled': this.enabled
+                } )
+            }
+        },
+        methods: {
+            focus: function () {
+                if ( !this.active )
+                    this.$refs[ 'search-input' ].focus()
+            }
         }
     } )
 
     Vue.component( 'search-panel', {
+        extends: inc.widgets.toolPanel,
         template: inc[ 'tool-search.panel-search-html' ],
         props: [ 'busy', 'results', 'highlightId' ],
         methods: {
@@ -88,48 +107,50 @@ include.module( 'tool-search', [ 'smk', 'tool', 'widgets', 'tool-search.widget-s
     SearchTool.prototype.afterInitialize = []
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
-    SearchTool.prototype.afterInitialize.push( function ( smk, aux ) {
+    SearchTool.prototype.afterInitialize.push( function ( smk ) {
         var self = this
 
-        aux.toolbar.vm.$on( 'search-widget.click', function ( ev ) {
-            if ( !self.visible || !self.enabled ) return
+        smk.on( this.id, {
+            'activate': function ( ev ) {
+                if ( !self.visible || !self.enabled ) return
 
-            if ( ev.toggle )
-                self.active = !self.active
-            else
-                self.active = true
-        } )
-
-        aux.toolbar.vm.$on( 'search-widget.input-change', function ( ev ) {
-            smk.$viewer.searched.clear()
-
-            self.busy = true
-            doAddressSearch( ev.text )
-                .then( function ( features ) {
+                if ( ev.toggle )
+                    self.active = !self.active
+                else
                     self.active = true
-                    smk.$viewer.searched.add( 'search', features, 'fullAddress' )
-                    self.busy = false
-                } )
-                .catch( function ( e ) {
-                    console.warn( 'search failure:', e )
-                } )
+            },
+
+            'input-change': function ( ev ) {
+                smk.$viewer.searched.clear()
+
+                self.busy = true
+                doAddressSearch( ev.text )
+                    .then( function ( features ) {
+                        self.active = true
+                        smk.$viewer.searched.add( 'search', features, 'fullAddress' )
+                        self.busy = false
+                    } )
+                    .catch( function ( e ) {
+                        console.warn( 'search failure:', e )
+                    } )
+            },
+
+            'hover': function ( ev ) {
+                smk.$viewer.searched.highlight( ev.result ? [ ev.result.id ] : [] )
+            },
+
+            'pick': function ( ev ) {
+                smk.$viewer.searched.pick( null )
+                smk.$viewer.searched.pick( ev.result.id )
+            },
+
+            'clear': function ( ev ) {
+                smk.$viewer.searched.clear()
+                self.initialSearch += 1
+            }
         } )
 
-
-        aux.panel.vm.$on( 'search-panel.hover', function ( ev ) {
-            smk.$viewer.searched.highlight( ev.result ? [ ev.result.id ] : [] )
-        } )
-
-        aux.panel.vm.$on( 'search-panel.pick', function ( ev ) {
-            smk.$viewer.searched.pick( null )
-            smk.$viewer.searched.pick( ev.result.id )
-        } )
-
-        aux.panel.vm.$on( 'search-panel.clear', function ( ev ) {
-            smk.$viewer.searched.clear()
-            self.initialSearch += 1
-        } )
-
+        // = : = : = : = : = : = : = : = : = : = : = : = : = : = : = : = : = : = : =
 
         smk.$viewer.searched.addedFeatures( function ( ev ) {
             self.results = ev.features
@@ -142,7 +163,6 @@ include.module( 'tool-search', [ 'smk', 'tool', 'widgets', 'tool-search.widget-s
             self.highlightId = ev.feature && ev.feature.id
 
             self.popupModel.feature = ev.feature
-            // Vue.set( self.popupModel, 'feature', ev.feature )
         } )
 
         // // smk.$viewer.selected.highlightedFeatures( function ( ev ) {
@@ -152,7 +172,7 @@ include.module( 'tool-search', [ 'smk', 'tool', 'widgets', 'tool-search.widget-s
             self.results = []
         } )
 
-        var el = smk.addToContainer( inc[ 'tool-search.popup-search-html' ] )
+        // = : = : = : = : = : = : = : = : = : = : = : = : = : = : = : = : = : = : =
 
         this.popupModel = {
             feature: null,
@@ -163,7 +183,7 @@ include.module( 'tool-search', [ 'smk', 'tool', 'widgets', 'tool-search.widget-s
             this.popupModel.tool.directions = true
 
         this.popupVm = new Vue( {
-            el: el,
+            el: smk.addToContainer( inc[ 'tool-search.popup-search-html' ] ),
             data: self.popupModel,
             methods: {
                 directionsToFeature: function ( feature ) {

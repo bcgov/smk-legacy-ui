@@ -1,5 +1,7 @@
 module.exports = function( grunt ) {
 
+    var path = require( "path" );
+
     require( 'load-grunt-tasks' )( grunt )
 
     grunt.initConfig( {
@@ -10,6 +12,13 @@ module.exports = function( grunt ) {
         buildPath: 'build',
 
         serverHost: 'localhost',
+
+        processTemplate: function ( content, srcpath ) {
+            return content.replace( /\<\%\=\s*[^%]+\s*\%\>/gi, function (m) {
+                grunt.log.writeln( srcpath + ': ' + m );
+                return grunt.template.process( m );
+            } )
+        },
 
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -46,10 +55,20 @@ module.exports = function( grunt ) {
                 dest: '<%= buildPath %>'
             },
 
+            'test-html': {
+                expand: true,
+                cwd: 'src/main/test',
+                src: [ '*html' ],
+                dest: '<%= buildPath %>/test',
+                options: {
+                    process: '<%= processTemplate %>',
+                },
+            },
+
             'test': {
                 expand: true,
                 cwd: 'src/main/test',
-                src: [ '**' ],
+                src: [ '**', '!**/*html' ],
                 dest: '<%= buildPath %>/test'
             },
 
@@ -76,6 +95,22 @@ module.exports = function( grunt ) {
 
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+        filelist: {
+            configs: {
+                files: [
+                    {
+                        cwd: 'src/main/test/config',
+                        src: [
+                            '*json',
+                        ],
+                        dest: '<%= buildPath %>/test/configs.json'
+                    }
+                ]
+            },
+        },
+
+        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
         watch: {
             options: {
                 livereload: {
@@ -95,7 +130,7 @@ module.exports = function( grunt ) {
 
             test: {
                 files: [ 'src/main/test/**' ],
-                tasks: [ 'copy:test', 'copy:deploy' ],
+                tasks: [ 'filelist:configs:filelist', 'copy:test-html', 'copy:test', 'copy:deploy' ],
             },
 
             tags: {
@@ -158,11 +193,42 @@ module.exports = function( grunt ) {
         )
     } )
 
+    grunt.registerMultiTask( 'filelist', 'Writes JSON blobs containing names of the matched files to sub-keys for destination in a config setting', function ( setting ) {
+        var out = {};
+        this.files.forEach( function ( f ) {
+            var cwd = f.cwd || '';
+
+            var dest = path.basename( f.dest, path.extname( f.dest ) )
+
+            var list = f.src.map( function ( filename ) {
+                var s = path.join( cwd, filename )
+                if ( !grunt.file.isFile( s ) ) return;
+
+                grunt.log.writeln( dest + ': ' + filename )
+                return {
+                    // name: path.basename( s ),
+                    path: filename,
+                }
+            } ).filter( function ( e ) { return !!e } )
+
+            out[ dest ] = list
+        } )
+
+        if ( setting )
+            grunt.config( setting, jsonOut( out ) )
+
+        function jsonOut( obj ) {
+            return JSON.stringify( obj, null, '  ' )
+        }
+    } )
+
     grunt.registerTask( 'build', [
         'clean:build',
         'gen-tags',
         'copy:src',
         'copy:include',
+        'filelist:configs:filelist',
+        'copy:test-html',
         'copy:test',
         'copy:deploy'
     ] )

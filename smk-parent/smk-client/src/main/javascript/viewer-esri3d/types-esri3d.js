@@ -1,4 +1,4 @@
-include.module( 'types-esri3d', [ 'smk', 'esri3d' ], function () {
+include.module( 'types-esri3d', [ 'esri3d' ], function () {
 
     return new Promise( function ( res ) {
         var objs = [

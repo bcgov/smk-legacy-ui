@@ -6,7 +6,7 @@
     visibility: hidden;
 }
 
-.smk-viewer {
+.smk-map-frame .smk-viewer {
     position: absolute;
     top: 0;
     left: 0;
@@ -15,7 +15,7 @@
     z-index: 1;
 }
 
-.smk-overlay {
+.smk-map-frame .smk-overlay {
     position: absolute;
     top: 7px;
     left: 7px;
@@ -28,7 +28,7 @@
 }
 
 
-.smk-command {
+.smk-map-frame .smk-command {
     cursor: pointer;
     color: blue;
     padding: 2px;
@@ -38,23 +38,47 @@
     font-size: 12px;
 }
 
-.smk-command.smk-disabled {
+.smk-map-frame .smk-command.smk-icon {
+    color: black;
+    padding: 0;
+    width: 26px;
+    height: 26px;
+    font-size: 24px;
+}
+
+.smk-map-frame .smk-command.smk-disabled {
     color: lightgray;
     font-style: italic;
 }
 
-.smk-command:hover {
+.smk-map-frame .smk-command.smk-icon.smk-disabled {
+    font-style: normal;
+}
+
+.smk-map-frame .smk-command:hover {
     border: 1px solid black;
 }
 
-.smk-command.smk-disabled:hover {
+.smk-map-frame .smk-command.smk-disabled:hover {
     border: 1px solid transparent;
 }
 
-.smk-commands {
+.smk-map-frame .smk-commands {
     margin-bottom: 1px;
 }
 
-.smk-active, .smk-tool-active {
+.smk-map-frame .smk-active, .smk-tool-active {
     background-color: #d2d9e6;
+}
+
+.smk-map-frame .smk-item {
+    /* border: 1px solid lightgray; */
+    border-radius: 5px;
+    margin-bottom: 1px;
+    cursor: default;
+}
+
+.smk-map-frame .smk-item:hover {
+    background-color: #d2d9e6;
+    /* border: 1px solid #d2d9e6; */
 }

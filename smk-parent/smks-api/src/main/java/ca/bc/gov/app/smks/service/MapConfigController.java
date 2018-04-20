@@ -26,9 +26,13 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import ca.bc.gov.app.smks.converter.DocumentConverterFactory;
 import ca.bc.gov.app.smks.converter.DocumentConverterFactory.DocumentType;
 import ca.bc.gov.app.smks.dao.CouchDAO;
+import ca.bc.gov.app.smks.model.Layer;
 import ca.bc.gov.app.smks.model.MapConfigInfo;
 import ca.bc.gov.app.smks.model.MapConfiguration;
 
@@ -282,16 +286,26 @@ public class MapConfigController
 					
 					String contentType = request.getContentType();
 					
-					if(type.equals("kml")) { docBytes = DocumentConverterFactory.convertDocument(request.getBytes(), DocumentType.KML); contentType = "application/octet-stream"; }
-					if(type.equals("kmz")) { docBytes = DocumentConverterFactory.convertDocument(request.getBytes(), DocumentType.KMZ); contentType = "application/octet-stream"; }
-					else if(type.equals("csv")) { docBytes = DocumentConverterFactory.convertDocument(request.getBytes(), DocumentType.CSV); contentType = "application/octet-stream"; }
-					else if(type.equals("wkt")) { docBytes = DocumentConverterFactory.convertDocument(request.getBytes(), DocumentType.WKT); contentType = "application/octet-stream"; }
-					else if(type.equals("gml")) { docBytes = DocumentConverterFactory.convertDocument(request.getBytes(), DocumentType.GML); contentType = "application/octet-stream"; }
-					else if(type.equals("shape")) { docBytes = DocumentConverterFactory.convertDocument(request.getBytes(), DocumentType.SHAPE); contentType = "application/octet-stream"; }
+					if(type.equals("kml")) { type = "geojson"; docBytes = DocumentConverterFactory.convertDocument(request.getBytes(), DocumentType.KML); contentType = "application/octet-stream"; }
+					if(type.equals("kmz")) { type = "geojson"; docBytes = DocumentConverterFactory.convertDocument(request.getBytes(), DocumentType.KMZ); contentType = "application/octet-stream"; }
+					else if(type.equals("csv")) { type = "geojson"; docBytes = DocumentConverterFactory.convertDocument(request.getBytes(), DocumentType.CSV); contentType = "application/octet-stream"; }
+					else if(type.equals("wkt")) { type = "geojson"; docBytes = DocumentConverterFactory.convertDocument(request.getBytes(), DocumentType.WKT); contentType = "application/octet-stream"; }
+					else if(type.equals("gml")) { type = "geojson"; docBytes = DocumentConverterFactory.convertDocument(request.getBytes(), DocumentType.GML); contentType = "application/octet-stream"; }
+					else if(type.equals("shape")) { type = "geojson"; docBytes = DocumentConverterFactory.convertDocument(request.getBytes(), DocumentType.SHAPE); contentType = "application/octet-stream"; }
 					
 					Attachment attachment = new Attachment(id, Base64.encodeBase64String(docBytes), contentType);
 				    resource.addInlineAttachment(attachment);
 
+				    // if this is a geojson blob, make sure we have verified the properties set
+				    /*if(type.equals("geojson"))
+				    {
+				        Layer layer = resource.getLayerByID(id);
+				        
+    				    ObjectMapper objectMapper = new ObjectMapper();
+    				    JsonNode node = objectMapper.readValue(docBytes, JsonNode.class);
+    				    
+				    }*/
+				    
 				    couchDAO.updateResource(resource);
 
 				    logger.debug("    Success!");

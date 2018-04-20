@@ -19,9 +19,26 @@
 		    integrity="sha512-pijLQd2FbV/7+Jwa86Mk3ACxnasfIMzJRrIlVQsuPKPCfUBCDMDUoLiBQRg7dAQY6D1rkmCcR8286hVTn/wlIg=="
 		    crossorigin=""></script>
     <link rel="stylesheet" href="https://js.arcgis.com/4.4/esri/css/main.css" />
-    <!-- Quill for text editor -->
-    <script src="https://cdn.quilljs.com/1.3.5/quill.js"></script>
-    <link href="https://cdn.quilljs.com/1.3.5/quill.snow.css" rel="stylesheet">
+    <!-- text editor -->
+    <script src="resources/js/trumbowyg/trumbowyg.min.js"></script>
+    <link rel="stylesheet" href="resources/js/trumbowyg/ui/trumbowyg.min.css">
+    
+    <script src="resources/js/trumbowyg/plugins/allowtagsfrompaste/trumbowyg.allowtagsfrompaste.min.js"></script>
+    <script src="resources/js/trumbowyg/plugins/base64/trumbowyg.base64.min.js"></script>
+    <!-- script src="resources/js/trumbowyg/plugins/cleanpaste/trumbowyg.cleanpaste.min.js"></script -->
+    <script src="resources/js/trumbowyg/plugins/colors/trumbowyg.colors.min.js"></script>
+    <script src="resources/js/trumbowyg/plugins/fontfamily/trumbowyg.fontfamily.min.js"></script>
+    <script src="resources/js/trumbowyg/plugins/fontsize/trumbowyg.fontsize.min.js"></script>
+    <script src="resources/js/trumbowyg/plugins/lineheight/trumbowyg.lineheight.min.js"></script>
+    <script src="resources/js/trumbowyg/plugins/mathml/trumbowyg.mathml.min.js"></script>
+    <script src="resources/js/trumbowyg/plugins/mention/trumbowyg.mention.min.js"></script>
+    <script src="resources/js/trumbowyg/plugins/noembed/trumbowyg.noembed.min.js"></script>
+    <script src="resources/js/trumbowyg/plugins/pasteimage/trumbowyg.pasteimage.min.js"></script>
+    <script src="resources/js/trumbowyg/plugins/preformatted/trumbowyg.preformatted.min.js"></script>
+    <script src="resources/js/trumbowyg/plugins/table/trumbowyg.table.min.js"></script>
+    <script src="resources/js/trumbowyg/plugins/template/trumbowyg.template.min.js"></script>
+    <script src="resources/js/trumbowyg/plugins/upload/trumbowyg.upload.min.js"></script>
+    
     <!-- Tree manager for layer viewers -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.fancytree/2.28.0/jquery.fancytree-all-deps.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/jquery.fancytree/2.28.0/skin-lion/ui.fancytree.min.css"  rel="stylesheet">
@@ -240,7 +257,6 @@
 						</form>
 					</div>
 					<div class="card-action">
-				    	<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="previewEdits();" style="width: 170px;"><i class="material-icons left">cached</i>Preview</a>
 		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="saveMapConfig();" style="width: 170px;"><i class="material-icons left">save</i>Save</a>
 		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="closeEditPanel();" style="width: 170px;"><i class="material-icons left">cancel</i>Close</a>
 		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="$('#editorTabs').tabs('select_tab', 'basemap')" style="width: 170px; position: absolute; right: 30px;"><i class="material-icons right">keyboard_arrow_right</i>Next</a>
@@ -282,16 +298,8 @@
 										<label class="black-text" for="Imagery">Imagery</label>
 									</p>
 									<p>
-										<input name="basemapGroup" type="radio" onclick="setBasemap('ImageryClarity')" id="ImageryClarity" value="ImageryClarity" v-model="viewer.baseMap" />
-										<label class="black-text" for="ImageryClarity">Advanced Imagery</label>
-									</p>
-									<p>
 										<input name="basemapGroup" type="radio" onclick="setBasemap('ShadedRelief')" id="ShadedRelief" value="ShadedRelief" v-model="viewer.baseMap" />
 										<label class="black-text" for="ShadedRelief">Shaded Relief</label>
-									</p>
-									<p>
-										<input name="basemapGroup" type="radio" onclick="setBasemap('Terrain')" id="Terrain" value="Terrain" v-model="viewer.baseMap" />
-										<label class="black-text" for="Terrain">Terrain</label>
 									</p>
 									<div style="height: 20px;"></div>
 									<p>
@@ -309,7 +317,6 @@
 						</form>
 					</div>
 					<div class="card-action">
-				    	<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="previewEdits();" style="width: 170px;"><i class="material-icons left">cached</i>Preview</a>
 		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="saveMapConfig();" style="width: 170px;"><i class="material-icons left">save</i>Save</a>
 		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="closeEditPanel();" style="width: 170px;"><i class="material-icons left">cancel</i>Close</a>
 		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="$('#editorTabs').tabs('select_tab', 'identity')" style="width: 170px; position: absolute; right: 204px;"><i class="material-icons left">keyboard_arrow_left</i>Back</a>
@@ -322,11 +329,11 @@
 					<div class="card-content black-text" style="height: calc(100vh - 280px); overflow: auto;">
 						<form id="layersForm" style="padding: 0px; margin: 0px;">
 							<div id="editLayerPanel" class="row" style="height: 100%; display: none; padding: 0px; margin: 0px;">
-								<div style="position: absolute; bottom: 14px; right: 30px; z-index: 1100;">
+								<div style="position: absolute; bottom: 14px; right: 30px; z-index: 1000;">
 									<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="finishLayerEdits(true);" style="width: 343px; height: 56px;"><i class="material-icons left">backup</i>Done Edits</a>
 								</div>
 								<div style="height: 100%;">
-									<div id="layerEditDataBCPanel" class="col s6" style="display: none; overflow: auto; height: 100%;">
+									<div id="layerEditDataBCPanel" class="col s9" style="display: none; overflow: auto; height: 100%;">
 										<div class="row">
 											<h5>DataBC Catalog Layer</h5>
 										</div>
@@ -358,8 +365,14 @@
 				          						<label for="dbcOpacity">Opacity</label>
 											</div>
 										</div>
+										<div class="row">
+											<div class="col s12 input-field">
+												<input id="dbcDefinitionExpression" type="text">
+				          						<label for="dbcDefinitionExpression">Filter Expression</label>
+											</div>
+										</div>
 									</div>
-									<div id="layerEditWMSPanel" class="col s6" style="display: none; overflow: auto; height: 100%;">
+									<div id="layerEditWMSPanel" class="col s9" style="display: none; overflow: auto; height: 100%;">
 										<div class="row">
 											<h5>WMS Service Layer</h5>
 										</div>
@@ -392,9 +405,9 @@
 											</div>
 										</div>
 									</div>
-									<div id="layerEditVectorPanel" class="col s6" style="display: none; overflow: auto; height: 100%;">
+									<div id="layerEditVectorPanel" class="col s9" style="display: none; overflow: auto; height: 100%;">
 										<div class="row">
-											<h5>File Upload Layer</h5>
+											<h5>Vector Layer</h5>
 										</div>
 										<div class="row" >
 						    				<div class="col s12 input-field">
@@ -414,27 +427,29 @@
 											</div>
 										</div>
 										<div class="row">
-											<div class="col s4 input-field">
+											<div class="col s12 input-field">
 												<input id="vectorEditUrl" type="text">
-				          						<label for="vectorEditUrl">URL</label>
+				          						<label for="vectorEditUrl">External URL</label>
 											</div>
 										</div>
 										<div class="row" >
-											<div class="col s3">
+											<div class="col s4">
 												<input type="checkbox" id="vectorVisible" />
 												<label class="black-text" for="vectorVisible">Visible</label>
 											</div>
-											<div class="col s3">
+											<div class="col s4">
 												<input type="checkbox" id="vectorQueryable" />
 												<label class="black-text" for="vectorQueryable">Identifiable</label>
 											</div>
-											<div class="col s3">
+										</div>
+										<div class="row" >
+											<div class="col s4">
 												<input type="checkbox" id="vectorClustering" />
-												<label class="black-text" for="vectorClustering">Cluster Points</label>
+												<label class="black-text" for="vectorClustering">Display as Cluster</label>
 											</div>
-											<div class="col s3">
-												<input type="checkbox" id="vectorHeatmapping" />
-												<label class="black-text" for="vectorHeatmapping">Heatmap Points</label>
+											<div class="col s4">
+												<input type="checkbox" id="vectorHeatmapping"/>
+												<label class="black-text" for="vectorHeatmapping">Display as Heatmap</label>
 											</div>
 						      			</div>
 						      			<div class="row">
@@ -471,13 +486,47 @@
 												<input id="vectorFillColor" type="color">
 											</div>
 						      			</div>
-						      			
-									</div>
-									<div class="col s6" style="height: 100%;">
-										<div class="row">
-											<h5>Attributes</h5>
+						      			<div class="row">
+											<div class="file-field input-field">
+												<div class="btn nrpp-blue-dark">
+													<span>Custom Point Marker</span>
+													<input type="file" id="customMarkerFileUpload">
+												</div>
+												<div class="file-path-wrapper">
+													<input class="file-path validate" type="text">
+												</div>
+											</div>
 										</div>
-										<div id="attributePanel" style="overflow:  auto; height: calc(100% - 50px);;">
+										<div class="row">
+											<div class="col s6 input-field">
+												<input id="vectorMarkerSizeX" type="text">
+				          						<label for="vectorMarkerSizeX">Marker Size X</label>
+											</div>
+											<div class="col s6 input-field">
+												<input id="vectorMarkerSizeY" type="text">
+				          						<label for="vectorMarkerSizeY">Marker Size Y</label>
+											</div>
+										</div>
+										<div class="row">
+											<div class="col s6 input-field">
+												<input id="vectorMarkerOffsetX" type="text">
+				          						<label for="vectorMarkerOffsetX">Marker Offset X</label>
+											</div>
+											<div class="col s6 input-field">
+												<input id="vectorMarkerOffsetY" type="text">
+				          						<label for="vectorMarkerOffsetY">Marker Offset Y</label>
+											</div>
+										</div>
+										<div class="row">
+											<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="downloadSelectedVector()" style="width: 170px;">Download JSON</a>
+										</div>
+									</div>
+									<div class="col s3">
+										<div class="row">
+											<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="$('#attributesModal').modal('open');" style="width: 170px;">Attributes</a>
+										</div>
+										<div class="row">
+											<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="openQueryEditor();" style="width: 170px;">Queries</a>
 										</div>
 									</div>
 								</div>
@@ -578,7 +627,7 @@
 												      <option value="" disabled selected>Choose vector type</option>
 												      <option value="kml">KML</option>
 												      <option value="kmz">KMZ</option>
-												      <option value="geojson">GeoJSON</option>
+												      <option value="vector">GeoJSON</option>
 												      <!-- <option value="wkt">WKT</option>-->
 												      <!-- <option value="gml">GML</option>-->
 												      <!-- <option value="csv">CSV</option>-->
@@ -589,7 +638,7 @@
 								    		<div class="row">
 								    			<div class="col s12 input-field">
 													<input id="vectorUrl" type="text">
-					          						<label for="vectorUrl">URL Location</label>
+					          						<label for="vectorUrl">External URL</label>
 												</div>
 								    		</div>
 								    		<div class="row" style="margin-left: 1px;">
@@ -602,21 +651,25 @@
 												</div>
 							      			</div>
 							      			<div class="row">
-							      				<div class="col s3">
+							      				<div class="col s4">
 													<input type="checkbox" id="kmlIsVisible" />
 													<label class="black-text" for="kmlIsVisible">Visible</label>
 												</div>
-												<div class="col s3">
+												<div class="col s4">
 													<input type="checkbox" id="kmlQueryable" />
 													<label class="black-text" for="kmlQueryable">Identifiable</label>
 												</div>
-							      				<div class="col s3">
-													<input type="checkbox" id="kmlClustering" />
-													<label class="black-text" for="kmlClustering">Cluster Points</label>
+												<div class="col s4"> 
 												</div>
-												<div class="col s3">
+											</div>
+											<div class="row">
+							      				<div class="col s4">
+													<input type="checkbox" id="kmlClustering" />
+													<label class="black-text" for="kmlClustering">Display as Cluster</label>
+												</div>
+												<div class="col s4">
 													<input type="checkbox" id="kmlHeatmapping" />
-													<label class="black-text" for="kmlHeatmapping">Heatmap Points</label>
+													<label class="black-text" for="kmlHeatmapping">Display as Heatmap</label>
 												</div>
 							      			</div>
 							      			<div class="row" >
@@ -652,8 +705,39 @@
 							    					<label for="kmlFillColor" class="black-text">Fill Color</label>
 													<input id="kmlFillColor" type="color">
 												</div>
-												<div style="height: 100px;"></div>
 							      			</div>
+							      			<div class="row">
+												<div class="file-field input-field">
+													<div class="btn nrpp-blue-dark">
+														<span>Custom Point Marker</span>
+														<input type="file" id="customMarkerFileUpload">
+													</div>
+													<div class="file-path-wrapper">
+														<input class="file-path validate" type="text">
+													</div>
+												</div>
+											</div>
+											<div class="row">
+												<div class="col s6 input-field">
+													<input id="kmlMarkerSizeX" type="text">
+					          						<label for="kmlMarkerSizeX">Marker Size X</label>
+												</div>
+												<div class="col s6 input-field">
+													<input id="kmlMarkerSizeY" type="text">
+					          						<label for="kmlMarkerSizeY">Marker Size Y</label>
+												</div>
+											</div>
+											<div class="row">
+												<div class="col s6 input-field">
+													<input id="kmlMarkerOffsetX" type="text">
+					          						<label for="kmlMarkerOffsetX">Marker Offset X</label>
+												</div>
+												<div class="col s6 input-field">
+													<input id="kmlMarkerOffsetY" type="text">
+					          						<label for="kmlMarkerOffsetY">Marker Offset Y</label>
+												</div>
+											</div>
+											<div style="height: 100px;"></div>
 								    	</div>
 									</ul>
 								</div>
@@ -697,7 +781,6 @@
 						</form>
 					</div>
 					<div class="card-action">
-				    	<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="previewEdits();" style="width: 170px;"><i class="material-icons left">cached</i>Preview</a>
 		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="saveMapConfig();" style="width: 170px;"><i class="material-icons left">save</i>Save</a>
 		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="closeEditPanel();" style="width: 170px;"><i class="material-icons left">cancel</i>Close</a>
 		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="$('#editorTabs').tabs('select_tab', 'basemap')" style="width: 170px; position: absolute; right: 204px;"><i class="material-icons left">keyboard_arrow_left</i>Back</a>
@@ -787,7 +870,6 @@
 										      <div class="collapsible-header"><i class="material-icons">home</i>About Panel Options</div>
 										      <div class="collapsible-body">
 										      	<div class="row" >
-										      		<div id="about-toolbar"></div>
 										      		<div id="about-content" style="height: 75%"></div>
 										      	</div>
 											  </div>
@@ -866,16 +948,8 @@
 														<label class="black-text" for="ImageryMini">Imagery</label>
 													</p>
 													<p>
-														<input name="minimapGroup" type="radio" onclick="setMinimapBasemap('ImageryClarity')" id="ImageryClarityMini" value="ImageryClarity" />
-														<label class="black-text" for="ImageryClarityMini">Advanced Imagery</label>
-													</p>
-													<p>
 														<input name="minimapGroup" type="radio" onclick="setMinimapBasemap('ShadedRelief')" id="ShadedReliefMini" value="ShadedRelief" />
 														<label class="black-text" for="ShadedReliefMini">Shaded Relief</label>
-													</p>
-													<p>
-														<input name="minimapGroup" type="radio" onclick="setMinimapBasemap('Terrain')" id="TerrainMini" value="Terrain" />
-														<label class="black-text" for="TerrainMini">Terrain</label>
 													</p>
 										      	</div>
 											  </div>
@@ -915,17 +989,88 @@
 														<label class="black-text" for="ImageryBml">Imagery</label>
 													</p>
 													<p>
-														<input type="checkbox" onclick="setBasemapSelector('ImageryClarity')" id="ImageryClarityBml" value="ImageryClarity" />
-														<label class="black-text" for="ImageryClarityBml">Advanced Imagery</label>
-													</p>
-													<p>
 														<input type="checkbox" onclick="setBasemapSelector('ShadedRelief')" id="ShadedReliefBml" value="ShadedRelief" />
 														<label class="black-text" for="ShadedReliefBml">Shaded Relief</label>
 													</p>
-													<p>
-														<input type="checkbox" onclick="setBasemapSelector('Terrain')" id="TerrainBml" value="Terrain" />
-														<label class="black-text" for="TerrainBml">Terrain</label>
-													</p>
+											  </div>
+										    </li>
+										    <li id="identifyOptions" style="display: none;">
+										      <div class="collapsible-header"><i class="material-icons">search</i>Identify Options</div>
+										      <div class="collapsible-body">
+												<div class="row" >
+													<div class="col s4 input-field">
+														<input id="identifyStyleOpacity" type="text">
+						          						<label for="identifyStyleOpacity">Opacity</label>
+													</div>
+													<div class="col s4 input-field">
+														<input id="identifyStyleStrokeOpacity" type="text">
+						          						<label for="identifyStyleStrokeOpacity">Stroke Opacity</label>
+													</div>
+													<div class="col s4 input-field">
+														<input id="identifyStyleFillOpacity" type="text">
+						          						<label for="identifyStyleFillOpacity">Fill Opacity</label>
+													</div>
+								      			</div>
+								      			<div class="row" >
+								      				<div class="col s4 input-field">
+														<input id="identifyStyleStrokeWidth" type="text">
+						          						<label for="identifyStyleStrokeWidth">Stroke Width</label>
+													</div>
+													<div class="col s4 input-field">
+														<input id="identifyStyleStrokeStyle" type="text">
+						          						<label for="identifyStyleStrokeStyle">Stroke Style</label>
+													</div>
+												</div>
+												<div class="row" >
+								    				<div class="col s4">
+														<label for="identifyStyleStrokeColor" class="black-text">Stroke Color</label>
+														<input id="identifyStyleStrokeColor" type="color">
+													</div>
+													<div class="col s4">
+								    					<label for="identifyStyleFillColor" class="black-text">Fill Color</label>
+														<input id="identifyStyleFillColor" type="color">
+													</div>
+								      			</div>
+											  </div>
+										    </li>
+										    <li id="selectionOptions" style="display: none;">
+										      <div class="collapsible-header"><i class="material-icons">select_all</i>Select Options</div>
+										      <div class="collapsible-body">
+												<div class="row" >
+													<div class="col s4 input-field">
+														<input id="selectStyleOpacity" type="text">
+						          						<label for="selectStyleOpacity">Opacity</label>
+													</div>
+													<div class="col s4 input-field">
+														<input id="selectStyleStrokeOpacity" type="text">
+						          						<label for="selectStyleStrokeOpacity">Stroke Opacity</label>
+													</div>
+													<div class="col s4 input-field">
+														<input id="selectStyleFillOpacity" type="text">
+						          						<label for="selectStyleFillOpacity">Fill Opacity</label>
+													</div>
+								      			</div>
+								      			<div class="row" >
+								      				<div class="col s4 input-field">
+														<input id="selectStyleStrokeWidth" type="text">
+						          						<label for="selectStyleStrokeWidth">Stroke Width</label>
+													</div>
+													<div class="col s4 input-field">
+														<input id="selectStyleStrokeStyle" type="text">
+						          						<label for="selectStyleStrokeStyle">Stroke Style</label>
+													</div>
+												</div>
+												<div class="row" >
+								    				<div class="col s4">
+														<label for="selectStyleStrokeColor" class="black-text">Stroke Color</label>
+														<input id="selectStyleStrokeColor" type="color">
+													</div>
+													<div class="col s4">
+								    					<label for="selectStyleFillColor" class="black-text">Fill Color</label>
+														<input id="selectStyleFillColor" type="color">
+													</div>
+													<div style="height: 100px;"></div>
+								      			</div>
 											  </div>
 										    </li>
 										  </ul>
@@ -935,7 +1080,6 @@
 						</form>
 					</div>
 					<div class="card-action">
-				    	<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="previewEdits();" style="width: 170px;"><i class="material-icons left">cached</i>Preview</a>
 		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="saveMapConfig();" style="width: 170px;"><i class="material-icons left">save</i>Save</a>
 		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="closeEditPanel();" style="width: 170px;"><i class="material-icons left">cancel</i>Close</a>
 		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="$('#editorTabs').tabs('select_tab', 'layers')" style="width: 170px; position: absolute; right: 204px;"><i class="material-icons left">keyboard_arrow_left</i>Back</a>
@@ -965,13 +1109,9 @@
 									</div>
 								</div>
 							</div>
-							<div class="row">
-								<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="uploadSurroundHeader();"><i class="material-icons left">backup</i>Upload Changes</a>
-							</div>
 						</form>
 					</div>
 					<div class="card-action">
-				    	<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="previewEdits();" style="width: 170px;"><i class="material-icons left">cached</i>Preview</a>
 		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="saveMapConfig();" style="width: 170px;"><i class="material-icons left">save</i>Save</a>
 		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="closeEditPanel();" style="width: 170px;"><i class="material-icons left">cancel</i>Close</a>
 		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="$('#editorTabs').tabs('select_tab', 'tools')" style="width: 170px; position: absolute; right: 30px;"><i class="material-icons left">keyboard_arrow_left</i>Back</a>
@@ -982,8 +1122,105 @@
 	    </div>
 		<!-- Footer -->
 		<div id="footer" class="footer nrpp-blue-dark">
-		</div>
+		</div>  
 	</div>
+	<!-- modal dialogs -->
+    <div id="attributesModal" class="modal modal-fixed-footer">
+      <div class="modal-content">
+		<div class="row">
+			<h5>Attributes</h5>
+		</div>
+		<div id="attributePanel" class="row">
+		</div>
+      </div>
+      <div class="modal-footer">
+        <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat">Close</a>
+      </div>
+    </div>
+    <div id="queriesModal" class="modal modal-fixed-footer">
+      <div class="modal-content">
+      	<div id="queryTable">
+			<div class="row">
+				<h5>Queries</h5>
+			</div>
+			<div id="queriesPanel">
+				<div class="row">
+				   <table class="bordered highlight responsive-table" id="queriesTable">
+		            <thead>
+		              <tr>
+		              	<th>ID</th>
+		                <th>Name</th>
+		                <th>Description</th>
+		                <th></th>
+		                <th></th>
+		              </tr>
+		            </thead>
+		            <tbody>
+		            </tbody>
+		          </table>
+				</div>
+			</div>
+			<div class="row">
+				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="addNewQuery();" style="width: 170px;"><i class="material-icons left">save</i>Add New</a>
+			</div>
+		</div>
+		<div id="queryEditor" style="display: none;">
+			<form id="queryEditorForm">
+				<div class="row">
+					<div class="col s4 input-field">
+						<input id="queryName" type="text">
+						<label for="queryName">Name</label>
+					</div>
+					<div class="col s8 input-field">
+						<input id="queryDescription" type="text">
+						<label for="queryDescription">Description</label>
+					</div>
+				</div>
+				<div class="row">
+					<!-- And/Or toggle  -->
+					<p>Select "And" to query all arguments together. Select "Or" if each argument is a separate query</p>
+					<div class="switch">
+						<label>
+							All
+	      					<input id="queryAndOrToggle" type="checkbox">
+	      					<span class="lever"></span>
+	      					Any
+	    				</label>
+	  				</div>
+				</div>
+				<div id="queryArguments">
+				</div>
+				<div class="row">
+					<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="addNewQueryArgument();" style="width: 220px;"><i class="material-icons left">add</i>Add Argument</a>
+				</div>
+				<div class="row">
+					<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="saveQuery();" style="width: 220px;"><i class="material-icons left">save</i>Save Query</a>
+				</div>
+			</form>
+		</div>
+      </div>
+      <div class="modal-footer">
+        <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat">Close</a>
+      </div>
+    </div>
+    <div id="queryDropdownModal" class="modal modal-fixed-footer">
+      <div class="modal-content">
+		<div class="row">
+			<h5>Dropdown Choices</h5>
+		</div>
+		<div class="row">
+			<p>Dropdown choices are seen below as a comma separated list. To add options, enter them in the text box below.</p>
+		</div>
+		<div id="dropdownOptionsPanel">
+	    </div>
+	    <div class="row">
+			<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="addNewChoice();" style="width: 220px;"><i class="material-icons left">add</i>Add Choice</a>
+		</div>
+      </div>
+      <div class="modal-footer">
+        <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat">Close</a>
+      </div>
+    </div>    
 	<script type="text/javascript">
 	</script>
   </body>

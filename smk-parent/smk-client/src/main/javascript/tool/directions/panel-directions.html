@@ -5,24 +5,48 @@
     </template>
 
     <template slot="commands">
-        <div class="smk-command-col">
+        <span class="smk-command-col">
             <div class="smk-command"
                 v-bind:class="{ 'smk-disabled': busy }"
-                v-on:click="$$emit( 'reverse' )"
+                v-on:click="!busy && $$emit( 'reverse' )"
             >Reverse</div>
 
             <div class="smk-command"
                 v-bind:class="{ 'smk-disabled': busy }"
-                v-on:click="$$emit( 'clear' )"
+                v-on:click="!busy && $$emit( 'clear' )"
             >Reset</div>
-        </div>
-        <span class="smk-command-col">
-            <label class="smk-command" v-bind:class="{ 'smk-disabled': busy }"><input type="checkbox" v-model="optimal" v-on:change="$$emit( 'option' )">Optimal order</label><br/>
-            <label class="smk-command" v-bind:class="{ 'smk-disabled': busy }"><input type="checkbox" v-model="roundTrip" v-on:change="$$emit( 'option' )">Round trip</label>
         </span>
+
         <span class="smk-command-col">
-            <label class="smk-command" v-bind:class="{ 'smk-disabled': busy }"><input type="radio" v-model="criteria" value="shortest" v-on:change="$$emit( 'option' )">Shortest</label><br/>
-            <label class="smk-command" v-bind:class="{ 'smk-disabled': busy }"><input type="radio" v-model="criteria" value="fastest" v-on:change="$$emit( 'option' )">Fastest</label>
+            <label class="smk-command"
+                v-bind:class="{ 'smk-disabled': busy }"
+            ><input type="checkbox"
+                v-model="optimal"
+                v-on:change="!busy && $$emit( 'config', getConfigState() )"
+            >Optimal order</label>
+
+            <label class="smk-command"
+                v-bind:class="{ 'smk-disabled': busy }"
+            ><input type="checkbox"
+                v-model="roundTrip"
+                v-on:change="!busy && $$emit( 'config', getConfigState() )"
+            >Round trip</label>
+        </span>
+
+        <span class="smk-command-col">
+            <label class="smk-command"
+                v-bind:class="{ 'smk-disabled': busy }"
+            ><input type="radio" value="shortest"
+                v-model="criteria"
+                v-on:change="!busy && $$emit( 'config', getConfigState() )"
+            >Shortest</label>
+
+            <label class="smk-command"
+                v-bind:class="{ 'smk-disabled': busy }"
+            ><input type="radio" value="fastest"
+                v-model="criteria"
+                v-on:change="!busy && $$emit( 'config', getConfigState() )"
+            >Fastest</label>
         </span>
     </template>
 
@@ -37,22 +61,20 @@
         v-bind:options="{ handle: '.smk-handle', disabled: optimal }"
         v-on:end="$$emit( 'changed-waypoints' )"
     >
-        <div class="smk-waypoint"
+        <div class="smk-waypoint smk-item"
             v-for="( node, i ) in waypoints"
         >
-            <span class="smk-command smk-handle"
+            <i class="smk-command smk-icon smk-handle material-icons"
                 v-bind:class="{ 'smk-disabled': optimal || busy }"
                 v-bind:title="optimal ? 'Optimal order' : 'Drag to reorder'"
-            >
-                <i class="material-icons">drag_handle</i>
-            </span>
+            >drag_handle</i>
 
             <address-search class="smk-description" placeholder="Click on point, or enter address"
                 v-model="node.description"
                 v-on:update="$$emit( 'update-waypoint', { index: i, item: $event } )"
             ></address-search>
 
-            <span class="smk-command smk-zoomto" title="Zoom to this waypoint"
+            <i class="smk-command smk-icon smk-zoomto material-icons" title="Zoom to this waypoint"
                 v-on:click="node.location && $$emit( 'zoom-waypoint', { location: node.location, index: i } )"
                 v-bind:class="{
                     'smk-disabled': !node.location,
@@ -60,16 +82,12 @@
                     'smk-middle':   node.location && firstWaypointIndex != i && lastWaypointIndex != i,
                     'smk-last':     lastWaypointIndex == i && firstWaypointIndex != i
                 }"
-            >
-                <i class="material-icons">location_on</i>
-            </span>
+            >location_on</i>
 
-            <span class="smk-command smk-remove" title="Remove this waypoint"
+            <i class="smk-command smk-icon smk-remove material-icons" title="Remove this waypoint"
                 v-on:click="waypoints.length > 2 && node.location && $$emit( 'remove-waypoint', { index: i } )"
                 v-bind:class="{ 'smk-disabled': !node.location || waypoints.length < 3 || busy }"
-            >
-                <i class="material-icons">delete</i>
-            </span>
+            >delete</i>
         </div>
     </draggable>
 

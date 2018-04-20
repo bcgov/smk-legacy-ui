@@ -1,7 +1,8 @@
-include.module( 'tool-markup', [ 'smk', 'tool' ], function () {
+include.module( 'tool-markup', [ 'tool' ], function () {
 
     function MarkupTool( option ) {
         SMK.TYPE.Tool.prototype.constructor.call( this, $.extend( {
+            order: 3
         }, option ) )
     }
 

@@ -1,20 +1,22 @@
-include.module( 'tool-menu', [ 'smk', 'tool', 'widgets', 'tool-menu.panel-menu-html' ], function ( inc ) {
+include.module( 'tool-menu', [ 'tool', 'widgets', 'tool-menu.panel-menu-html' ], function ( inc ) {
 
     Vue.component( 'menu-widget', {
         extends: inc.widgets.toolButton,
     } )
 
     Vue.component( 'menu-panel', {
+        extends: inc.widgets.toolPanel,
         template: inc[ 'tool-menu.panel-menu-html' ],
-        props: [ 'title', 'visible', 'enabled', 'active', 'subWidgets', 'subPanels', 'activeToolType' ]
+        props: [ 'visible', 'enabled', 'active', 'subWidgets', 'subPanels', 'activeToolId' ]
     } )
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
     function MenuTool( option ) {
         this.makePropWidget( 'icon', 'menu' )
+
         this.makePropPanel( 'subWidgets', [] )
         this.makePropPanel( 'subPanels', {} )
-        this.makePropPanel( 'activeToolType', null )
+        this.makePropPanel( 'activeToolId', null )
 
         SMK.TYPE.Tool.prototype.constructor.call( this, $.extend( {
             title:          null,
@@ -29,34 +31,35 @@ include.module( 'tool-menu', [ 'smk', 'tool', 'widgets', 'tool-menu.panel-menu-h
     MenuTool.prototype.afterInitialize = []
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
-    MenuTool.prototype.afterInitialize.push( function ( smk, aux ) {
+    MenuTool.prototype.afterInitialize.push( function ( smk ) {
         var self = this
 
-        aux.toolbar.vm.$on( 'menu-widget.click', function () {
-            if ( !self.visible || !self.enabled ) return
+        smk.on( this.id, {
+            'activate': function () {
+                if ( !self.visible || !self.enabled ) return
 
-            self.active = !self.active
+                self.active = !self.active
+            }
         } )
 
         self.changedActive( function () {
             if ( self.selectedTool )
                 self.selectedTool.active = self.active
         } )
-
-        aux.menu.setContainer( this )
     } )
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
-    MenuTool.prototype.add = function ( tool ) {
+    MenuTool.prototype.addTool = function ( tool ) {
         var self = this
 
         this.subWidgets.push( {
+            id: tool.id,
             type: tool.type,
             widgetComponent: tool.widgetComponent,
             widget: tool.widget
         } )
 
-        Vue.set( this.subPanels, tool.type, {
+        Vue.set( this.subPanels, tool.id, {
             panelComponent: tool.panelComponent,
             panel: tool.panel
         } )
@@ -66,7 +69,7 @@ include.module( 'tool-menu', [ 'smk', 'tool', 'widgets', 'tool-menu.panel-menu-h
 
         tool.changedActive( function () {
             if ( tool.active ) {
-                if ( self.selectedTool.type != tool.type ) {
+                if ( self.selectedTool.id != tool.id ) {
                     var prev = self.selectedTool
                     self.selectedTool = tool
                     prev.active = false
@@ -74,12 +77,12 @@ include.module( 'tool-menu', [ 'smk', 'tool', 'widgets', 'tool-menu.panel-menu-h
                 self.active = true
             }
             else {
-                if ( self.selectedTool.type == tool.type && self.active )
+                if ( self.selectedTool.id == tool.id && self.active )
                     tool.active = true
             }
 
-            if ( tool.type == self.selectedTool.type )
-                self.activeToolType = tool.active ? tool.type : null
+            if ( tool.id == self.selectedTool.id )
+                self.activeToolId = tool.active ? tool.id : null
         } )
     }
 

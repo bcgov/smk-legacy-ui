@@ -1,4 +1,4 @@
-include.module( 'layer-leaflet', [ 'smk', 'layer', 'util' ], function () {
+include.module( 'layer-leaflet', [ 'layer', 'util' ], function () {
 
     function defineLayerType( name, def ) {
         var base = SMK.TYPE.Layer[ name ].base
@@ -156,21 +156,25 @@ include.module( 'layer-leaflet', [ 'smk', 'layer', 'util' ], function () {
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    defineLayerType( 'geojson', {
+    defineLayerType( 'vector', {
 
         getFeaturesAtPoint: getVectorFeaturesAtPoint
 
     } )
 
-    SMK.TYPE.Layer[ 'geojson' ].leaflet.create = function ( layers, zIndex ) {
+    SMK.TYPE.Layer[ 'vector' ].leaflet.create = function ( layers, zIndex ) {
+        var self = this
+
         if ( layers.length != 1 ) throw new Error( 'only 1 config allowed' )
+        if ( ( layers[0].useClustering + layers[0].useHeatmap + layers[0].useRaw ) > 1 ) throw new Error( 'raw or heatmap or clustering' )
 
         var layer = new L.geoJson( null, {
             pointToLayer: function ( geojson, latlng ) {
-                return L.circleMarker( latlng )
+                return markerForStyle.call( self, latlng, layers[ 0 ].config.style )
             },
             onEachFeature: function ( feature, layer ) {
-                layer.setStyle( convertStyle( layers[ 0 ].config.style, feature.geometry.type ) )
+                if ( layer.setStyle )
+                    layer.setStyle( convertStyle( layers[ 0 ].config.style, feature.geometry.type ) )
             },
             renderer: L.svg(),
             interactive: false
@@ -184,18 +188,45 @@ include.module( 'layer-leaflet', [ 'smk', 'layer', 'util' ], function () {
         } )
 
         if ( !layers[ 0 ].config.dataUrl )
-            layers[ 0 ].config.dataUrl = this.resolveAttachmentUrl( layers[ 0 ].config.id, layers[ 0 ].config.type )
+            layers[ 0 ].config.dataUrl = this.resolveAttachmentUrl( layers[ 0 ].config.id, 'geojson' )
+        else if ( layers[ 0 ].config.dataUrl.startsWith( '@' ) )
+            layers[ 0 ].config.dataUrl = this.resolveAttachmentUrl( layers[ 0 ].config.dataUrl.substr( 1 ), 'geojson' )
 
         if ( !layers[ 0 ].config.CRS )
             layers[ 0 ].config.CRS = 'EPSG4326'
 
-        return $.get( layers[ 0 ].config.dataUrl, null, null, 'json' )
+        return SMK.UTIL.makePromise( function ( res, rej ) {
+                $.get( layers[ 0 ].config.dataUrl, null, null, 'json' ).then( res, rej )
+            } )
             .then( function ( data ) {
                 console.log( 'loaded', layers[ 0 ].config.dataUrl )
                 layer.addData( data )
                 return layer
             } )
+            .then( function ( layer ) {
+                if ( !layers[ 0 ].config.useClustering ) return layer
+
+                var cluster = L.markerClusterGroup()
+                cluster.addLayers( [ layer ] )
+
+                return cluster
+            } )
+            .then( function ( layer ) {
+                if ( !layers[ 0 ].config.useHeatmap ) return layer
+
+				var points = [];
+				var intensity = 100;
+
+				layer.eachLayer( function ( ly ) {
+					var centroid = turf.centroid( ly.feature.geometry )
+					points.push( [ centroid.geometry.coordinates[ 1 ], centroid.geometry.coordinates[ 0 ], intensity ] )
+				});
+
+				return L.heatLayer( points, { radius: 25 } )
+            } )
     }
+
+    SMK.TYPE.Layer[ 'geojson' ].leaflet = SMK.TYPE.Layer[ 'vector' ].leaflet
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -226,31 +257,64 @@ include.module( 'layer-leaflet', [ 'smk', 'layer', 'util' ], function () {
             }
     }
 
+    function markerForStyle( latlng, styleConfig ) {
+        if ( styleConfig.markerUrl ) {
+            return L.marker( latlng, {
+                icon: styleConfig.marker || ( styleConfig.marker = L.icon( {
+                    iconUrl: this.resolveAttachmentUrl( styleConfig.markerUrl.substr( 1 ), '' ),
+                    iconSize: styleConfig.markerSize,
+                    iconAnchor: styleConfig.markerOffset,
+                } ) ),
+                interactive: false
+            } )
+        }
+        else {
+            return L.circleMarker( latlng, {
+                interactive: false
+            } )
+        }
+    }
+
     function getVectorFeaturesAtPoint( location, view, option ) {
         var self = this
 
         if ( !option.layer ) return
 
-        var fs = []
-        option.layer.eachLayer( function ( sly ) {
-            var geoj = sly.toGeoJSON()
-            if ( geoj.geometry.type == 'Polygon' || geoj.geometry.type == 'MultiPolygon' ) {
-                var inp = turf.booleanPointInPolygon( [ location.map.longitude, location.map.latitude ] , geoj )
-                if ( inp ) fs.push( geoj )
-            }
-            else {
-                console.log( 'skip', geoj.geometry.type )
+        var features = []
+        var test = [ location.map.longitude, location.map.latitude ]
+        var toleranceKm = option.tolerance * view.metersPerPixel / 1000;
+
+        option.layer.eachLayer( function ( ly ) {
+            var ft = ly.toGeoJSON()
+
+            switch ( ft.geometry.type ) {
+            case 'Polygon':
+            case 'MultiPolygon':
+                if ( turf.booleanPointInPolygon( test, ft ) ) features.push( ft )
+                break
+
+            case 'LineString':
+            case 'MultiLineString':
+                var close = turf.segmentReduce( ft, function ( accum, segment ) {
+                    return accum || turf.pointToLineDistance( test, segment ) < toleranceKm
+                }, false )
+                if ( close ) features.push( ft )
+                break
+
+            case 'Point':
+            case 'MultiPoint':
+                var close = turf.coordReduce( ft, function ( accum, coord ) {
+                    return accum || turf.distance( coord, test ) < toleranceKm
+                }, false )
+                if ( close ) features.push( ft )
+                break
+
+            default:
+                console.warn( 'skip', ft.geometry.type )
             }
         } )
 
-        fs.forEach( function ( f, i ) {
-            if ( self.config.titleAttribute )
-                f.title = r.attributes[ self.config.titleAttribute ]
-            else
-                f.title = 'Feature #' + ( i + 1 )
-        } )
-
-        return fs
+        return features
     }
 
 } )
