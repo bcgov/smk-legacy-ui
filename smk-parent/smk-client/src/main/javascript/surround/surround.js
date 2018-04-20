@@ -9,7 +9,9 @@ include.module( 'surround', [ 'vue', 'surround.header-html' ], function ( inc ) 
             el: el,
             data: Object.assign( {
                 lmfId: smk.lmfId,
-                imageSrc: null
+                imageSrc: null,
+                title: null,
+                subtitles: null,
             }, smk.surround ),
             methods: {
                 url: function ( url ) {

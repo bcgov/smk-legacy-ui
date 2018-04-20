@@ -284,7 +284,7 @@
                             "value": "kamloops"
                         }
                     ],
-                    "clause": {
+                    "predicate": {
                         "operator": "or",
                         "arguments": [
                             {
@@ -342,7 +342,7 @@
                             "value": "100"
                         }
                     ],
-                    "clause": {
+                    "predicate": {
                         "operator": "and",
                         "arguments": [
                             {
@@ -380,7 +380,7 @@
                             "value": "Observation"
                         }
                     ],
-                    "clause": {
+                    "predicate": {
                         "operator": "and",
                         "arguments": [
                             {
@@ -431,7 +431,7 @@
                             "value": "Observation"
                         }
                     ],
-                    "clause": {
+                    "predicate": {
                         "operator": "or",
                         "arguments": [
                             {
@@ -540,7 +540,7 @@
                             ]
                         }
                     ],
-                    "clause": {
+                    "predicate": {
                         "operator": "or",
                         "arguments": [
                             {
@@ -590,7 +590,7 @@
                             "value": "foo"
                         }
                     ],
-                    "clause": {
+                    "predicate": {
                         "operator": "and",
                         "arguments": [
                             {

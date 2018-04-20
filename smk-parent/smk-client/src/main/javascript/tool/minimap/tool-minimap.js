@@ -1,4 +1,4 @@
-include.module( 'tool-minimap', [ 'smk', 'tool' ], function () {
+include.module( 'tool-minimap', [ 'tool' ], function () {
 
     function MinimapTool( option ) {
         SMK.TYPE.Tool.prototype.constructor.call( this, $.extend( {

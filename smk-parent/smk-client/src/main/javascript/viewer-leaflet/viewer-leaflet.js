@@ -29,14 +29,17 @@ include.module( 'viewer-leaflet', [ 'viewer', 'leaflet' ], function () {
 
         self.map.scrollWheelZoom.disable()
 
-        if ( smk.viewer ) {
-            if ( smk.viewer.initialExtent ) {
-                var bx = smk.viewer.initialExtent
-                self.map.fitBounds( [ [ bx[ 1 ], bx[ 0 ] ], [ bx[ 3 ], bx[ 2 ] ] ] );
-            }
+        if ( smk.viewer.location.extent ) {
+            var bx = smk.viewer.location.extent
+            self.map.fitBounds( [ [ bx[ 1 ], bx[ 0 ] ], [ bx[ 3 ], bx[ 2 ] ] ] )
+        }
 
-            if ( smk.viewer.baseMap )
-                self.setBasemap( smk.viewer.baseMap )
+        if ( smk.viewer.location.center && !smk.viewer.location.extent ) {
+            self.map.flyTo( [ smk.viewer.location.center[ 1 ], smk.viewer.location.center[ 0 ] ], smk.viewer.location.zoom, { animate: false } )
+        }
+
+        if ( smk.viewer.baseMap ) {
+            self.setBasemap( smk.viewer.baseMap )
         }
 
         function changedView() {

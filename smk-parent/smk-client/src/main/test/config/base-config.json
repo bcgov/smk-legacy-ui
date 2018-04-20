@@ -10,7 +10,9 @@
     "viewer": {
         "type": "leaflet",
 
-        "initialExtent": [ -139.1782, 47.6039, -110.3533, 60.5939 ],
+        "location": {
+            "extent": [ -139.1782, 47.6039, -110.3533, 60.5939 ]
+        },
 
         "baseMap": "Streets"
     },
@@ -45,9 +47,6 @@
         { "type": "search" },
         { "type": "identify" },
         { "type": "select" },
-        { "type": "queries", "enabled": false },
-        { "type": "query", "instance": "746--query1", "position": "menu", "icon": "account_balance" },
-        { "type": "query", "instance": "746--query2", "position": "toolbar", "icon": "account_box" },
-        { "type": "query", "instance": "746--query3", "icon": "bug_report" }
+        { "type": "menu", "enabled": true }
     ]
 }

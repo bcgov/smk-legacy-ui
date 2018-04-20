@@ -43,14 +43,14 @@
         <span class="smk-navigator"
             v-bind:class="{ 'smk-hidden': !hasMultiple }"
         >
-            <i class="material-icons smk-move smk-command"
+            <i class="material-icons smk-move smk-command smk-icon"
                 v-on:click="movePrevious()"
             >navigate_before</i>
 
             <span class="smk-position"
             >{{ position }}</span>
 
-            <i class="material-icons smk-move smk-command"
+            <i class="material-icons smk-move smk-command smk-icon"
                 v-on:click="moveNext()"
             >navigate_next</i>
         </span>

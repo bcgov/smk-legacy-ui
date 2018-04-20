@@ -51,3 +51,4 @@ smk-parent/smk-client/node_modules
 smk-parent/smk-client/build
 smk-parent/smk-client/node
 .DS_Store
+.vscode/settings.json

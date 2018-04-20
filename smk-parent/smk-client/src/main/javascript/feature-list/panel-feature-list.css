@@ -48,11 +48,15 @@
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    align-items: flex-start;
+    align-items: center;
 }
 
 .smk-feature-list-panel .smk-layer .smk-feature span {
     flex-basis: 100%;
+    margin-left: 5px;
+    font-size: 14px;
+    margin-top: 5px;
+    margin-bottom: 5px;
 }
 
 .smk-feature-list-panel .smk-layer .smk-feature.smk-highlighted {
@@ -75,29 +79,37 @@
     font-weight: bold;
     font-size: 15px;
     margin-bottom: 5px;
-    margin-top: -5px;
     text-align: center;
     min-height: 40px;
+    border-radius: 10px;
+    background-color: rgb(87.8%, 100%, 88.6%);
 
-    display: flex;
+    display: none;
     flex-direction: column;
     justify-content: center;
     align-items: center;
 }
 
 .smk-feature-list-panel .smk-message.smk-error {
+    display: flex;
     color: red;
+    background-color: rgb(100%, 87.8%, 87.8%);
 }
 
 .smk-feature-list-panel .smk-message.smk-summary {
+    display: flex;
 }
 
 .smk-feature-list-panel .smk-message.smk-progress {
+    display: flex;
     color: blue;
+    background-color: rgb(87%, 96.5%, 99.1%);
 }
 
 .smk-feature-list-panel .smk-message.smk-warning {
+    display: flex;
     color: orange;
+    background-color: rgb(100%, 94.4%, 87.8%);
 }
 
 .smk-feature-list-panel .smk-submessage {

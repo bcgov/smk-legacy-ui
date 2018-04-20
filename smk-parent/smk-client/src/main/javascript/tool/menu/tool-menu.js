@@ -1,4 +1,4 @@
-include.module( 'tool-menu', [ 'smk', 'tool', 'widgets', 'tool-menu.panel-menu-html' ], function ( inc ) {
+include.module( 'tool-menu', [ 'tool', 'widgets', 'tool-menu.panel-menu-html' ], function ( inc ) {
 
     Vue.component( 'menu-widget', {
         extends: inc.widgets.toolButton,

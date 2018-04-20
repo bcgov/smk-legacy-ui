@@ -1,4 +1,4 @@
-include.module( 'layer-esri3d', [ 'smk', 'layer', 'util', 'types-esri3d' ], function () {
+include.module( 'layer-esri3d', [ 'layer', 'util', 'types-esri3d' ], function () {
 
     var E = SMK.TYPE.Esri3d
 

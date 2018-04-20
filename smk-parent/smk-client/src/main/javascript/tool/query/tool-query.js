@@ -1,4 +1,4 @@
-include.module( 'tool-query', [ 'smk', 'tool', 'widgets', 'tool-query.panel-query-html', 'tool-query.parameter-input-html', 'tool-query.parameter-select-html', 'tool-query.parameter-constant-html' ], function ( inc ) {
+include.module( 'tool-query', [ 'tool', 'widgets', 'tool-query.panel-query-html', 'tool-query.parameter-input-html', 'tool-query.parameter-select-html', 'tool-query.parameter-constant-html' ], function ( inc ) {
 
     Vue.component( 'parameter-constant', {
         template: inc[ 'tool-query.parameter-constant-html' ],
@@ -134,6 +134,17 @@ include.module( 'tool-query', [ 'smk', 'tool', 'widgets', 'tool-query.panel-quer
     QueryTool.prototype.afterInitialize.push( function ( smk ) {
         var self = this
 
+        self.changedActive( function () {
+            if ( self.active ) {
+                switch ( self.onActivate ) {
+                case 'execute':
+                    smk.emit( self.id, 'execute' )
+                    break;
+
+                }
+            }
+        } )
+
         smk.on( this.id, {
             'activate': function () {
                 if ( !self.visible || !self.enabled ) return
@@ -172,9 +183,9 @@ include.module( 'tool-query', [ 'smk', 'tool', 'widgets', 'tool-query.panel-quer
                     param[ p.prop.id ] = $.extend( {}, p.prop )
                 } )
 
-                return self.query.queryLayer( param, self.config, smk.$viewer )
+                return self.query.queryLayer( param, self.config, smk.$viewer, self.query.layer.id )
                     .then( function ( features ) {
-                        self.featureSet.add( self.query.layer.config.id, features )
+                        self.featureSet.add( self.query.layer.id, features )
                     } )
                     .catch( function ( err ) {
                         self.setMessage( 'Query returned no results', 'warning' )

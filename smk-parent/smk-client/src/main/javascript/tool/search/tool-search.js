@@ -1,4 +1,4 @@
-include.module( 'tool-search', [ 'smk', 'tool', 'widgets', 'tool-search.widget-search-html', 'tool-search.panel-search-html', 'tool-search.popup-search-html' ], function ( inc ) {
+include.module( 'tool-search', [ 'tool', 'widgets', 'tool-search.widget-search-html', 'tool-search.panel-search-html', 'tool-search.popup-search-html' ], function ( inc ) {
 
     var request
 
@@ -39,7 +39,7 @@ include.module( 'tool-search', [ 'smk', 'tool', 'widgets', 'tool-search.widget-s
     Vue.component( 'search-widget', {
         mixins: [ inc.widgets.emit ],
         template: inc[ 'tool-search.widget-search-html' ],
-        props: [ 'id', 'title', 'visible', 'enabled', 'active', 'icon', 'type', 'initialSearch' ],
+        props: [ 'id', 'type', 'title', 'visible', 'enabled', 'active', 'icon', 'type', 'initialSearch' ],
         data: function () {
             return {
                 search: null
@@ -48,6 +48,23 @@ include.module( 'tool-search', [ 'smk', 'tool', 'widgets', 'tool-search.widget-s
         watch: {
             initialSearch: function () {
                 this.search = null
+            }
+        },
+        computed: {
+            classes: function () {
+                var c = {}
+                c[ 'smk-' + this.type + '-tool' ] = true
+                return Object.assign( c, {
+                    'smk-tool-active': this.active,
+                    'smk-tool-visible': this.visible,
+                    'smk-tool-enabled': this.enabled
+                } )
+            }
+        },
+        methods: {
+            focus: function () {
+                if ( !this.active )
+                    this.$refs[ 'search-input' ].focus()
             }
         }
     } )

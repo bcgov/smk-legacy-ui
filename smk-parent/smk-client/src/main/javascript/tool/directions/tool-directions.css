@@ -17,17 +17,23 @@
     overflow-y: hidden;
 }
 
-.smk-directions-panel .smk-description {
-    width: calc( 100% - 92px );
-    height: 24px;
-    vertical-align: top;
-    margin-top: 2px;
-}
 
 .smk-directions-panel .smk-waypoint {
-    border: 1px solid gray;
-    border-radius: 5px;
-    margin-bottom: 1px;
+    display: flex;
+    align-items: center;
+}
+
+.smk-directions-panel .smk-description {
+    align-self: stretch;
+    flex-basis: 100%;
+    margin: 2px 0;
+    background-color: transparent;
+    margin-right: 5px;
+}
+
+.smk-directions-panel .smk-description input {
+    height: calc( 100% - 2px );
+    border-radius: 2px;
 }
 
 .smk-directions-panel .smk-waypoint .smk-command {
@@ -59,9 +65,9 @@
     font-weight: bold;
     font-size: 15px;
     margin-bottom: 5px;
-    margin-top: -5px;
     text-align: center;
     min-height: 40px;
+    border-radius: 10px;
 
     display: flex;
     flex-direction: column;
@@ -71,13 +77,16 @@
 
 .smk-directions-panel .smk-message.smk-error {
     color: red;
+    background-color: rgb(100%, 87.8%, 87.8%);
 }
 
 .smk-directions-panel .smk-message.smk-summary {
+    background-color: rgb(87.8%, 100%, 88.6%);
 }
 
 .smk-directions-panel .smk-message.smk-progress {
     color: blue;
+    background-color: rgb(87%, 96.5%, 99.1%);
 }
 
 .smk-directions-panel .smk-body .smk-directions {

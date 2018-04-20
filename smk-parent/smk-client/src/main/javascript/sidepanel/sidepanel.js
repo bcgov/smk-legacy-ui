@@ -23,7 +23,7 @@ include.module( 'sidepanel', [ 'vue', 'sidepanel.sidepanel-html', 'sidepanel.pan
             }
     } )
 
-        this.container = $( smk.$option.container )
+        this.container = $( smk.$container )
     }
 
     Sidepanel.prototype.setActiveTool = function ( tool ) {

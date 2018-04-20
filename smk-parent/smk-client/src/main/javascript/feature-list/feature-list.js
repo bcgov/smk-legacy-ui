@@ -1,4 +1,4 @@
-include.module( 'feature-list', [ 'smk', 'tool', 'widgets', 'feature-list.panel-feature-list-html', 'feature-list.popup-feature-html' ], function ( inc ) {
+include.module( 'feature-list', [ 'tool', 'widgets', 'feature-list.panel-feature-list-html', 'feature-list.popup-feature-html' ], function ( inc ) {
 
     Vue.component( 'feature-list-panel', {
         extends: inc.widgets.toolPanel,
@@ -62,7 +62,7 @@ include.module( 'feature-list', [ 'smk', 'tool', 'widgets', 'feature-list.panel-
 
             if ( !self.layers[ ly.index ] )
                 Vue.set( self.layers, ly.index, {
-                    id:         ly.config.id,
+                    id:         ly.id,
                     title:      ly.config.title,
                     features:   []
                 } )
@@ -174,8 +174,10 @@ include.module( 'feature-list', [ 'smk', 'tool', 'widgets', 'feature-list.panel-
         this.message = message
 
         this.messageClass = {}
-        if ( Class )
-            this.messageClass[ 'smk-' + Class ] = true
+        if ( message && !Class)
+            Class = 'summary'
+
+        this.messageClass[ 'smk-' + Class ] = true
 
         if ( delay )
             return SMK.UTIL.makePromise( function ( res ) { setTimeout( res, delay ) } )

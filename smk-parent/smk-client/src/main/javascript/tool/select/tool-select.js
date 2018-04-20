@@ -1,4 +1,4 @@
-include.module( 'tool-select', [ 'smk', 'feature-list', 'widgets', 'tool-select.panel-select-html' ], function ( inc ) {
+include.module( 'tool-select', [ 'feature-list', 'widgets', 'tool-select.panel-select-html' ], function ( inc ) {
 
     Vue.component( 'select-widget', {
         extends: inc.widgets.toolButton,

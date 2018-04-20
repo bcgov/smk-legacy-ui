@@ -1,4 +1,4 @@
-include.module( 'tool-dropdown', [ 'smk', 'tool', 'widgets', 'tool-dropdown.panel-dropdown-html' ], function ( inc ) {
+include.module( 'tool-dropdown', [ 'tool', 'widgets', 'tool-dropdown.panel-dropdown-html' ], function ( inc ) {
 
     Vue.component( 'dropdown-widget', {
         extends: inc.widgets.toolButton,

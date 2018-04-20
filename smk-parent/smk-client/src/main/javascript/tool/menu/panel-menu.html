@@ -1,13 +1,12 @@
 <side-panel class="smk-menu-panel">
-    <h1 slot="header">{{ title }}
+    <template slot="header">
         <component class="smk-tool"
             v-for="tool in subWidgets"
-            v-bind:class="{ 'smk-tool-active': tool.widget.active, 'smk-tool-visible': tool.widget.visible, 'smk-tool-enabled': tool.widget.enabled }"
-            :key="tool.id"
+            v-bind:key="tool.id"
             v-bind:is="tool.widgetComponent"
             v-bind="tool.widget"
         ></component>
-    </h1>
+    </template>
 
     <component class="smk-panel"
         v-if="activeToolId && subPanels[ activeToolId ]"

@@ -1,4 +1,4 @@
-include.module( 'feature-set', [ 'smk', 'jquery', 'util', 'event' ], function () {
+include.module( 'feature-set', [ 'jquery', 'util', 'event' ], function () {
 
     var FeatureSetEvent = SMK.TYPE.Event.define( [
         'addedFeatures',
@@ -29,11 +29,11 @@ include.module( 'feature-set', [ 'smk', 'jquery', 'util', 'event' ], function ()
             var id = featureId( f, keyAttribute, nonce )
 
             while ( id in self.featureSet ) {
-                console.warn( 'collision', f, id, nonce )
+                // console.warn( 'collision', f, id, nonce )
 
                 var other = self.featureSet[ id ]
                 if ( SMK.UTIL.isDeepEqual( f.properties, other.properties ) ) {
-                    console.warn( 'already present', f, other )
+                    // console.warn( 'already present', f, other )
                     return
                 }
 
