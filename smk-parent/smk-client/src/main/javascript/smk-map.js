@@ -35,24 +35,45 @@ include.module( 'smk-map', [ 'jquery', 'util', 'viewer', 'layer' ], function () 
 
         function loadConfigs() {
             return SMK.UTIL.waitAll( self.$option.config.map( function ( c ) {
-                switch ( typeof c ) {
-
-                case 'string': // assumed to be a url of config file
-                    var id = c.toLowerCase().replace( /[^a-z0-9]+/g, '-' ).replace( /^[-]|[-]$/g, '' )
-                    var tag = 'config-' + id
-                    include.tag( tag, { loader: 'template', url: c } )
-
-                    return include( tag )
-                        .then( function ( inc ) {
-                            return JSON.parse( inc[ tag ] )
-                        } )
-
-                case 'object': // assumed to be a literal config obj
+                if ( !c.url )
                     return SMK.UTIL.resolved( c )
 
-                default:
-                    throw new Error( 'unknown type in config: ' + typeof( c ) )
-                }
+                var id = c.url.toLowerCase().replace( /[^a-z0-9]+/g, '-' ).replace( /^[-]|[-]$/g, '' )
+                var tag = 'config-' + id
+                include.tag( tag, { loader: 'template', url: c.url } )
+
+                return include( tag )
+                    .then( function ( inc ) {
+                        try {
+                            var obj = JSON.parse( inc[ tag ] )
+                            obj.$sources = c.$sources
+                            return obj
+                        }
+                        catch ( e ) {
+                            console.warn( c.$sources[ 0 ], inc[ tag ] )
+                            e.parseSource = c.$sources[ 0 ]
+                            throw e
+                        }
+                    } )
+
+                // switch ( typeof c ) {
+
+                // case 'string': // assumed to be a url of config file
+                //     var id = c.toLowerCase().replace( /[^a-z0-9]+/g, '-' ).replace( /^[-]|[-]$/g, '' )
+                //     var tag = 'config-' + id
+                //     include.tag( tag, { loader: 'template', url: c } )
+
+                //     return include( tag )
+                //         .then( function ( inc ) {
+                //             return JSON.parse( inc[ tag ] )
+                //         } )
+
+                // case 'object': // assumed to be a literal config obj
+                //     return SMK.UTIL.resolved( c )
+
+                // default:
+                //     throw new Error( 'unknown type in config: ' + typeof( c ) )
+                // }
             } ) )
         }
 

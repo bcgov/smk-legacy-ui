@@ -1,77 +1,15 @@
 ( function () {
 
-    polyfills()
+    installPolyfills()
 
-    if ( !window.SMK ) window.SMK = {}
+    setupGlobalSMK()
 
-    window.SMK = Object.assign( {
-        MAP: {},
-        VIEWER: {},
-        TYPE: {},
-        UTIL: {},
-        BOOT: Promise.resolve(),
-        CONFIG: {
-            surround: {
-                type: "default",
-                title: 'Simple Map Kit'
-            },
-            viewer: {
-                type: "leaflet",
-                location: {
-                    extent: [ -139.1782, 47.6039, -110.3533, 60.5939 ],
-                    zoom: 5,
-                },
-                baseMap: 'Topographic',
-            },
-            tools: [
-                {
-                    type: "search",
-                    enabled: true,
-                },
-                {
-                    type: "directions",
-                    enabled: true,
-                },
-                {
-                    type: "markup",
-                    enabled: true,
-                }
-            ]
-        }
-    }, window.SMK )
-
-    window.SMK.BOOT = window.SMK.BOOT
+    SMK.BOOT = SMK.BOOT
         .then( parseScriptElement )
         .then( resolveConfig )
         .then( loadInclude )
-        .then( initializeSMK )
-        .catch( function ( e ) {
-            console.error( e )
-
-            var message = document.createElement( 'div' )
-            message.innerHTML = '\
-                <div style="\
-                    display:flex;\
-                    flex-direction:column;\
-                    justify-content:center;\
-                    align-items:center;\
-                    border: 5px solid red;\
-                    padding: 20px;\
-                    margin: 20px;\
-                    position: absolute;\
-                    top: 0;\
-                    left: 0;\
-                    right: 0;\
-                    bottom: 0;\
-                ">\
-                    <h1>SMK Client</h1>\
-                    <h2>Initialization failed</h2>\
-                    <pre>{}</pre>\
-                </div>\
-            '.replace( /\s+/g, ' ' ).replace( '{}', e.stack )
-
-            document.querySelector( 'body' ).appendChild( message )
-        } )
+        .then( initializeSmkMap )
+        .catch( SMK.ON_FAILURE )
 
 // = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
@@ -111,7 +49,6 @@
         function attrList( Default ) {
             return function( key, el ) {
                 var val = attrString( Default )( key, el )
-                // if ( val == null ) return []
                 return val.split( /\s*[|]\s*/ ).filter( function ( i ) { return !!i } )
             }
         }
@@ -127,19 +64,11 @@
 // = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
     function resolveConfig( attr ) {
-        try {
-            var configs = []
-            attr.config.forEach( function ( c, i ) {
-                var source = 'attr[' + i + ']'
-                configs = configs.concat( parseDocumentArguments( c, source ) || parseLiteralJson( c, source ) || parseOption( c, source ) || parseUrl( c, source ) )
-            } )
-        }
-        catch ( e ) {
-            if ( e.parseSource )
-                e.message += ', while parsing ' + e.parseSource
-
-            throw e
-        }
+        var configs = []
+        attr.config.forEach( function ( c, i ) {
+            var source = 'attr[' + i + ']'
+            configs = configs.concat( parseDocumentArguments( c, source ) || parseLiteralJson( c, source ) || parseOption( c, source ) || parseUrl( c, source ) )
+        } )
 
         attr.config = configs
 
@@ -154,7 +83,7 @@
         var params = location.search.substr( 1 ).split( '&' )
         var configs = []
         params.forEach( function ( p, i ) {
-            var source1 = source + '.arg[' + config + ',' + i + ']'
+            var source1 = source + ' -> arg[' + config + ',' + i + ']'
             try {
                 var m = decodeURIComponent( p ).match( paramPattern )
                 if ( !m ) return
@@ -173,7 +102,7 @@
     function parseLiteralJson( config, source ) {
         if ( !/^[{].+[}]$/.test( config ) ) return
 
-        source += '.json'
+        source += ' -> json'
         try {
             var obj = JSON.parse( config )
             obj.$sources = [ source ]
@@ -195,7 +124,7 @@
         var option = m[ 1 ].toLowerCase()
         if ( !( option in optionHandler ) ) return []
 
-        source += '.option[' + option + ']'
+        source += ' -> option[' + option + ']'
         try {
             var obj = optionHandler[ option ]( m[ 3 ], source )
 
@@ -208,7 +137,7 @@
     }
 
     function parseUrl( config, source ) {
-        source += '.url[' + config + ']'
+        source += ' -> url[' + config + ']'
         var obj = {
             url: config,
             $sources: [ source ]
@@ -301,7 +230,7 @@
 
 // = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
-    function initializeSMK( attr ) {
+    function initializeSmkMap( attr ) {
         try {
             include.tag( 'smk-tags' )
         }
@@ -339,7 +268,7 @@
 
 // = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
-    function polyfills() {
+    function installPolyfills() {
         window.dojoConfig = {
             has: {
                 "esri-promise-compatibility": 1
@@ -387,6 +316,81 @@
             if ( document.__defineGetter__ )
                 document.__defineGetter__( 'currentScript', actualScript )
         } )()
+    }
+
+// = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+
+    function setupGlobalSMK() {
+        // if ( !window.SMK ) window.SMK = {}
+
+        return window.SMK = Object.assign( {
+            MAP: {},
+            VIEWER: {},
+            TYPE: {},
+            UTIL: {},
+
+            CONFIG: {
+                surround: {
+                    type: "default",
+                    title: 'Simple Map Kit'
+                },
+                viewer: {
+                    type: "leaflet",
+                    location: {
+                        extent: [ -139.1782, 47.6039, -110.3533, 60.5939 ],
+                        zoom: 5,
+                    },
+                    baseMap: 'Topographic',
+                },
+                tools: [
+                    {
+                        type: "search",
+                        enabled: true,
+                    },
+                    {
+                        type: "directions",
+                        enabled: true,
+                    },
+                    {
+                        type: "markup",
+                        enabled: true,
+                    }
+                ]
+            },
+
+            BOOT: Promise.resolve(),
+            ON_FAILURE: function ( e ) {
+                if ( e.parseSource )
+                    e.message += ',\n  while parsing ' + e.parseSource
+
+                console.error( e )
+
+                var message = document.createElement( 'div' )
+                message.innerHTML = '\
+                    <div style="\
+                        display:flex;\
+                        flex-direction:column;\
+                        justify-content:center;\
+                        align-items:center;\
+                        border: 5px solid red;\
+                        padding: 20px;\
+                        margin: 20px;\
+                        position: absolute;\
+                        top: 0;\
+                        left: 0;\
+                        right: 0;\
+                        bottom: 0;\
+                    ">\
+                        <h1>SMK Client</h1>\
+                        <h2>Initialization failed</h2>\
+                        <pre>{}</pre>\
+                    </div>\
+                '.replace( /\s+/g, ' ' ).replace( '{}', e.stack )
+
+                document.querySelector( 'body' ).appendChild( message )
+            }
+
+        }, window.SMK )
     }
 
 } )();
