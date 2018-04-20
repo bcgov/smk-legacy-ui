@@ -134,6 +134,17 @@ include.module( 'tool-query', [ 'tool', 'widgets', 'tool-query.panel-query-html'
     QueryTool.prototype.afterInitialize.push( function ( smk ) {
         var self = this
 
+        self.changedActive( function () {
+            if ( self.active ) {
+                switch ( self.onActivate ) {
+                case 'execute':
+                    smk.emit( self.id, 'execute' )
+                    break;
+
+                }
+            }
+        } )
+
         smk.on( this.id, {
             'activate': function () {
                 if ( !self.visible || !self.enabled ) return
