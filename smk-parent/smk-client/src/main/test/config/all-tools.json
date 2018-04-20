@@ -3,12 +3,12 @@
         { "type": "measure" },
         { "type": "scale",
             "showFactor": true,
-            "showBar": true 
+            "showBar": true
         },
         { "type": "coordinate" },
         { "type": "minimap", "baseMap": "Imagery" },
-        { "type": "markup", "enabled": false },
-        { "type": "measure", "enabled": false },
+        { "type": "markup", "enabled": true },
+        { "type": "measure", "enabled": true },
         { "type": "directions" },
         { "type": "pan" },
         { "type": "zoom",
@@ -25,6 +25,7 @@
         { "type": "search" },
         { "type": "identify" },
         { "type": "select" },
-        { "type": "menu", "enabled": true }
+        { "type": "menu", "enabled": true },
+        { "type": "query", "enabled": true }
     ]
 }
