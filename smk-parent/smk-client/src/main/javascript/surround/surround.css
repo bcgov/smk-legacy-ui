@@ -56,11 +56,11 @@ body {
     font-size:      15px;
 }
 
-.smk-viewer {
+.smk-map-frame .smk-viewer {
     top: 72px;
 }
 
-.smk-overlay {
+.smk-map-frame .smk-overlay {
     top: 77px;
 }
 

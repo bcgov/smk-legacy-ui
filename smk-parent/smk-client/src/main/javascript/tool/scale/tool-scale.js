@@ -2,6 +2,7 @@ include.module( 'tool-scale', [ 'tool' ], function () {
 
     function ScaleTool( option ) {
         SMK.TYPE.Tool.prototype.constructor.call( this, $.extend( {
+            order: 2
         }, option ) )
     }
 

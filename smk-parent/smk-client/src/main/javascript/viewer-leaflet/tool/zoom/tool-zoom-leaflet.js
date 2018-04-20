@@ -14,7 +14,9 @@ include.module( 'tool-zoom-leaflet', [ 'tool-zoom', 'leaflet' ], function () {
         }
 
         if ( this.control !== false ) {
-            L.control.zoom().addTo( smk.$viewer.map )
+            L.control.zoom( {
+                position: 'topright'
+            } ).addTo( smk.$viewer.map )
         }
     } )
 

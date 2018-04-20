@@ -110,6 +110,9 @@ include.module( 'tool-query', [ 'tool', 'widgets', 'tool-query.panel-query-html'
             widgetComponent:'query-widget',
             panelComponent: 'query-panel',
         }, option ) )
+
+        if ( !this.instance )
+            throw new Error( 'query tool needs an instance' )
     }
 
     SMK.TYPE.QueryTool = QueryTool

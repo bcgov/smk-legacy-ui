@@ -2,6 +2,7 @@ include.module( 'tool-coordinate', [ 'tool' ], function () {
 
     function CoordinateTool( option ) {
         SMK.TYPE.Tool.prototype.constructor.call( this, $.extend( {
+            order: 3
         }, option ) )
     }
 

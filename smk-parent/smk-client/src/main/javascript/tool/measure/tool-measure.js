@@ -2,6 +2,7 @@ include.module( 'tool-measure', [ 'tool' ], function () {
 
     function MeasureTool( option ) {
         SMK.TYPE.Tool.prototype.constructor.call( this, $.extend( {
+            order: 2
         }, option ) )
     }
 
