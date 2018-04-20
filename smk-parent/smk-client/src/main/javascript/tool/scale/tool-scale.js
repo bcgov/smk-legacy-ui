@@ -1,4 +1,4 @@
-include.module( 'tool-scale', [ 'smk', 'tool' ], function () {
+include.module( 'tool-scale', [ 'tool' ], function () {
 
     function ScaleTool( option ) {
         SMK.TYPE.Tool.prototype.constructor.call( this, $.extend( {

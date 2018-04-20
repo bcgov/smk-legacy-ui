@@ -1,4 +1,4 @@
-include.module( 'tool-identify', [ 'smk', 'feature-list', 'widgets', 'tool-identify.panel-identify-html' ], function ( inc ) {
+include.module( 'tool-identify', [ 'feature-list', 'widgets', 'tool-identify.panel-identify-html' ], function ( inc ) {
 
     Vue.component( 'identify-widget', {
         extends: inc.widgets.toolButton,

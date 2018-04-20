@@ -1,4 +1,4 @@
-include.module( 'tool-query', [ 'smk', 'tool', 'widgets', 'tool-query.panel-query-html', 'tool-query.parameter-input-html', 'tool-query.parameter-select-html', 'tool-query.parameter-constant-html' ], function ( inc ) {
+include.module( 'tool-query', [ 'tool', 'widgets', 'tool-query.panel-query-html', 'tool-query.parameter-input-html', 'tool-query.parameter-select-html', 'tool-query.parameter-constant-html' ], function ( inc ) {
 
     Vue.component( 'parameter-constant', {
         template: inc[ 'tool-query.parameter-constant-html' ],
@@ -133,6 +133,17 @@ include.module( 'tool-query', [ 'smk', 'tool', 'widgets', 'tool-query.panel-quer
 
     QueryTool.prototype.afterInitialize.push( function ( smk ) {
         var self = this
+
+        self.changedActive( function () {
+            if ( self.active ) {
+                switch ( self.onActivate ) {
+                case 'execute':
+                    smk.emit( self.id, 'execute' )
+                    break;
+
+                }
+            }
+        } )
 
         smk.on( this.id, {
             'activate': function () {

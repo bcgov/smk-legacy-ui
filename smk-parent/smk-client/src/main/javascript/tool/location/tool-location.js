@@ -1,4 +1,4 @@
-include.module( 'tool-location', [ 'smk', 'tool', 'widgets', 'tool-location.popup-location-html' ], function ( inc ) {
+include.module( 'tool-location', [ 'tool', 'widgets', 'tool-location.popup-location-html' ], function ( inc ) {
 
     function LocationTool( option ) {
         this.makePropWidget( 'location', {} )

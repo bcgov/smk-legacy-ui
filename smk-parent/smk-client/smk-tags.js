@@ -8,7 +8,6 @@ exports.gen = function () {
     t.script( 'jquery', 'lib/jquery-1.11.2.js' )
     t.script( 'vue', 'lib/vue-2.5.11.js' )
 
-    t.script( 'smk', 'smk.js' )
     t.script( 'util', 'util.js' )
     t.script( 'event', 'event.js' )
     t.script( 'smk-map', 'smk-map.js' )

@@ -1,4 +1,4 @@
-include.module( 'tool-pan', [ 'smk', 'tool' ], function () {
+include.module( 'tool-pan', [ 'tool' ], function () {
 
     function PanTool( option ) {
         SMK.TYPE.Tool.prototype.constructor.call( this, $.extend( {

@@ -1,4 +1,4 @@
-include.module( 'feature-list', [ 'smk', 'tool', 'widgets', 'feature-list.panel-feature-list-html', 'feature-list.popup-feature-html' ], function ( inc ) {
+include.module( 'feature-list', [ 'tool', 'widgets', 'feature-list.panel-feature-list-html', 'feature-list.popup-feature-html' ], function ( inc ) {
 
     Vue.component( 'feature-list-panel', {
         extends: inc.widgets.toolPanel,

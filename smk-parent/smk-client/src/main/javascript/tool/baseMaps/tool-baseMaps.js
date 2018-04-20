@@ -1,5 +1,5 @@
-include.module( 'tool-baseMaps', [ 'smk', 'tool', 'widgets', 'viewer', 'leaflet', 'tool-baseMaps.panel-base-maps-html' ], function ( inc ) {
-// include.module( 'tool-baseMaps', [ 'smk', 'tool', 'widgets', 'viewer', 'tool-baseMaps.panel-base-maps-html' ], function ( inc ) {
+include.module( 'tool-baseMaps', [ 'tool', 'widgets', 'viewer', 'leaflet', 'tool-baseMaps.panel-base-maps-html' ], function ( inc ) {
+// include.module( 'tool-baseMaps', [ 'tool', 'widgets', 'viewer', 'tool-baseMaps.panel-base-maps-html' ], function ( inc ) {
 
     Vue.component( 'baseMaps-widget', {
         extends: inc.widgets.toolButton,

@@ -1,4 +1,4 @@
-include.module( 'query', [ 'smk', 'jquery', 'util', 'event' ], function () {
+include.module( 'query', [ 'jquery', 'util', 'event' ], function () {
 
     var QueryEvent = SMK.TYPE.Event.define( [
         // 'startedLoading',

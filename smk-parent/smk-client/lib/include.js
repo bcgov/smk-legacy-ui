@@ -9,6 +9,8 @@
         timeout: 60 * 1000
     }
 
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
     function includeTag( tag, attr ) {
         if ( !attr ) {
             if ( !TAG[ tag ] ) throw new Error( 'tag "' + tag + '" not defined' )
@@ -43,7 +45,7 @@
     loader.tags = function ( inc ) {
         return this.template( inc )
             .then( function ( data ) {
-                var tagData = parseJSONC( data )
+                var tagData = JSON.parse( data )
                 var tags = Object.keys( tagData )
                 tags.forEach( function ( t ) {
                     includeTag( t, tagData[ t ] )
@@ -313,25 +315,6 @@
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    // var p = Promise.resolve()
-
-    // if ( TAG.$tags )
-    //     p = p.then( function () {
-    //         return include( '$tags' )
-    //     } )
-    //     .then( function ( inc ) {
-    //         includeTag( parseJSONC( inc[ '$tags' ] ) )
-    //     } )
-
-    // p.then( function () {
-    //     return include( '$main' )
-    // } )
-    // .catch( function ( e ) {
-    //     console.warn( 'failed to include $main', e )
-    // } )
-
-    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
     /**
      * Modified from http://stackoverflow.com/a/22429679
      *
@@ -411,64 +394,6 @@
         }
     }
 
-    function parseJSONC( jsonWithComments ) {
-        return JSON.parse( stripJsonComments( jsonWithComments ) )
-    }
-
-    // assumes is valid json data with single line comments added
-    function stripJsonComments( json ) {
-        var strippedLines = json.replace( /^\s*[/][/].*$/gm, '' ).split( '\n' );
-
-        for ( var i in strippedLines ) {
-            var pieces = strippedLines[ i ].split( /[/][/]/g )
-
-            // no trailing comments
-            if ( pieces.length < 2 ) continue;
-
-            // 2 pieces and no quotes in 2nd piece
-            if ( pieces.length == 2 && ( !pieces[ 1 ] || !/"/.test( pieces[ 1 ] ) ) ) {
-                strippedLines[ i ] = pieces[ 0 ]
-                continue;
-            }
-
-            // more than 2 pieces, and no quotes in first piece
-            if ( pieces.length > 2 && ( !/"/.test( pieces[ 0 ] ) ) ) {
-                strippedLines[ i ] = pieces[ 0 ]
-                continue;
-            }
-
-            // console.log( pieces )
-
-            // gather pieces until the quotes balance
-            var j = 1, out = pieces[ 0 ];
-            while ( j < pieces.length ) {
-                // find all quotes, with their prefixes
-                var quotes = out.match( /[^"]*"/g )
-
-                // count quotes than haven't been escaped
-                var unescaped = 0;
-                for ( var k = 0; k < quotes.length; k++ ) {
-                    if ( /([^\\]|^)([\\][\\])*.$/.test( quotes[ k ] ) ) {
-                        // console.log( quotes[ k ] )
-                        unescaped += 1;
-                    }
-                }
-                // console.log( '==+', out, quotes, unescaped )
-
-                // a even number of unescaped quotes means that we've got a balanced piece
-                if ( ( unescaped & 1 ) == 0 ) break;
-
-                // accumulate next piece
-                out += '//' + pieces[ j ]
-                j += 1;
-            }
-            // console.log( '==', out )
-
-            strippedLines[ i ] = out;
-        }
-        return strippedLines.join( '\n' )
-    }
-
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
     window.include = include
@@ -476,7 +401,6 @@
     window.include.tag = includeTag
     window.include.hash = hash
     window.include.option = option
-    window.include.parseJSONC = parseJSONC
 
 } )()
 

@@ -1,4 +1,4 @@
-include.module( 'feature-set', [ 'smk', 'jquery', 'util', 'event' ], function () {
+include.module( 'feature-set', [ 'jquery', 'util', 'event' ], function () {
 
     var FeatureSetEvent = SMK.TYPE.Event.define( [
         'addedFeatures',

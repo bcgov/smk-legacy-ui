@@ -1,32 +1,10 @@
 {
-    "smkId": "test-app",
-    "smkRevision": 1,
-
-    "name": "SMK Demo App",
-
-    "createdBy": "bwj",
-    "published": false,
-
-    "viewer": {
-        "type": "leaflet",
-
-        "location": {
-            "extent": [ -139.1782, 47.6039, -110.3533, 60.5939 ]
-        },
-
-        "baseMap": "Streets"
-    },
-
-    "surround": {
-        "type": "default",
-        "title": "Standalone SMK Demo App"
-    },
-
     "tools": [
         { "type": "measure" },
         { "type": "scale",
             "showFactor": true,
-            "showBar": true },
+            "showBar": true 
+        },
         { "type": "coordinate" },
         { "type": "minimap", "baseMap": "Imagery" },
         { "type": "markup", "enabled": false },

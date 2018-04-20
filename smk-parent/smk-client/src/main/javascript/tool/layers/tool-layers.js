@@ -1,4 +1,4 @@
-include.module( 'tool-layers', [ 'smk', 'tool', 'widgets', 'tool-layers.panel-layers-html' ], function ( inc ) {
+include.module( 'tool-layers', [ 'tool', 'widgets', 'tool-layers.panel-layers-html' ], function ( inc ) {
 
     Vue.component( 'layers-widget', {
         extends: inc.widgets.toolButton,
