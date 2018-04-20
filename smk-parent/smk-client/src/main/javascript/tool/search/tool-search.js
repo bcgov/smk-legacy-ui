@@ -60,6 +60,12 @@ include.module( 'tool-search', [ 'tool', 'widgets', 'tool-search.widget-search-h
                     'smk-tool-enabled': this.enabled
                 } )
             }
+        },
+        methods: {
+            focus: function () {
+                if ( !this.active )
+                    this.$refs[ 'search-input' ].focus()
+            }
         }
     } )
 
