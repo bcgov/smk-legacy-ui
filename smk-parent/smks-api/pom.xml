@@ -185,7 +185,7 @@
 		    <version>1.14.0</version>
 		</dependency>
 	</dependencies>
-	<build>
+        <build>
 		<finalName>smks-api</finalName>
 		<plugins>
 		  <plugin>
@@ -220,18 +220,14 @@
 				<target>${jdk.version}</target>
 			</configuration>
 		  </plugin>
-
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.12.4</version>
-        <configuration>
-          <skipTests>true</skipTests>
-        </configuration>
-      </plugin>
-
-		 
+		      <plugin>
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-surefire-plugin</artifactId>
+			<version>2.12.4</version>
+			<configuration>
+			  <skipTests>true</skipTests>
+			</configuration>
+		      </plugin>
 		</plugins>
 	</build>
 </project>
