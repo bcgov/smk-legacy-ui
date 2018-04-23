@@ -480,15 +480,22 @@ function addNewMapConfig()
 	data.published = false;
 	data.surround = { type: "default", title: "" };
     data.viewer = {
-			        type: "leaflet",
-			        initialExtent: [
-			            -139.1782,
-			            47.6039,
-			            -110.3533,
-			            60.5939
-			        ],
-			        baseMap: "Imagery"
-				};
+    	    "type": "leaflet",
+    	    "location": {
+    	      "extent": [
+    	        -142.33886718750003,
+    	        61.77312286453146,
+    	        -107.22656250000001,
+    	        45.920587344733654
+    	      ],
+    	      "center": [
+    	        -139.1782,
+    	        47.6039
+    	      ],
+    	      "zoom": 5
+    	    },
+    	    "baseMap": "Streets"
+    	  };
     data.layers = [];
     data._id = null;
     data._rev = null;
@@ -507,10 +514,6 @@ function addNewMapConfig()
 			    },
 			    {
 			      "type": "layers",
-			      "enabled": true
-			    },
-			    {
-			      "type": "identify",
 			      "enabled": true
 			    },
 			    {
@@ -567,9 +570,49 @@ function addNewMapConfig()
 			      ]
 			    },
 			    {
-			      "type": "select",
-			      "enabled": true
-			    },
+			        "type": "select",
+			        "enabled": true,
+			        "title": "Selection Panel",
+			        "style": {
+			          "strokeWidth": 1,
+			          "strokeStyle": "1, 1",
+			          "strokeColor": "#000000",
+			          "strokeOpacity": 0.8,
+			          "fillColor": "#000000",
+			          "fillOpacity": 0.5,
+			          "markerSize": [
+			            20,
+			            20
+			          ],
+			          "markerOffset": [
+			            10,
+			            0
+			          ]
+			        },
+			        "styleOpacity": 1
+			      },
+			    {
+			        "type": "identify",
+			        "enabled": true,
+			        "title": "Identify Panel",
+			        "style": {
+			          "strokeWidth": 1,
+			          "strokeStyle": "1, 1",
+			          "strokeColor": "#000000",
+			          "strokeOpacity": 0.8,
+			          "fillColor": "#000000",
+			          "fillOpacity": 0.5,
+			          "markerSize": [
+			            20,
+			            20
+			          ],
+			          "markerOffset": [
+			            10,
+			            0
+			          ]
+			        },
+			        "styleOpacity": 1
+			      },
 			    {
 			      "type": "search",
 			      "enabled": true
