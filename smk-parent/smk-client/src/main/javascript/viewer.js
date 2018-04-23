@@ -148,7 +148,7 @@ include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', '
 
                 if ( cfg.queries )
                     cfg.queries.forEach( function ( q ) {
-                        var query = new SMK.TYPE.Query[ cfg.type ]( ly, q )
+                        var query = new SMK.TYPE.Query[ cfg.type ]( ly.id, q )
 
                         self.query[ query.id ] = query
                         self.queried[ query.id ] = new SMK.TYPE.FeatureSet()

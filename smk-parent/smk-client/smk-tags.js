@@ -14,8 +14,11 @@ exports.gen = function () {
     t.script( 'viewer', 'viewer.js' )
     t.script( 'layer', 'layer.js' )
     t.script( 'tool', 'tool.js' )
-    t.script( 'query', 'query.js' )
+    // t.script( 'query', 'query.js' )
     t.script( 'feature-set', 'feature-set.js' )
+
+    t.group( 'query' )
+        .dir( 'query/**/*', { cwd: baseDir } )
 
     t.sequence( 'map-frame-styles' )
         .style( 'resources/css/smk-map-frame.css' )
