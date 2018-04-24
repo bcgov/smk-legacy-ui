@@ -46,7 +46,7 @@
 	                script.setAttribute( "src", "../smk-client/smk-bootstrap.js" )
 	                script.setAttribute( "smk-disconnected", false )
 	                script.setAttribute( "smk-standalone", true )
-	                script.setAttribute( "smk-config", service )
+	                script.setAttribute( "smk-config", service + ',?smk' )
 	                
 	                document.getElementsByTagName( 'head' )[ 0 ].appendChild( script );
                 }
