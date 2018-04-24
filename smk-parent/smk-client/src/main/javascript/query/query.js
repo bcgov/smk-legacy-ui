@@ -50,4 +50,24 @@ include.module( 'query', [ 'jquery', 'util', 'event' ], function () {
     Query.prototype.queryLayer = function ( arg ) {
         console.log( 'not implemented', arg )
     }
+
+    Query.prototype.makeRequest = function ( option, resultFilter, onStateChange ) {
+        var self = this
+
+        this.abortRequestInProgress()
+
+        this.requestInProgress = SMK.UTIL.makeRequest( option )
+        this.requestInProgress.changedState( function () { onStateChange( this.requestInProgres.state ) } )
+
+        this.requestInProgress.start( resultFilter )
+
+        return this.requestInProgress
+    }
+
+    Query.prototype.abortRequestInProgress = function () {
+        if ( this.requestInProgress )
+            this.requestInProgress.abort()
+
+        this.requestInProgress = null
+    }
 } )

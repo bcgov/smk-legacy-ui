@@ -1,4 +1,4 @@
-include.module( 'util', null, function ( inc ) {
+include.module( 'util', [ 'event' ], function ( inc ) {
 
     Object.assign( window.SMK.UTIL, {
         makePromise: function( withFn ) {
@@ -17,6 +17,23 @@ include.module( 'util', null, function ( inc ) {
             return Promise.all( promises )
         },
 
+        makeRequest: function ( option ) {
+            return new SMK.TYPE.Request( option )
+        },
+        // makeRequest: function ( option, toAbort ) {
+        //     toAbort = toAbort || function () {}
+
+        //     return this.makePromise( function ( res, rej ) {
+        //         var xhr = $.ajax( option )
+        //         xhr.then( res, rej )
+
+        //         toAbort( function ( source ) {
+        //             rej( new Error( 'aborted' + ( source ? ' by ' + source : '' ) ) )
+        //             xhr.abort()
+        //         } )
+        //     } )
+        // },
+
         type: function( val ) {
             var t = typeof val
             if ( t != 'object' ) return t
@@ -24,7 +41,7 @@ include.module( 'util', null, function ( inc ) {
             if ( val === null ) return 'null'
             return 'object'
         },
-            
+
         templatePattern: /<%=\s*(.*?)\s*%>/g,
         templateReplace: function ( template, replacer ) {
             if ( !replacer ) return template
@@ -194,8 +211,84 @@ include.module( 'util', null, function ( inc ) {
                     properties: obj.properties
                 }
             }
-        }
+        },
 
     } )
+
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    var RequestEvent = SMK.TYPE.Event.define( [
+        'changedState'
+    ] )
+
+    function Request( option ) {
+        var self = this
+
+        RequestEvent.prototype.constructor.call( this )
+
+        this.$option = option
+        this.abort = function () { this.state = 'aborted' }
+
+        var state
+        Object.defineProperty( this, 'state', {
+            get: function () { return state },
+            set: function ( v ) {
+                if ( v == state ) return
+                if ( state == 'aborted' ) return
+                // console.log( self.config.id, v )
+                state = v
+                self.changedState()
+            }
+        } )
+
+        this.state = 'pending'
+    }
+
+    Object.assign( Request.prototype, RequestEvent.prototype )
+    SMK.TYPE.Request = Request
+
+    Request.prototype.start = function ( onResult ) {
+        var self = this
+
+        if ( this.$promise ) return this
+        if ( this.state == 'aborted' ) return this
+
+        this.$promise = SMK.UTIL.makePromise( function ( res, rej ) {
+            self.state = 'requesting'
+
+            var xhr = $.ajax( self.$option )
+            xhr.then( res, rej )
+
+            self.changedState( function () {
+                if ( self.state != 'aborted' ) return
+
+                rej( new Error( 'aborted' ) )
+                xhr.abort()
+            } )
+        } )
+        .then( function ( data ) {
+            if ( onResult )
+                return onResult( data )
+
+            return data
+        } )
+
+        this.$promise
+            .then( function ( data ) {
+                self.state = 'succeeded'
+                return data
+            } )
+            .catch( function ( err ) {
+                self.state = 'failed'
+                console.warn( err )
+            } )
+
+        return this
+    }
+
+    Request.prototype.result = function () {
+        if ( !this.$promise ) throw new Error( 'request not started' )
+        return this.$promise
+    }
 
 } )

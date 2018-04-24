@@ -141,7 +141,9 @@ include.module( 'tool-query', [ 'tool', 'widgets', 'tool-query.panel-query-html'
             if ( self.active ) {
                 switch ( self.onActivate ) {
                 case 'execute':
-                    smk.emit( self.id, 'execute' )
+                    Vue.nextTick( function () {
+                        smk.emit( self.id, 'execute' )
+                    } )
                     break;
 
                 }
@@ -180,29 +182,57 @@ include.module( 'tool-query', [ 'tool', 'widgets', 'tool-query.panel-query-html'
             },
 
             'execute': function ( ev ) {
-                self.featureSet.clear()
-                self.busy = true
-                self.setMessage( 'Executing query', 'progress' )
-
                 var param = {}
                 self.parameters.forEach( function ( p, i ) {
                     param[ p.prop.id ] = $.extend( {}, p.prop )
                 } )
 
-                return SMK.UTIL.resolved()
-                    .then( function () {
-                        return self.query.queryLayer( param, self.config, smk.$viewer )
-                    } )
-                    .then( function ( features ) {
-                        self.featureSet.add( self.query.layerId, features )
-                    } )
-                    .catch( function ( err ) {
-                        console.warn( err )
-                        self.setMessage( 'Query returned no results', 'warning' )
-                    } )
-                    .finally( function () {
+                var request = self.query.queryLayer( param, self.config, smk.$viewer )
+
+                request.changedState( function () {
+                    switch ( request.state ) {
+                    case 'requesting':
+                        self.featureSet.clear()
+                        self.busy = true
+                        self.setMessage( 'Executing query', 'progress' )
+                        break
+
+                    case 'aborted':
+                        self.featureSet.clear()
                         self.busy = false
-                    } )
+                        self.setMessage( 'Query was aborted', 'warning' )
+                        break
+
+                    case 'succeeded':
+                        request.result().then( function ( features ) {
+                            self.featureSet.add( self.query.layerId, features )
+                            self.busy = false
+                        } )
+                        break
+
+                    case 'failed':
+                        self.setMessage( 'Query returned no results', 'warning' )
+                        self.busy = false
+                        break
+
+                    default:
+                    }
+                } )
+
+                // return SMK.UTIL.resolved()
+                //     .then( function () {
+                //         return self.query.queryLayer( param, self.config, smk.$viewer )
+                //     } )
+                //     .then( function ( features ) {
+                //         self.featureSet.add( self.query.layerId, features )
+                //     } )
+                //     .catch( function ( err ) {
+                //         console.warn( err )
+                //         self.setMessage( 'Query returned no results', 'warning' )
+                //     } )
+                //     .finally( function () {
+                //         self.busy = false
+                //     } )
             },
 
             'config': function ( ev ) {

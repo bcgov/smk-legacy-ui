@@ -9,7 +9,7 @@ include( 'query' ).then( function () {
     SMK.TYPE.Query[ 'wms' ] = WmsQuery
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
-    WmsQuery.prototype.queryLayer = function ( param, config, viewer ) {
+    WmsQuery.prototype.queryLayer = function ( param, config, viewer, onStateChange ) {
         var self = this
 
         var layerConfig = viewer.layerId[ this.layerId ].config
@@ -32,18 +32,15 @@ include( 'query' ).then( function () {
         //     data.spatialRel = 'esriSpatialRelIntersects'
         // }
 
-        return SMK.UTIL.makePromise( function ( res, rej ) {
-            $.ajax( {
-                url:        layerConfig.serviceUrl,
-                method:     'GET',
-                data:       data,
-                dataType:   'json',
-                // contentType:    'application/json',
-                // crossDomain:    true,
-                // withCredentials: true,
-            } ).then( res, rej )
-        } )
-        .then( function ( data ) {
+        return this.makeRequest( {
+            url:        layerConfig.serviceUrl,
+            method:     'GET',
+            data:       data,
+            dataType:   'json',
+            // contentType:    'application/json',
+            // crossDomain:    true,
+            // withCredentials: true,
+        }, function ( data ) {
             console.log( data )
 
             if ( !data ) throw new Error( 'no features' )

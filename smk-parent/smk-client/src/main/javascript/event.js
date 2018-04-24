@@ -1,4 +1,4 @@
-include.module( 'event', [ 'vue', 'util' ], function () {
+include.module( 'event', [ 'vue' ], function () {
 
     function Event ( events ) {
         this.dispatcher = new Vue()

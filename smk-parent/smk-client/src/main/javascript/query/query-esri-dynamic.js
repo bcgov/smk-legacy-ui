@@ -47,16 +47,14 @@ include( 'query' ).then( function () {
             data.spatialRel = 'esriSpatialRelIntersects'
         }
 
-        return SMK.UTIL.makePromise( function ( res, rej ) {
-            $.ajax( {
-                url:        serviceUrl,
-                method:     'POST',
-                data:       data,
-                dataType:   'json',
-                // contentType:    'application/json',
-                // crossDomain:    true,
-                // withCredentials: true,
-            } ).then( res, rej )
+        return this.makeRequest( {
+            url:        serviceUrl,
+            method:     'POST',
+            data:       data,
+            dataType:   'json',
+            // contentType:    'application/json',
+            // crossDomain:    true,
+            // withCredentials: true,
         } )
         .then( function ( data ) {
             console.log( data )
