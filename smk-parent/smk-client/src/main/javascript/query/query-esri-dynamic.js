@@ -1,4 +1,4 @@
-include.module( 'query-esri-dynamic', [ 'query' ], function () {
+include( 'query' ).then( function () {
 
     function EsriDynamicQuery() {
         SMK.TYPE.Query.prototype.constructor.apply( this, arguments )

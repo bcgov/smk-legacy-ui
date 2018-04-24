@@ -10,11 +10,9 @@ include.module( 'query', [ 'jquery', 'util', 'event' ], function () {
 
         QueryEvent.prototype.constructor.call( this )
 
-        $.extend( this, {
-            layerId: layerId
-        }, config )
-
-        this.id = layerId + '--' + this.id
+        Object.assign( this, config )
+        this.layerId = layerId
+        this.id = this.layerId + '--' + this.id
         // var loading = false
         // Object.defineProperty( this, 'loading', {
         //     get: function () { return loading },

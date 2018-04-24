@@ -146,6 +146,9 @@ include.module( 'tool-query', [ 'tool', 'widgets', 'tool-query.panel-query-html'
 
                 }
             }
+            else {
+
+            }
         } )
 
         smk.on( this.id, {
@@ -186,7 +189,10 @@ include.module( 'tool-query', [ 'tool', 'widgets', 'tool-query.panel-query-html'
                     param[ p.prop.id ] = $.extend( {}, p.prop )
                 } )
 
-                return self.query.queryLayer( param, self.config, smk.$viewer )
+                return SMK.UTIL.resolved()
+                    .then( function () {
+                        return self.query.queryLayer( param, self.config, smk.$viewer )
+                    } )
                     .then( function ( features ) {
                         self.featureSet.add( self.query.layerId, features )
                     } )

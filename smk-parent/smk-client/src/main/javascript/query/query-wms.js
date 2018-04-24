@@ -1,4 +1,4 @@
-include.module( 'query-wms', [ 'query' ], function () {
+include( 'query' ).then( function () {
 
     function WmsQuery() {
         SMK.TYPE.Query.prototype.constructor.apply( this, arguments )
@@ -12,40 +12,30 @@ include.module( 'query-wms', [ 'query' ], function () {
     WmsQuery.prototype.queryLayer = function ( param, config, viewer ) {
         var self = this
 
-        var serviceUrl  = this.layer.config.serviceUrl + '/dynamicLayer/query'
+        var layerConfig = viewer.layerId[ this.layerId ].config
 
-        var dynamicLayer = JSON.parse( this.layer.config.dynamicLayers[ 0 ] )
-        delete dynamicLayer.drawingInfo
+        var filter = makeCqlClause( this.predicate, param )
 
-        var whereClause = makeCqlClause( this.predicate, param )
+        var data = $.extend( {
+            service:      "WFS",
+            version:      '1.1.0',
+            request:      "GetFeature",
+            srsName:      'EPSG:4326',
+            typename:     layerConfig.layerName,
+            outputformat: "application/json",
+            cql_filter:   filter,
+        }, param.option );
 
-        var attrs = this.layer.config.attributes.filter( function ( a ) { return a.visible !== false } ).map( function ( a ) { return a.name } )
-
-        var data = {
-            f:                  'geojson',
-            layer:              JSON.stringify( dynamicLayer ).replace( /^"|"$/g, '' ),
-            where:              whereClause,
-            outFields:          attrs.join( ',' ),
-            inSR:               4326,
-            outSR:              4326,
-            returnGeometry:     true,
-            returnZ:            false,
-            returnM:            false,
-            returnIdsOnly:      false,
-            returnCountOnly:    false,
-            returnDistinctValues:   false,
-        }
-
-        if ( config.within ) {
-            data.geometry = viewer.getView().extent.join( ',' )
-            data.geometryType = 'esriGeometryEnvelope'
-            data.spatialRel = 'esriSpatialRelIntersects'
-        }
+        // if ( config.within ) {
+        //     data.geometry = viewer.getView().extent.join( ',' )
+        //     data.geometryType = 'esriGeometryEnvelope'
+        //     data.spatialRel = 'esriSpatialRelIntersects'
+        // }
 
         return SMK.UTIL.makePromise( function ( res, rej ) {
             $.ajax( {
-                url:        serviceUrl,
-                method:     'POST',
+                url:        layerConfig.serviceUrl,
+                method:     'GET',
                 data:       data,
                 dataType:   'json',
                 // contentType:    'application/json',
@@ -60,8 +50,8 @@ include.module( 'query-wms', [ 'query' ], function () {
             if ( !data.features || data.features.length == 0 ) throw new Error( 'no features' )
 
             return data.features.map( function ( f, i ) {
-                if ( self.layer.config.titleAttribute )
-                    f.title = f.properties[ self.layer.config.titleAttribute ]
+                if ( layerConfig.titleAttribute )
+                    f.title = f.properties[ layerConfig.titleAttribute ]
                 else
                     f.title = 'Feature #' + ( i + 1 )
 
