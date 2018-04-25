@@ -142,12 +142,8 @@ include.module( 'tool-query', [ 'tool', 'widgets', 'tool-query.panel-query-html'
                 switch ( self.onActivate ) {
                 case 'execute':
                     smk.emit( self.id, 'execute' )
-                    break;
-
+                    break
                 }
-            }
-            else {
-
             }
         } )
 
@@ -214,6 +210,7 @@ include.module( 'tool-query', [ 'tool', 'widgets', 'tool-query.panel-query-html'
                     .finally( function () {
                         self.busy = false
                     } )
+
             },
 
             'config': function ( ev ) {
