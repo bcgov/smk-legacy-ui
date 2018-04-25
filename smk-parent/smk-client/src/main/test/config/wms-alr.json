@@ -3,7 +3,7 @@
         {
             "type": "query",
             "instance": "whse-legal-admin-boundaries-oats-alr-polys--query1",
-            "onActivate": "execute"
+            "onActivate": "executexxxxx"
         }
     ],
     "layers": [

@@ -25,9 +25,9 @@
             ><input type="checkbox"
                 v-model="within"
                 v-on:change="$$emit( 'config', getConfigState() )"
-            >Within current extent</label><br/>    
+            >Within current extent</label><br/>
         </div>
-        <div class="smk-command-row">            
+        <div class="smk-command-row">
             <span class="smk-command"
                 v-bind:class="{ 'smk-disabled': list.isEmpty && !isModified || busy}"
                 v-on:click="( !list.isEmpty || isModified ) && !busy && $$emit( 'reset' )"
@@ -43,7 +43,7 @@
                 v-on:click="!list.isEmpty && !busy && $$emit( 'add-all' )"
             >Add all to selection</span>
         </div>
-</template>
+    </template>
 
     <template slot="placeholder">
         Configure parameters and click Execute.

@@ -1,0 +1,86 @@
+{
+    "tools": [
+        {
+            "type": "query",
+            "instance": "whse-tantalis-ta-survey-parcels-svw--q1"
+        }
+    ],
+    "layers": [
+        {
+            "id": "whse-tantalis-ta-survey-parcels-svw",
+            "queries": [
+                {
+                    "id": "q1",
+                    "title": "Find by Description",
+                    "description": "Find Survey Parcels by description",
+                    "parameters": [
+                        {
+                            "id": "p1",
+                            "type": "input",
+                            "title": "description contains",
+                            "value": ""
+                        },
+                        {
+                            "id": "p2",
+                            "type": "select",
+                            "title": "Parcel type is",
+                            "choices": [
+                                { "title": "Primary", "value": "Primary" },
+                                { "title": "Subdivision", "value": "Subdivision" }
+                            ]
+                        }
+                    ],
+                    "predicate": {
+                        "operator": "and",
+                        "arguments": [
+                            {
+                                "operator": "equals",
+                                "arguments": [
+                                    {
+                                        "operand": "attribute",
+                                        "name": "PARCEL_TYPE"
+                                    },
+                                    {
+                                        "operand": "parameter",
+                                        "id": "p2"
+                                    }
+                                ]
+                            },
+                            {
+                                "operator": "or",
+                                "arguments": [
+                                    {
+                                        "operator": "contains",
+                                        "arguments": [
+                                            {
+                                                "operand": "attribute",
+                                                "name": "PARCEL_LEGAL_DESCRIPTION"
+                                            },
+                                            {
+                                                "operand": "parameter",
+                                                "id": "p1"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "operator": "contains",
+                                        "arguments": [
+                                            {
+                                                "operand": "attribute",
+                                                "name": "PARCEL_SHORT_DESCRIPTION"
+                                            },
+                                            {
+                                                "operand": "parameter",
+                                                "id": "p1"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    ]
+}

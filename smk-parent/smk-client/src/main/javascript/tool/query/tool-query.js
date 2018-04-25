@@ -194,7 +194,18 @@ include.module( 'tool-query', [ 'tool', 'widgets', 'tool-query.panel-query-html'
                         return self.query.queryLayer( param, self.config, smk.$viewer )
                     } )
                     .then( function ( features ) {
-                        self.featureSet.add( self.query.layerId, features )
+                        return asyncIterator(
+                            function () {
+                                return features.length > 0
+                            },
+                            function () {
+                                console.log( features.length )
+
+                                var chunk = features.splice( 0, 50 )
+                                self.featureSet.add( self.query.layerId, chunk )
+                            },
+                            5
+                        )
                     } )
                     .catch( function ( err ) {
                         console.warn( err )
@@ -225,6 +236,27 @@ include.module( 'tool-query', [ 'tool', 'widgets', 'tool-query.panel-query-html'
         } )
 
     } )
+
+    function asyncIterator( test, body, delay ) {
+        return SMK.UTIL.makePromise( function ( res, rej ) {
+            try {
+                if ( !test() ) return res( false )
+                body()
+
+                setTimeout( function () {
+                    res( true )
+                }, delay )
+            }
+            catch ( e ) {
+                return rej( e )
+            }
+        } )
+        .then( function ( cont ) {
+            if ( !cont ) return
+
+            return asyncIterator( test, body )
+        } )
+    }
 
     return QueryTool
 } )
