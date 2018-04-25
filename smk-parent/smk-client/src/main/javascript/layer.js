@@ -213,14 +213,23 @@ include.module( 'layer', [ 'jquery', 'util', 'event' ], function () {
     defineLayerType( 'esri-dynamic', {
 
         getLegends: function () {
-            var legendRequest = this.config.serviceUrl + '/legend?f=pjson&dynamicLayers=' + JSON.stringify( this.config.dynamicLayers.map( function( dl ) { return JSON.parse( dl ) } ) );
-            return $.ajax( {
-                url: legendRequest,
-                type: "get",
-                dataType: "jsonp",
-                contentType: "application/json",
-                crossDomain: true,
-                withCredentials: true,
+            var self = this
+
+            var serviceUrl = this.config.serviceUrl + '/legend'
+            var dynamicLayers = '[' + this.config.dynamicLayers.join( ',' ) + ']'
+
+            var data = {
+                f:             'json',
+                dynamicLayers: dynamicLayers
+            }
+
+            return SMK.UTIL.makePromise( function ( res, rej ) {
+                $.ajax( {
+                    url:        serviceUrl,
+                    type:       "post",
+                    data:       data,
+                    dataType:   "json",
+                } ).then( res, rej )
             } )
             .then ( function ( data ) {
                 var layer = data.layers[0]; // should only get one back...
@@ -240,8 +249,9 @@ include.module( 'layer', [ 'jquery', 'util', 'event' ], function () {
             var serviceUrl  = this.config.serviceUrl + '/identify'
             var dynamicLayers = '[' + this.config.dynamicLayers.join( ',' ) + ']'
 
-            var param = {
-                geometryType:   'esriGeometryPoint',
+            var data = {
+                f:              'json',
+                dynamicLayers:  dynamicLayers,
                 sr:             4326,
                 tolerance:      1,
                 mapExtent:      view.extent.join( ',' ),
@@ -249,9 +259,8 @@ include.module( 'layer', [ 'jquery', 'util', 'event' ], function () {
                 returnGeometry: true,
                 returnZ:        false,
                 returnM:        false,
-                f:              'json',
+                geometryType:   'esriGeometryPoint',
                 geometry:       location.map.longitude + ',' + location.map.latitude,
-                dynamicLayers:  dynamicLayers,
                 tolerance:      option.tolerance
             }
 
@@ -259,11 +268,8 @@ include.module( 'layer', [ 'jquery', 'util', 'event' ], function () {
                 $.ajax( {
                     url:            serviceUrl,
                     type:           'post',
-                    data:           param,
+                    data:           data,
                     dataType:       'json',
-                    // contentType:    "application/json",
-                    // crossDomain:    true,
-                    // withCredentials: true,
                 } ).then( res, rej )
             } )
             .then( function ( data ) {
