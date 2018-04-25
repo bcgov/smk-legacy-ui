@@ -1,242 +1,45 @@
-include.module( 'query', [ 'jquery', 'util', 'event' ], function () {
+include( 'query' ).then( function () {
 
-    var QueryEvent = SMK.TYPE.Event.define( [
-        // 'startedLoading',
-        // 'finishedLoading',
-    ] )
+    function VectorQuery() {
+        SMK.TYPE.Query.prototype.constructor.apply( this, arguments )
+    }
 
-    function Query( layer, config ) {
+    $.extend( VectorQuery.prototype, SMK.TYPE.Query.prototype )
+
+    SMK.TYPE.Query[ 'vector' ] = VectorQuery
+    // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+    //
+    VectorQuery.prototype.queryLayer = function ( param, config, viewer ) {
         var self = this
 
-        QueryEvent.prototype.constructor.call( this )
+        var layerConfig = viewer.layerId[ this.layerId ].config
 
-        $.extend( this, {
-            layer: layer
-        }, config )
+        var test = makeTest( this.predicate, param )
 
-        this.id = layer.id + '--' + this.id
-        // var loading = false
-        // Object.defineProperty( this, 'loading', {
-        //     get: function () { return loading },
-        //     set: function ( v ) {
-        //         if ( !!v == loading ) return
-        //         // console.log( self.config.id, v )
-        //         loading = !!v
-        //         if ( v )
-        //             self.startedLoading()
-        //         else
-        //             self.finishedLoading()
-        //     }
-        // } )
-    }
-
-    $.extend( Query.prototype, QueryEvent.prototype )
-    // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-    //
-    Query.prototype.getParameters = function () {
-        var self = this;
-
-        return this.parameters.map( function ( p ) {
-            return {
-                id: self.id + '--' + p.id,
-                component: 'parameter-' + p.type,
-                prop: $.extend( true, { value: null }, p ),
-                initial: p.value
-            }
+        var features = []
+        viewer.visibleLayer[ this.layerId ].eachLayer( function ( ly ) {
+            if ( test( ly.feature.properties ) )
+                features.push( ly.feature )
         } )
-    }
 
+        return SMK.UTIL.resolved( features )
+            .then( function ( features ) {
+                console.log( features )
 
-    Query.prototype.queryLayer = function ( arg ) {
-        console.log( 'not implemented', arg )
-    }
-    // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-    //
-    SMK.TYPE.Query = {}
+                if ( !features || features.length == 0 ) throw new Error( 'no features' )
 
-    function defineQueryType( name, def ) {
-        var qt = function () {
-            Query.prototype.constructor.apply( this, arguments )
-        }
-
-        $.extend( qt.prototype, Query.prototype, def )
-
-        SMK.TYPE.Query[ name ] = qt
-    }
-
-    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-    defineQueryType( 'folder' )
-
-    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-    defineQueryType( 'group' )
-
-    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-    defineQueryType( 'wms', {
-    } )
-
-    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-    defineQueryType( 'esri-dynamic', {
-
-        queryLayer: function ( param, config, viewer ) {
-            var self = this
-
-            if ( this.layer.config.dynamicLayers.length != 1 )
-                throw new Error( 'more than one dynamic layer def' )
-
-            var serviceUrl  = this.layer.config.serviceUrl + '/dynamicLayer/query'
-
-            var dynamicLayer = JSON.parse( this.layer.config.dynamicLayers[ 0 ] )
-            delete dynamicLayer.drawingInfo
-
-            var whereClause = makeWhereClause( this.predicate, param )
-
-            var attrs = this.layer.config.attributes.filter( function ( a ) { return a.visible !== false } ).map( function ( a ) { return a.name } )
-
-            var data = {
-                f:                  'geojson',
-                layer:              JSON.stringify( dynamicLayer ).replace( /^"|"$/g, '' ),
-                where:              whereClause,
-                outFields:          attrs.join( ',' ),
-                inSR:               4326,
-                outSR:              4326,
-                returnGeometry:     true,
-                returnZ:            false,
-                returnM:            false,
-                returnIdsOnly:      false,
-                returnCountOnly:    false,
-                returnDistinctValues:   false,
-            }
-
-            if ( config.within ) {
-                data.geometry = viewer.getView().extent.join( ',' )
-                data.geometryType = 'esriGeometryEnvelope'
-                data.spatialRel = 'esriSpatialRelIntersects'
-            }
-
-            return SMK.UTIL.makePromise( function ( res, rej ) {
-                $.ajax( {
-                    url:        serviceUrl,
-                    method:     'POST',
-                    data:       data,
-                    dataType:   'json',
-                    // contentType:    'application/json',
-                    // crossDomain:    true,
-                    // withCredentials: true,
-                } ).then( res, rej )
-            } )
-            .then( function ( data ) {
-                console.log( data )
-
-                if ( !data ) throw new Error( 'no features' )
-                if ( !data.features || data.features.length == 0 ) throw new Error( 'no features' )
-
-                return data.features.map( function ( f, i ) {
-                    if ( self.layer.config.titleAttribute )
-                        f.title = f.properties[ self.layer.config.titleAttribute ]
+                return features.map( function ( f, i ) {
+                    if ( layerConfig.titleAttribute )
+                        f.title = f.properties[ layerConfig.titleAttribute ]
                     else
                         f.title = 'Feature #' + ( i + 1 )
 
                     return f
                 } )
             } )
-        }
-
-    } )
-
-    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-    defineQueryType( 'kml', {
-    } )
-
-    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-    defineQueryType( 'vector', {
-
-        queryLayer: function ( param, config, viewer, layerId ) {
-            var self = this
-
-            var test = makeTest( this.predicate, param )
-
-            var features = []
-            viewer.visibleLayer[ layerId ].eachLayer( function ( ly ) {
-                if ( test( ly.feature.properties ) )
-                    features.push( ly.feature )
-            } )
-
-            return SMK.UTIL.resolved( features )
-                .then( function ( features ) {
-                    console.log( features )
-
-                    if ( !features || features.length == 0 ) throw new Error( 'no features' )
-
-                    return features.map( function ( f, i ) {
-                        if ( self.layer.config.titleAttribute )
-                            f.title = f.properties[ self.layer.config.titleAttribute ]
-                        else
-                            f.title = 'Feature #' + ( i + 1 )
-
-                        return f
-                    } )
-                } )
-            // var whereClause = makeWhereClause( this.predicate, param )
-
-            // var attrs = this.layer.config.attributes.filter( function ( a ) { return a.visible !== false } ).map( function ( a ) { return a.name } )
-
-            // var data = {
-            //     f:                  'geojson',
-            //     layer:              JSON.stringify( dynamicLayer ).replace( /^"|"$/g, '' ),
-            //     where:              whereClause,
-            //     outFields:          attrs.join( ',' ),
-            //     inSR:               4326,
-            //     outSR:              4326,
-            //     returnGeometry:     true,
-            //     returnZ:            false,
-            //     returnM:            false,
-            //     returnIdsOnly:      false,
-            //     returnCountOnly:    false,
-            //     returnDistinctValues:   false,
-            // }
-
-            // if ( config.within ) {
-            //     data.geometry = viewer.getView().extent.join( ',' )
-            //     data.geometryType = 'esriGeometryEnvelope'
-            //     data.spatialRel = 'esriSpatialRelIntersects'
-            // }
-
-            // return SMK.UTIL.makePromise( function ( res, rej ) {
-            //     $.ajax( {
-            //         url:        serviceUrl,
-            //         method:     'POST',
-            //         data:       data,
-            //         dataType:   'json',
-            //         // contentType:    'application/json',
-            //         // crossDomain:    true,
-            //         // withCredentials: true,
-            //     } ).then( res, rej )
-            // } )
-            // .then( function ( data ) {
-            //     console.log( data )
-
-            //     if ( !data ) throw new Error( 'no features' )
-            //     if ( !data.features || data.features.length == 0 ) throw new Error( 'no features' )
-
-            //     return data.features.map( function ( f, i ) {
-            //         if ( self.layer.config.titleAttribute )
-            //             f.title = f.properties[ self.layer.config.titleAttribute ]
-            //         else
-            //             f.title = 'Feature #' + ( i + 1 )
-
-            //         return f
-            //     } )
-            // } )
-        }
-
-    } )
-
+    }
+    // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+    //
     function makeTest( predicate, param ) {
         return makeTestOperator( predicate, param )
     }
@@ -245,7 +48,7 @@ include.module( 'query', [ 'jquery', 'util', 'event' ], function () {
         if ( !( predicate.operator in testOperator ) )
             throw new Error( 'unknown operator: ' + JSON.stringify( predicate ) )
 
-        return testOperator[ predicate.operator ]( predicate.arguments, param )        
+        return testOperator[ predicate.operator ]( predicate.arguments, param )
     }
 
     var testOperator = {
@@ -351,7 +154,7 @@ include.module( 'query', [ 'jquery', 'util', 'event' ], function () {
             return function ( properties ) {
                 return ! a( properties )
             }
-        }        
+        }
     }
 
     function makeTestOperand( predicate, param ) {
@@ -374,7 +177,7 @@ include.module( 'query', [ 'jquery', 'util', 'event' ], function () {
             }
         }
     }
-    
+
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
     function makeWhereClause( predicate, param ) {

@@ -3,6 +3,7 @@
     <component class="smk-panel"
         v-if="activeToolId && tool[ activeToolId ]"
         v-bind:is="tool[ activeToolId ].panelComponent"
+        v-bind:key="activeToolId"
         v-bind="tool[ activeToolId ].panel"
     ></component>
 
