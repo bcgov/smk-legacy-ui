@@ -19,6 +19,8 @@ include.module( 'surround', [ 'vue', 'surround.header-html' ], function ( inc ) 
                 }
             }
         } )
+
+        $( 'head title' ).text( smk.surround.title )
     }
 
     SMK.TYPE.Surround = Surround
