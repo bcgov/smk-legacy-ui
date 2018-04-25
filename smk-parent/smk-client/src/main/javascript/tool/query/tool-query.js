@@ -102,7 +102,9 @@ include.module( 'tool-query', [ 'tool', 'widgets', 'tool-query.panel-query-html'
 
         this.makePropPanel( 'description', null )
         this.makePropPanel( 'parameters', null )
-        this.makePropPanel( 'config', { within: true } )
+        this.makePropPanel( 'config', {
+            within: true
+        } )
 
         SMK.TYPE.FeatureList.prototype.constructor.call( this, $.extend( {
             order:          4,
@@ -132,6 +134,9 @@ include.module( 'tool-query', [ 'tool', 'widgets', 'tool-query.panel-query-html'
         this.title = this.query.title
         this.description = this.query.description
         this.parameters = this.query.getParameters()
+
+        if ( !smk.$viewer.layerId[ this.query.layerId ].config.geometryAttribute )
+            this.config.within = null
     } )
 
     QueryTool.prototype.afterInitialize.push( function ( smk ) {

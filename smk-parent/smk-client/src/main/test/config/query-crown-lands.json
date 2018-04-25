@@ -3,7 +3,12 @@
         {
             "type": "query",
             "instance": "whse-tantalis-ta-survey-parcels-svw--q1"
+        },
+        {
+            "type": "query",
+            "instance": "whse-tantalis-ta-crown-leases-svw--q1"
         }
+
     ],
     "layers": [
         {
@@ -76,6 +81,37 @@
                                         ]
                                     }
                                 ]
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "whse-tantalis-ta-crown-leases-svw",
+            "queries": [
+                {
+                    "id": "q1",
+                    "title": "Find by Description",
+                    "description": "Find Crown Leases by description",
+                    "parameters": [
+                        {
+                            "id": "p1",
+                            "type": "input",
+                            "title": "description contains",
+                            "value": ""
+                        }
+                    ],
+                    "predicate": {
+                        "operator": "contains",
+                        "arguments": [
+                            {
+                                "operand": "attribute",
+                                "name": "TENURE_LEGAL_DESCRIPTION"
+                            },
+                            {
+                                "operand": "parameter",
+                                "id": "p1"
                             }
                         ]
                     }

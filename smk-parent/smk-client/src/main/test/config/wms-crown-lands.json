@@ -87,6 +87,7 @@
             "layerName": "WHSE_TANTALIS.TA_SURVEY_PARCELS_SVW",
             "styleName": "Land_Act_Survey_Parcels_Tantalis_Outlined",
             "titleAttribute": "PARCEL_SHORT_DESCRIPTION",
+            "geometryAttribute": "SHAPE",
             "attributes": [
                 {
                     "name": "PIN_SID",

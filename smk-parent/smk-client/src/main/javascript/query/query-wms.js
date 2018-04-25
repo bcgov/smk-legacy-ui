@@ -26,11 +26,9 @@ include( 'query' ).then( function () {
             cql_filter:   filter,
         }, param.option );
 
-        // if ( config.within ) {
-        //     data.geometry = viewer.getView().extent.join( ',' )
-        //     data.geometryType = 'esriGeometryEnvelope'
-        //     data.spatialRel = 'esriSpatialRelIntersects'
-        // }
+        if ( config.within && layerConfig.geometryAttribute ) {
+            data.cql_filter = '( ' + data.cql_filter + ' ) AND BBOX( ' + layerConfig.geometryAttribute + ', ' + viewer.getView().extent.join( ', ' ) + ', \'EPSG:4326\' )'
+        }
 
         return SMK.UTIL.makePromise( function ( res, rej ) {
             $.ajax( {
