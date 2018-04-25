@@ -1,4 +1,7 @@
 {
+    "surround": {
+        "subtitles": [ "Crown Lands" ]
+    },
     "layers": [
         {
             "id": "whse-tantalis-ta-crown-leases-svw",

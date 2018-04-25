@@ -1,4 +1,7 @@
 {
+    "surround": {
+        "subtitles": [ "All Tools" ]
+    },
     "tools": [
         { "type": "measure" },
         { "type": "scale",
