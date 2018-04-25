@@ -57,8 +57,7 @@ include.module( 'query', [ 'jquery', 'util', 'event' ], function () {
         this.abortRequestInProgress()
 
         this.requestInProgress = SMK.UTIL.makeRequest( option )
-        this.requestInProgress.changedState( function () { onStateChange( this.requestInProgres.state ) } )
-
+        this.requestInProgress.changedState( function () { onStateChange( self.requestInProgress.state ) } )
         this.requestInProgress.start( resultFilter )
 
         return this.requestInProgress

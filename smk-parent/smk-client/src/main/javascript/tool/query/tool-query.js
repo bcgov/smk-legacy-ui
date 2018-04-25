@@ -187,10 +187,8 @@ include.module( 'tool-query', [ 'tool', 'widgets', 'tool-query.panel-query-html'
                     param[ p.prop.id ] = $.extend( {}, p.prop )
                 } )
 
-                var request = self.query.queryLayer( param, self.config, smk.$viewer )
-
-                request.changedState( function () {
-                    switch ( request.state ) {
+                var request = self.query.queryLayer( param, self.config, smk.$viewer, function ( state ) {
+                    switch ( state ) {
                     case 'requesting':
                         self.featureSet.clear()
                         self.busy = true
@@ -205,8 +203,10 @@ include.module( 'tool-query', [ 'tool', 'widgets', 'tool-query.panel-query-html'
 
                     case 'succeeded':
                         request.result().then( function ( features ) {
+
                             self.featureSet.add( self.query.layerId, features )
                             self.busy = false
+                            request.finished()
                         } )
                         break
 

@@ -235,6 +235,8 @@ include.module( 'util', [ 'event' ], function ( inc ) {
             set: function ( v ) {
                 if ( v == state ) return
                 if ( state == 'aborted' ) return
+                if ( state == 'finished' ) return
+                if ( state == 'failed' ) return
                 // console.log( self.config.id, v )
                 state = v
                 self.changedState()
@@ -289,6 +291,10 @@ include.module( 'util', [ 'event' ], function ( inc ) {
     Request.prototype.result = function () {
         if ( !this.$promise ) throw new Error( 'request not started' )
         return this.$promise
+    }
+
+    Request.prototype.finished = function () {
+        self.state = 'finished'
     }
 
 } )

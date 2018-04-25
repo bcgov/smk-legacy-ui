@@ -32,29 +32,33 @@ include( 'query' ).then( function () {
         //     data.spatialRel = 'esriSpatialRelIntersects'
         // }
 
-        return this.makeRequest( {
-            url:        layerConfig.serviceUrl,
-            method:     'GET',
-            data:       data,
-            dataType:   'json',
-            // contentType:    'application/json',
-            // crossDomain:    true,
-            // withCredentials: true,
-        }, function ( data ) {
-            console.log( data )
+        return this.makeRequest(
+            {
+                url:        layerConfig.serviceUrl,
+                method:     'GET',
+                data:       data,
+                dataType:   'json',
+                // contentType:    'application/json',
+                // crossDomain:    true,
+                // withCredentials: true,
+            },
+            function ( data ) {
+                console.log( data )
 
-            if ( !data ) throw new Error( 'no features' )
-            if ( !data.features || data.features.length == 0 ) throw new Error( 'no features' )
+                if ( !data ) throw new Error( 'no features' )
+                if ( !data.features || data.features.length == 0 ) throw new Error( 'no features' )
 
-            return data.features.map( function ( f, i ) {
-                if ( layerConfig.titleAttribute )
-                    f.title = f.properties[ layerConfig.titleAttribute ]
-                else
-                    f.title = 'Feature #' + ( i + 1 )
+                return data.features.map( function ( f, i ) {
+                    if ( layerConfig.titleAttribute )
+                        f.title = f.properties[ layerConfig.titleAttribute ]
+                    else
+                        f.title = 'Feature #' + ( i + 1 )
 
-                return f
-            } )
-        } )
+                    return f
+                } )
+            },
+            onStateChange
+        )
     }
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
