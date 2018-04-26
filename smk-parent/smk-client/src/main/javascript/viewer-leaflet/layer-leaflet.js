@@ -126,14 +126,12 @@ include.module( 'layer-leaflet', [ 'layer', 'util' ], function () {
             interactive: false
         } )
 
-        if ( !layers[ 0 ].config.dataUrl ) {
-            layers[ 0 ].config.dataUrl = this.resolveAttachmentUrl( layers[ 0 ].config.id, layers[ 0 ].config.type )
-        }
+        var url = this.resolveAttachmentUrl( layers[ 0 ].config.dataUrl, layers[ 0 ].config.id, layers[ 0 ].config.type )
 
         if ( !layers[ 0 ].config.CRS )
             layers[ 0 ].config.CRS = 'EPSG4326'
 
-        var kmlLayer = omnivore.kml( layers[ 0 ].config.dataUrl, null, jsonLayer )
+        var kmlLayer = omnivore.kml( url, null, jsonLayer )
 
         kmlLayer.on( {
             add: function () {
@@ -144,7 +142,7 @@ include.module( 'layer-leaflet', [ 'layer', 'util' ], function () {
         return SMK.UTIL.makePromise( function ( res, rej ) {
             kmlLayer.on( {
                 'ready': function () {
-                    console.log( 'loaded', layers[ 0 ].config.dataUrl )
+                    console.log( 'loaded', url )
                     res( kmlLayer )
                 },
                 'error': function () {
@@ -187,19 +185,16 @@ include.module( 'layer-leaflet', [ 'layer', 'util' ], function () {
             }
         } )
 
-        if ( !layers[ 0 ].config.dataUrl )
-            layers[ 0 ].config.dataUrl = this.resolveAttachmentUrl( layers[ 0 ].config.id, 'geojson' )
-        else if ( layers[ 0 ].config.dataUrl.startsWith( '@' ) )
-            layers[ 0 ].config.dataUrl = this.resolveAttachmentUrl( layers[ 0 ].config.dataUrl.substr( 1 ), 'geojson' )
+        var url = this.resolveAttachmentUrl( layers[ 0 ].config.dataUrl, layers[ 0 ].config.id, 'geojson' )
 
         if ( !layers[ 0 ].config.CRS )
             layers[ 0 ].config.CRS = 'EPSG4326'
 
         return SMK.UTIL.makePromise( function ( res, rej ) {
-                $.get( layers[ 0 ].config.dataUrl, null, null, 'json' ).then( res, rej )
+                $.get( url, null, null, 'json' ).then( res, rej )
             } )
             .then( function ( data ) {
-                console.log( 'loaded', layers[ 0 ].config.dataUrl )
+                console.log( 'loaded', url )
                 layer.addData( data )
                 return layer
             } )
@@ -261,7 +256,7 @@ include.module( 'layer-leaflet', [ 'layer', 'util' ], function () {
         if ( styleConfig.markerUrl ) {
             return L.marker( latlng, {
                 icon: styleConfig.marker || ( styleConfig.marker = L.icon( {
-                    iconUrl: this.resolveAttachmentUrl( styleConfig.markerUrl.substr( 1 ), '' ),
+                    iconUrl: this.resolveAttachmentUrl( styleConfig.markerUrl, null, 'png' ),
                     iconSize: styleConfig.markerSize,
                     iconAnchor: styleConfig.markerOffset,
                 } ) ),

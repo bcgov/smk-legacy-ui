@@ -115,6 +115,7 @@ include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', '
         this.lmfId = smk.lmfId
         this.type = smk.viewer.type
         this.disconnected = smk.$option.disconnected
+        this.serviceUrl = smk.$option[ 'service-url' ]
 
         this.identified = new SMK.TYPE.FeatureSet()
         this.selected = new SMK.TYPE.FeatureSet()
@@ -442,11 +443,22 @@ include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', '
     }
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
-    Viewer.prototype.resolveAttachmentUrl = function ( attachmentId, type ) {
+    Viewer.prototype.resolveAttachmentUrl = function ( url, id, type ) {
+        if ( url && url.startsWith( '@' ) ) {
+            id = url.substr( 1 )
+            url = null
+        }
+
+        if ( url )
+            return url
+
+        if ( !id )
+            throw new Error( 'attachment without URL or Id' )
+
         if ( this.disconnected )
-            return 'attachments/' + attachmentId + ( type ? '.' + type : '' )
+            return 'attachments/' + id + ( type ? '.' + type : '' )
         else
-            return '../smks-api/MapConfigurations/' + this.lmfId + '/Attachments/' + attachmentId
+            return this.serviceUrl + '/MapConfigurations/' + this.lmfId + '/Attachments/' + id
     }
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //

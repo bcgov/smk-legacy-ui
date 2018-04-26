@@ -24,11 +24,12 @@ include.module( 'smk-map', [ 'jquery', 'util', 'viewer', 'layer' ], function () 
             .then( loadConfigs )
             .then( mergeConfigs )
             .then( initMapFrame )
-            .then( initSurround )
+            .then( loadSurround )
             .then( loadViewer )
             .then( loadTools )
             .then( initViewer )
             .then( initTools )
+            .then( initSurround )
             .then( showMap )
 
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -187,12 +188,16 @@ include.module( 'smk-map', [ 'jquery', 'util', 'viewer', 'layer' ], function () 
             } )
         }
 
+        function loadSurround() {
+            if ( !self.$option.standalone ) return
+
+            return include( 'surround' )
+        }
+
         function initSurround() {
             if ( !self.$option.standalone ) return
 
-            return include( 'surround' ).then( function () {
-                self.$surround = new SMK.TYPE.Surround( self )
-            } )
+            self.$surround = new SMK.TYPE.Surround( self )
         }
 
         function loadViewer() {

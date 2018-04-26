@@ -22,6 +22,7 @@
             'standalone':   attrBoolean( false, true ),
             'disconnected': attrBoolean( false, true ),
             'base-url':     attrString( ( new URL( script.src.replace( 'smk-bootstrap.js', '' ), document.location ) ).toString() ),
+            'service-url':  attrString( '../smks-api' ),
         }
 
         Object.keys( smkAttr ).forEach( function ( k ) {
