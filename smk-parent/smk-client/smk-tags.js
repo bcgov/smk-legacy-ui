@@ -168,7 +168,7 @@ exports.gen = function () {
 
     t.sequence( 'leaflet-extensions' )
         .tag( 'leaflet' )
-        .script( 'resources/js/NonTiledLayer-src.js' )
+        .script( 'lib/NonTiledLayer-src.js' )
         .script( 'https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-omnivore/v0.3.1/leaflet-omnivore.min.js' )
         .script( 'https://unpkg.com/terraformer@1.0.7' )
         .script( 'https://unpkg.com/terraformer-arcgis-parser@1.0.5' )
@@ -177,7 +177,7 @@ exports.gen = function () {
     	.style( "https://unpkg.com/leaflet.markercluster@1.0.6/dist/MarkerCluster.css" )
     	.style( "https://unpkg.com/leaflet.markercluster@1.0.6/dist/MarkerCluster.Default.css" )
     	.script( "https://unpkg.com/leaflet.markercluster@1.0.6/dist/leaflet.markercluster-src.js" )
-    	.script( "resources/js/leaflet-heat.js" )
+    	.script( "lib/leaflet-heat.js" )
 
     // esri3d
 
@@ -224,7 +224,7 @@ exports.gen = function () {
         .tag( 'leaflet' )
         .style( 'https://js.arcgis.com/4.6/esri/css/main.css' )
         .script( 'https://js.arcgis.com/4.6/' )
-        .script( 'resources/js/toGeoJSON.js' )
+        .script( 'lib/toGeoJSON.js' )
         .script( 'https://unpkg.com/terraformer@1.0.7' )
         .script( 'https://unpkg.com/terraformer-arcgis-parser@1.0.5' )
         .script( 'https://unpkg.com/terraformer-wkt-parser@1.1.2' )
