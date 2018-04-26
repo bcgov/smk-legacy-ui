@@ -181,11 +181,9 @@ include.module( 'smk-map', [ 'jquery', 'util', 'viewer', 'layer' ], function () 
         }
 
         function initMapFrame() {
-            return include( 'map-frame-styles' ).then( function () {
-                $( self.$container )
-                    .addClass( 'smk-map-frame' )
-                    .addClass( 'smk-viewer-' + self.viewer.type )
-            } )
+            $( self.$container )
+                .addClass( 'smk-map-frame' )
+                .addClass( 'smk-viewer-' + self.viewer.type )
         }
 
         function loadSurround() {

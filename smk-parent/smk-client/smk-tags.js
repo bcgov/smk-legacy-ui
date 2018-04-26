@@ -5,33 +5,35 @@ exports.gen = function () {
 
     var t = new tg.TagSet()
 
-    t.script( 'jquery', 'lib/jquery-1.11.2.js' )
+    t.script( 'jquery', 'lib/jquery-3.3.1.min.js' )
     t.script( 'vue', 'lib/vue-2.5.11.js' )
 
     t.script( 'util', 'util.js' )
     t.script( 'event', 'event.js' )
-    t.script( 'smk-map', 'smk-map.js' )
     t.script( 'viewer', 'viewer.js' )
     t.script( 'layer', 'layer.js' )
     t.script( 'tool', 'tool.js' )
-    // t.script( 'query', 'query.js' )
     t.script( 'feature-set', 'feature-set.js' )
+
+    t.group( 'smk-map' )
+        .script( 'smk-map.js' )
+        .style( 'smk-map-frame.css' )
 
     t.group( 'query' )
         .dir( 'query/**/*', { cwd: baseDir } )
 
-    t.sequence( 'map-frame-styles' )
-        .style( 'resources/css/smk-map-frame.css' )
-        .style( 'https://fonts.googleapis.com/icon?family=Material+Icons' )
-
     t.group( 'surround' )
         .dir( 'surround/**/*', { cwd: baseDir } )
 
+    t.style( 'material-icons', 'https://fonts.googleapis.com/icon?family=Material+Icons' )
+
     t.group( 'toolbar' )
         .dir( 'toolbar/**/*', { cwd: baseDir } )
+        .tag( 'material-icons' )
 
     t.group( 'sidepanel' )
         .dir( 'sidepanel/**/*', { cwd: baseDir } )
+        .tag( 'material-icons' )
 
     t.group( 'widgets' )
         .dir( 'widgets/**/*', { cwd: baseDir } )
@@ -41,7 +43,6 @@ exports.gen = function () {
 
     t.group( 'feature-list' )
         .dir( 'feature-list/**/*', { cwd: baseDir } )
-
 
     t.group( 'tool-menu' )
         .dir( 'tool/menu/**/*', { cwd: baseDir } )
