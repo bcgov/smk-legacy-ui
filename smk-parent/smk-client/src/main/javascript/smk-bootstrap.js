@@ -4,12 +4,19 @@
 
     setupGlobalSMK()
 
+    console.time( 'smk-bootstrap' )
+    console.groupCollapsed( 'SMK bootstrap' )
+
     SMK.BOOT = SMK.BOOT
         .then( parseScriptElement )
         .then( resolveConfig )
         .then( loadInclude )
         .then( initializeSmkMap )
         .catch( SMK.ON_FAILURE )
+        .finally( function () {
+            console.groupEnd()
+            console.timeEnd( 'smk-bootstrap' )
+        } )
 
 // = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
@@ -29,7 +36,7 @@
             smkAttr[ k ] = smkAttr[ k ]( 'smk-' + k, script )
         } )
 
-        console.log( 'SMK attributes', smkAttr )
+        console.log( 'SMK attributes', JSON.parse( JSON.stringify( smkAttr ) ) )
 
         return Promise.resolve( smkAttr )
 

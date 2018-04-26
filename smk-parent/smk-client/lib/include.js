@@ -82,7 +82,6 @@
                 script.setAttribute( 'src', self.$resolveUrl( inc.url ) )
 
                 document.getElementsByTagName( 'head' )[ 0 ].appendChild( script );
-                // console.log( 'added element', inc )
             } )
         }
         else throw new Error( 'Can\'t load script' )
@@ -142,7 +141,6 @@
                 } )
 
                 req.addEventListener( 'error', function ( ev ) {
-                    console.log(ev)
                     rej( new Error( 'failed to load template from ' + url ) )
                 } )
 
@@ -217,7 +215,6 @@
         if ( base && tag.url && !tag.external && !/[/][/]/.test( tag.url ) ) {
             var m = tag.url.match( /(^|[/])([^/]+)$/ )
             newTag = base + '.' +  m[ 2 ].replace( /[.]/g, '-' ).toLowerCase()
-            // console.log( tag.url, m, newTag )
         }
         else {
             newTag = 'anon-' + hash( anon )
@@ -257,26 +254,22 @@
                         return inc.module
                     } )
                     .then( function ( r ) {
-                        // console.log( '"' + tag + '" resolve' );
                         res( r )
                     } )
                     .catch( function ( e ) {
-                        // console.warn(e)
                         rej( e )
                     } )
 
                 setTimeout( function () {
-                    // console.log( '"' + tag + '" timeout' );
                     rej( new Error( 'timeout' ) )
                 }, OPTION.timeout )
             } ) )
             .then( function ( res ) {
-                console.log( 'included ' + inc.loader + ' "' + tag + '"', inc.url || inc.tags )
+                console.debug( 'included ' + inc.loader + ' "' + tag + '"', inc.url || inc.tags )
                 return res
             } )
             .catch( function ( e ) {
                 e.message += ', for tag "' + tag + '"'
-                // console.warn( e )
                 throw e
             } )
     }
@@ -307,7 +300,7 @@
                 return mod
             } )
             .then( function ( exp ) {
-                console.log( 'module "' + tag + '"' )
+                console.debug( 'module "' + tag + '"' )
                 inc.exported = exp
                 return exp
             } )

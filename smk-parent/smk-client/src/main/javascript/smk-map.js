@@ -1,4 +1,4 @@
-include.module( 'smk-map', [ 'jquery', 'util', 'viewer', 'layer' ], function () {
+include.module( 'smk-map', [ 'jquery', 'util' ], function () {
 
     function SmkMap( option ) {
         this.$option = option
@@ -11,7 +11,9 @@ include.module( 'smk-map', [ 'jquery', 'util', 'viewer', 'layer' ], function () 
     SmkMap.prototype.initialize = function () {
         var self = this;
 
-        console.log( 'smk initialize:', this.$option )
+        console.groupCollapsed( 'SMK initialize #' + this.$option[ 'container-id' ] )
+
+        console.log( 'options:', JSON.parse( JSON.stringify( this.$option ) ) )
 
         this.$container = document.getElementById( this.$option[ 'container-id' ] )
         if ( !this.$container )
@@ -31,6 +33,9 @@ include.module( 'smk-map', [ 'jquery', 'util', 'viewer', 'layer' ], function () 
             .then( initTools )
             .then( initSurround )
             .then( showMap )
+            .finally( function () {
+                console.groupEnd()
+            } )
 
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -63,12 +68,12 @@ include.module( 'smk-map', [ 'jquery', 'util', 'viewer', 'layer' ], function () 
             var config = Object.assign( {}, SMK.CONFIG )
             config.$sources = []
 
-            console.log( 'base', JSON.stringify( config, null, '  ' ) )
+            console.log( 'base', JSON.parse( JSON.stringify( config ) ) )
 
             while( configs.length > 0 ) {
                 var c = configs.shift()
 
-                console.log( 'merging', JSON.stringify( c, null, '  ' ) )
+                console.log( 'merging', JSON.parse( JSON.stringify( config ) ) )
 
                 mergeSurround( config, c )
                 mergeViewer( config, c )
@@ -80,7 +85,7 @@ include.module( 'smk-map', [ 'jquery', 'util', 'viewer', 'layer' ], function () 
 
                 Object.assign( config, c )
 
-                console.log( 'merged', JSON.stringify( config, null, '  ' ) )
+                console.log( 'merged', JSON.parse( JSON.stringify( config ) ) )
             }
 
             Object.assign( self, config )
