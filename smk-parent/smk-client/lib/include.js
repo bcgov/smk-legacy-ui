@@ -6,7 +6,7 @@
     var TAG = {}
     var OPTION = {
         baseUrl: document.location,
-        timeout: 60 * 1000
+        timeout: 10 * 1000
     }
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -156,6 +156,8 @@
             a[ i ] = _assignAnonTag( t, tag )
         } )
 
+        console.group( tag, 'sequence', JSON.stringify( inc.tags ) )
+
         var promise = Promise.resolve()
         var res = {}
 
@@ -169,6 +171,7 @@
         } )
 
         return promise.then( function () {
+            console.groupEnd()
             return res
         } )
     }
@@ -178,12 +181,15 @@
             a[ i ] = _assignAnonTag( t, tag )
         } )
 
+        console.group( tag, 'group', JSON.stringify( inc.tags ) )
+
         var promises = inc.tags.map( function ( t ) {
             return Promise.resolve().then( function () { return _include( t ) } )
         } )
 
         return Promise.all( promises )
             .then( function ( ress ) {
+                console.groupEnd()
                 var res = {}
                 inc.tags.forEach( function ( t, i ) {
                     res[ t ] = ress[ i ]
@@ -246,19 +252,20 @@
         return inc.include =
             ( new Promise( function ( res, rej ) {
                 loader[ inc.loader ].call( loader, inc, tag )
-                    .then( function ( res ) {
-                        inc.loaded = res
+                    .then( function ( r ) {
+                        inc.loaded = r
 
-                        if ( !inc.module ) return res
+                        if ( !inc.module ) return r
 
                         return inc.module
                     } )
-                    .then( function ( r ) {
-                        res( r )
-                    } )
-                    .catch( function ( e ) {
-                        rej( e )
-                    } )
+                    .then( res, rej )
+                    // .then( function ( r ) {
+                    //     res( r )
+                    // } )
+                    // .catch( function ( e ) {
+                    //     rej( e )
+                    // } )
 
                 setTimeout( function () {
                     rej( new Error( 'timeout' ) )
@@ -270,6 +277,8 @@
             } )
             .catch( function ( e ) {
                 e.message += ', for tag "' + tag + '"'
+                console.warn(e)
+
                 throw e
             } )
     }

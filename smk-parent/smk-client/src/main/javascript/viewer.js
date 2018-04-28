@@ -363,12 +363,16 @@ include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', '
         var self = this
 
         option = Object.assign( {
-            tolerance: 3
+            tolerance: 5
         }, option )
 
         var view = this.getView()
 
-        this.startedIdentify()
+        var searchArea = turf.polygon( [ SMK.UTIL.circlePoints( location.screen, option.tolerance, 32 ).map( function ( p ) { return self.screenToMap( p ) } ) ] )
+
+        // var searchArea = turf.circle( [ location.map.longitude, location.map.latitude ], option.tolerance * view.metersPerPixelAtY( location.screen.y ) / 1000 )
+
+        this.startedIdentify( { area: searchArea } )
 
         this.identified.clear()
 
