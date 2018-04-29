@@ -1,0 +1,16 @@
+<div>
+    <div class="smk-header">
+        <h3>{{ layer.title }}</h3>
+        <h2>{{ feature.title }}</h2>
+    </div>
+
+    <div class="smk-attributes">
+        <div class="smk-attribute"
+            v-for="(val, attr) in feature.properties"
+            v-if="!layer.attributes || layer.attributes.length == 0"
+        >
+            <span class="smk-title" v-html="attr.replace( /_/g, '<' + 'wbr' + '>_' )"></span>
+            <span class="smk-value">{{ val }}</span>
+        </div>
+    </div>
+</div>

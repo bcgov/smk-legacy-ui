@@ -1,33 +1,9 @@
 <div class="smk-feature-popup" v-if="layer">
-    <div class="smk-header" v-if="!feature.properties.description">
-        <h3>{{ layer.title }}</h2>
-        <h2>{{ feature.title }}</h2>
-    </div>
-
-    <div class="smk-description"
-        v-if="feature.properties.description"
-        v-html="feature.properties.description"
-    ></div>
-
-    <div class="smk-attributes"
-        v-if="!feature.properties.description"
-    >
-        <div class="smk-attribute"
-            v-for="attr in layer.attributes"
-            v-if="layer.attributes && attr.visible !== false"
-        >
-            <span class="smk-title" v-html="attr.title.replace( /_/g, '<' + 'wbr' + '>_' )"></span>
-            <span class="smk-value">{{ feature.properties[ attr.name ] }}</span>
-        </div>
-
-        <div class="smk-attribute"
-            v-for="(val, attr) in feature.properties"
-            v-if="!layer.attributes || layer.attributes.length == 0"
-        >
-            <span class="smk-title" v-html="attr.replace( /_/g, '<' + 'wbr' + '>_' )"></span>
-            <span class="smk-value">{{ val }}</span>
-        </div>
-    </div>
+    <component 
+        v-bind:key="layer.id"
+        v-bind:is="attributeComponent"
+        v-bind="$data"
+    ></component>
 
     <div class="smk-commands">
         <span class="smk-command"

@@ -1,4 +1,10 @@
-include.module( 'feature-list', [ 'tool', 'widgets', 'feature-list.panel-feature-list-html', 'feature-list.popup-feature-html' ], function ( inc ) {
+include.module( 'feature-list', [ 'tool', 'widgets', 
+    'feature-list.panel-feature-list-html', 
+    'feature-list.popup-feature-html', 
+    'feature-list.feature-attributes-html',
+    'feature-list.feature-properties-html',
+    'feature-list.feature-description-html' 
+], function ( inc ) {
 
     Vue.component( 'feature-list-panel', {
         extends: inc.widgets.toolPanel,
@@ -12,6 +18,31 @@ include.module( 'feature-list', [ 'tool', 'widgets', 'feature-list.panel-feature
             }
         },
     } )
+
+    var featureProps = [
+        'feature',
+        'layer',
+        'attributeComponent',
+        'tool',
+        'hasMultiple',
+        'position'
+    ]
+
+    Vue.component( 'feature-attributes', {
+        template: inc[ 'feature-list.feature-attributes-html' ],
+        props: featureProps
+    } )
+
+    Vue.component( 'feature-properties', {
+        template: inc[ 'feature-list.feature-properties-html' ],
+        props: featureProps
+    } )
+
+    Vue.component( 'feature-description', {
+        template: inc[ 'feature-list.feature-description-html' ],
+        props: featureProps
+    } )
+
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
     function FeatureList( option ) {
@@ -115,6 +146,8 @@ include.module( 'feature-list', [ 'tool', 'widgets', 'feature-list.panel-feature
                 title:      ev.feature.title,
                 properties: Object.assign( {}, ev.feature.properties )
             }
+
+            self.setPopupAttributeComponent( ly, ev.feature, ly.config.featureTemplate )
         } )
 
         // = : = : = : = : = : = : = : = : = : = : = : = : = : = : = : = : = : = : =
@@ -122,6 +155,7 @@ include.module( 'feature-list', [ 'tool', 'widgets', 'feature-list.panel-feature
         this.popupModel = {
             feature: null,
             layer: null,
+            attributeComponent: null,
             tool: {},
             hasMultiple: false,
             position: null
@@ -169,6 +203,39 @@ include.module( 'feature-list', [ 'tool', 'widgets', 'feature-list.panel-feature
         } )
 
     } )
+
+    FeatureList.prototype.setPopupAttributeComponent = function ( layer, feature ) {
+        if ( layer.config.featureTemplate ) {
+            this.popupModel.attributeComponent = 'template-' + layer.config.id
+            
+            if ( !Vue.component( this.popupModel.attributeComponent ) ) {
+                try {
+                    var tmpl = Vue.compile( layer.config.featureTemplate )
+                }
+                catch ( e ) {
+                    console.warn( 'failed compiling template:', this.popupModel.attributeComponent, e )
+                    layer.config.featureTemplate = null
+                }
+
+                if ( tmpl )
+                    Vue.component( this.popupModel.attributeComponent, {
+                        render: tmpl.render,
+                        staticRenderFns: tmpl.staticRenderFns,
+                        props: featureProps
+                    } )
+            }
+            
+            if ( Vue.component( this.popupModel.attributeComponent ) )
+                return
+        }
+
+        if ( feature.properties.description )
+            this.popupModel.attributeComponent = 'feature-description'
+        else if ( layer.config.attributes )
+            this.popupModel.attributeComponent = 'feature-attributes'
+        else
+            this.popupModel.attributeComponent = 'feature-properties'
+    }
 
     FeatureList.prototype.setMessage = function ( message, Class, delay ) {
         this.message = message
