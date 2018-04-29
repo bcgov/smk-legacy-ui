@@ -1,4 +1,4 @@
-include.module( 'layer.layer-vector-js', [ 'layer' ], function () {
+include.module( 'layer.layer-vector-js', [ 'layer.layer-js' ], function () {
 
     function VectorLayer() {
         SMK.TYPE.Layer.prototype.constructor.apply( this, arguments )
@@ -32,7 +32,7 @@ include.module( 'layer.layer-vector-js', [ 'layer' ], function () {
         if ( this.hasChildren() )
             this.isContainer = true
 
-        Layer.prototype.initialize.apply( this, arguments )
+        SMK.TYPE.Layer.prototype.initialize.apply( this, arguments )
 
         if ( this.config.useHeatmap )
             this.config.isQueryable = false

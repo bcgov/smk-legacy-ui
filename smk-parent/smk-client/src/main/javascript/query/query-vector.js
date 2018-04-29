@@ -1,4 +1,4 @@
-include.module( 'query.query-vector-js', [ 'query' ], function () {
+include.module( 'query.query-vector-js', [ 'query.query-js' ], function () {
 
     function VectorQuery() {
         SMK.TYPE.Query.prototype.constructor.apply( this, arguments )

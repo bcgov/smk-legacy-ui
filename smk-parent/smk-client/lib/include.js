@@ -6,7 +6,7 @@
     var TAG = {}
     var OPTION = {
         baseUrl: document.location,
-        timeout: 10 * 1000
+        timeout: 60 * 1000
     }
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -156,7 +156,7 @@
             a[ i ] = _assignAnonTag( t, tag )
         } )
 
-        console.group( tag, 'sequence', JSON.stringify( inc.tags ) )
+        // console.group( tag, 'sequence', JSON.stringify( inc.tags ) )
 
         var promise = Promise.resolve()
         var res = {}
@@ -171,7 +171,7 @@
         } )
 
         return promise.then( function () {
-            console.groupEnd()
+            // console.groupEnd()
             return res
         } )
     }
@@ -181,7 +181,7 @@
             a[ i ] = _assignAnonTag( t, tag )
         } )
 
-        console.group( tag, 'group', JSON.stringify( inc.tags ) )
+        // console.group( tag, 'group', JSON.stringify( inc.tags ) )
 
         var promises = inc.tags.map( function ( t ) {
             return Promise.resolve().then( function () { return _include( t ) } )
@@ -189,7 +189,7 @@
 
         return Promise.all( promises )
             .then( function ( ress ) {
-                console.groupEnd()
+                // console.groupEnd()
                 var res = {}
                 inc.tags.forEach( function ( t, i ) {
                     res[ t ] = ress[ i ]

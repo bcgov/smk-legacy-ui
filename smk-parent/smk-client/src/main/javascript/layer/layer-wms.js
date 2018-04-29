@@ -1,4 +1,4 @@
-include.module( 'layer.layer-wms-js', [ 'layer' ], function () {
+include.module( 'layer.layer-wms-js', [ 'layer.layer-js' ], function () {
 
     function WmsLayer() {
         SMK.TYPE.Layer.prototype.constructor.apply( this, arguments )
