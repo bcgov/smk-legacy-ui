@@ -1,4 +1,4 @@
-include( 'query' ).then( function () {
+include.module( 'query.query-wms-js', [ 'query.query-js' ], function () {
 
     function WmsQuery() {
         SMK.TYPE.Query.prototype.constructor.apply( this, arguments )

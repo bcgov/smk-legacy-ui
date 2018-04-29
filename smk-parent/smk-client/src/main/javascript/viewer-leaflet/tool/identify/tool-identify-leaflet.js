@@ -17,8 +17,16 @@ include.module( 'tool-identify-leaflet', [ 'leaflet', 'tool-identify', 'feature-
 
     SMK.TYPE.IdentifyTool.prototype.afterInitialize.push( inc[ 'feature-list-clustering-leaflet' ] )
 
-    // SMK.TYPE.IdentifyTool.prototype.afterInitialize.push( function ( smk ) {
-    //     var self = this
+    SMK.TYPE.IdentifyTool.prototype.afterInitialize.push( function ( smk ) {
+        var self = this
+
+        smk.$viewer.startedIdentify( function ( ev ) {
+            if ( self.searchArea )
+                self.searchArea.remove()
+
+            self.searchArea = L.geoJSON( ev.area, { pane: 'markerPane', style: { fill: false, color: 'black' } } ).addTo( smk.$viewer.map )
+        } )
+
 
     //     // var  smk.$viewer = smk.$viewer
     //     // var self.featureSet = smk.$viewer.identified
@@ -149,7 +157,7 @@ include.module( 'tool-identify-leaflet', [ 'leaflet', 'tool-identify', 'feature-
     //         self.marker = {}
     //     } )
 
-    // } )
+    } )
 
 
 } )

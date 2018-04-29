@@ -1,4 +1,4 @@
-include.module( 'viewer-leaflet', [ 'viewer', 'leaflet' ], function () {
+include.module( 'viewer-leaflet', [ 'viewer', 'leaflet', 'layer-leaflet', 'leaflet-extensions', 'feature-list-leaflet' ], function () {
 
     function ViewerLeaflet() {
         SMK.TYPE.Viewer.prototype.constructor.apply( this, arguments )
@@ -95,6 +95,8 @@ include.module( 'viewer-leaflet', [ 'viewer', 'leaflet' ], function () {
     }
 
     ViewerLeaflet.prototype.getView = function () {
+        var self = this
+
         var b = this.map.getBounds()
         var size = this.map.getSize()
         var c = this.map.getCenter()
@@ -114,8 +116,20 @@ include.module( 'viewer-leaflet', [ 'viewer', 'leaflet' ], function () {
             screen: {
                 width:  size.x,
                 height: size.y
-            }
+            },
+            // metersPerPixelAtY: function ( vertical ) {
+            //     return self.map.distance( self.map.containerPointToLatLng( [ 0, vertical ] ), self.map.containerPointToLatLng( [ 100, vertical ] ) ) / 100
+            // }
         }
+    }
+
+    ViewerLeaflet.prototype.screenToMap = function ( screen ) {
+        if ( Array.isArray( screen ) )
+            var ll = this.map.containerPointToLatLng( screen )
+        else
+            var ll = this.map.containerPointToLatLng( [ screen.x, screen.y ] )
+
+        return [ ll.lng, ll.lat ]
     }
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
@@ -170,8 +184,8 @@ include.module( 'viewer-leaflet', [ 'viewer', 'leaflet' ], function () {
             animate: false
         } )
     }
-    // // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-    // //
+    // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+    //
     // ViewerLeaflet.prototype.getCurrentLocation = function () {
     //     var self = this
 

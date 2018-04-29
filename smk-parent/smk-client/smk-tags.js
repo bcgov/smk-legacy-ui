@@ -11,13 +11,16 @@ exports.gen = function () {
     t.script( 'util', 'util.js' )
     t.script( 'event', 'event.js' )
     t.script( 'viewer', 'viewer.js' )
-    t.script( 'layer', 'layer.js' )
+    // t.script( 'layer', 'layer.js' )
     t.script( 'tool', 'tool.js' )
     t.script( 'feature-set', 'feature-set.js' )
 
     t.group( 'smk-map' )
         .script( 'smk-map.js' )
         .style( 'smk-map-frame.css' )
+
+    t.group( 'layer' )
+        .dir( 'layer/**/*', { cwd: baseDir } )
 
     t.group( 'query' )
         .dir( 'query/**/*', { cwd: baseDir } )
@@ -149,18 +152,20 @@ exports.gen = function () {
     t.group( 'tool-search-leaflet' )
         .dir( 'viewer-leaflet/tool/search/**/*', { cwd: baseDir } )
 
-    t.script( 'layer-leaflet', 'viewer-leaflet/layer-leaflet.js' )
+    t.group( 'layer-leaflet' )
+        .dir( 'viewer-leaflet/layer/**/*', { cwd: baseDir } )
 
     t.script( 'feature-list-leaflet', 'viewer-leaflet/feature-list-leaflet.js' )
+    t.script( 'feature-list-clustering-leaflet', 'viewer-leaflet/feature-list-clustering-leaflet.js' )
 
     t.group( 'viewer-leaflet' )
         .script( 'viewer-leaflet/viewer-leaflet.js' )
-        .tag( 'layer-leaflet' )
         .style( 'viewer-leaflet/viewer-leaflet.css' )
-        .tag( 'leaflet-extensions' )
-        .tag( 'feature-list-leaflet' )
 
-    t.script( 'feature-list-clustering-leaflet', 'viewer-leaflet/feature-list-clustering-leaflet.js' )
+        // .tag( 'layer-leaflet' )
+        // .tag( 'leaflet-extensions' )
+        // .tag( 'feature-list-leaflet' )
+
 
     t.sequence( 'leaflet' )
         .script( 'https://unpkg.com/leaflet@1.2.0/dist/leaflet.js', { 'integrity': 'sha512-lInM/apFSqyy1o6s89K4iQUKg6ppXEgsVxT35HbzUupEVRh2Eu9Wdl4tHj7dZO0s1uvplcYGmt3498TtHq+log==' } )
