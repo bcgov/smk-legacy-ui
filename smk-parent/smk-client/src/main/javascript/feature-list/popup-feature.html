@@ -1,8 +1,11 @@
 <div class="smk-feature-popup" v-if="layer">
-    <component 
+    <component
         v-bind:key="layer.id"
         v-bind:is="attributeComponent"
-        v-bind="$data"
+        v-bind="{
+            layer:   layer,
+            feature: feature,
+        }"
     ></component>
 
     <div class="smk-commands">

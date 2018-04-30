@@ -7,9 +7,8 @@
     <div class="smk-attributes">
         <div class="smk-attribute"
             v-for="(val, attr) in feature.properties"
-            v-if="!layer.attributes || layer.attributes.length == 0"
         >
-            <span class="smk-title" v-html="attr.replace( /_/g, '<' + 'wbr' + '>_' )"></span>
+            <span class="smk-title" v-html="insertWordBreaks( attr )"></span>
             <span class="smk-value">{{ val }}</span>
         </div>
     </div>
