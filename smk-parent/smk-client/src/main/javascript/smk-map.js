@@ -25,6 +25,7 @@ include.module( 'smk-map', [ 'jquery', 'util' ], function () {
         return SMK.UTIL.resolved()
             .then( loadConfigs )
             .then( mergeConfigs )
+            .then( resolveConfig )
             .then( initMapFrame )
             .then( loadSurround )
             .then( loadViewer )
@@ -183,6 +184,27 @@ include.module( 'smk-map', [ 'jquery', 'util' ], function () {
                 delete merge[ prop ]
             }
 
+        }
+
+        function resolveConfig() {
+            return SMK.UTIL.waitAll( self.layers.map( function ( ly ) {
+                if ( ly.type != 'esri-dynamic' ) return ly
+                if ( ly.dynamicLayers ) return ly
+                if ( !ly.mpcmId ) throw new Error( 'No mpcmId provided' )
+
+                return SMK.UTIL.makePromise( function ( res, rej ) {
+                    $.ajax( {
+                        url: 'https://mpcm-catalogue.api.gov.bc.ca/catalogV2/PROD/' + ly.mpcmId,
+                        dataType: 'xml',
+                        method: 'post'
+                    } ).then( res, rej )
+                } )
+                .then( function ( data ) {
+                    debugger
+                } )
+                // console.log( ly )
+
+            } ) )
         }
 
         function initMapFrame() {
