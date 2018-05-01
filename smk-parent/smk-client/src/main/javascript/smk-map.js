@@ -195,8 +195,7 @@ include.module( 'smk-map', [ 'jquery', 'util' ], function () {
                 return SMK.UTIL.makePromise( function ( res, rej ) {
                     $.ajax( {
                         url: 'https://mpcm-catalogue.api.gov.bc.ca/catalogV2/PROD/' + ly.mpcmId,
-                        dataType: 'xml',
-                        method: 'post'
+                        dataType: 'xml'
                     } ).then( res, rej )
                 } )
                 .then( function ( data ) {
