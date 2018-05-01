@@ -209,7 +209,100 @@
                     activeTool: toolId
                 }
             }
-        }
+        },
+
+        'query': function ( arg, source ) {
+            var args = arg.split( ',' )
+            if ( args.length < 3 ) throw new Error( '-query needs at least 3 arguments' )
+
+            var queryId = 'query-' + arg.replace( /[^a-z0-9]+/ig, '-' ).replace( /(^[-]+)|([-]+$)/g, '' ).toLowerCase()
+
+            var layerId = args[ 0 ]
+            var conj = args[ 1 ].trim().toLowerCase()
+            if ( conj != 'and' && conj != 'or' ) throw new Error( '-query conjunction must be one of: AND, OR' )
+
+            var parameters = []
+            function constant( value ) {
+                var id = 'constant' + ( parameters.length + 1 )
+                parameters.push( {
+                    id: id,
+                    type: 'constant',
+                    value: JSON.parse( value )
+                } )
+                return id
+            }
+
+            var clauses = args.slice( 2 ).map( function ( p ) {
+                var m = p.trim().match( /^(\w+)\s*(like|LIKE|=|<=?|>=?)\s*(.+?)$/ )
+                if ( !m ) throw new Error( '-query expression is invalid' )
+
+                var args = [
+                    { operand: 'attribute', name: m[ 1 ] },
+                    { operand: 'parameter', id: constant( m[ 3 ] ) }
+                ]
+
+                switch ( m[ 2 ].toLowerCase() ) {
+                    case 'like': return { operator: 'contains', arguments: args }
+                    case '=': return { operator: 'equals', arguments: args }
+                    case '>': return { operator: 'greater-than', arguments: args }
+                    case '<': return { operator: 'less-than', arguments: args }
+                    case '>=': return { operator: 'not', arguments: [ { operator: 'less-than', arguments: args } ] }
+                    case '<=': return { operator: 'not', arguments: [ { operator: 'greater-than', arguments: args } ] }
+                }
+            } )
+
+            return {
+                $sources: [ source ],
+                viewer: {
+                    activeTool: 'query--' + layerId + '--' + queryId,
+                },
+                tools: [ {
+                    type: 'query',
+                    instance: layerId + '--' + queryId,
+                    onActivate: 'execute'
+                } ],
+                layers: [ {
+                    id: layerId,
+                    queries: [ {
+                        id: queryId,
+                        parameters: parameters,
+                        predicate: {
+                            operator: conj,
+                            arguments: clauses
+                        }
+                    } ]
+                } ]
+            }
+        },
+
+        // These options are for backward compatibility with DMF
+
+        'll': function ( arg, source ) {
+            var args = arg.split( ',' )
+            if ( args.length != 2 ) throw new Error( '-ll needs 2 arguments' )
+            return {
+                $sources: [ source ],
+                viewer: {
+                    location: {
+                        center: [ args[ 0 ], args[ 1 ] ]
+                    }
+                }
+            }
+        },
+
+        'z': function ( arg, source ) {
+            var args = arg.split( ',' )
+            if ( args.length != 1 ) throw new Error( '-z needs 1 argument' )
+            return {
+                $sources: [ source ],
+                viewer: {
+                    location: {
+                        zoom: args[ 0 ]
+                    }
+                }
+            }
+        },
+
     }
 
 // = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
