@@ -135,6 +135,8 @@
         source += ' -> option[' + option + ']'
         try {
             var obj = optionHandler[ option ]( m[ 3 ], source )
+            if ( !obj.$sources )
+                obj.$sources = [ source ]
 
             return obj
         }
@@ -159,11 +161,10 @@
             return parseLiteralJson( arg, source ) || parseUrl( arg, source )
         },
 
-        'extent': function ( arg, source ) {
+        'extent': function ( arg ) {
             var args = arg.split( ',' )
             if ( args.length != 4 ) throw new Error( '-extent needs 4 arguments' )
             return {
-                $sources: [ source ],
                 viewer: {
                     location: {
                         extent: args
@@ -172,11 +173,10 @@
             }
         },
 
-        'center': function ( arg, source ) {
+        'center': function ( arg ) {
             var args = arg.split( ',' )
             if ( args.length < 2 || args.length > 3 ) throw new Error( '-center needs 2 or 3 arguments' )
             return {
-                $sources: [ source ],
                 viewer: {
                     location: {
                         center: [ args[ 0 ], args[ 1 ] ],
@@ -186,16 +186,15 @@
             }
         },
 
-        'viewer': function ( arg, source ) {
+        'viewer': function ( arg ) {
             return {
-                $sources: [ source ],
                 viewer: {
                     type: arg
                 }
             }
         },
 
-        'active-tool': function ( arg, source ) {
+        'active-tool': function ( arg ) {
             var args = arg.split( ',' )
             if ( args.length != 1 && args.length != 2 ) throw new Error( '-active-tool needs 1 or 2 arguments' )
 
@@ -204,14 +203,13 @@
                 toolId += '--' + args[ 1 ]
 
             return {
-                $sources: [ source ],
                 viewer: {
                     activeTool: toolId
                 }
             }
         },
 
-        'query': function ( arg, source ) {
+        'query': function ( arg ) {
             var args = arg.split( ',' )
             if ( args.length < 3 ) throw new Error( '-query needs at least 3 arguments' )
 
@@ -252,7 +250,6 @@
             } )
 
             return {
-                $sources: [ source ],
                 viewer: {
                     activeTool: 'query--' + layerId + '--' + queryId,
                 },
@@ -275,13 +272,88 @@
             }
         },
 
-        // These options are for backward compatibility with DMF
+        'layer': function ( arg, source ) {
+            var args = arg.split( ',' )
+            if ( args.length < 2 ) throw new Error( '-layer needs at least 2 arguments' )
 
-        'll': function ( arg, source ) {
+            var layerId = 'layer-' + arg.replace( /[^a-z0-9]+/ig, '-' ).replace( /(^[-]+)|([-]+$)/g, '' ).toLowerCase()
+
+            var type = args[ 0 ].trim().toLowerCase()
+            switch ( type ) {
+                case 'esri-dynamic':
+                    if ( args.length < 3 ) throw new Error( '-layer=esri-dynamic needs at least 3 arguments' )
+                    return {
+                        layers: [ {
+                            id:         layerId,
+                            type:       'esri-dynamic',
+                            isVisible:  true,
+                            serviceUrl: args[ 1 ],
+                            mpcmId:     args[ 2 ],
+                            title:      args[ 3 ] || ( 'ESRI Dynamic ' + args[ 2 ] ),
+                        } ]
+                }
+
+                case 'wms':
+                    if ( args.length < 3 ) throw new Error( '-layer=wms needs at least 3 arguments' )
+                    return {
+                        layers: [ {
+                            id:         layerId,
+                            type:       'wms',
+                            isVisible:  true,
+                            serviceUrl: args[ 1 ],
+                            layerName:  args[ 2 ],
+                            styleName:  args[ 3 ],
+                            title:      args[ 4 ] || ( 'WMS ' + args[ 2 ] ),
+                        } ]
+                }
+
+                case 'vector':
+                    return {
+                        layers: [ {
+                            id:         layerId,
+                            type:       'vector',
+                            isVisible:  true,
+                            dataUrl:    args[ 1 ],
+                            title:      args[ 2 ] || ( 'Vector ' + args[ 1 ] ),
+                        } ]
+                    }
+
+                default: throw new Error( 'unknown layer type: ' + type )
+            }
+        },
+
+        'no-tools': function ( arg ) {
+            return {
+                tools: [
+                    { type: 'about',        enabled: false },
+                    { type: 'baseMaps',     enabled: false },
+                    { type: 'coordinate',   enabled: false },
+                    { type: 'directions',   enabled: false },
+                    { type: 'dropdown',     enabled: false },
+                    { type: 'identify',     enabled: false },
+                    { type: 'layers',       enabled: false },
+                    { type: 'location',     enabled: false },
+                    { type: 'markup',       enabled: false },
+                    { type: 'measure',      enabled: false },
+                    { type: 'menu',         enabled: false },
+                    { type: 'minimap',      enabled: false },
+                    { type: 'pan',          enabled: false },
+                    { type: 'query',        enabled: false },
+                    { type: 'scale',        enabled: false },
+                    { type: 'search',       enabled: false },
+                    { type: 'select',       enabled: false },
+                    { type: 'zoom',         enabled: false }
+                ]
+            }
+        },
+
+        // Options below are for backward compatibility with DMF
+
+        'll': function ( arg ) {
             var args = arg.split( ',' )
             if ( args.length != 2 ) throw new Error( '-ll needs 2 arguments' )
+
             return {
-                $sources: [ source ],
                 viewer: {
                     location: {
                         center: [ args[ 0 ], args[ 1 ] ]
@@ -290,16 +362,44 @@
             }
         },
 
-        'z': function ( arg, source ) {
+        'z': function ( arg ) {
             var args = arg.split( ',' )
             if ( args.length != 1 ) throw new Error( '-z needs 1 argument' )
+
             return {
-                $sources: [ source ],
                 viewer: {
                     location: {
                         zoom: args[ 0 ]
                     }
                 }
+            }
+        },
+
+        'lshow': function ( arg ) {
+            var args = arg.split( ',' )
+            if ( args.length < 1 ) throw new Error( '-lshow needs at least 1 argument' )
+
+            return {
+                layers: args.map( function ( id ) {
+                    return {
+                        id: id,
+                        isVisible: true
+                    }
+                } )
+            }
+        },
+
+        'lhide': function ( arg ) {
+            var args = arg.split( ',' )
+            if ( args.length < 1 ) throw new Error( '-lhide needs at least 1 argument' )
+
+            return {
+                layers: args.map( function ( id ) {
+                    return {
+                        id: id,
+                        isVisible: false
+                    }
+                } )
             }
         },
 
