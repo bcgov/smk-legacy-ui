@@ -35,6 +35,7 @@ import ca.bc.gov.app.smks.dao.CouchDAO;
 import ca.bc.gov.app.smks.model.Layer;
 import ca.bc.gov.app.smks.model.MapConfigInfo;
 import ca.bc.gov.app.smks.model.MapConfiguration;
+import ca.bc.gov.app.smks.model.layer.Vector;
 
 @CrossOrigin
 @RestController
@@ -296,15 +297,29 @@ public class MapConfigController
 					Attachment attachment = new Attachment(id, Base64.encodeBase64String(docBytes), contentType);
 				    resource.addInlineAttachment(attachment);
 
-				    // if this is a geojson blob, make sure we have verified the properties set
-				    /*if(type.equals("geojson"))
+				    if(type.equals("image") && id.equals("surroundImage"))
 				    {
-				        Layer layer = resource.getLayerByID(id);
+				        resource.getSurround().setImageSrc("surroundImage");
+				    }
+				    
+				    // if this is a geojson blob, make sure we have verified the properties set
+				    if(type.equals("geojson"))
+				    {
+				        Vector layer = (Vector)resource.getLayerByID(id);
 				        
     				    ObjectMapper objectMapper = new ObjectMapper();
     				    JsonNode node = objectMapper.readValue(docBytes, JsonNode.class);
     				    
-				    }*/
+    				    if(node.isArray())
+    				    {
+    				        
+    				    }
+    				    // loop through the properties node for each record and identify all possible attributes. 
+    				    // Ignore "description"
+    				    // for each attribute found, add to the layers attribute list.
+    				    
+    				    //layer.getAttributes().add(...);
+				    }
 				    
 				    couchDAO.updateResource(resource);
 

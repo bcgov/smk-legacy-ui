@@ -60,6 +60,43 @@ var data = {
 	    _rev: null
 	};
 
+function openLayerTemplateEditor()
+{
+	// configure layer-popup-content
+	$('#layer-popup-content').trumbowyg(
+	{
+		resetCss: true,
+		btns: [
+		        ['viewHTML'],
+		        ['undo', 'redo'], // Only supported in Blink browsers
+		        ['formatting'],
+		        ['strong', 'em', 'del'],
+		        ['superscript', 'subscript'],
+		        ['foreColor', 'backColor'],
+		        ['justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull'],
+		        ['unorderedList', 'orderedList'],
+		        ['horizontalRule'],
+		        ['preformatted'],
+		        ['template'],
+		        ['removeformat'],
+		        ['link'],
+		        ['insertImage', 'base64'],
+		        ['noembed'],
+		        ['fullscreen']
+		    ]
+	});
+	
+	$('#layer-popup-content').on('tbwchange', function(delta, oldDelta, source)
+	{
+		selectedLayerNode.data.popupTemplate = $("#layer-popup-content").trumbowyg('html');
+	});
+
+	$("#layer-popup-content").empty();
+	$("#layer-popup-content").trumbowyg('html', selectedLayerNode.data.popupTemplate);
+
+	$('#layerPopupTemplateModal').modal('open');
+}
+
 function setToolActivation(toolType)
 {
 	data.tools.forEach(function(tool)
@@ -155,7 +192,6 @@ function setToolActivation(toolType)
 
 function setupQuillEditor(tool)
 {
-	
 	$('#about-content').trumbowyg(
 	{
 		resetCss: true,
@@ -2327,6 +2363,7 @@ $(document).ready(function()
 	    	updateDropdownList();
 	    }
 	});
+	$('#layerPopupTemplateModal').modal({ dismissible: false });
 });
 
 var fileContents;
