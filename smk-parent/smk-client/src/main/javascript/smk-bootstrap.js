@@ -320,11 +320,33 @@
             }
         },
 
-        'no-tools': function ( arg ) {
+        'show-tool': function ( arg ) {
+            var args = arg.split( ',' )
+            if ( args.length < 1 ) throw new Error( '-show-tool needs at least 1 argument' )
+
             return {
-                tools: [
-                    { type: '*', enabled: false }
-                ]
+                tools: args.map( function ( type ) {
+                    if ( type == 'all' ) type = '*'
+                    return {
+                        type: type,
+                        enabled: true
+                    }
+                } )
+            }
+        },
+
+        'hide-tool': function ( arg ) {
+            var args = arg.split( ',' )
+            if ( args.length < 1 ) throw new Error( '-hide-tool needs at least 1 argument' )
+
+            return {
+                tools: args.map( function ( type ) {
+                    if ( type == 'all' ) type = '*'
+                    return {
+                        type: type,
+                        enabled: false
+                    }
+                } )
             }
         },
 
