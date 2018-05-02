@@ -74,7 +74,7 @@ include.module( 'smk-map', [ 'jquery', 'util' ], function () {
             while( configs.length > 0 ) {
                 var c = configs.shift()
 
-                console.log( 'merging', JSON.parse( JSON.stringify( config ) ) )
+                console.log( 'merging', JSON.parse( JSON.stringify( c ) ) )
 
                 mergeSurround( config, c )
                 mergeViewer( config, c )
