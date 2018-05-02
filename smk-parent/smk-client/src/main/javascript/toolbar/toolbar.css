@@ -17,6 +17,10 @@
     align-items: stretch;
 }
 
+.smk-toolbar.smk-hidden  {
+    display: none;
+}
+
 .smk-tool {
     display: none;
     opacity: 0.5;

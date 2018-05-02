@@ -7,10 +7,8 @@ include.module( 'toolbar', [ 'vue', 'toolbar.toolbar-html' ], function ( inc ) {
             tools: [],
         }
 
-        var el = smk.addToOverlay( inc[ 'toolbar.toolbar-html' ] )
-
         this.vm = new Vue( {
-            el: el,
+            el: smk.addToOverlay( inc[ 'toolbar.toolbar-html' ] ),
             data: this.model,
             methods: {
                 trigger: function ( toolId, event, arg ) {

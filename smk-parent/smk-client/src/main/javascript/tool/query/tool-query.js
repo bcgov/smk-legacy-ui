@@ -200,8 +200,6 @@ include.module( 'tool-query', [ 'tool', 'widgets', 'tool-query.panel-query-html'
                                 return features.length > 0
                             },
                             function () {
-                                console.log( features.length )
-
                                 var chunk = features.splice( 0, 50 )
                                 self.featureSet.add( self.query.layerId, chunk )
                             },

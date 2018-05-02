@@ -1,5 +1,6 @@
-<div class="smk-toolbar">
-
+<div class="smk-toolbar"
+    v-bind:class="{ 'smk-hidden': tools.length == 0 }"
+>
     <component class="smk-tool"
         v-for="tool in tools"
         v-bind:key="tool.id"

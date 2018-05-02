@@ -25,7 +25,7 @@
 
         var smkAttr = {
             'container-id': attrString( 'smk-map-frame' ),
-            'config':       attrList( '?smk' ),
+            'config':       attrList( '?smk-' ),
             'standalone':   attrBoolean( false, true ),
             'disconnected': attrBoolean( false, true ),
             'base-url':     attrString( ( new URL( script.src.replace( 'smk-bootstrap.js', '' ), document.location ) ).toString() ),
@@ -86,7 +86,7 @@
     function parseDocumentArguments( config, source ) {
         if ( !/^[?]/.test( config ) ) return
 
-        var paramPattern = new RegExp( '^' + config.substr( 1 ) + '([-].+)$', 'i' )
+        var paramPattern = new RegExp( '^' + config.substr( 1 ) + '(.+)$', 'i' )
 
         var params = location.search.substr( 1 ).split( '&' )
         var configs = []
@@ -96,7 +96,7 @@
                 var m = decodeURIComponent( p ).match( paramPattern )
                 if ( !m ) return
 
-                configs = configs.concat( parseOption( m[ 1 ], source1 ) )
+                configs = configs.concat( parseOption( m[ 1 ], source1 ) || [] )
             }
             catch ( e ) {
                 if ( !e.parseSource ) e.parseSource = source1
@@ -124,17 +124,17 @@
     }
 
     function parseOption( config, source ) {
-        if ( !/^[-].+$/.test( config ) ) return
-
-        var m = config.match( /^[-](.+?)([=](.+))?$/ )
-        if ( !m ) return []
+        var m = config.match( /^(.+?)([=](.+))?$/ )
+        if ( !m ) return
 
         var option = m[ 1 ].toLowerCase()
-        if ( !( option in optionHandler ) ) return []
+        if ( !( option in optionHandler ) ) return
 
         source += ' -> option[' + option + ']'
         try {
             var obj = optionHandler[ option ]( m[ 3 ], source )
+            if ( !obj.$sources )
+                obj.$sources = [ source ]
 
             return obj
         }
@@ -159,11 +159,10 @@
             return parseLiteralJson( arg, source ) || parseUrl( arg, source )
         },
 
-        'extent': function ( arg, source ) {
+        'extent': function ( arg ) {
             var args = arg.split( ',' )
             if ( args.length != 4 ) throw new Error( '-extent needs 4 arguments' )
             return {
-                $sources: [ source ],
                 viewer: {
                     location: {
                         extent: args
@@ -172,11 +171,10 @@
             }
         },
 
-        'center': function ( arg, source ) {
+        'center': function ( arg ) {
             var args = arg.split( ',' )
             if ( args.length < 2 || args.length > 3 ) throw new Error( '-center needs 2 or 3 arguments' )
             return {
-                $sources: [ source ],
                 viewer: {
                     location: {
                         center: [ args[ 0 ], args[ 1 ] ],
@@ -186,16 +184,15 @@
             }
         },
 
-        'viewer': function ( arg, source ) {
+        'viewer': function ( arg ) {
             return {
-                $sources: [ source ],
                 viewer: {
                     type: arg
                 }
             }
         },
 
-        'active-tool': function ( arg, source ) {
+        'active-tool': function ( arg ) {
             var args = arg.split( ',' )
             if ( args.length != 1 && args.length != 2 ) throw new Error( '-active-tool needs 1 or 2 arguments' )
 
@@ -204,12 +201,191 @@
                 toolId += '--' + args[ 1 ]
 
             return {
-                $sources: [ source ],
                 viewer: {
                     activeTool: toolId
                 }
             }
-        }
+        },
+
+        'query': function ( arg ) {
+            var args = arg.split( ',' )
+            if ( args.length < 3 ) throw new Error( '-query needs at least 3 arguments' )
+
+            var queryId = 'query-' + arg.replace( /[^a-z0-9]+/ig, '-' ).replace( /(^[-]+)|([-]+$)/g, '' ).toLowerCase()
+
+            var layerId = args[ 0 ]
+            var conj = args[ 1 ].trim().toLowerCase()
+            if ( conj != 'and' && conj != 'or' ) throw new Error( '-query conjunction must be one of: AND, OR' )
+
+            var parameters = []
+            function constant( value ) {
+                var id = 'constant' + ( parameters.length + 1 )
+                parameters.push( {
+                    id: id,
+                    type: 'constant',
+                    value: JSON.parse( value )
+                } )
+                return id
+            }
+
+            var clauses = args.slice( 2 ).map( function ( p ) {
+                var m = p.trim().match( /^(\w+)\s*(like|LIKE|=|<=?|>=?)\s*(.+?)$/ )
+                if ( !m ) throw new Error( '-query expression is invalid' )
+
+                var args = [
+                    { operand: 'attribute', name: m[ 1 ] },
+                    { operand: 'parameter', id: constant( m[ 3 ] ) }
+                ]
+
+                switch ( m[ 2 ].toLowerCase() ) {
+                    case 'like': return { operator: 'contains', arguments: args }
+                    case '=': return { operator: 'equals', arguments: args }
+                    case '>': return { operator: 'greater-than', arguments: args }
+                    case '<': return { operator: 'less-than', arguments: args }
+                    case '>=': return { operator: 'not', arguments: [ { operator: 'less-than', arguments: args } ] }
+                    case '<=': return { operator: 'not', arguments: [ { operator: 'greater-than', arguments: args } ] }
+                }
+            } )
+
+            return {
+                viewer: {
+                    activeTool: 'query--' + layerId + '--' + queryId,
+                },
+                tools: [ {
+                    type: 'query',
+                    instance: layerId + '--' + queryId,
+                    onActivate: 'execute'
+                } ],
+                layers: [ {
+                    id: layerId,
+                    queries: [ {
+                        id: queryId,
+                        parameters: parameters,
+                        predicate: {
+                            operator: conj,
+                            arguments: clauses
+                        }
+                    } ]
+                } ]
+            }
+        },
+
+        'layer': function ( arg, source ) {
+            var args = arg.split( ',' )
+            if ( args.length < 2 ) throw new Error( '-layer needs at least 2 arguments' )
+
+            var layerId = 'layer-' + arg.replace( /[^a-z0-9]+/ig, '-' ).replace( /(^[-]+)|([-]+$)/g, '' ).toLowerCase()
+
+            var type = args[ 0 ].trim().toLowerCase()
+            switch ( type ) {
+                case 'esri-dynamic':
+                    if ( args.length < 3 ) throw new Error( '-layer=esri-dynamic needs at least 3 arguments' )
+                    return {
+                        layers: [ {
+                            id:         layerId,
+                            type:       'esri-dynamic',
+                            isVisible:  true,
+                            serviceUrl: args[ 1 ],
+                            mpcmId:     args[ 2 ],
+                            title:      args[ 3 ] || ( 'ESRI Dynamic ' + args[ 2 ] ),
+                        } ]
+                }
+
+                case 'wms':
+                    if ( args.length < 3 ) throw new Error( '-layer=wms needs at least 3 arguments' )
+                    return {
+                        layers: [ {
+                            id:         layerId,
+                            type:       'wms',
+                            isVisible:  true,
+                            serviceUrl: args[ 1 ],
+                            layerName:  args[ 2 ],
+                            styleName:  args[ 3 ],
+                            title:      args[ 4 ] || ( 'WMS ' + args[ 2 ] ),
+                        } ]
+                }
+
+                case 'vector':
+                    return {
+                        layers: [ {
+                            id:         layerId,
+                            type:       'vector',
+                            isVisible:  true,
+                            dataUrl:    args[ 1 ],
+                            title:      args[ 2 ] || ( 'Vector ' + args[ 1 ] ),
+                        } ]
+                    }
+
+                default: throw new Error( 'unknown layer type: ' + type )
+            }
+        },
+
+        'no-tools': function ( arg ) {
+            return {
+                tools: [
+                    { type: '*', enabled: false }
+                ]
+            }
+        },
+
+        'show-layer': function ( arg ) {
+            var args = arg.split( ',' )
+            if ( args.length < 1 ) throw new Error( '-show-layer needs at least 1 argument' )
+
+            return {
+                layers: args.map( function ( id ) {
+                    if ( id == 'all' ) id = '**'
+                    return {
+                        id: id,
+                        isVisible: true
+                    }
+                } )
+            }
+        },
+
+        'hide-layer': function ( arg ) {
+            var args = arg.split( ',' )
+            if ( args.length < 1 ) throw new Error( '-hide-layer needs at least 1 argument' )
+
+            return {
+                layers: args.map( function ( id ) {
+                    if ( id.toLowerCase() == 'all' ) id = '**'
+                    return {
+                        id: id,
+                        isVisible: false
+                    }
+                } )
+            }
+        },
+
+        // Options below are for backward compatibility with DMF
+
+        'll': function ( arg ) {
+            var args = arg.split( ',' )
+            if ( args.length != 2 ) throw new Error( '-ll needs 2 arguments' )
+
+            return {
+                viewer: {
+                    location: {
+                        center: [ args[ 0 ], args[ 1 ] ]
+                    }
+                }
+            }
+        },
+
+        'z': function ( arg ) {
+            var args = arg.split( ',' )
+            if ( args.length != 1 ) throw new Error( '-z needs 1 argument' )
+
+            return {
+                viewer: {
+                    location: {
+                        zoom: args[ 0 ]
+                    }
+                }
+            }
+        },
+
     }
 
 // = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =

@@ -25,6 +25,7 @@ include.module( 'smk-map', [ 'jquery', 'util' ], function () {
         return SMK.UTIL.resolved()
             .then( loadConfigs )
             .then( mergeConfigs )
+            .then( resolveConfig )
             .then( initMapFrame )
             .then( loadSurround )
             .then( loadViewer )
@@ -73,7 +74,7 @@ include.module( 'smk-map', [ 'jquery', 'util' ], function () {
             while( configs.length > 0 ) {
                 var c = configs.shift()
 
-                console.log( 'merging', JSON.parse( JSON.stringify( config ) ) )
+                console.log( 'merging', JSON.parse( JSON.stringify( c ) ) )
 
                 mergeSurround( config, c )
                 mergeViewer( config, c )
@@ -128,8 +129,18 @@ include.module( 'smk-map', [ 'jquery', 'util' ], function () {
                 return mergeCollection( base, merge, 'tools', {
                     findFn: function ( merge ) {
                         return function ( base ) {
-                            return merge.type == base.type &&
-                                merge.instance == base.instance
+                            return ( merge.type == base.type || merge.type == '*' ) &&
+                                ( !merge.instance || merge.instance == base.instance )
+                        }
+                    },
+                    mergeFn: function ( base, merge ) {
+                        if ( merge.type && merge.type == '*' ) {
+                            var m = JSON.parse( JSON.stringify( merge ) )
+                            delete m.type
+                            Object.assign( base, m )
+                        }
+                        else {
+                            Object.assign( base, merge )
                         }
                     }
                 } )
@@ -137,6 +148,11 @@ include.module( 'smk-map', [ 'jquery', 'util' ], function () {
 
             function mergeLayers( base, merge ) {
                 return mergeCollection( base, merge, 'layers', {
+                    findFn: function ( merge ) {
+                        return function ( base ) {
+                            return merge.id == base.id || merge.id.startsWith( '*' )
+                        }
+                    },
                     mergeFn: function ( baseLayer, mergeLayer ) {
                         mergeCollection( baseLayer, mergeLayer, 'queries', {
                             mergeFn: function ( baseQuery, mergeQuery ) {
@@ -146,9 +162,19 @@ include.module( 'smk-map', [ 'jquery', 'util' ], function () {
                             }
                         } )
 
+                        if ( mergeLayer.id == '**' && !mergeLayer.layers )
+                            mergeLayer.layers = [ JSON.parse( JSON.stringify( mergeLayer ) ) ]
+
                         mergeLayers( baseLayer, mergeLayer )
 
-                        Object.assign( baseLayer, mergeLayer )
+                        if ( mergeLayer.id && mergeLayer.id.startsWith( '*' ) ) {
+                            var m = JSON.parse( JSON.stringify( mergeLayer ) )
+                            delete m.id
+                            Object.assign( baseLayer, m )
+                        }
+                        else {
+                            Object.assign( baseLayer, mergeLayer )
+                        }
                     }
                 } )
             }
@@ -168,12 +194,15 @@ include.module( 'smk-map', [ 'jquery', 'util' ], function () {
 
                 if ( base[ prop ] ) {
                     merge[ prop ].forEach( function( m ) {
-                        var item = base[ prop ].find( findFn( m ) )
-
-                        if ( item )
-                            mergeFn( item, m )
-                        else
+                        var items = base[ prop ].filter( findFn( m ) )
+                        if ( items.length > 0 ) {
+                            items.forEach( function ( item ) {
+                                mergeFn( item, m )
+                            } )
+                        }
+                        else {
                             base[ prop ].push( m )
+                        }
                     } )
                 }
                 else {
@@ -183,6 +212,28 @@ include.module( 'smk-map', [ 'jquery', 'util' ], function () {
                 delete merge[ prop ]
             }
 
+        }
+
+        function resolveConfig() {
+            if ( !self.layers ) return
+
+            return SMK.UTIL.waitAll( self.layers.map( function ( ly ) {
+                if ( ly.type != 'esri-dynamic' ) return ly
+                if ( ly.dynamicLayers ) return ly
+                if ( !ly.mpcmId ) throw new Error( 'No mpcmId provided' )
+
+                return SMK.UTIL.makePromise( function ( res, rej ) {
+                    $.ajax( {
+                        url: 'https://mpcm-catalogue.api.gov.bc.ca/catalogV2/PROD/' + ly.mpcmId,
+                        dataType: 'xml'
+                    } ).then( res, rej )
+                } )
+                .then( function ( data ) {
+                    debugger
+                } )
+                // console.log( ly )
+
+            } ) )
         }
 
         function initMapFrame() {
