@@ -19,6 +19,7 @@ include.module( 'tool-identify', [ 'feature-list', 'widgets', 'tool-identify.pan
             title:              'Identify',
             widgetComponent:    'identify-widget',
             panelComponent:     'identify-panel',
+            showPanel:          false
         }, option ) )
     }
 
