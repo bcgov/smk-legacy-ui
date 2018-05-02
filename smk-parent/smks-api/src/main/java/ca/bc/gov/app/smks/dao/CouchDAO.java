@@ -1,6 +1,7 @@
 package ca.bc.gov.app.smks.dao;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -140,9 +141,9 @@ public class CouchDAO
 		return results;
 	}
 
-	public List<MapConfiguration> getAllConfigs()
+	public HashMap<String, String> getAllConfigs()
 	{
-		List<MapConfiguration> results = new ArrayList<MapConfiguration>();
+		HashMap<String, String> results = new HashMap<String, String>();
 
 		ViewQuery query = new ViewQuery()
 			      .designDocId("_design/fetch-configs")
@@ -154,7 +155,7 @@ public class CouchDAO
 		// parse the remaining results into MapConfiguration documents
 		for(Row row : rowsToParse)
 		{
-			results.add(getResourceByDocId(row.getId()));
+		    results.put(row.getId(), row.getKey());
 		}
 
 		return results;

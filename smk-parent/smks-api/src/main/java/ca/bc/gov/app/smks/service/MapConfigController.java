@@ -1,8 +1,11 @@
 package ca.bc.gov.app.smks.service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
@@ -32,6 +35,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import ca.bc.gov.app.smks.converter.DocumentConverterFactory;
 import ca.bc.gov.app.smks.converter.DocumentConverterFactory.DocumentType;
 import ca.bc.gov.app.smks.dao.CouchDAO;
+import ca.bc.gov.app.smks.model.Attribute;
 import ca.bc.gov.app.smks.model.Layer;
 import ca.bc.gov.app.smks.model.MapConfigInfo;
 import ca.bc.gov.app.smks.model.MapConfiguration;
@@ -100,13 +104,30 @@ public class MapConfigController
 		try
 		{
 			logger.debug("    Querying for all Map Resources...");
-			List<MapConfiguration> resources = couchDAO.getAllConfigs();
-			logger.debug("    Success, found " + resources.size() + " results");
+			HashMap<String, String> resourceIds = couchDAO.getAllConfigs();
+			logger.debug("    Success, found " + resourceIds.size() + " valid results");
 
 			ArrayList<MapConfigInfo> configSnippets = new ArrayList<MapConfigInfo>();
-			for(MapConfiguration config : resources)
+			for(String configId : resourceIds.keySet())
 			{
-				configSnippets.add(new MapConfigInfo(config));
+			    try
+			    {
+			        MapConfiguration config = couchDAO.getMapConfiguration(resourceIds.get(configId));
+				    configSnippets.add(new MapConfigInfo(config));
+			    }
+			    catch(Exception e)
+			    {
+			        logger.debug("Map Configuration " + configId + " could not be loaded because it was invalid");
+			        
+			        // Add an empty config snippet
+			        MapConfigInfo config = new MapConfigInfo();
+			        config.setId(configId);
+			        config.setName(resourceIds.get(configId));
+			        config.setRevision(0);
+			        config.setValid(false);
+			        
+			        configSnippets.add(config);
+			    }
 			}
 
 			result = new ResponseEntity<ArrayList<MapConfigInfo>>(configSnippets, HttpStatus.OK);
@@ -232,10 +253,37 @@ public class MapConfigController
 			logger.debug("    Updating a Map Configuration...");
 
 			if(request.isPublished()) throw new Exception("You cannot update the currently published Map Configuration. Please update the editable version.");
-
-			// seems to be blowing away the attachments?
+			
 			MapConfiguration resource = couchDAO.getMapConfiguration(id);
 
+		     // find out if we're removing layers. If so, we may have to remove attachments as well
+			boolean layerRemoved = false;
+            for(Layer originalLayer : resource.getLayers())
+            {
+                if(originalLayer.getType().equals("vector"))
+                {
+                    boolean exists = false;
+                    for(Layer layer : request.getLayers())
+                    {
+                        if(layer.getType().equals("vector") && layer.getId().equals(originalLayer.getId()))
+                        {
+                            exists = true;
+                        }
+                    }
+                    
+                    if(!exists)
+                    {
+                        // remove attachment for this layer.
+                        deleteAttachment(id, originalLayer.getId());
+                        layerRemoved = true;
+                    }
+                }
+            }
+			
+            // refresh, in case we've turfed any layer attachments
+            if(layerRemoved) resource = couchDAO.getMapConfiguration(id);
+            
+            // Clone, to prevent removal of the attachments
 			resource.setCreatedBy(request.getCreatedBy());
 			resource.setId(request.getId());
 			resource.setLayers(request.getLayers());
@@ -249,8 +297,7 @@ public class MapConfigController
 			resource.setTools(request.getTools());
 			resource.setViewer(request.getViewer());
 
-			// updating request directly appears to delete the entire attachment set?
-			// _attachment stubs are not being serialized for some reason.
+			// Update!
 			couchDAO.updateResource(resource);
 			result = new ResponseEntity<String>("{ \"status\": \"Success!\" }", HttpStatus.OK);
 		}
@@ -287,12 +334,16 @@ public class MapConfigController
 					
 					String contentType = request.getContentType();
 					
-					if(type.equals("kml")) { type = "geojson"; docBytes = DocumentConverterFactory.convertDocument(request.getBytes(), DocumentType.KML); contentType = "application/octet-stream"; }
-					if(type.equals("kmz")) { type = "geojson"; docBytes = DocumentConverterFactory.convertDocument(request.getBytes(), DocumentType.KMZ); contentType = "application/octet-stream"; }
-					else if(type.equals("csv")) { type = "geojson"; docBytes = DocumentConverterFactory.convertDocument(request.getBytes(), DocumentType.CSV); contentType = "application/octet-stream"; }
-					else if(type.equals("wkt")) { type = "geojson"; docBytes = DocumentConverterFactory.convertDocument(request.getBytes(), DocumentType.WKT); contentType = "application/octet-stream"; }
-					else if(type.equals("gml")) { type = "geojson"; docBytes = DocumentConverterFactory.convertDocument(request.getBytes(), DocumentType.GML); contentType = "application/octet-stream"; }
-					else if(type.equals("shape")) { type = "geojson"; docBytes = DocumentConverterFactory.convertDocument(request.getBytes(), DocumentType.SHAPE); contentType = "application/octet-stream"; }
+					if(contentType.equals("application/vnd.google-earth.kml+xml")) type = "kml";
+					if(contentType.equals("application/vnd.google-earth.kmz")) type = "kmz";
+					if(contentType.equals("application/zip")) type = "shape";
+					
+					if(type.equals("kml")) { type = "vector"; docBytes = DocumentConverterFactory.convertDocument(request.getBytes(), DocumentType.KML); contentType = "application/octet-stream"; }
+					if(type.equals("kmz")) { type = "vector"; docBytes = DocumentConverterFactory.convertDocument(request.getBytes(), DocumentType.KMZ); contentType = "application/octet-stream"; }
+					else if(type.equals("csv")) { type = "vector"; docBytes = DocumentConverterFactory.convertDocument(request.getBytes(), DocumentType.CSV); contentType = "application/octet-stream"; }
+					else if(type.equals("wkt")) { type = "vector"; docBytes = DocumentConverterFactory.convertDocument(request.getBytes(), DocumentType.WKT); contentType = "application/octet-stream"; }
+					else if(type.equals("gml")) { type = "vector"; docBytes = DocumentConverterFactory.convertDocument(request.getBytes(), DocumentType.GML); contentType = "application/octet-stream"; }
+					else if(type.equals("shape")) { type = "vector"; docBytes = DocumentConverterFactory.convertDocument(request.getBytes(), DocumentType.SHAPE); contentType = "application/octet-stream"; }
 					
 					Attachment attachment = new Attachment(id, Base64.encodeBase64String(docBytes), contentType);
 				    resource.addInlineAttachment(attachment);
@@ -303,22 +354,44 @@ public class MapConfigController
 				    }
 				    
 				    // if this is a geojson blob, make sure we have verified the properties set
-				    if(type.equals("geojson"))
+				    if(type.equals("vector"))
 				    {
 				        Vector layer = (Vector)resource.getLayerByID(id);
 				        
     				    ObjectMapper objectMapper = new ObjectMapper();
     				    JsonNode node = objectMapper.readValue(docBytes, JsonNode.class);
+
+    				    List<String> fieldNames = new ArrayList<String>();
     				    
-    				    if(node.isArray())
-    				    {
-    				        
-    				    }
-    				    // loop through the properties node for each record and identify all possible attributes. 
-    				    // Ignore "description"
-    				    // for each attribute found, add to the layers attribute list.
+				        for (final JsonNode featureNode : node.get("features")) 
+				        {
+				            JsonNode properties = featureNode.get("properties");
+
+				            for (Iterator<String> iter = properties.fieldNames(); iter.hasNext(); ) 
+				            {
+				                String fieldName = iter.next();
+				                
+				                if(!fieldName.equals("description") && !fieldNames.contains(fieldName))
+				                {
+				                    fieldNames.add(fieldName);
+				                }
+				            }
+				        }
     				    
-    				    //layer.getAttributes().add(...);
+    				    //clear the attribute list
+				        layer.getAttributes().clear();
+				        
+				        // add the new list
+				        for(String field : fieldNames)
+				        {
+				            Attribute attr = new Attribute();
+				            attr.setId(field);
+				            attr.setName(field);
+				            attr.setTitle(field.replace("-", " "));
+				            attr.setVisible(true);
+				            
+				            layer.getAttributes().add(attr);
+				        }
 				    }
 				    
 				    couchDAO.updateResource(resource);

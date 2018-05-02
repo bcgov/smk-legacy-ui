@@ -11,6 +11,7 @@ public class WMSInfoLayer
 	private String wmsVersion;
 	private String metadataUrl;
 	private List<WMSInfoStyle> styles;
+	private List<Attribute> attributes;
 
 	public WMSInfoLayer()
 	{
@@ -84,6 +85,17 @@ public class WMSInfoLayer
 		this.metadataUrl = metadataUrl;
 	}
 
+    public List<Attribute> getAttributes()
+    {
+        if(attributes == null) attributes = new ArrayList<Attribute>();
+        return attributes;
+    }
+
+    public void setAttributes(List<Attribute> attributes)
+    {
+        this.attributes = attributes;
+    }
+    
     @Override
     public boolean equals( Object other ) {
         if ( other == null ) return false;

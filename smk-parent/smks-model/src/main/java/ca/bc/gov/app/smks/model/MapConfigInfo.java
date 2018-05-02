@@ -10,6 +10,7 @@ public class MapConfigInfo
 	private String id;
 	private int revision;
 	private String creator;
+	private boolean valid;
 	
 	public MapConfigInfo() { }
 
@@ -19,6 +20,7 @@ public class MapConfigInfo
 		this.id = config.getLmfId();
 		this.revision = config.getLmfRevision();
 		this.creator = config.getCreatedBy();
+		this.valid = true;
 	}
 	
 	public String getName() 
@@ -59,5 +61,15 @@ public class MapConfigInfo
 	public void setCreator(String creator) 
 	{
 		this.creator = creator;
+	}
+	
+	public boolean getValid()
+	{
+	    return this.valid;
+	}
+	
+	public void setValid(boolean valid)
+	{
+	    this.valid = valid;
 	}
 }

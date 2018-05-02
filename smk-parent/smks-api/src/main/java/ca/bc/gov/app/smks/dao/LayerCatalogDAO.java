@@ -19,6 +19,9 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import ca.bc.gov.app.smks.model.Attribute;
 import ca.bc.gov.app.smks.model.MPCMInfoLayer;
 import ca.bc.gov.app.smks.model.WMSInfoLayer;
@@ -319,8 +322,8 @@ public class LayerCatalogDAO
 	                String name = layerElement.getElementsByTagName("Name").item(0).getTextContent();
 
 	                WMSInfoLayer layer = new WMSInfoLayer();
-					layer.setTitle( title);
-					layer.setName( name);
+					layer.setTitle(title);
+					layer.setName(name);
 
 					serviceLayers.add(layer);
 
@@ -371,6 +374,39 @@ public class LayerCatalogDAO
 								}
 	    		        }
 	    		    }
+	                
+	                // see if we can get the attribute list
+	                // https://openmaps.gov.bc.ca/geo/pub/wms?service=WFS&version=1.1.0&request=DescribeFeatureType&typename=WHSE_LEGAL_ADMIN_BOUNDARIES.OATS_ALR_POLYS&outputformat=application%2Fjson
+	                try
+	                {
+    	                String wfsUrl = url.split("\\?")[0] + "?service=WFS&version=1.1.0&request=DescribeFeatureType&typename=" + name + "&outputformat=application%2Fjson";
+    	                
+    	                ObjectMapper objectMapper = new ObjectMapper();
+                        JsonNode node = objectMapper.readValue(new URL(wfsUrl), JsonNode.class);
+                        
+                        JsonNode properties = node.get("featureTypes").get(0).get("properties");
+                        for(int propertyIndex = 0; propertyIndex < properties.size(); propertyIndex++)
+                        {
+                            JsonNode property = properties.get(propertyIndex);
+                            
+                            if(!property.get("localType").asText().equals("Geometry"))
+                            {
+                                Attribute attr = new Attribute();
+                                attr.setId(property.get("name").asText());
+                                attr.setName(property.get("name").asText());
+                                attr.setTitle(property.get("name").asText());
+                                attr.setVisible(true);
+                                
+                                layer.getAttributes().add(attr);
+                            }
+                        }
+	                }
+	                catch(Exception e)
+	                {
+	                    logger.debug("WFS Attributes could not be found for " + name);
+	                    // we can't add attributes, but may as well at least load up the layer
+	                    // so don't fail hard here
+	                }
 	            }
 	        }
 	    }

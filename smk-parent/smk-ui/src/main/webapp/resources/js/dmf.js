@@ -746,7 +746,9 @@ function saveMapConfig()
         			attchId = attachment.layer.id;
         			attchType = attachment.type;
     			}
-
+        		
+        		if(attchType == null) attchType = "vector";
+        		
         		$.ajax
         		({
         			url: serviceUrl + "MapConfigurations/" + data.lmfId + "/Attachments/?id=" + attchId + "&type=" + attchType,
@@ -1806,7 +1808,7 @@ function addSelectedWmsLayer()
 					attribution: "",
 					metadataUrl: "",
 					opacity: 0.65,
-					attributes: []
+					attributes: wmsData.attributes
 				  };
 
 			data.layers.push(wmsItem);
@@ -2176,25 +2178,32 @@ function loadConfigs()
 
         	data.forEach(function(appConfigStub)
         	{
-        		$.ajax
-    			({
-    				url: serviceUrl + 'MapConfigurations/' + appConfigStub.id,
-                    type: 'get',
-                    dataType: 'json',
-                    contentType:'application/json',
-                    crossDomain: true,
-                    withCredentials: true,
-                    success: function (appConfig)
-                    {
-                    	mapConfigs.push(appConfig);
-                		$("#appsTable > tbody:last-child").append("<tr id='" + appConfig.lmfId + "\'><td><a href='#' onclick='previewMapConfig(\"" + appConfig.lmfId + "\");' class='blue-text'>" + appConfig.name + "</a></td><td>" + appConfig.viewer.type + "</td><td>" + appConfig.lmfRevision + "." + (parseInt(appConfig._rev.split('-')[0]) - 1) + "</td><td><a href='#' onclick='editMapConfig(\"" + appConfig.lmfId + "\");' class='blue-text'>Edit</a></td><td><a href='#' onclick='publishMapConfig(\"" + appConfig.lmfId + "\");' class='blue-text'>Publish</a></td><td><a href='#' onclick='deleteMapConfig(\"" + appConfig.lmfId + "\");' class='blue-text'>Delete</a></td></tr>");
-                    },
-                    error: function (status)
-                    {
-                        // error handler
-                        Materialize.toast('Error loading application ' + appConfigStub.id, 4000);
-                    }
-    			});
+        		if(appConfigStub.valid)
+        		{
+	        		$.ajax
+	    			({
+	    				url: serviceUrl + 'MapConfigurations/' + appConfigStub.id,
+	                    type: 'get',
+	                    dataType: 'json',
+	                    contentType:'application/json',
+	                    crossDomain: true,
+	                    withCredentials: true,
+	                    success: function (appConfig)
+	                    {
+	                    	mapConfigs.push(appConfig);
+	                		$("#appsTable > tbody:last-child").append("<tr id='" + appConfig.lmfId + "\'><td><a href='#' onclick='previewMapConfig(\"" + appConfig.lmfId + "\");' class='blue-text'>" + appConfig.name + "</a></td><td>" + appConfig.viewer.type + "</td><td>" + appConfig.lmfRevision + "." + (parseInt(appConfig._rev.split('-')[0]) - 1) + "</td><td><a href='#' onclick='editMapConfig(\"" + appConfig.lmfId + "\");' class='blue-text'>Edit</a></td><td><a href='#' onclick='publishMapConfig(\"" + appConfig.lmfId + "\");' class='blue-text'>Publish</a></td><td><a href='#' onclick='deleteMapConfig(\"" + appConfig.lmfId + "\");' class='blue-text'>Delete</a></td></tr>");
+	                    },
+	                    error: function (status)
+	                    {
+	                        // error handler
+	                        Materialize.toast('Error loading application ' + appConfigStub.id, 4000);
+	                    }
+	    			});
+        		}
+        		else
+    			{
+        			$("#appsTable > tbody:last-child").append("<tr id='" + appConfigStub.id + "\'><td>" + appConfigStub.name + " (Invalid Config)</a></td><td>---</td><td>---</td><td></td><td></td><td></td></tr>");
+        		}
         	});
         },
         error: function (status)

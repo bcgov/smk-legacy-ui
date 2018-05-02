@@ -178,6 +178,57 @@ public class DocumentConverterFactory
 		                String description = feature.getElementsByTagName("description").item(0).getTextContent();
 		                jsonProperties.put("description", description);
 	                }
+	                
+	                // read ExtendedData properties, if they exist
+	                if(feature.getElementsByTagName("ExtendedData").getLength() != 0)
+	                {
+	                    HashMap<String, String> attributeData = new HashMap<String, String>();
+	                    
+	                    NodeList attributes = feature.getElementsByTagName("ExtendedData").item(0).getChildNodes();
+	                    int attrlength = attributes.getLength();
+	                    for (int attrIndex = 0; attrIndex < attrlength; attrIndex++)
+	                    {
+	                        if (attributes.item(attrIndex).getNodeType() == Node.ELEMENT_NODE)
+	                        {
+	                            Element attribute = (Element) attributes.item(attrIndex);
+	                            
+	                            if(attribute.getTagName().equals("Data"))
+	                            {
+    	                            try
+    	                            {
+        	                            // We now have a Data tag. read the name
+        	                            String attrName = attribute.getAttribute("name");
+        	                            // check if there is a displayName tag. If so, Use that instead
+        	                            if(attribute.getElementsByTagName("displayName").getLength() != 0)
+        	                            {
+        	                                attrName = attribute.getElementsByTagName("displayName").item(0).getTextContent();
+        	                            }
+        	                            
+        	                            // clean the attrName to get rid of spaces. They aren't allowed in the Json
+        	                            attrName = attrName.replace(" ", "-");
+        	                            
+        	                            // now get the value
+        	                            String attrVal = attribute.getElementsByTagName("value").item(0).getTextContent();
+        	                            
+        	                            // if the KML contains more than one of the same attribute name (invalid!)
+        	                            // this will silently overwrite it.
+        	                            if(attrName != null && attrName.length() > 0) attributeData.put(attrName, attrVal);
+    	                            }
+    	                            catch(Exception e)
+    	                            {
+    	                                // Likely the doc is invalid here, but we don't really want to stop checking.
+    	                                logger.debug("Invalid attribute in KML!");
+    	                            }
+	                            }
+	                        }
+	                    }
+	                    
+	                    // go through attribute final list and create properties
+	                    for(String attr : attributeData.keySet())
+	                    {
+	                        jsonProperties.put(attr, attributeData.get(attr));
+	                    }
+	                }
 	            }
 	        }
 	    }
