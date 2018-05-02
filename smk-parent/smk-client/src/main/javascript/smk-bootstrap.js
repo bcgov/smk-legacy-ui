@@ -325,25 +325,38 @@
         'no-tools': function ( arg ) {
             return {
                 tools: [
-                    { type: 'about',        enabled: false },
-                    { type: 'baseMaps',     enabled: false },
-                    { type: 'coordinate',   enabled: false },
-                    { type: 'directions',   enabled: false },
-                    { type: 'dropdown',     enabled: false },
-                    { type: 'identify',     enabled: false },
-                    { type: 'layers',       enabled: false },
-                    { type: 'location',     enabled: false },
-                    { type: 'markup',       enabled: false },
-                    { type: 'measure',      enabled: false },
-                    { type: 'menu',         enabled: false },
-                    { type: 'minimap',      enabled: false },
-                    { type: 'pan',          enabled: false },
-                    { type: 'query',        enabled: false },
-                    { type: 'scale',        enabled: false },
-                    { type: 'search',       enabled: false },
-                    { type: 'select',       enabled: false },
-                    { type: 'zoom',         enabled: false }
+                    { type: '*', enabled: false }
                 ]
+            }
+        },
+
+        'show-layer': function ( arg ) {
+            var args = arg.split( ',' )
+            if ( args.length < 1 ) throw new Error( '-show-layer needs at least 1 argument' )
+
+            return {
+                layers: args.map( function ( id ) {
+                    if ( id == 'all' ) id = '**'
+                    return {
+                        id: id,
+                        isVisible: true
+                    }
+                } )
+            }
+        },
+
+        'hide-layer': function ( arg ) {
+            var args = arg.split( ',' )
+            if ( args.length < 1 ) throw new Error( '-hide-layer needs at least 1 argument' )
+
+            return {
+                layers: args.map( function ( id ) {
+                    if ( id.toLowerCase() == 'all' ) id = '**'
+                    return {
+                        id: id,
+                        isVisible: false
+                    }
+                } )
             }
         },
 
@@ -372,34 +385,6 @@
                         zoom: args[ 0 ]
                     }
                 }
-            }
-        },
-
-        'lshow': function ( arg ) {
-            var args = arg.split( ',' )
-            if ( args.length < 1 ) throw new Error( '-lshow needs at least 1 argument' )
-
-            return {
-                layers: args.map( function ( id ) {
-                    return {
-                        id: id,
-                        isVisible: true
-                    }
-                } )
-            }
-        },
-
-        'lhide': function ( arg ) {
-            var args = arg.split( ',' )
-            if ( args.length < 1 ) throw new Error( '-lhide needs at least 1 argument' )
-
-            return {
-                layers: args.map( function ( id ) {
-                    return {
-                        id: id,
-                        isVisible: false
-                    }
-                } )
             }
         },
 
