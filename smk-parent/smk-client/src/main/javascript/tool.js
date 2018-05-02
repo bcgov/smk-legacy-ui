@@ -118,6 +118,10 @@ include.module( 'tool', [ 'jquery', 'event' ], function () {
     }
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
+    Tool.prototype.hasPickPriority = function ( toolIdSet ) {
+        return false
+    }
+
     return Tool
 
 } )

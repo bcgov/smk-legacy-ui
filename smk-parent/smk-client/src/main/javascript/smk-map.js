@@ -277,8 +277,6 @@ include.module( 'smk-map', [ 'jquery', 'util' ], function () {
 
             if ( !self.tools || self.tools.length == 0 ) return
 
-            self.tools.push( { type: 'location' } )
-
             return SMK.UTIL.waitAll( self.tools.filter( function ( t ) { return t.enabled !== false } ).map( function ( t ) {
                 var tag = 'tool-' + t.type
                 return include( tag )
@@ -384,4 +382,13 @@ include.module( 'smk-map', [ 'jquery', 'util' ], function () {
 
         return this
     }
+
+    SmkMap.prototype.withTool = function ( toolId, action ) {
+        var self = this
+
+        if ( !this.$tool[ toolId ] ) return
+
+        return action.call( this.$tool[ toolId ] )
+    }
+
 } )

@@ -528,6 +528,10 @@
                 },
                 tools: [
                     {
+                        type: "location",
+                        enabled: true,
+                    },
+                    {
                         type: "search",
                         enabled: true,
                     },
@@ -569,7 +573,7 @@
                         <h2>Initialization failed</h2>\
                         <pre>{}</pre>\
                     </div>\
-                '.replace( /\s+/g, ' ' ).replace( '{}', e.stack )
+                '.replace( /\s+/g, ' ' ).replace( '{}', e ? e.stack || '' : '' )
 
                 document.querySelector( 'body' ).appendChild( message )
             }

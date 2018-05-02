@@ -19,7 +19,6 @@ include.module( 'tool-identify', [ 'feature-list', 'widgets', 'tool-identify.pan
             title:              'Identify',
             widgetComponent:    'identify-widget',
             panelComponent:     'identify-panel',
-            // featureSetProperty: 'identified'
         }, option ) )
     }
 
@@ -36,9 +35,9 @@ include.module( 'tool-identify', [ 'feature-list', 'widgets', 'tool-identify.pan
     IdentifyTool.prototype.afterInitialize.push( function ( smk ) {
         var self = this
 
-        // smk.$viewer.handlePick( this, function ( location ) {
-        //     smk.$viewer.identifyFeatures( location )
-        // } )
+        smk.$viewer.handlePick( this, function ( location ) {
+            smk.$viewer.identifyFeatures( location )
+        } )
 
         smk.on( this.id, {
             'activate': function () {
@@ -71,7 +70,6 @@ include.module( 'tool-identify', [ 'feature-list', 'widgets', 'tool-identify.pan
                 self.setMessage( 'No features found', 'warning' )
             }
             else {
-                smk.$tool.location.reset()
                 smk.$viewer.identified.pick( self.firstId )
 
                 var stat = smk.$viewer.identified.getStats()
@@ -86,6 +84,10 @@ include.module( 'tool-identify', [ 'feature-list', 'widgets', 'tool-identify.pan
         } )
 
     } )
+
+    IdentifyTool.prototype.hasPickPriority = function ( toolIdSet ) {
+        return !toolIdSet.location
+    }
 
     return IdentifyTool
 } )

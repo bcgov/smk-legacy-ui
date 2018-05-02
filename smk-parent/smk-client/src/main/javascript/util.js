@@ -98,6 +98,10 @@ include.module( 'util', null, function ( inc ) {
             }
         },
 
+        makeSet: function ( values ) {
+            return values.reduce( function ( accum, v ) { accum[ v ] = true; return accum }, {} )
+        },
+
         extractCRS: function ( obj ) {
             if ( obj.properties )
                 if ( obj.properties.name )
