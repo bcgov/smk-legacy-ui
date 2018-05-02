@@ -215,6 +215,8 @@ include.module( 'smk-map', [ 'jquery', 'util' ], function () {
         }
 
         function resolveConfig() {
+            if ( !self.layers ) return
+
             return SMK.UTIL.waitAll( self.layers.map( function ( ly ) {
                 if ( ly.type != 'esri-dynamic' ) return ly
                 if ( ly.dynamicLayers ) return ly

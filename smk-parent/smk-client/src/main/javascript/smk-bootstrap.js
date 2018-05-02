@@ -25,7 +25,7 @@
 
         var smkAttr = {
             'container-id': attrString( 'smk-map-frame' ),
-            'config':       attrList( '?smk' ),
+            'config':       attrList( '?smk-' ),
             'standalone':   attrBoolean( false, true ),
             'disconnected': attrBoolean( false, true ),
             'base-url':     attrString( ( new URL( script.src.replace( 'smk-bootstrap.js', '' ), document.location ) ).toString() ),
@@ -86,7 +86,7 @@
     function parseDocumentArguments( config, source ) {
         if ( !/^[?]/.test( config ) ) return
 
-        var paramPattern = new RegExp( '^' + config.substr( 1 ) + '([-].+)$', 'i' )
+        var paramPattern = new RegExp( '^' + config.substr( 1 ) + '(.+)$', 'i' )
 
         var params = location.search.substr( 1 ).split( '&' )
         var configs = []
@@ -96,7 +96,7 @@
                 var m = decodeURIComponent( p ).match( paramPattern )
                 if ( !m ) return
 
-                configs = configs.concat( parseOption( m[ 1 ], source1 ) )
+                configs = configs.concat( parseOption( m[ 1 ], source1 ) || [] )
             }
             catch ( e ) {
                 if ( !e.parseSource ) e.parseSource = source1
@@ -124,13 +124,11 @@
     }
 
     function parseOption( config, source ) {
-        if ( !/^[-].+$/.test( config ) ) return
-
-        var m = config.match( /^[-](.+?)([=](.+))?$/ )
-        if ( !m ) return []
+        var m = config.match( /^(.+?)([=](.+))?$/ )
+        if ( !m ) return
 
         var option = m[ 1 ].toLowerCase()
-        if ( !( option in optionHandler ) ) return []
+        if ( !( option in optionHandler ) ) return
 
         source += ' -> option[' + option + ']'
         try {
