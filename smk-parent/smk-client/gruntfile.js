@@ -218,7 +218,7 @@ module.exports = function( grunt ) {
             grunt.config( setting, jsonOut( out ) )
 
         function jsonOut( obj ) {
-            return JSON.stringify( obj, null, '  ' )
+            return JSON.stringify( obj )
         }
     } )
 

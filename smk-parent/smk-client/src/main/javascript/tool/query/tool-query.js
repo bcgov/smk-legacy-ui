@@ -102,7 +102,9 @@ include.module( 'tool-query', [ 'tool', 'widgets', 'tool-query.panel-query-html'
 
         this.makePropPanel( 'description', null )
         this.makePropPanel( 'parameters', null )
-        this.makePropPanel( 'config', { within: true } )
+        this.makePropPanel( 'config', {
+            within: true
+        } )
 
         SMK.TYPE.FeatureList.prototype.constructor.call( this, $.extend( {
             order:          4,
@@ -132,6 +134,9 @@ include.module( 'tool-query', [ 'tool', 'widgets', 'tool-query.panel-query-html'
         this.title = this.query.title
         this.description = this.query.description
         this.parameters = this.query.getParameters()
+
+        if ( !smk.$viewer.layerId[ this.query.layerId ].config.geometryAttribute )
+            this.config.within = null
     } )
 
     QueryTool.prototype.afterInitialize.push( function ( smk ) {
@@ -142,8 +147,7 @@ include.module( 'tool-query', [ 'tool', 'widgets', 'tool-query.panel-query-html'
                 switch ( self.onActivate ) {
                 case 'execute':
                     smk.emit( self.id, 'execute' )
-                    break;
-
+                    break
                 }
             }
         } )
@@ -186,16 +190,30 @@ include.module( 'tool-query', [ 'tool', 'widgets', 'tool-query.panel-query-html'
                     param[ p.prop.id ] = $.extend( {}, p.prop )
                 } )
 
-                return self.query.queryLayer( param, self.config, smk.$viewer, self.query.layer.id )
+                return SMK.UTIL.resolved()
+                    .then( function () {
+                        return self.query.queryLayer( param, self.config, smk.$viewer )
+                    } )
                     .then( function ( features ) {
-                        self.featureSet.add( self.query.layer.id, features )
+                        return asyncIterator(
+                            function () {
+                                return features.length > 0
+                            },
+                            function () {
+                                var chunk = features.splice( 0, 50 )
+                                self.featureSet.add( self.query.layerId, chunk )
+                            },
+                            5
+                        )
                     } )
                     .catch( function ( err ) {
+                        console.warn( err )
                         self.setMessage( 'Query returned no results', 'warning' )
                     } )
                     .finally( function () {
                         self.busy = false
                     } )
+
             },
 
             'config': function ( ev ) {
@@ -218,6 +236,27 @@ include.module( 'tool-query', [ 'tool', 'widgets', 'tool-query.panel-query-html'
         } )
 
     } )
+
+    function asyncIterator( test, body, delay ) {
+        return SMK.UTIL.makePromise( function ( res, rej ) {
+            try {
+                if ( !test() ) return res( false )
+                body()
+
+                setTimeout( function () {
+                    res( true )
+                }, delay )
+            }
+            catch ( e ) {
+                return rej( e )
+            }
+        } )
+        .then( function ( cont ) {
+            if ( !cont ) return
+
+            return asyncIterator( test, body )
+        } )
+    }
 
     return QueryTool
 } )

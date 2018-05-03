@@ -24,7 +24,7 @@ include.module( 'util', null, function ( inc ) {
             if ( val === null ) return 'null'
             return 'object'
         },
-            
+
         templatePattern: /<%=\s*(.*?)\s*%>/g,
         templateReplace: function ( template, replacer ) {
             if ( !replacer ) return template
@@ -194,6 +194,17 @@ include.module( 'util', null, function ( inc ) {
                     properties: obj.properties
                 }
             }
+        },
+
+        circlePoints: function ( center, radius, segmentCount ) {
+            var points = []
+            for( var i = 0; i <= segmentCount; i++ )
+                points.push( [
+                    center.x + radius * Math.cos( 2 * Math.PI * i / segmentCount ),
+                    center.y + radius * Math.sin( 2 * Math.PI * i / segmentCount )
+                ] )
+
+            return points
         }
 
     } )

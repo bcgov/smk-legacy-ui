@@ -3,22 +3,18 @@ include.module( 'surround', [ 'vue', 'surround.header-html' ], function ( inc ) 
     function Surround( smk ) {
         var self = this
 
-        var el = smk.addToContainer( inc[ 'surround.header-html' ], { id: 'smk-header' }, true )
+        try { var url = smk.$viewer.resolveAttachmentUrl( smk.surround.imageSrc, null, 'png' ) } catch ( e ) {}
 
         this.vm = new Vue( {
-            el: el,
-            data: Object.assign( {
-                lmfId: smk.lmfId,
-                imageSrc: null,
-                title: null,
-                subtitles: null,
-            }, smk.surround ),
-            methods: {
-                url: function ( url ) {
-                    return "url( '" + url + "')"
-                }
+            el:     smk.addToContainer( inc[ 'surround.header-html' ], { id: 'smk-header' }, true ),
+            data: {
+                imageUrl:   url,
+                title:      smk.surround.title,
+                subtitles:  smk.surround.subtitles,
             }
         } )
+
+        $( 'head title' ).text( smk.surround.title )
     }
 
     SMK.TYPE.Surround = Surround

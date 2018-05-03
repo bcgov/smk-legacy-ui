@@ -151,7 +151,7 @@ include.module( 'layer-esri3d', [ 'layer', 'util', 'types-esri3d' ], function ()
                 } )
             } )
         } )
-        
+
         return layer
     }
 
@@ -168,14 +168,13 @@ include.module( 'layer-esri3d', [ 'layer', 'util', 'types-esri3d' ], function ()
 
         if ( layers.length != 1 ) throw new Error( 'only 1 config allowed' )
 
-        if ( !layers[ 0 ].config.dataUrl )
-            layers[ 0 ].config.dataUrl = this.resolveAttachmentUrl( layers[ 0 ].config.id, layers[ 0 ].config.type )
+        var url = this.resolveAttachmentUrl( layers[ 0 ].config.dataUrl, layers[ 0 ].config.id, 'kml' )
 
         return SMK.UTIL.makePromise( function ( res, rej ) {
-            $.get( layers[ 0 ].config.dataUrl, null, null, 'xml' ).then( function ( doc ) {
+            $.get( url, null, null, 'xml' ).then( function ( doc ) {
                 res( doc )
             }, function () {
-                rej( 'request to ' + layers[ 0 ].config.dataUrl + ' failed' )
+                rej( 'request to ' + url + ' failed' )
             } )
         } )
         .then( function ( doc ) {
@@ -189,25 +188,24 @@ include.module( 'layer-esri3d', [ 'layer', 'util', 'types-esri3d' ], function ()
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    defineLayerType( 'geojson', {
+    defineLayerType( 'vector', {
 
         getFeaturesAtPoint: getVectorFeaturesAtPoint
 
     } )
 
-    SMK.TYPE.Layer[ 'geojson' ].esri3d.create = function ( layers, zIndex ) {
+    SMK.TYPE.Layer[ 'vector' ].esri3d.create = function ( layers, zIndex ) {
         var self = this;
 
         if ( layers.length != 1 ) throw new Error( 'only 1 config allowed' )
 
-        if ( !layers[ 0 ].config.dataUrl )
-            layers[ 0 ].config.dataUrl = this.resolveAttachmentUrl( layers[ 0 ].config.id, layers[ 0 ].config.type )
+        var url = this.resolveAttachmentUrl( layers[ 0 ].config.dataUrl, layers[ 0 ].config.id, 'geojson' )
 
         return SMK.UTIL.makePromise( function ( res, rej ) {
-            $.get( layers[ 0 ].config.dataUrl, null, null, 'json' ).then( function ( doc ) {
+            $.get( url, null, null, 'json' ).then( function ( doc ) {
                 res( doc )
             }, function () {
-                rej( 'request to ' + layers[ 0 ].config.dataUrl + ' failed' )
+                rej( 'request to ' + url + ' failed' )
             } )
         } )
         .then( function ( geojson ) {

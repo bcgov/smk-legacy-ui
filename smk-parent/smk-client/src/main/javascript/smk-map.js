@@ -1,4 +1,4 @@
-include.module( 'smk-map', [ 'jquery', 'util', 'viewer', 'layer' ], function () {
+include.module( 'smk-map', [ 'jquery', 'util' ], function () {
 
     function SmkMap( option ) {
         this.$option = option
@@ -11,7 +11,9 @@ include.module( 'smk-map', [ 'jquery', 'util', 'viewer', 'layer' ], function () 
     SmkMap.prototype.initialize = function () {
         var self = this;
 
-        console.log( 'smk initialize:', this.$option )
+        console.groupCollapsed( 'SMK initialize #' + this.$option[ 'container-id' ] )
+
+        console.log( 'options:', JSON.parse( JSON.stringify( this.$option ) ) )
 
         this.$container = document.getElementById( this.$option[ 'container-id' ] )
         if ( !this.$container )
@@ -23,13 +25,18 @@ include.module( 'smk-map', [ 'jquery', 'util', 'viewer', 'layer' ], function () 
         return SMK.UTIL.resolved()
             .then( loadConfigs )
             .then( mergeConfigs )
+            .then( resolveConfig )
             .then( initMapFrame )
-            .then( initSurround )
+            .then( loadSurround )
             .then( loadViewer )
             .then( loadTools )
             .then( initViewer )
             .then( initTools )
+            .then( initSurround )
             .then( showMap )
+            .finally( function () {
+                console.groupEnd()
+            } )
 
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -62,12 +69,12 @@ include.module( 'smk-map', [ 'jquery', 'util', 'viewer', 'layer' ], function () 
             var config = Object.assign( {}, SMK.CONFIG )
             config.$sources = []
 
-            console.log( 'base', JSON.stringify( config, null, '  ' ) )
+            console.log( 'base', JSON.parse( JSON.stringify( config ) ) )
 
             while( configs.length > 0 ) {
                 var c = configs.shift()
 
-                console.log( 'merging', JSON.stringify( c, null, '  ' ) )
+                console.log( 'merging', JSON.parse( JSON.stringify( c ) ) )
 
                 mergeSurround( config, c )
                 mergeViewer( config, c )
@@ -79,7 +86,7 @@ include.module( 'smk-map', [ 'jquery', 'util', 'viewer', 'layer' ], function () 
 
                 Object.assign( config, c )
 
-                console.log( 'merged', JSON.stringify( config, null, '  ' ) )
+                console.log( 'merged', JSON.parse( JSON.stringify( config ) ) )
             }
 
             Object.assign( self, config )
@@ -122,8 +129,18 @@ include.module( 'smk-map', [ 'jquery', 'util', 'viewer', 'layer' ], function () 
                 return mergeCollection( base, merge, 'tools', {
                     findFn: function ( merge ) {
                         return function ( base ) {
-                            return merge.type == base.type &&
-                                merge.instance == base.instance
+                            return ( merge.type == base.type || merge.type == '*' ) &&
+                                ( !merge.instance || merge.instance == base.instance )
+                        }
+                    },
+                    mergeFn: function ( base, merge ) {
+                        if ( merge.type && merge.type == '*' ) {
+                            var m = JSON.parse( JSON.stringify( merge ) )
+                            delete m.type
+                            Object.assign( base, m )
+                        }
+                        else {
+                            Object.assign( base, merge )
                         }
                     }
                 } )
@@ -131,6 +148,11 @@ include.module( 'smk-map', [ 'jquery', 'util', 'viewer', 'layer' ], function () 
 
             function mergeLayers( base, merge ) {
                 return mergeCollection( base, merge, 'layers', {
+                    findFn: function ( merge ) {
+                        return function ( base ) {
+                            return merge.id == base.id || merge.id.startsWith( '*' )
+                        }
+                    },
                     mergeFn: function ( baseLayer, mergeLayer ) {
                         mergeCollection( baseLayer, mergeLayer, 'queries', {
                             mergeFn: function ( baseQuery, mergeQuery ) {
@@ -140,9 +162,19 @@ include.module( 'smk-map', [ 'jquery', 'util', 'viewer', 'layer' ], function () 
                             }
                         } )
 
+                        if ( mergeLayer.id == '**' && !mergeLayer.layers )
+                            mergeLayer.layers = [ JSON.parse( JSON.stringify( mergeLayer ) ) ]
+
                         mergeLayers( baseLayer, mergeLayer )
 
-                        Object.assign( baseLayer, mergeLayer )
+                        if ( mergeLayer.id && mergeLayer.id.startsWith( '*' ) ) {
+                            var m = JSON.parse( JSON.stringify( mergeLayer ) )
+                            delete m.id
+                            Object.assign( baseLayer, m )
+                        }
+                        else {
+                            Object.assign( baseLayer, mergeLayer )
+                        }
                     }
                 } )
             }
@@ -162,12 +194,15 @@ include.module( 'smk-map', [ 'jquery', 'util', 'viewer', 'layer' ], function () 
 
                 if ( base[ prop ] ) {
                     merge[ prop ].forEach( function( m ) {
-                        var item = base[ prop ].find( findFn( m ) )
-
-                        if ( item )
-                            mergeFn( item, m )
-                        else
+                        var items = base[ prop ].filter( findFn( m ) )
+                        if ( items.length > 0 ) {
+                            items.forEach( function ( item ) {
+                                mergeFn( item, m )
+                            } )
+                        }
+                        else {
                             base[ prop ].push( m )
+                        }
                     } )
                 }
                 else {
@@ -179,20 +214,44 @@ include.module( 'smk-map', [ 'jquery', 'util', 'viewer', 'layer' ], function () 
 
         }
 
+        function resolveConfig() {
+            if ( !self.layers ) return
+
+            return SMK.UTIL.waitAll( self.layers.map( function ( ly ) {
+                if ( ly.type != 'esri-dynamic' ) return ly
+                if ( ly.dynamicLayers ) return ly
+                if ( !ly.mpcmId ) throw new Error( 'No mpcmId provided' )
+
+                return SMK.UTIL.makePromise( function ( res, rej ) {
+                    $.ajax( {
+                        url: 'https://mpcm-catalogue.api.gov.bc.ca/catalogV2/PROD/' + ly.mpcmId,
+                        dataType: 'xml'
+                    } ).then( res, rej )
+                } )
+                .then( function ( data ) {
+                    debugger
+                } )
+                // console.log( ly )
+
+            } ) )
+        }
+
         function initMapFrame() {
-            return include( 'map-frame-styles' ).then( function () {
-                $( self.$container )
-                    .addClass( 'smk-map-frame' )
-                    .addClass( 'smk-viewer-' + self.viewer.type )
-            } )
+            $( self.$container )
+                .addClass( 'smk-map-frame' )
+                .addClass( 'smk-viewer-' + self.viewer.type )
+        }
+
+        function loadSurround() {
+            if ( !self.$option.standalone ) return
+
+            return include( 'surround' )
         }
 
         function initSurround() {
             if ( !self.$option.standalone ) return
 
-            return include( 'surround' ).then( function () {
-                self.$surround = new SMK.TYPE.Surround( self )
-            } )
+            self.$surround = new SMK.TYPE.Surround( self )
         }
 
         function loadViewer() {
