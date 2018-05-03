@@ -107,4 +107,52 @@ include.module( 'layer.layer-wms-js', [ 'layer.layer-js' ], function () {
         //     options.xhrFields.withCredentials = true
     }
 
+    WmsLayer.prototype.getFeaturesInArea = function ( area, view, option ) {
+        var self = this
+
+        var serviceUrl  = this.config.serviceUrl
+        var layerName   = this.config.layerName
+        var styleName   = this.config.styleName
+        var version     = '1.1.1'
+        var wkt = 'POLYGON((' + area.geometry.coordinates[ 0 ].map( function ( c ) { return c.join( ' ' ) } ).join( ',' ) + '))'
+        var filter = 'INTERSECTS( ' + this.config.geometryAttribute + ', ' + wkt + ' )'
+
+        var data = {
+            service:      "WFS",
+            version:      '1.1.0',
+            request:      "GetFeature",
+            srsName:      'EPSG:4326',
+            typename:     this.config.layerName,
+            outputformat: "application/json",
+            cql_filter:   filter,
+        }
+
+        return SMK.UTIL.makePromise( function ( res, rej ) {
+            $.ajax( {
+                url:        self.config.serviceUrl,
+                method:     'GET',
+                data:       data,
+                dataType:   'json',
+                // contentType:    'application/json',
+                // crossDomain:    true,
+                // withCredentials: true,
+            } ).then( res, rej )
+        } )
+        .then( function ( data ) {
+            console.log( data )
+
+            if ( !data ) throw new Error( 'no features' )
+            if ( !data.features || data.features.length == 0 ) throw new Error( 'no features' )
+
+            return data.features.map( function ( f, i ) {
+                if ( self.config.titleAttribute )
+                    f.title = f.properties[ self.config.titleAttribute ]
+                else
+                    f.title = 'Feature #' + ( i + 1 )
+
+                return f
+            } )
+        } )
+    }
+
 } )

@@ -405,7 +405,8 @@ include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', '
 
             option.layer = self.visibleLayer[ id ]
 
-            var p = ly.getFeaturesAtPoint( location, view, option )
+            var p = ly.getFeaturesInArea( searchArea, view, option )
+            // var p = ly.getFeaturesAtPoint( location, view, option )
             if ( !p ) return
 
             promises.push(
