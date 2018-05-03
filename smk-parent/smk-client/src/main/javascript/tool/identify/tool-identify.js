@@ -40,8 +40,8 @@ include.module( 'tool-identify', [ 'feature-list', 'widgets', 'tool-identify.pan
             if ( self.active ) {
                 if ( self.firstId )
                     setTimeout( function () {
-                        smk.$viewer.identified.pick( self.firstId )                
-                    }, 50 ) 
+                        smk.$viewer.identified.pick( self.firstId )
+                    }, 50 )
             }
         } )
 
@@ -91,6 +91,14 @@ include.module( 'tool-identify', [ 'feature-list', 'widgets', 'tool-identify.pan
 
                 self.setMessage( '<div>Identified ' + SMK.UTIL.grammaticalNumber( stat.featureCount, null, 'a feature', '{} features' ) + '</div>' + sub )
             }
+        } )
+
+        smk.$viewer.changedView( function ( ev ) {
+            if ( !self.active ) return
+
+            var picked = smk.$viewer.identified.getPicked()
+            if ( picked )
+                smk.$viewer.identified.pick( picked.id )
         } )
 
     } )
