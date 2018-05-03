@@ -36,6 +36,15 @@ include.module( 'tool-identify', [ 'feature-list', 'widgets', 'tool-identify.pan
     IdentifyTool.prototype.afterInitialize.push( function ( smk ) {
         var self = this
 
+        self.changedActive( function () {
+            if ( self.active ) {
+                if ( self.firstId )
+                    setTimeout( function () {
+                        smk.$viewer.identified.pick( self.firstId )                
+                    }, 50 ) 
+            }
+        } )
+
         smk.$viewer.handlePick( this, function ( location ) {
             smk.$viewer.identifyFeatures( location )
         } )

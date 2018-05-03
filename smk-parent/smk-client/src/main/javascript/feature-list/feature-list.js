@@ -98,6 +98,9 @@ include.module( 'feature-list', [ 'tool', 'widgets',
                 } )
 
             Vue.set( self.layers[ ly.index ], 'features', self.layers[ ly.index ].features.concat( ev.features.map( function ( ft ) {
+                if ( !self.firstId )
+                    self.firstId = ft.id
+
                 return {
                     id:     ft.id,
                     title:  ft.title
@@ -107,6 +110,7 @@ include.module( 'feature-list', [ 'tool', 'widgets',
 
         self.featureSet.clearedFeatures( function ( ev ) {
             self.layers = []
+            self.firstId = null
         } )
 
         self.featureSet.removedFeatures( function ( ev ) {
@@ -218,11 +222,9 @@ include.module( 'feature-list', [ 'tool', 'widgets',
             if ( !Vue.component( this.popupModel.attributeComponent ) ) {
                 if ( template ) {
                     try {
-                        var compiled = Vue.compile( template )
                         Vue.component( this.popupModel.attributeComponent, {
+                            template:           template,
                             extends:            featurePopup,
-                            render:             compiled.render,
-                            staticRenderFns:    compiled.staticRenderFns,
                         } )
                     }
                     catch ( e ) {
