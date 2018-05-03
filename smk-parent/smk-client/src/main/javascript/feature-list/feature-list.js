@@ -202,6 +202,9 @@ include.module( 'feature-list', [ 'tool', 'widgets',
                     this.position = ( self.popupCurrentIndex + 1 ) + ' / ' + l
                     self.featureSet.pick( self.popupFeatureIds[ self.popupCurrentIndex ] )
                 },
+            },
+            updated: function () {
+                self.updatePopup()
             }
         } )
 
