@@ -102,6 +102,31 @@ include.module( 'util', null, function ( inc ) {
             return values.reduce( function ( accum, v ) { accum[ v ] = true; return accum }, {} )
         },
 
+        makeDelayedCall: function ( fn, option ) {
+            var timeoutId
+
+            function cancel() {
+                if ( timeoutId ) clearTimeout( timeoutId )
+                timeoutId = null
+            }
+
+            var delayedCall = function () {
+                var ctxt = option.context || this
+                var args = option.arguments || [].slice.call( arguments )
+
+                cancel()
+
+                timeoutId = setTimeout( function () {
+                    timeoutId = null
+                    fn.apply( ctxt, args )
+                }, option.delay || 200 )
+            }
+
+            delayedCall.cancel = cancel
+
+            return delayedCall
+        },
+
         extractCRS: function ( obj ) {
             if ( obj.properties )
                 if ( obj.properties.name )

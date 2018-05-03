@@ -93,12 +93,34 @@ include.module( 'tool-identify', [ 'feature-list', 'widgets', 'tool-identify.pan
             }
         } )
 
+        var onChangedViewStart = SMK.UTIL.makeDelayedCall( function () {
+            picked = smk.$viewer.identified.getPicked()
+            if ( !picked ) return
+
+            // console.log( 'onChangedViewStart' )
+
+            self.wasPickedId = picked.id
+            smk.$viewer.identified.pick( null )
+        }, { delay: 400 } )
+
+        var onChangedViewEnd = SMK.UTIL.makeDelayedCall( function () {
+            if ( !self.wasPickedId ) return
+
+            // console.log( 'onChangedViewEnd' )
+
+            smk.$viewer.identified.pick( self.wasPickedId )
+            self.wasPickedId = null
+        }, { delay: 410 } )
+
         smk.$viewer.changedView( function ( ev ) {
             if ( !self.active ) return
 
-            var picked = smk.$viewer.identified.getPicked()
-            if ( picked )
-                smk.$viewer.identified.pick( picked.id )
+            if ( ev.operation == 'move' ) return
+
+            // console.log( self.wasPickedId, ev )
+
+            if ( ev.after == 'start' ) return onChangedViewStart()
+            if ( ev.after == 'end' ) return onChangedViewEnd()
         } )
 
     } )
