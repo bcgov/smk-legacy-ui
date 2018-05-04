@@ -387,7 +387,7 @@ include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', '
 
         var view = this.getView()
 
-        var searchArea = turf.polygon( [ SMK.UTIL.circlePoints( location.screen, option.tolerance, 32 ).map( function ( p ) { return self.screenToMap( p ) } ) ] )
+        var searchArea = turf.polygon( [ SMK.UTIL.circlePoints( location.screen, option.tolerance, 12 ).map( function ( p ) { return self.screenToMap( p ) } ) ] )
 
         // var searchArea = turf.circle( [ location.map.longitude, location.map.latitude ], option.tolerance * view.metersPerPixelAtY( location.screen.y ) / 1000 )
 

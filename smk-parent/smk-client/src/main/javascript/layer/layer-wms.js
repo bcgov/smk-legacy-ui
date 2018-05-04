@@ -110,21 +110,18 @@ include.module( 'layer.layer-wms-js', [ 'layer.layer-js' ], function () {
     WmsLayer.prototype.getFeaturesInArea = function ( area, view, option ) {
         var self = this
 
-        var serviceUrl  = this.config.serviceUrl
-        var layerName   = this.config.layerName
-        var styleName   = this.config.styleName
-        var version     = '1.1.1'
-        var wkt = 'POLYGON((' + area.geometry.coordinates[ 0 ].map( function ( c ) { return c.join( ' ' ) } ).join( ',' ) + '))'
-        var filter = 'INTERSECTS( ' + this.config.geometryAttribute + ', ' + wkt + ' )'
+        var filter = '<Filter xmlns:gml="http://www.opengis.net/gml"><Intersects><PropertyName></PropertyName><gml:Polygon srsName="http://www.opengis.net/gml/srs/epsg.xml#4326" xmlns:gml="http://www.opengis.net/gml"><gml:outerBoundaryIs><gml:LinearRing><gml:coordinates decimal="." cs="," ts=" ">' +
+            area.geometry.coordinates[ 0 ].map( function ( c ) { return c.join( ',' ) } ).join( ' ' ) +
+        '</gml:coordinates></gml:LinearRing></gml:outerBoundaryIs></gml:Polygon></Intersects></Filter>'
 
         var data = {
-            service:      "WFS",
-            version:      '1.1.0',
-            request:      "GetFeature",
-            srsName:      'EPSG:4326',
-            typename:     this.config.layerName,
-            outputformat: "application/json",
-            cql_filter:   filter,
+            service:        "WFS",
+            version:        '1.0.0',
+            request:        "GetFeature",
+            srsName:        'EPSG:4326',
+            typename:       this.config.layerName,
+            outputformat:   "application/json",
+            filter:         filter,
         }
 
         return SMK.UTIL.makePromise( function ( res, rej ) {
@@ -133,9 +130,6 @@ include.module( 'layer.layer-wms-js', [ 'layer.layer-js' ], function () {
                 method:     'GET',
                 data:       data,
                 dataType:   'json',
-                // contentType:    'application/json',
-                // crossDomain:    true,
-                // withCredentials: true,
             } ).then( res, rej )
         } )
         .then( function ( data ) {
