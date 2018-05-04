@@ -284,6 +284,7 @@ function setToolActivation(toolType)
     			$("#identifyStyleStrokeStyle").val(tool.style.strokeStyle);
     			$("#identifyStyleStrokeColor").val(tool.style.strokeColor);
     			$("#identifyStyleFillColor").val(tool.style.fillColor);
+    			$("#identifyPanelVisible").prop('checked', tool.showPanel);
     		}
 	    	else if(tool.type == "identify" && tool.enabled == false) $("#identifyOptions").hide();
 	    	else if(tool.type == "select" && tool.enabled == true)
@@ -511,7 +512,6 @@ function setupMapConfigToolsUI()
 	{
     	if(tool.type == "coordinate") $("#coordinates").prop('checked', tool.enabled);
     	else if(tool.type == "attribution") $("#attribution").prop('checked', tool.enabled);
-    	else if(tool.type == "sidebar") $("#sidebar").prop('checked', tool.enabled);
     	else if(tool.type == "layers") $("#layerPanel").prop('checked', tool.enabled);
     	else if(tool.type == "pan") $("#panning").prop('checked', tool.enabled);
     	else if(tool.type == "zoom")
@@ -613,6 +613,7 @@ function setupMapConfigToolsUI()
     			$("#identifyStyleStrokeStyle").val(tool.style.strokeStyle);
     			$("#identifyStyleStrokeColor").val(tool.style.strokeColor);
     			$("#identifyStyleFillColor").val(tool.style.fillColor);
+    			$("#identifyPanelVisible").prop('checked', tool.showPanel);
 			}
 		}
     	else if(tool.type == "search") $("#searchPanel").prop('checked', tool.enabled);
@@ -644,6 +645,7 @@ function finishToolEdits()
 			tool.style.strokeStyle = $("#identifyStyleStrokeStyle").val();
 			tool.style.strokeColor = $("#identifyStyleStrokeColor").val();
 			tool.style.fillColor = $("#identifyStyleFillColor").val();
+			tool.showPanel = $("#identifyStyleFillColor").is(":checked");
 		}
 		else if(tool.type == "select") 
 		{
@@ -693,10 +695,6 @@ function addNewMapConfig()
 			    },
 			    {
 			      "type": "attribution",
-			      "enabled": true
-			    },
-			    {
-			      "type": "sidebar",
 			      "enabled": true
 			    },
 			    {
@@ -857,7 +855,7 @@ function saveMapConfig()
 	}
 
 	console.log("Saving JSON: " + JSON.stringify(data));
-
+	
 	$.ajax
 	({
 		url: serviceUrl + requestUrl,
@@ -908,37 +906,41 @@ function processAttachments(unsavedAttachments)
         if (i < unsavedAttachments.length) 
         {
         	attachment = unsavedAttachments[i];
-    		var documentData = new FormData();
-    		
-    		var attchId;
-    		var attchType;
-    		
-    		if(attachment.type == "header_upload") 
-    		{
-    			attchId = "surroundImage";
-    			attchType = "image";
-    			documentData.append('file', attachment.contents);
-    		}
-    		else if(attachment.type == "marker_upload") 
-    		{
-    			attchId = attachment.layer.id + "-marker";
-    			attchType = "image";
-    			documentData.append('file', dataURLToBlob(attachment.contents));
-    		}
-    		else 
-    		{
-    			attchId = attachment.layer.id;
-    			attchType = attachment.type;
-    			documentData.append('file', attachment.contents);
-    		}
-    		
-    		if(attchType == null) attchType = "vector";
-    		    		
-            return handleAttachmentUpload(data.lmfId, attchId, attchType, documentData).then(function(unsavedAttachments) 
-            {
-                ++i;
-                return next();
-            });
+        	
+        	if(attachment.contents != null)
+        	{
+	    		var documentData = new FormData();
+	    		
+	    		var attchId;
+	    		var attchType;
+	    		
+	    		if(attachment.type == "header_upload") 
+	    		{
+	    			attchId = "surroundImage";
+	    			attchType = "image";
+	    			documentData.append('file', attachment.contents);
+	    		}
+	    		else if(attachment.type == "marker_upload") 
+	    		{
+	    			attchId = attachment.layer.id + "-marker";
+	    			attchType = "image";
+	    			documentData.append('file', dataURLToBlob(attachment.contents));
+	    		}
+	    		else 
+	    		{
+	    			attchId = attachment.layer.id;
+	    			attchType = attachment.type;
+	    			documentData.append('file', attachment.contents);
+	    		}
+	    		
+	    		if(attchType == null) attchType = "vector";
+	    		    		
+	            return handleAttachmentUpload(data.lmfId, attchId, attchType, documentData).then(function(unsavedAttachments) 
+	            {
+	                ++i;
+	                return next();
+	            });
+        	}
          }
          else 
          {
@@ -1263,7 +1265,7 @@ function finishLayerEdits(save)
 			
 			// add the attachment data to the cache for upload after save
 			// currently you cannot re-upload and must create a new layer
-			if(fileContents != null)
+			if(fileContents != null)asdasd
 			{
 				unsavedAttachments.push(
 				{
@@ -1961,6 +1963,7 @@ function uploadVectorLayer()
 			if(attch.type == "marker_upload" && attch.layer == null)
 			{
 				attch.layer = layer;
+				layer.style.markerUrl = "@" +  layer.id + "-marker";
 			}
 		});
 	}
@@ -2458,7 +2461,7 @@ function loadConfigs()
                     success: function (appConfig)
                     {
                     	publishedMapConfigs.push(appConfig);
-                		$("#publishedAppsTable > tbody:last-child").append("<tr id='" + appConfig.lmfId + "\-pub'><td><a href='#' onclick='previewPublishedMapConfig(\"" + appConfig.lmfId + "\");' class='blue-text'>" + appConfig.name + "</a></td><td>" + appConfig.viewer.type + "</td><td>" + appConfig.lmfRevision + "." + (parseInt(appConfig._rev.split('-')[0]) - 1) + "</td><td><a href='#' onclick='unPublishMapConfig(\"" + appConfig.lmfId + "\");' class='blue-text'>Un-Publish</a></td><td><a href='" + serviceUrl + "MapConfigurations/Published/" + appConfig.lmfId + "/Export/' download='smk_client.war' class='blue-text'>Export</a></td></tr>");
+                		$("#publishedAppsTable > tbody:last-child").append("<tr id='" + appConfig.lmfId + "\-pub'><td><a href='#' onclick='previewPublishedMapConfig(\"" + appConfig.lmfId + "\");' class='blue-text'>" + appConfig.name + "</a></td><td>" + appConfig.viewer.type + "</td><td>" + appConfig.lmfRevision + "." + (parseInt(appConfig._rev.split('-')[0]) - 1) + "</td><td><a href='#' onclick='unPublishMapConfig(\"" + appConfig.lmfId + "\");' class='blue-text'>Un-Publish</a></td><td><a href='" + serviceUrl + "MapConfigurations/Published/" + appConfig.lmfId + "/Export/' download='smk_client.zip' class='blue-text'>Export</a></td></tr>");
                     },
                     error: function (status)
                     {
@@ -2625,6 +2628,8 @@ function readMarkerFile(e)
 			layer: selectedLayerNode != null ? selectedLayerNode.data : {},
 			contents: re.target.result
 		});
+		fileContents = null;
+		selectedLayerNode.data.style.markerUrl = "@" + selectedLayerNode.data.id + "-marker";
 	};
 
 	reader.readAsDataURL(fileContents);

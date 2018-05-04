@@ -47,7 +47,7 @@ public class LayerStyle implements Cloneable
 	public void setFillOpacity(Double fillOpacity) { this.fillOpacity = fillOpacity; }
 
 	public String getMarkerUrl() { return markerUrl; }
-	public void setMarkerUrl(String markerSymbolPath) { this.markerUrl = markerUrl; }
+	public void setMarkerUrl(String markerUrl) { this.markerUrl = markerUrl; }
 
 	public Integer[] getMarkerSize() {
 		if ( markerSize == null ) markerSize = new Integer[2];

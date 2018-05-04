@@ -24,7 +24,6 @@ import ca.bc.gov.app.smks.model.tool.Query;
 import ca.bc.gov.app.smks.model.tool.Scale;
 import ca.bc.gov.app.smks.model.tool.Search;
 import ca.bc.gov.app.smks.model.tool.Select;
-import ca.bc.gov.app.smks.model.tool.Sidebar;
 import ca.bc.gov.app.smks.model.tool.Zoom;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -45,7 +44,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
     @Type( name = "pan",			value = Pan.class ),
     @Type( name = "attribution",	value = Attribution.class ),
     @Type( name = "zoom",			value = Zoom.class ),
-    @Type( name = "sidebar",		value = Sidebar.class ),
     @Type( name = "about",			value = About.class ),
     @Type( name = "baseMaps",		value = BaseMaps.class ),
     @Type( name = "layers",			value = Layers.class ),
@@ -73,7 +71,6 @@ public class Tool implements Cloneable
         pan( Pan.class ),
         attribution( Attribution.class ),
         zoom( Zoom.class ),
-        sidebar( Sidebar.class ),
         about( About.class ),
         baseMaps( BaseMaps.class ),
         layers( Layers.class ),
@@ -105,16 +102,23 @@ public class Tool implements Cloneable
     protected int order;
     protected String instance;
     protected String position;
-
+    protected boolean showPanel; 
+    
     public Tool() {
     	title = "Unknown"; 
         enabled = true;
+        showPanel = true;
     }
 
     protected Tool( Tool tool ) 
     {
     	title = tool.title;
     	enabled = tool.enabled;
+    	icon = tool.icon;
+    	order = tool.order;
+    	instance = tool.instance;
+    	position = tool.position;
+    	showPanel = tool.showPanel;
     }
 
     public String getIcon() 
@@ -188,6 +192,16 @@ public class Tool implements Cloneable
     
     public String getPosition() {
         return this.position;
+    }
+    
+    public boolean getShowPanel()
+    {
+        return this.showPanel;
+    }
+    
+    public void setShowPanel(boolean showPanel)
+    {
+        this.showPanel = showPanel;
     }
     
     public Tool clone()

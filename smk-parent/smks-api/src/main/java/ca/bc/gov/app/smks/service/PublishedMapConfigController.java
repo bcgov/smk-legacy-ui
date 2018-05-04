@@ -11,6 +11,7 @@ import java.nio.file.Path;
 import java.nio.file.attribute.FileAttribute;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
@@ -339,7 +340,15 @@ public class PublishedMapConfigController
 					File tempExportZip = new File(classLoader.getResource("smk-client.war").getFile());
 					InputStream targetStream = new FileInputStream(tempExportZip);
 					
-					File exportTemplateZip = File.createTempFile(resource.getLmfId()+ "_export", ".war");
+					String tempLocationPath = System.getProperty("java.io.tmpdir"); 
+					if(!tempLocationPath.endsWith(File.separator)) tempLocationPath += File.separator;
+					tempLocationPath += UUID.randomUUID() + File.separator;
+					
+					File tempPath = new File(tempLocationPath);
+					tempPath.mkdirs();
+					
+					File exportTemplateZip = new File(tempLocationPath + "export.war");
+					exportTemplateZip.createNewFile();
 					logger.debug("    Copying zip to temp file '" + exportTemplateZip.getName() + "'...");
 					FileOutputStream os = new FileOutputStream(exportTemplateZip);
 				    IOUtils.copy(targetStream, os);
@@ -355,7 +364,8 @@ public class PublishedMapConfigController
 				    
 				    // create config json
 				    ObjectMapper mapper = new ObjectMapper();
-				    File mapConfigTempFile = File.createTempFile(resource.getName() + "_map_config", ".json");
+				    File mapConfigTempFile = new File(tempLocationPath + "map_config.json");
+				    mapConfigTempFile.createNewFile();
 				    mapper.writeValue(mapConfigTempFile, resource);
 				    String configString = mapper.writeValueAsString(resource);
 				    
@@ -365,7 +375,7 @@ public class PublishedMapConfigController
 				    // copy all attachments
 				    if(resource.getAttachments() != null)
 				    {
-				    	File tempAttchPath = new File(System.getProperty("java.io.tmpdir") + File.separator + resource.getLmfId() + File.separator + "attachments" + File.separator);
+				    	File tempAttchPath = new File(tempLocationPath + "attachments" + File.separator);
 				    	tempAttchPath.mkdirs();
 				    	ArrayList<File> tempFiles = new ArrayList<File>();
 				    	
@@ -420,9 +430,10 @@ public class PublishedMapConfigController
 				    if(smkConfigDocumentNames.length() > 0 && smkConfigDocumentNames.endsWith(",")) smkConfigDocumentNames = smkConfigDocumentNames.substring(0, smkConfigDocumentNames.length() - 1);
 				    
 				    // create index.html with refs to config and attachments, and insert
-				    File indexHtml = File.createTempFile(resource.getLmfId() + "_index", ".html");
-				                                                                                          
-				    String indexCode = "<html><head><title>" + resource.getName() + "</title></head><body><div id=\"smk-map-frame\"></div><script src=\"smk-bootstrap.js\" smk-standalone=\"true\">return " + configString + "</script></body></html>";
+				    File indexHtml = new File(tempLocationPath + "index.html");
+				    indexHtml.createNewFile();
+				    
+				    String indexCode = "<html><head><title>" + resource.getSurround().getTitle() + "</title></head><body><div id=\"smk-map-frame\"></div><script src=\"smk-bootstrap.js\" smk-standalone=\"true\">return " + configString + "</script></body></html>";
 				    
 				    PrintWriter out = new PrintWriter(indexHtml);
 				    out.write(indexCode);
@@ -439,7 +450,7 @@ public class PublishedMapConfigController
 			        InputStream exportStream = new FileInputStream(exportableZip);
 				    
 					//add zip to published document as an attachment file called "export"
-					
+			        resource = couchDAO.getPublishedConfig(id);
 					Attachment newAttachment = new Attachment(EXPORT_ATTACHMENT_NAME, Base64.encodeBase64String(IOUtils.toByteArray(exportStream)), "application/octet-stream");
 				    resource.addInlineAttachment(newAttachment);
 
@@ -457,6 +468,8 @@ public class PublishedMapConfigController
 				    exportTemplateZip.delete();
 				    mapConfigTempFile.delete();
 				    exportableZip.delete();
+				    tempPath.delete();
+				    tempPath = null;
 				}
 				
 				if(attachment != null)

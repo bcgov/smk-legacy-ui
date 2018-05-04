@@ -75,6 +75,8 @@ public class Layer implements Cloneable
 		this.setMaxScale(layer.getMaxScale());
 		this.setMinScale(layer.getMinScale());
 		this.setOpacity(layer.getOpacity());
+		this.setPopupTemplate(layer.getPopupTemplate());
+		this.setIsQueryable(layer.isQueryable);
 	}
 
 	public String getId()
@@ -192,7 +194,6 @@ public class Layer implements Cloneable
 	public Layer clone()
 	{
 		Layer clone = new Layer( this );
-
 		return clone;
 	}
 }
