@@ -1,14 +1,16 @@
 include.module( 'tool-select-leaflet', [ 'leaflet', 'tool-select' ], function ( inc ) {
 
     SMK.TYPE.SelectTool.prototype.styleFeature = function () {
-        return {
-            color:       'blue',
-            weight:      3,
-            opacity:     0.7,
-            dashArray:   '6,6',
-            lineCap:     'butt',
-            // fillColor:   '#00a5ff',
-            fillOpacity: 0.0,
+        var self = this
+        return function () {
+            return Object.assign( {
+                color:       'blue',
+                weight:      3,
+                opacity:     0.7,
+                dashArray:   '6,6',
+                lineCap:     'butt',
+                fillOpacity: 0.0,
+            }, self.style )
         }
     }
 
@@ -22,7 +24,7 @@ include.module( 'tool-select-leaflet', [ 'leaflet', 'tool-select' ], function ( 
                     self.highlight[ f.id ] = L.circleMarker( L.GeoJSON.coordsToLatLng( f.geometry.coordinates ), {
                             radius: 20
                         } )
-                        .setStyle( self.styleFeature() )
+                        .setStyle( self.styleFeature()() )
                     break;
 
                 case 'MultiPoint':
@@ -30,7 +32,7 @@ include.module( 'tool-select-leaflet', [ 'leaflet', 'tool-select' ], function ( 
 
                 default:
                     self.highlight[ f.id ] = L.geoJSON( f.geometry, {
-                        style: self.styleFeature
+                        style: self.styleFeature()
                     } )
                 }
             } )

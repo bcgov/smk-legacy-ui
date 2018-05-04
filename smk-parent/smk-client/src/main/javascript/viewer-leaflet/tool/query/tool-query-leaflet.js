@@ -1,17 +1,15 @@
 include.module( 'tool-query-leaflet', [ 'leaflet', 'tool-query', 'feature-list-clustering-leaflet' ], function ( inc ) {
 
     SMK.TYPE.QueryTool.prototype.styleFeature = function () {
-        return {
-            // color:       '#ffff00',
-            // weight:      2,
-            // opacity:     0.7,
-            // fillColor:   '#ffa500',
-            // fillOpacity: 0.1,
-            color:       'black',
-            weight:      3,
-            opacity:     0.8,
-            fillColor:   'white',
-            fillOpacity: 0.5,
+        var self = this
+        return function () {
+            return Object.assign( {
+                color:       'black',
+                weight:      3,
+                opacity:     0.8,
+                fillColor:   'white',
+                fillOpacity: 0.5,
+            }, self.style )
         }
     }
 

@@ -61,7 +61,7 @@ include.module( 'feature-list-clustering-leaflet', [ 'leaflet', 'feature-list-le
                         center = [ f._identifyPoint.latitude, f._identifyPoint.longitude ]
 
                     self.highlight[ f.id ] = L.geoJSON( f.geometry, {
-                        style: self.styleFeature
+                        style: self.styleFeature()
                     } )
                 }
 

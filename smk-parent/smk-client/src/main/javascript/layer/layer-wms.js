@@ -107,4 +107,46 @@ include.module( 'layer.layer-wms-js', [ 'layer.layer-js' ], function () {
         //     options.xhrFields.withCredentials = true
     }
 
+    WmsLayer.prototype.getFeaturesInArea = function ( area, view, option ) {
+        var self = this
+
+        var filter = '<Filter xmlns:gml="http://www.opengis.net/gml"><Intersects><PropertyName></PropertyName><gml:Polygon srsName="http://www.opengis.net/gml/srs/epsg.xml#4326" xmlns:gml="http://www.opengis.net/gml"><gml:outerBoundaryIs><gml:LinearRing><gml:coordinates decimal="." cs="," ts=" ">' +
+            area.geometry.coordinates[ 0 ].map( function ( c ) { return c.join( ',' ) } ).join( ' ' ) +
+        '</gml:coordinates></gml:LinearRing></gml:outerBoundaryIs></gml:Polygon></Intersects></Filter>'
+
+        var data = {
+            service:        "WFS",
+            version:        '1.0.0',
+            request:        "GetFeature",
+            srsName:        'EPSG:4326',
+            typename:       this.config.layerName,
+            outputformat:   "application/json",
+            filter:         filter,
+        }
+
+        return SMK.UTIL.makePromise( function ( res, rej ) {
+            $.ajax( {
+                url:        self.config.serviceUrl,
+                method:     'GET',
+                data:       data,
+                dataType:   'json',
+            } ).then( res, rej )
+        } )
+        .then( function ( data ) {
+            // console.log( data )
+
+            if ( !data ) throw new Error( 'no features' )
+            if ( !data.features || data.features.length == 0 ) throw new Error( 'no features' )
+
+            return data.features.map( function ( f, i ) {
+                if ( self.config.titleAttribute )
+                    f.title = f.properties[ self.config.titleAttribute ]
+                else
+                    f.title = 'Feature #' + ( i + 1 )
+
+                return f
+            } )
+        } )
+    }
+
 } )

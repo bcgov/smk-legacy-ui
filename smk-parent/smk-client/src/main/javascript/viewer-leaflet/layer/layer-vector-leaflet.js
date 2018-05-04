@@ -9,6 +9,55 @@ include.module( 'layer-leaflet.layer-vector-leaflet-js', [ 'layer.layer-vector-j
     SMK.TYPE.Layer[ 'vector' ][ 'leaflet' ] = VectorLeafletLayer
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
+    VectorLeafletLayer.prototype.getFeaturesInArea = function ( area, view, option ) {
+        var self = this
+
+        if ( !option.layer ) return
+
+        var features = []
+
+        option.layer.eachLayer( function ( ly ) {
+            var ft = ly.toGeoJSON()
+
+            switch ( ft.geometry.type ) {
+            case 'Polygon':
+                if ( turf.intersect( ft, area ) )
+                    features.push( ft )
+                break
+
+            case 'MultiPolygon':
+                var intersect = ft.geometry.coordinates.reduce( function ( accum, poly ) {
+                    return accum || !!turf.intersect( turf.polygon( poly ), area )
+                }, false )
+                if ( intersect ) features.push( ft )
+                break
+
+            case 'LineString':
+                if ( turf.booleanCrosses( area, ft ) ) features.push( ft )
+
+            case 'MultiLineString':
+                var close = turf.segmentReduce( ft, function ( accum, segment ) {
+                    return accum || turf.booleanCrosses( area, segment )
+                }, false )
+                if ( close ) features.push( ft )
+                break
+
+            case 'Point':
+            case 'MultiPoint':
+                var close = turf.coordReduce( ft, function ( accum, coord ) {
+                    return accum || turf.booleanPointInPolygon( coord, area )
+                }, false )
+                if ( close ) features.push( ft )
+                break
+
+            default:
+                console.warn( 'skip', ft.geometry.type )
+            }
+        } )
+
+        return features
+    }
+
     VectorLeafletLayer.prototype.getFeaturesAtPoint = function ( location, view, option ) {
         var self = this
 
@@ -77,7 +126,7 @@ include.module( 'layer-leaflet.layer-vector-leaflet-js', [ 'layer.layer-vector-j
             }
         } )
 
-        var url = this.resolveAttachmentUrl( layers[ 0 ].config.dataUrl, layers[ 0 ].config.id, 'geojson' )
+        var url = this.resolveAttachmentUrl( layers[ 0 ].config.dataUrl, layers[ 0 ].config.id, 'json' )
 
         if ( !layers[ 0 ].config.CRS )
             layers[ 0 ].config.CRS = 'EPSG4326'

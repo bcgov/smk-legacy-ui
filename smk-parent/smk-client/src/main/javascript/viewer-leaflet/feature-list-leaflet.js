@@ -9,9 +9,19 @@ include.module( 'feature-list-leaflet', [ 'leaflet', 'feature-list' ], function 
         this.highlight = {}
         this.featureHighlights = L.layerGroup( { pane: 'markerPane' } )
 
+        if ( this.showPanel ) {
+            var tlPadding = L.point( 340, 40 )
+            var brPadding = L.point( 40, 40 )
+        }
+        else {
+            var tlPadding = L.point( 40, 40 )
+            var brPadding = L.point( 40, 40 )
+        }
+
         this.popup = L.popup( {
                 maxWidth: 400,
-                autoPanPaddingTopLeft: L.point( 300, 100 ),
+                autoPanPaddingTopLeft: tlPadding,
+                autoPanPaddingBottomRight: brPadding,
                 offset: [ 0, -10 ]
             } )
             .setContent( function () { return self.popupVm.$el } )
@@ -20,10 +30,10 @@ include.module( 'feature-list-leaflet', [ 'leaflet', 'feature-list' ], function 
             popupopen: function ( ev ) {
                 if ( ev.popup !== self.popup ) return
 
-                var px = vw.map.project( ev.popup._latlng )
-                px.y -= ev.popup._container.clientHeight / 2
-                px.x -= 150
-                vw.map.panTo( vw.map.unproject( px ), { animate: true } )
+                // var px = vw.map.project( ev.popup._latlng )
+                // px.y -= ev.popup._container.clientHeight / 2
+                // px.x -= 150
+                // vw.map.panTo( vw.map.unproject( px ), { animate: true } )
             },
 
             popupclose: function ( ev ) {
@@ -98,5 +108,9 @@ include.module( 'feature-list-leaflet', [ 'leaflet', 'feature-list' ], function 
             }
         }
     } )
+
+    SMK.TYPE.FeatureList.prototype.updatePopup = SMK.UTIL.makeDelayedCall( function () {
+        this.popup.update()
+    }, { delay: 500 } )
 
 } )

@@ -13,10 +13,7 @@ include.module( 'layer-leaflet.layer-esri-dynamic-leaflet-js', [ 'layer.layer-es
         if ( layers.length != 1 ) throw new Error( 'only 1 config allowed' )
 
         var serviceUrl  = layers[ 0 ].config.serviceUrl
-        var layerNames  = ( layers[ 0 ].config.layers || [] ).join( ',' )
         var dynamicLayers  = layers[ 0 ].config.dynamicLayers.map( function( dl ) { return JSON.parse( dl ) } ) //.join( ',' )
-        // var version     = layers[ 0 ].config.version
-        // var attribution = layers[ 0 ].config.attribution
         var opacity     = layers[ 0 ].config.opacity
 
         var minZoom
@@ -30,7 +27,6 @@ include.module( 'layer-leaflet.layer-esri-dynamic-leaflet-js', [ 'layer.layer-es
         var layer = L.esri.dynamicMapLayer( {
             url:            serviceUrl,
             opacity:        opacity,
-            layers:         layerNames,
             dynamicLayers:  dynamicLayers,
             maxZoom:        maxZoom,
             minZoom:        minZoom
