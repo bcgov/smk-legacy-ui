@@ -133,7 +133,7 @@ include.module( 'layer.layer-wms-js', [ 'layer.layer-js' ], function () {
             } ).then( res, rej )
         } )
         .then( function ( data ) {
-            console.log( data )
+            // console.log( data )
 
             if ( !data ) throw new Error( 'no features' )
             if ( !data.features || data.features.length == 0 ) throw new Error( 'no features' )
