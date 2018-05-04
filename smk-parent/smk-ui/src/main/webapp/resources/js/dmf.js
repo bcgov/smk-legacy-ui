@@ -60,12 +60,143 @@ var data = {
 	    _rev: null
 	};
 
+function parseKmlLayerStyle(fileText)
+{
+	var layer = omnivore.kml.parse(fileText);
+	
+	var firstLayer = Object.keys(layer._layers)[0];
+	// parsed styles from omnivore (incomplete)
+	var options = layer._layers[firstLayer].options;
+	
+	var dom = (new DOMParser()).parseFromString(fileText, 'text/xml');
+	// parsed styles from direct dom (dom.firstChild(kml).firstChild(document)
+	var styleNodes = dom.firstElementChild.firstElementChild.childNodes;
+	
+	var opacity = options.opacity != null ? options.opacity : 1.0;
+	var strokeOpacity = 1.0;
+	var fillOpacity = options.fillOpacity != null ? options.fillOpacity : 0.65;
+	var strokeWidth = options.weight != null ? options.weight : "1";
+	var strokeStyle = options.dashArray != null ? options.dashArray : "1";
+	var strokeColor = options.color != null ? options.color : "#000000";
+	var fillColor = options.fillColor != null ? options.fillColor : options.color != null ? options.color : "#000000";
+	var markerSize = 1;
+	var markerUrl = null;
+	var markerOffsetX = 0;
+	var markerOffsetY = 0;
+	
+	for(var i = 0; i < styleNodes.length; i++)
+	{
+		var node = styleNodes[i];
+		if(node.localName == "Style")
+		{
+			for(var styleIndex = 0; styleIndex < node.childNodes.length; styleIndex++)
+			{
+				var styleNode = node.childNodes[styleIndex];
+				
+				if(styleNode.nodeName != "#text")
+				{
+					if(styleNode.getElementsByTagName("color").length) 
+					{
+						fillColor = styleNode.getElementsByTagName("color")[0].innerHTML;
+						strokeColor = styleNode.getElementsByTagName("color")[0].innerHTML;
+					}
+					
+					if(styleNode.localName == "LineStyle")
+					{
+						if(styleNode.getElementsByTagName("width").length) strokeWidth = styleNode.getElementsByTagName("width")[0].innerHTML;
+					}
+					else if(styleNode.localName == "PolyStyle")
+					{
+						if(styleNode.getElementsByTagName("fill").length) fillOpacity = styleNode.getElementsByTagName("fill")[0].innerHTML;
+						if(styleNode.getElementsByTagName("outline").length) strokeWidth = styleNode.getElementsByTagName("outline")[0].innerHTML;
+					}
+					else if(styleNode.localName == "IconStyle")
+					{
+						if(styleNode.getElementsByTagName("scale").length) markerSize = styleNode.getElementsByTagName("scale")[0].innerHTML;
+						if(styleNode.getElementsByTagName("hotSpot").length) markerOffsetX = styleNode.getElementsByTagName("hotSpot")[0].getAttribute("x").innerHTML;
+						if(styleNode.getElementsByTagName("hotSpot").length) markerOffsetY = styleNode.getElementsByTagName("hotSpot")[0].getAttribute("y").innerHTML;
+						if(styleNode.getElementsByTagName("Icon").length) markerUrl = styleNode.getElementsByTagName("Icon")[0].getElementsByTagName("href")[0].innerHTML;
+					}
+				}
+			}
+		}
+	}
+	
+	if(markerUrl != null)
+	{
+		unsavedAttachments.push(
+		{
+			type: "marker_upload",
+			layer: null,
+			contents: getBase64Image(markerUrl)
+		});
+	}
+	
+	if(fillColor.length > 7) fillColor = "#" + fillColor.substring(0, 6);
+	if(strokeColor.length > 7) strokeColor = "#" + strokeColor.substring(0, 6);
+
+	// set the vector layer panel options
+	if(selectedLayerNode == null) // new file panel
+	{
+		$("#kmlOpacity").val(opacity);
+		$("#kmlStrokeOpacity").val(strokeOpacity);
+		$("#kmlFillOpacity").val(fillOpacity);
+		$("#kmlStrokeWidth").val(strokeWidth);
+		$("#kmlStrokeStyle").val(strokeStyle);
+		$("#kmlStrokeColor").val(strokeColor);
+		$("#kmlFillColor").val(fillColor);
+		
+		if(markerUrl != null)
+		{
+			$("#kmlMarkerSizeX").val(markerSize);
+			$("#kmlMarkerSizeY").val(markerSize);
+			$("#kmlMarkerOffsetX").val(markerOffsetX);
+			$("#kmlMarkerOffsetY").val(markerOffsetY);
+		}
+	}
+	else // edit panel
+	{
+		$("#vectorOpacity").val(opacity);
+		$("#vectorStrokeOpacity").val(strokeOpacity);
+		$("#vectorFillOpacity").val(fillOpacity);
+		$("#vectorStrokeWidth").val(strokeWidth);
+		$("#vectorStrokeStyle").val(strokeStyle);
+		$("#vectorStrokeColor").val(strokeColor);
+		$("#vectorFillColor").val(fillColor);
+		
+		if(markerUrl != null)
+		{
+			$("#vectorMarkerSizeX").val(markerSize);
+			$("#vectorMarkerSizeY").val(markerSize);
+			$("#vectorMarkerOffsetX").val(markerOffsetX);
+			$("#vectorMarkerOffsetY").val(markerOffsetY);
+		}
+	}
+	
+	Materialize.updateTextFields();
+}
+
+function getBase64Image(imgUrl) 
+{
+    var image   = new Image();
+    var canvas = document.createElement("canvas");
+	var context = canvas.getContext("2d");
+	
+	image.src = imgUrl;
+	context.drawImage(image, 0, 0);
+	
+	var dataURL = canvas.toDataURL("image/png");
+	return dataURL; // dataURL.replace(/^data:image\/(png|jpg);base64,/, "");
+}
+
+
 function openLayerTemplateEditor()
 {
 	// configure layer-popup-content
 	$('#layer-popup-content').trumbowyg(
 	{
 		resetCss: true,
+		semantic: false,
 		btns: [
 		        ['viewHTML'],
 		        ['undo', 'redo'], // Only supported in Blink browsers
@@ -92,6 +223,8 @@ function openLayerTemplateEditor()
 	});
 
 	$("#layer-popup-content").empty();
+	$("#layer-popup-content").trumbowyg('html', "");
+	$('#layer-popup-content').trumbowyg('toggle');
 	$("#layer-popup-content").trumbowyg('html', selectedLayerNode.data.popupTemplate);
 
 	$('#layerPopupTemplateModal').modal('open');
@@ -296,59 +429,77 @@ function editMapConfig(mapConfigId)
 	{
 		if(mapConfig.lmfId == mapConfigId)
 		{
-			selectedMapConfig = mapConfig;
+			// reload, in case of changes made by other users
+			$.ajax
+			({
+				url: serviceUrl + 'MapConfigurations/' + mapConfigId,
+		        type: 'get',
+		        dataType: 'json',
+		        contentType:'application/json',
+		        crossDomain: true,
+		        withCredentials: true,
+		        success: function (loadedConfig)
+		        {
+		        	mapConfig = loadedConfig;
+		        	selectedMapConfig = loadedConfig;
 
-			data.lmfId = mapConfig.lmfId;
-			data.name = mapConfig.name;
-			data.lmfRevision = mapConfig.lmfRevision;
-			data.createdBy = mapConfig.createdBy;
-			data.published = mapConfig.published;
-			data.surround = mapConfig.surround;
-		    data.viewer = mapConfig.viewer;
-		    data.tools = mapConfig.tools;
-		    data.layers = mapConfig.layers;
-		    data._id = mapConfig._id;
-		    data._rev = mapConfig._rev;
+					data.lmfId = loadedConfig.lmfId;
+					data.name = loadedConfig.name;
+					data.lmfRevision = loadedConfig.lmfRevision;
+					data.createdBy = loadedConfig.createdBy;
+					data.published = loadedConfig.published;
+					data.surround = loadedConfig.surround;
+				    data.viewer = loadedConfig.viewer;
+				    data.tools = loadedConfig.tools;
+				    data.layers = loadedConfig.layers;
+				    data._id = loadedConfig._id;
+				    data._rev = loadedConfig._rev;
 
-		    setupMapConfigToolsUI();
+				    setupMapConfigToolsUI();
 
-			$("#menu-content").hide("fast");
-        	$("#editor-content").show("fast");
+					$("#menu-content").hide("fast");
+		        	$("#editor-content").show("fast");
 
-        	// reset the layer tree
-        	var layerSource = [];
-        	if(data.layers == null) data.layers = [];
-        	data.layers.forEach(function(lyr)
-        	{
-        		var lyrNode = {
-								title: lyr.title,
-								folder: false,
-								expanded: false,
-								data: lyr,
-								children: []
-							};
-        		layerSource.push(lyrNode);
+		        	// reset the layer tree
+		        	var layerSource = [];
+		        	if(data.layers == null) data.layers = [];
+		        	data.layers.forEach(function(lyr)
+		        	{
+		        		var lyrNode = {
+										title: lyr.title,
+										folder: false,
+										expanded: false,
+										data: lyr,
+										children: []
+									};
+		        		layerSource.push(lyrNode);
 
-        		var tree = $('#layer-tree').fancytree('getTree');
-        		tree.reload(layerSource);
-        	});
+		        		var tree = $('#layer-tree').fancytree('getTree');
+		        		tree.reload(layerSource);
+		        	});
 
-        	basemapViewerMap.invalidateSize();
+		        	basemapViewerMap.invalidateSize();
 
-        	unsavedAttachments = [];
-        	fileContents = null;
+		        	unsavedAttachments = [];
+		        	fileContents = null;
 
-        	$(document).ready(function()
-        	{
-        	    Materialize.updateTextFields();
+		        	$(document).ready(function()
+		        	{
+		        	    Materialize.updateTextFields();
 
-        	 // init basemap viewer
-        	    setBasemap(data.viewer.baseMap);
-        	    var southWest = L.latLng(47.294133725, -113.291015625),
-                	northEast = L.latLng(61.1326289908, -141.064453125),
-                	bounds = L.latLngBounds(southWest, northEast);
-        	    basemapViewerMap.fitBounds(bounds);
-        	});
+		        	 // init basemap viewer
+		        	    setBasemap(data.viewer.baseMap);
+		        	    var southWest = L.latLng(47.294133725, -113.291015625),
+		                	northEast = L.latLng(61.1326289908, -141.064453125),
+		                	bounds = L.latLngBounds(southWest, northEast);
+		        	    basemapViewerMap.fitBounds(bounds);
+		        	});
+		        },
+		        error: function (status)
+    	        {
+    	            Materialize.toast('Map config loading failed. Please refresh and try again.', 4000);
+    	        }
+			});
 		}
 	});
 }
@@ -722,56 +873,24 @@ function saveMapConfig()
 
         	// now we need to complete any attachments before moving on.
 
-        	unsavedAttachments.forEach(function (attachment)
-        	{
-
-        		var documentData = new FormData();
-        		documentData.append('file', attachment.contents);
-
-        		var attchId;
-        		var attchType;
+        	if(unsavedAttachments.length > 0)
+    		{
+        		$("#editor-content").hide("fast");
+        		$("#menu-content").show("fast");
+        		$("#loadingBar").show();
+        		$("#appsTablePanel").hide();
         		
-        		if(attachment.type == "header_upload") 
-    			{
-    				attchId = "surroundImage";
-    				attchType = "image";
-    			}
-        		else if(attachment.type == "marker_upload") 
-    			{
-    				attchId = attachment.layer.id + "_marker";
-    				attchType = "image";
-    			}
-        		else 
-    			{
-        			attchId = attachment.layer.id;
-        			attchType = attachment.type;
-    			}
-        		
-        		if(attchType == null) attchType = "vector";
-        		
-        		$.ajax
-        		({
-        			url: serviceUrl + "MapConfigurations/" + data.lmfId + "/Attachments/?id=" + attchId + "&type=" + attchType,
-        	        type: "post",
-        	        data: documentData,
-        	        crossDomain: true,
-        	        withCredentials: true,
-        	        cache: false,
-        	        contentType: false,
-        	        processData: false,
-        	        success: function (result)
-        	        {
-        	        	Materialize.toast('Successfully uploaded attachment for ' + attachment.layer.title, 4000);
-        	        	loadConfigs();
-        	        },
-        	        error: function (status)
-        	        {
-        	            Materialize.toast('Error uploading attachment ' + attachment.layer.title, 4000);
-        	        }
-        		});
-    		});
-
-        	closeEditPanel();
+	        	processAttachments(unsavedAttachments).then(function()
+	        	{
+	        		Materialize.toast('Attachment upload complete', 4000);
+	        		closeEditPanel();
+	        	});
+    		}
+        	else
+    		{
+        		Materialize.toast('No attachments to process. Save complete.', 4000);
+        		closeEditPanel();
+    		}
         },
         error: function (status)
         {
@@ -779,6 +898,102 @@ function saveMapConfig()
             if(data._rev == null) data._id = null;
         }
 	});
+}
+
+function processAttachments(unsavedAttachments)
+{
+	var i = 0;
+    function next() 
+    {
+        if (i < unsavedAttachments.length) 
+        {
+        	attachment = unsavedAttachments[i];
+    		var documentData = new FormData();
+    		
+    		var attchId;
+    		var attchType;
+    		
+    		if(attachment.type == "header_upload") 
+    		{
+    			attchId = "surroundImage";
+    			attchType = "image";
+    			documentData.append('file', attachment.contents);
+    		}
+    		else if(attachment.type == "marker_upload") 
+    		{
+    			attchId = attachment.layer.id + "-marker";
+    			attchType = "image";
+    			documentData.append('file', dataURLToBlob(attachment.contents));
+    		}
+    		else 
+    		{
+    			attchId = attachment.layer.id;
+    			attchType = attachment.type;
+    			documentData.append('file', attachment.contents);
+    		}
+    		
+    		if(attchType == null) attchType = "vector";
+    		    		
+            return handleAttachmentUpload(data.lmfId, attchId, attchType, documentData).then(function(unsavedAttachments) 
+            {
+                ++i;
+                return next();
+            });
+         }
+         else 
+         {
+             // all done with loop
+         }
+    }
+    return next();
+}
+
+function handleAttachmentUpload(lmfId, attchId, attchType, documentData)
+{
+	return Promise.resolve($.ajax
+	({
+		url: serviceUrl + "MapConfigurations/" + lmfId + "/Attachments/?id=" + attchId + "&type=" + attchType,
+        type: "post",
+        data: documentData,
+        crossDomain: true,
+        withCredentials: true,
+        cache: false,
+        contentType: false,
+        processData: false,
+        error: function (status)
+        {
+            Materialize.toast('Error uploading attachment ' + attchId, 4000);
+        }
+	}));
+}
+
+function dataURLToBlob(dataURL) 
+{
+    var BASE64_MARKER = ';base64,';
+    if (dataURL.indexOf(BASE64_MARKER) == -1) 
+    {
+        var parts = dataURL.split(',');
+        var contentType = parts[0].split(':')[1];
+        var raw = parts[1];
+        
+        return new Blob([raw], {type: contentType});
+    }
+    else 
+    {
+        var parts = dataURL.split(BASE64_MARKER);
+        var contentType = parts[0].split(':')[1];
+        var raw = window.atob(parts[1]);
+        var rawLength = raw.length;
+        
+        var uInt8Array = new Uint8Array(rawLength);
+        
+        for (var i = 0; i < rawLength; ++i) 
+        {
+            uInt8Array[i] = raw.charCodeAt(i);
+        }
+        
+        return new Blob([uInt8Array], {type: contentType});
+    }
 }
 
 function unPublishMapConfig(mapConfigId)
@@ -1743,7 +1958,7 @@ function uploadVectorLayer()
 		
 		unsavedAttachments.forEach(function(attch)
 		{
-			if(attch.type == "marker_upload")
+			if(attch.type == "marker_upload" && attch.layer == null)
 			{
 				attch.layer = layer;
 			}
@@ -1773,6 +1988,9 @@ function addSelectedDataLayer()
 	if(dbcSelected) addSelectedDataBCLayer();
 	else if(wmsSelected) addSelectedWmsLayer();
 	else if(uploadSelected) uploadVectorLayer();
+	
+	// clear the File Upload form
+	document.getElementById("layersDisplayForm").reset();
 }
 
 function addSelectedWmsLayer()
@@ -2170,13 +2388,13 @@ function loadConfigs()
         contentType:'application/json',
         crossDomain: true,
         withCredentials: true,
-        success: function (data)
+        success: function (resultData)
         {
         	// finished building table
         	$("#loadingBar").hide();
         	$("#appsTablePanel").show();
 
-        	data.forEach(function(appConfigStub)
+        	resultData.forEach(function(appConfigStub)
         	{
         		if(appConfigStub.valid)
         		{
@@ -2190,8 +2408,11 @@ function loadConfigs()
 	                    withCredentials: true,
 	                    success: function (appConfig)
 	                    {
-	                    	mapConfigs.push(appConfig);
-	                		$("#appsTable > tbody:last-child").append("<tr id='" + appConfig.lmfId + "\'><td><a href='#' onclick='previewMapConfig(\"" + appConfig.lmfId + "\");' class='blue-text'>" + appConfig.name + "</a></td><td>" + appConfig.viewer.type + "</td><td>" + appConfig.lmfRevision + "." + (parseInt(appConfig._rev.split('-')[0]) - 1) + "</td><td><a href='#' onclick='editMapConfig(\"" + appConfig.lmfId + "\");' class='blue-text'>Edit</a></td><td><a href='#' onclick='publishMapConfig(\"" + appConfig.lmfId + "\");' class='blue-text'>Publish</a></td><td><a href='#' onclick='deleteMapConfig(\"" + appConfig.lmfId + "\");' class='blue-text'>Delete</a></td></tr>");
+	                    	if($("#" + appConfig.lmfId).length == 0) 
+	                    	{
+	                    		mapConfigs.push(appConfig);
+	                    		$("#appsTable > tbody:last-child").append("<tr id='" + appConfig.lmfId + "\'><td><a href='#' onclick='previewMapConfig(\"" + appConfig.lmfId + "\");' class='blue-text'>" + appConfig.name + "</a></td><td>" + appConfig.viewer.type + "</td><td>" + appConfig.lmfRevision + "." + (parseInt(appConfig._rev.split('-')[0]) - 1) + "</td><td><a href='#' onclick='editMapConfig(\"" + appConfig.lmfId + "\");' class='blue-text'>Edit</a></td><td><a href='#' onclick='publishMapConfig(\"" + appConfig.lmfId + "\");' class='blue-text'>Publish</a></td><td><a href='#' onclick='deleteMapConfig(\"" + appConfig.lmfId + "\");' class='blue-text'>Delete</a></td></tr>");
+	                    	}
 	                    },
 	                    error: function (status)
 	                    {
@@ -2358,7 +2579,8 @@ $(document).ready(function()
 	document.getElementById('vectorFileUpload').addEventListener('change', readFile, false);
 	document.getElementById('headerImageFileUpload').addEventListener('change', readHeaderFile, false);
 	document.getElementById('replaceVectorFileUpload').addEventListener('change', readFile, false);
-	document.getElementById('customMarkerFileUpload').addEventListener('change', readMarkerFile, false);
+	document.getElementById('customMarkerFileUploadUpdate').addEventListener('change', readMarkerFile, false);
+	document.getElementById('customMarkerFileUploadNew').addEventListener('change', readMarkerFile, false);
 	
 	// init modals
 	$('.modal').modal();
@@ -2392,13 +2614,20 @@ function readHeaderFile(e)
 function readMarkerFile(e)
 {
 	readFile(e);
-	
-	unsavedAttachments.push(
+
+	var reader = new FileReader();
+
+	reader.onload = function(re)
 	{
-		type: "marker_upload",
-		layer: selectedLayerNode.data,
-		contents: fileContents
-	});
+		unsavedAttachments.push(
+		{
+			type: "marker_upload",
+			layer: selectedLayerNode != null ? selectedLayerNode.data : {},
+			contents: re.target.result
+		});
+	};
+
+	reader.readAsDataURL(fileContents);
 }
 
 function readFile(e)
@@ -2413,20 +2642,19 @@ function readFile(e)
 	}
 
 	fileContents = file;
-}
-
-var fileString;
-function fileToString(file)
-{
-	fileString = null;
-	var reader = new FileReader();
-
-	reader.onload = function(e)
+	
+	if(file.type == "application/vnd.google-earth.kml+xml")
 	{
-		fileString = e.target.result;
-	};
+		// get style info via omnivore
+		var reader = new FileReader();
 
-	reader.readAsText(file);
+		reader.onload = function(e)
+		{
+			parseKmlLayerStyle(e.target.result);
+		};
+
+		reader.readAsText(fileContents);
+	}
 }
 
 function uuid()

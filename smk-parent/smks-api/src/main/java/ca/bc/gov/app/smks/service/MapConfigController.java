@@ -292,7 +292,7 @@ public class MapConfigController
 			resource.setName(request.getName());
 			resource.setProject(request.getProject());
 			resource.setPublished(request.isPublished());
-			resource.setRevision(request.getRevision());
+			//resource.setRevision(request.getRevision());
 			resource.setSurround(request.getSurround());
 			resource.setTools(request.getTools());
 			resource.setViewer(request.getViewer());
@@ -393,7 +393,9 @@ public class MapConfigController
 				            layer.getAttributes().add(attr);
 				        }
 				    }
-				    
+
+				    MapConfiguration updatedResource = couchDAO.getMapConfiguration(config_id);
+				    resource.setRevision(updatedResource.getRevision());
 				    couchDAO.updateResource(resource);
 
 				    logger.debug("    Success!");
@@ -403,7 +405,7 @@ public class MapConfigController
 			}
 			catch (Exception e)
 			{
-				logger.error("    ## Error fetching all attachment resource: " + e.getMessage());
+				logger.error("    ## Error creating attachment resource: " + e.getMessage());
 				result = new ResponseEntity<String>("{ \"status\": \"ERROR\", \"message\": \"" + e.getMessage() + "\" }", HttpStatus.BAD_REQUEST);
 			}
 		}
