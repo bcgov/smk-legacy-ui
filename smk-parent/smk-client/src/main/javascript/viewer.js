@@ -199,9 +199,20 @@ include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', '
         function constructLayer( layerConfig, index, parentId, cb ) {
             var id = ( parentId ? parentId + '==' : '' ) + layerConfig.id
 
-            var ly = new SMK.TYPE.Layer[ layerConfig.type ][ smk.viewer.type ]( layerConfig )
+            try {
+                if ( !( layerConfig.type in SMK.TYPE.Layer ) )
+                    throw new Error( 'layer type "' + layerConfig.type + '" not defined' )
 
-            ly.initialize( id, index, parentId )
+                if ( !( smk.viewer.type in SMK.TYPE.Layer[ layerConfig.type ] ) )
+                    throw new Error( 'layer type "' + layerConfig.type + '" not defined for viewer "' + smk.viewer.type + '"' )
+
+                var ly = new SMK.TYPE.Layer[ layerConfig.type ][ smk.viewer.type ]( layerConfig )
+                ly.initialize( id, index, parentId )
+            }
+            catch ( e ) {
+                e.message += ', when creating layer id "' + id + '"'
+                throw e
+            }
 
             cb( ly, layerConfig )
 

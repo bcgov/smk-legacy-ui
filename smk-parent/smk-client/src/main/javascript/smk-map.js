@@ -262,6 +262,9 @@ include.module( 'smk-map', [ 'jquery', 'util' ], function () {
         }
 
         function initViewer() {
+            if ( !( self.viewer.type in SMK.TYPE.Viewer ) )
+                throw new Error( 'viewer type "' + self.viewer.type + '" not defined' )
+
             self.$viewer = new SMK.TYPE.Viewer[ self.viewer.type ]()
             return SMK.UTIL.resolved()
                 .then( function () {
