@@ -24,6 +24,7 @@ include.module( 'tool', [ 'jquery', 'event' ], function () {
     // Tool.prototype.type = 'unknown'
     Tool.prototype.order = 1
     Tool.prototype.position = 'toolbar'
+    Tool.prototype.showPanel = true
 
     SMK.TYPE.Tool = Tool
 
@@ -118,6 +119,10 @@ include.module( 'tool', [ 'jquery', 'event' ], function () {
     }
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
+    Tool.prototype.hasPickPriority = function ( toolIdSet ) {
+        return false
+    }
+
     return Tool
 
 } )

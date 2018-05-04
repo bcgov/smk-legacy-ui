@@ -19,7 +19,7 @@ include.module( 'tool-identify', [ 'feature-list', 'widgets', 'tool-identify.pan
             title:              'Identify',
             widgetComponent:    'identify-widget',
             panelComponent:     'identify-panel',
-            // featureSetProperty: 'identified'
+            showPanel:          false
         }, option ) )
     }
 
@@ -36,9 +36,18 @@ include.module( 'tool-identify', [ 'feature-list', 'widgets', 'tool-identify.pan
     IdentifyTool.prototype.afterInitialize.push( function ( smk ) {
         var self = this
 
-        // smk.$viewer.handlePick( this, function ( location ) {
-        //     smk.$viewer.identifyFeatures( location )
-        // } )
+        self.changedActive( function () {
+            if ( self.active ) {
+                if ( self.firstId )
+                    setTimeout( function () {
+                        smk.$viewer.identified.pick( self.firstId )
+                    }, 50 )
+            }
+        } )
+
+        smk.$viewer.handlePick( this, function ( location ) {
+            smk.$viewer.identifyFeatures( location )
+        } )
 
         smk.on( this.id, {
             'activate': function () {
@@ -71,7 +80,6 @@ include.module( 'tool-identify', [ 'feature-list', 'widgets', 'tool-identify.pan
                 self.setMessage( 'No features found', 'warning' )
             }
             else {
-                smk.$tool.location.reset()
                 smk.$viewer.identified.pick( self.firstId )
 
                 var stat = smk.$viewer.identified.getStats()
@@ -85,7 +93,41 @@ include.module( 'tool-identify', [ 'feature-list', 'widgets', 'tool-identify.pan
             }
         } )
 
+        var onChangedViewStart = SMK.UTIL.makeDelayedCall( function () {
+            picked = smk.$viewer.identified.getPicked()
+            if ( !picked ) return
+
+            // console.log( 'onChangedViewStart' )
+
+            self.wasPickedId = picked.id
+            smk.$viewer.identified.pick( null )
+        }, { delay: 400 } )
+
+        var onChangedViewEnd = SMK.UTIL.makeDelayedCall( function () {
+            if ( !self.wasPickedId ) return
+
+            // console.log( 'onChangedViewEnd' )
+
+            smk.$viewer.identified.pick( self.wasPickedId )
+            self.wasPickedId = null
+        }, { delay: 410 } )
+
+        smk.$viewer.changedView( function ( ev ) {
+            if ( !self.active ) return
+
+            if ( ev.operation == 'move' ) return
+
+            // console.log( self.wasPickedId, ev )
+
+            if ( ev.after == 'start' ) return onChangedViewStart()
+            if ( ev.after == 'end' ) return onChangedViewEnd()
+        } )
+
     } )
+
+    IdentifyTool.prototype.hasPickPriority = function ( toolIdSet ) {
+        return !toolIdSet.location
+    }
 
     return IdentifyTool
 } )

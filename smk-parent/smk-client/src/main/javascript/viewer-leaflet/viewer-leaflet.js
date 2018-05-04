@@ -42,15 +42,17 @@ include.module( 'viewer-leaflet', [ 'viewer', 'leaflet', 'layer-leaflet', 'leafl
             self.setBasemap( smk.viewer.baseMap )
         }
 
-        function changedView() {
-            self.changedView( self.getView() )
+        function changedView( ev) {
+            return function () {
+                self.changedView( ev )
+            }
         }
 
-        self.map.on( 'zoomstart', changedView )
-        self.map.on( 'movestart', changedView )
-        self.map.on( 'zoomend', changedView )
-        self.map.on( 'moveend', changedView )
-        changedView()
+        self.map.on( 'zoomstart', changedView( { operation: 'zoom', after: 'start' } ) )
+        self.map.on( 'movestart', changedView( { operation: 'move', after: 'start' } ) )
+        self.map.on( 'zoomend', changedView( { operation: 'zoom', after: 'end' } ) )
+        self.map.on( 'moveend', changedView( { operation: 'move', after: 'end' } ) )
+        changedView()()
 
         self.finishedLoading( function () {
             self.map.eachLayer( function ( ly ) {
