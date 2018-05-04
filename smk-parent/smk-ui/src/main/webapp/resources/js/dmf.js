@@ -870,7 +870,7 @@ function saveMapConfig()
         	Materialize.toast('Successfully saved application ' + data.lmfId + '. Checking for attachment uploads...', 4000);
 
         	// now we need to complete any attachments before moving on.
-
+        	
         	if(unsavedAttachments.length > 0)
     		{
         		$("#editor-content").hide("fast");
@@ -1265,7 +1265,7 @@ function finishLayerEdits(save)
 			
 			// add the attachment data to the cache for upload after save
 			// currently you cannot re-upload and must create a new layer
-			if(fileContents != null)asdasd
+			if(fileContents !== null)
 			{
 				unsavedAttachments.push(
 				{
@@ -1275,6 +1275,15 @@ function finishLayerEdits(save)
 				});
 			}
 
+			unsavedAttachments.forEach(function(attch)
+			{
+				if(attch.type == "marker_upload" && attch.layer == null)
+				{
+					attch.layer = selectedLayerNode.data;
+					selectedLayerNode.data.style.markerUrl = "@" +  selectedLayerNode.data.id + "-marker";
+				}
+			});
+			
 			document.getElementById("layersForm").reset();
 		}
 
