@@ -119,8 +119,9 @@ include.module( 'tool-baseMaps', [ 'tool', 'widgets', 'viewer', 'leaflet', 'tool
         } )
 
         smk.$viewer.changedView( function ( ev ) {
-            self.center = ev.center
-            self.zoom = ev.zoom
+            var view = smk.$viewer.getView()
+            self.center = view.center
+            self.zoom = view.zoom
         } )
 
         var v = smk.$viewer.getView()

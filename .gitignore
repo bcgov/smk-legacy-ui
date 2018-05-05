@@ -1,54 +1,38 @@
 # Compiled class file
-*.class
+**/*.class
 
 # Log file
-*.log
+**/*.log
 
 # BlueJ files
-*.ctxt
+**/*.ctxt
 
 # Mobile Tools for Java (J2ME)
-.mtj.tmp/
+**/.mtj.tmp/
 
-# Package Files #
-*.jar
-*.war
-*.ear
-*.zip
-*.tar.gz
-*.rar
+# Package Files
+**/*.jar
+**/*.war
+**/*.ear
+**/*.zip
+**/*.tar.gz
+**/*.rar
 
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
-hs_err_pid*
-smk-parent/.project
-smk-parent/.settings/org.eclipse.core.resources.prefs
-smk-parent/.settings/org.eclipse.m2e.core.prefs
-smk-parent/smk-ui/.classpath
-smk-parent/smk-ui/.project
-smk-parent/smk-ui/.settings/.jsdtscope
-smk-parent/smk-ui/.settings/org.eclipse.core.resources.prefs
-smk-parent/smk-ui/.settings/org.eclipse.jdt.core.prefs
-smk-parent/smk-ui/.settings/org.eclipse.m2e.core.prefs
-smk-parent/smk-ui/.settings/org.eclipse.wst.common.component
-smk-parent/smk-ui/.settings/org.eclipse.wst.common.project.facet.core.xml
-smk-parent/smk-ui/.settings/org.eclipse.wst.jsdt.ui.superType.container
-smk-parent/smk-ui/.settings/org.eclipse.wst.jsdt.ui.superType.name
-smk-parent/smk-ui/.settings/org.eclipse.wst.validation.prefs
-smk-parent/smks-api/.classpath
-smk-parent/smks-api/.project
-smk-parent/smks-api/.settings/.jsdtscope
-smk-parent/smks-api/.settings/org.eclipse.core.resources.prefs
-smk-parent/smks-api/.settings/org.eclipse.jdt.core.prefs
-smk-parent/smks-api/.settings/org.eclipse.m2e.core.prefs
-smk-parent/smks-api/.settings/org.eclipse.wst.common.component
-smk-parent/smks-api/.settings/org.eclipse.wst.common.project.facet.core.xml
-smk-parent/smks-api/.settings/org.eclipse.wst.jsdt.ui.superType.container
-smk-parent/smks-api/.settings/org.eclipse.wst.jsdt.ui.superType.name
-smk-parent/smks-api/.settings/org.eclipse.wst.validation.prefs
-smk-parent/smk-ui/src/main/webapp/resources/js/leaflet.history.js
-smk-parent/smk-client/target
-smk-parent/smk-client/node_modules
-smk-parent/smk-client/build
-smk-parent/smk-client/node
-.DS_Store
-.vscode/settings.json
+# Virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+**/hs_err_pid*
+
+# Hidden files
+**/.classpath
+**/.DS_Store
+**/.project
+
+# Hidden dirs
+**/.vscode/**
+**/.settings/**
+
+# Generated dirs
+**/node_modules/**
+**/target/**
+**/build/**
+**/node/**
+**/bin/**

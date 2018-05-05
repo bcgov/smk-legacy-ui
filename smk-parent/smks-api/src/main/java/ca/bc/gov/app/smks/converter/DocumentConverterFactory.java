@@ -59,13 +59,36 @@ public class DocumentConverterFactory
 	
 	public enum DocumentType { KML, KMZ, WKT, GML, CSV, SHAPE };
 	
-	private static final String WKT = "GEOGCS[" + "\"WGS 84\"," + "  DATUM[" + "    \"WGS_1984\","
+	private static final String WGS84_WKT = "GEOGCS[" + "\"WGS 84\"," + "  DATUM[" + "    \"WGS_1984\","
 	        + "    SPHEROID[\"WGS 84\",6378137,298.257223563,AUTHORITY[\"EPSG\",\"7030\"]],"
 	        + "    TOWGS84[0,0,0,0,0,0,0]," + "    AUTHORITY[\"EPSG\",\"6326\"]],"
 	        + "  PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],"
 	        + "  UNIT[\"DMSH\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9108\"]],"
 	        + "  AXIS[\"Lat\",NORTH]," + "  AXIS[\"Long\",EAST],"
 	        + "  AUTHORITY[\"EPSG\",\"4326\"]]";
+	
+	private static final String BCALBERS_WKT = "PROJCS[\"NAD83 / BC Albers\","
+	        + "GEOGCS[\"NAD83\", "
+	        + "  DATUM[\"North_American_Datum_1983\", "
+	        + "    SPHEROID[\"GRS 1980\", 6378137.0, 298.257222101, AUTHORITY[\"EPSG\",\"7019\"]], "
+	        + "    TOWGS84[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "
+	        + "    AUTHORITY[\"EPSG\",\"6269\"]], "
+	        + "  PRIMEM[\"Greenwich\", 0.0, AUTHORITY[\"EPSG\",\"8901\"]], "
+	        + "  UNIT[\"degree\", 0.017453292519943295], "
+	        + "  AXIS[\"Lon\", EAST], "
+	        + "  AXIS[\"Lat\", NORTH], "
+	        + "  AUTHORITY[\"EPSG\",\"4269\"]], "
+	        + "PROJECTION[\"Albers_Conic_Equal_Area\"], "
+	        + "PARAMETER[\"central_meridian\", -126.0], "
+	        + "PARAMETER[\"latitude_of_origin\", 45.0], "
+	        + "PARAMETER[\"standard_parallel_1\", 50.0], "
+	        + "PARAMETER[\"false_easting\", 1000000.0], "
+	        + "PARAMETER[\"false_northing\", 0.0], "
+	        + "PARAMETER[\"standard_parallel_2\", 58.5], "
+	        + "UNIT[\"m\", 1.0], "
+	        + "AXIS[\"x\", EAST], "
+	        + "AXIS[\"y\", NORTH], "
+	        + "AUTHORITY[\"EPSG\",\"3005\"]]";
 	
 	public static byte[] convertDocument(byte[] document, DocumentType docType) throws SAXException, IOException, ParserConfigurationException, ZipException, MismatchedDimensionException, FactoryException, TransformException
 	{
@@ -114,6 +137,22 @@ public class DocumentConverterFactory
         docStream.close();
         docStream = null;
         
+        // identify the styles
+        NodeList styleNodes = doc.getElementsByTagName("Style");
+        
+        if (styleNodes != null)
+        {
+            int length = styleNodes.getLength();
+            for (int featureIndex = 0; featureIndex < length; featureIndex++)
+            {
+                if (styleNodes.item(featureIndex).getNodeType() == Node.ELEMENT_NODE)
+                {
+                    Element style = (Element) styleNodes.item(featureIndex);
+                }
+            }
+        }
+        
+        // Process the placemark geometry
         NodeList featureNodes = doc.getElementsByTagName("Placemark");
         
         if (featureNodes != null)
@@ -177,6 +216,57 @@ public class DocumentConverterFactory
 	                {
 		                String description = feature.getElementsByTagName("description").item(0).getTextContent();
 		                jsonProperties.put("description", description);
+	                }
+	                
+	                // read ExtendedData properties, if they exist
+	                if(feature.getElementsByTagName("ExtendedData").getLength() != 0)
+	                {
+	                    HashMap<String, String> attributeData = new HashMap<String, String>();
+	                    
+	                    NodeList attributes = feature.getElementsByTagName("ExtendedData").item(0).getChildNodes();
+	                    int attrlength = attributes.getLength();
+	                    for (int attrIndex = 0; attrIndex < attrlength; attrIndex++)
+	                    {
+	                        if (attributes.item(attrIndex).getNodeType() == Node.ELEMENT_NODE)
+	                        {
+	                            Element attribute = (Element) attributes.item(attrIndex);
+	                            
+	                            if(attribute.getTagName().equals("Data"))
+	                            {
+    	                            try
+    	                            {
+        	                            // We now have a Data tag. read the name
+        	                            String attrName = attribute.getAttribute("name");
+        	                            // check if there is a displayName tag. If so, Use that instead
+        	                            if(attribute.getElementsByTagName("displayName").getLength() != 0)
+        	                            {
+        	                                attrName = attribute.getElementsByTagName("displayName").item(0).getTextContent();
+        	                            }
+        	                            
+        	                            // clean the attrName to get rid of spaces. They aren't allowed in the Json
+        	                            attrName = attrName.replace(" ", "-");
+        	                            
+        	                            // now get the value
+        	                            String attrVal = attribute.getElementsByTagName("value").item(0).getTextContent();
+        	                            
+        	                            // if the KML contains more than one of the same attribute name (invalid!)
+        	                            // this will silently overwrite it.
+        	                            if(attrName != null && attrName.length() > 0) attributeData.put(attrName, attrVal);
+    	                            }
+    	                            catch(Exception e)
+    	                            {
+    	                                // Likely the doc is invalid here, but we don't really want to stop checking.
+    	                                logger.debug("Invalid attribute in KML!");
+    	                            }
+	                            }
+	                        }
+	                    }
+	                    
+	                    // go through attribute final list and create properties
+	                    for(String attr : attributeData.keySet())
+	                    {
+	                        jsonProperties.put(attr, attributeData.get(attr));
+	                    }
 	                }
 	            }
 	        }
@@ -410,7 +500,7 @@ public class DocumentConverterFactory
 	    FeatureCollection collection = featureSource.getFeatures();
 	    FeatureIterator iterator = collection.features();
 
-	    CoordinateReferenceSystem sourceCRS = CRS.parseWKT(WKT);
+	    CoordinateReferenceSystem sourceCRS = CRS.parseWKT(WGS84_WKT);
 	    
 	    // create a JSON object to hold our data
 	    ObjectNode convertedJson = JsonNodeFactory.instance.objectNode();
@@ -428,15 +518,20 @@ public class DocumentConverterFactory
             ObjectNode jsonProperties = featureJson.putObject("properties");
             ObjectNode geometryObject = featureJson.putObject("geometry");
             
-    		CoordinateReferenceSystem targetCRS = CRS.parseWKT(WKT);
+    		CoordinateReferenceSystem targetCRS = CRS.parseWKT(WGS84_WKT);
 
     		if(projectionFile != null)
     		{
     			String projectionString = new String(Files.readAllBytes(Paths.get(projectionFile.getPath()))); 
     			sourceCRS = CRS.parseWKT(projectionString);
+    			
+    			if(sourceCRS.getIdentifiers().size() > 0 && sourceCRS.getIdentifiers().iterator().next().getCode().equals("3005"))
+    			{
+    			    sourceCRS = CRS.parseWKT(BCALBERS_WKT);
+    			}
     		}
 
-    		MathTransform transform = CRS.findMathTransform(sourceCRS, targetCRS);
+    		MathTransform transform = CRS.findMathTransform(sourceCRS, targetCRS, false); // set leniancy to true for smoother handling?
     		
     		if(sourceGeometry.getValue() instanceof MultiPolygon)
     		{

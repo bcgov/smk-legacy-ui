@@ -59,6 +59,7 @@ public class Layer implements Cloneable
 	private Double minScale;
 	private Double maxScale;
 	private boolean isQueryable;
+	private String popupTemplate;
 	
 	public Layer()
 	{
@@ -74,6 +75,8 @@ public class Layer implements Cloneable
 		this.setMaxScale(layer.getMaxScale());
 		this.setMinScale(layer.getMinScale());
 		this.setOpacity(layer.getOpacity());
+		this.setPopupTemplate(layer.getPopupTemplate());
+		this.setIsQueryable(layer.isQueryable);
 	}
 
 	public String getId()
@@ -172,6 +175,16 @@ public class Layer implements Cloneable
 		return isQueryable;
 	}
 	
+	public String getPopupTemplate()
+	{
+	    return this.popupTemplate;
+	}
+	
+	public void setPopupTemplate(String popupTemplate)
+	{
+	    this.popupTemplate = popupTemplate;
+	}
+	
 	@Override
 	public String toString()
 	{
@@ -181,8 +194,6 @@ public class Layer implements Cloneable
 	public Layer clone()
 	{
 		Layer clone = new Layer( this );
-
 		return clone;
 	}
-
 }

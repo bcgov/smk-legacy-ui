@@ -82,7 +82,6 @@
                 script.setAttribute( 'src', self.$resolveUrl( inc.url ) )
 
                 document.getElementsByTagName( 'head' )[ 0 ].appendChild( script );
-                // console.log( 'added element', inc )
             } )
         }
         else throw new Error( 'Can\'t load script' )
@@ -142,7 +141,6 @@
                 } )
 
                 req.addEventListener( 'error', function ( ev ) {
-                    console.log(ev)
                     rej( new Error( 'failed to load template from ' + url ) )
                 } )
 
@@ -158,6 +156,8 @@
             a[ i ] = _assignAnonTag( t, tag )
         } )
 
+        // console.group( tag, 'sequence', JSON.stringify( inc.tags ) )
+
         var promise = Promise.resolve()
         var res = {}
 
@@ -171,6 +171,7 @@
         } )
 
         return promise.then( function () {
+            // console.groupEnd()
             return res
         } )
     }
@@ -180,12 +181,15 @@
             a[ i ] = _assignAnonTag( t, tag )
         } )
 
+        // console.group( tag, 'group', JSON.stringify( inc.tags ) )
+
         var promises = inc.tags.map( function ( t ) {
             return Promise.resolve().then( function () { return _include( t ) } )
         } )
 
         return Promise.all( promises )
             .then( function ( ress ) {
+                // console.groupEnd()
                 var res = {}
                 inc.tags.forEach( function ( t, i ) {
                     res[ t ] = ress[ i ]
@@ -217,7 +221,6 @@
         if ( base && tag.url && !tag.external && !/[/][/]/.test( tag.url ) ) {
             var m = tag.url.match( /(^|[/])([^/]+)$/ )
             newTag = base + '.' +  m[ 2 ].replace( /[.]/g, '-' ).toLowerCase()
-            // console.log( tag.url, m, newTag )
         }
         else {
             newTag = 'anon-' + hash( anon )
@@ -249,34 +252,33 @@
         return inc.include =
             ( new Promise( function ( res, rej ) {
                 loader[ inc.loader ].call( loader, inc, tag )
-                    .then( function ( res ) {
-                        inc.loaded = res
+                    .then( function ( r ) {
+                        inc.loaded = r
 
-                        if ( !inc.module ) return res
+                        if ( !inc.module ) return r
 
                         return inc.module
                     } )
-                    .then( function ( r ) {
-                        // console.log( '"' + tag + '" resolve' );
-                        res( r )
-                    } )
-                    .catch( function ( e ) {
-                        // console.warn(e)
-                        rej( e )
-                    } )
+                    .then( res, rej )
+                    // .then( function ( r ) {
+                    //     res( r )
+                    // } )
+                    // .catch( function ( e ) {
+                    //     rej( e )
+                    // } )
 
                 setTimeout( function () {
-                    // console.log( '"' + tag + '" timeout' );
                     rej( new Error( 'timeout' ) )
                 }, OPTION.timeout )
             } ) )
             .then( function ( res ) {
-                console.log( 'included ' + inc.loader + ' "' + tag + '"', inc.url || inc.tags )
+                console.debug( 'included ' + inc.loader + ' "' + tag + '"', inc.url || inc.tags )
                 return res
             } )
             .catch( function ( e ) {
                 e.message += ', for tag "' + tag + '"'
-                // console.warn( e )
+                console.warn(e)
+
                 throw e
             } )
     }
@@ -307,7 +309,7 @@
                 return mod
             } )
             .then( function ( exp ) {
-                console.log( 'module "' + tag + '"' )
+                console.debug( 'module "' + tag + '"' )
                 inc.exported = exp
                 return exp
             } )

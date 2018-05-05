@@ -490,7 +490,7 @@
 											<div class="file-field input-field">
 												<div class="btn nrpp-blue-dark">
 													<span>Custom Point Marker</span>
-													<input type="file" id="customMarkerFileUpload">
+													<input type="file" id="customMarkerFileUploadUpdate">
 												</div>
 												<div class="file-path-wrapper">
 													<input class="file-path validate" type="text">
@@ -527,6 +527,9 @@
 										</div>
 										<div class="row">
 											<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="openQueryEditor();" style="width: 170px;">Queries</a>
+										</div>
+										<div class="row">
+											<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="openLayerTemplateEditor();" style="width: 170px;">Popup Template</a>
 										</div>
 									</div>
 								</div>
@@ -710,7 +713,7 @@
 												<div class="file-field input-field">
 													<div class="btn nrpp-blue-dark">
 														<span>Custom Point Marker</span>
-														<input type="file" id="customMarkerFileUpload">
+														<input type="file" id="customMarkerFileUploadNew">
 													</div>
 													<div class="file-path-wrapper">
 														<input class="file-path validate" type="text">
@@ -834,10 +837,6 @@
 										<label class="black-text" for="markup">markup</label>
 									</p>
 									<p><h5 style="border-bottom: 2px solid #fcba19;">Menu Options</h5></p>
-									<p>
-										<input type="checkbox" id="sidebar" onclick="setToolActivation('sidebar')"/>
-										<label class="black-text" for="sidebar">Sidebar</label>
-									</p>
 									<p>
 										<input type="checkbox" id="aboutPanel" onclick="setToolActivation('about')"/>
 										<label class="black-text" for="aboutPanel">About Panel</label>
@@ -1031,6 +1030,12 @@
 														<input id="identifyStyleFillColor" type="color">
 													</div>
 								      			</div>
+								      			<div class="row" >
+								      				<p>
+								      					<input type="checkbox" id="identifyPanelVisible" />
+														<label class="black-text" for="identifyPanelVisible">Show in Panel</label>
+								      				</p>
+								      			</div>
 											  </div>
 										    </li>
 										    <li id="selectionOptions" style="display: none;">
@@ -1220,7 +1225,23 @@
       <div class="modal-footer">
         <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat">Close</a>
       </div>
-    </div>    
+    </div>   
+    <div id="layerPopupTemplateModal" class="modal modal-fixed-footer">
+      <div class="modal-content">
+		<div class="row">
+			<h5>Layer Popup Template</h5>
+		</div>
+		<div class="row">
+			<p>Dropdown choices are seen below as a comma separated list. To add options, enter them in the text box below.</p>
+		</div>
+	    <div class="row">
+	    	<div id="layer-popup-content" style="height: 75%"></div>
+		</div>
+      </div>
+      <div class="modal-footer">
+        <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat">Close</a>
+      </div>
+    </div> 
 	<script type="text/javascript">
 	</script>
   </body>

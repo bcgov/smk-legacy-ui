@@ -1,17 +1,15 @@
 include.module( 'tool-identify-leaflet', [ 'leaflet', 'tool-identify', 'feature-list-clustering-leaflet' ], function ( inc ) {
 
     SMK.TYPE.IdentifyTool.prototype.styleFeature = function () {
-        return {
-            // color:       '#ffff00',
-            // weight:      2,
-            // opacity:     0.7,
-            // fillColor:   '#ffa500',
-            // fillOpacity: 0.1,
-            color:       'black',
-            weight:      3,
-            opacity:     0.8,
-            fillColor:   'white',
-            fillOpacity: 0.5,
+        var self = this
+        return function () {
+            return Object.assign( {
+                color:       'black',
+                weight:      3,
+                opacity:     0.8,
+                fillColor:   'white',
+                fillOpacity: 0.5,
+            }, self.style )
         }
     }
 
@@ -19,6 +17,14 @@ include.module( 'tool-identify-leaflet', [ 'leaflet', 'tool-identify', 'feature-
 
     // SMK.TYPE.IdentifyTool.prototype.afterInitialize.push( function ( smk ) {
     //     var self = this
+
+    //     smk.$viewer.startedIdentify( function ( ev ) {
+    //         if ( self.searchArea )
+    //             self.searchArea.remove()
+
+    //         self.searchArea = L.geoJSON( ev.area, { pane: 'markerPane', style: { fill: false, color: 'black' } } ).addTo( smk.$viewer.map )
+    //     } )
+
 
     //     // var  smk.$viewer = smk.$viewer
     //     // var self.featureSet = smk.$viewer.identified

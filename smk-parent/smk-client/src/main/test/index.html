@@ -3,11 +3,8 @@
     <head>
         <title>STANDALONE</title>
         <!-- STATIC -->
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-        <!-- <script src="https://cdn.rawgit.com/harvesthq/chosen/gh-pages/chosen.jquery.min.js"></script> -->
-        <!-- <link href="https://cdn.rawgit.com/harvesthq/chosen/gh-pages/chosen.min.css" rel="stylesheet"/> -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
         <link rel="stylesheet" href="test-settings.css">
-        <!-- <script src="test-settings.js"></script> -->
         <!-- DYNAMIC LOADED -->
     </head>
     <body >
@@ -29,12 +26,12 @@
         <template id="smk-script">
             <script src="../smk-bootstrap.js" smk-disconnected smk-standalone
                 smk-container-id=""
-                smk-config=""
+                smk-config="?"
             ></script>
         </template>
 
         <script>
-            var filelist = <%= filelist %>
+            var filelist = JSON.parse( '<%= filelist %>' )
 
             $( function () {
                 $( '#options' )
@@ -50,8 +47,8 @@
                         .split( '&' )
                         .filter( function ( a ) { return a.startsWith( 'smk' ) } )
                         .map( function ( a ) { return decodeURIComponent( a ) } )
-                        .join( '\n' )  
-                    )    
+                        .join( '\n' )
+                    )
                     .on( 'input', function () {
                         this.style.height = 'auto';
                         this.style.height = ( this.scrollHeight ) + 'px';
@@ -61,8 +58,8 @@
                 $( '#add' ).click( function () {
                     $( '#config' ).text( $( '#config' ).text() + '\n' + $( '#options' ).val() )
                     $( '#config' ).trigger( 'input' )
-                } )                    
-                
+                } )
+
                 $( '#apply' ).click( function () {
                     // document.location.search = $( '#config' ).serialize()
                 } )

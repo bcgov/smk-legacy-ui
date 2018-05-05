@@ -116,7 +116,8 @@
       "attributes": [],
       "serviceUrl": "https://openmaps.gov.bc.ca/geo/pub/ows",
       "layerName": "pub:WHSE_BASEMAPPING.GBA_RAILWAY_TRACKS_SP",
-      "styleName": "Railway_Tracks"
+      "styleName": "Railway_Tracks",
+      "geometryAttribute": "SHAPE"
     },
     {
       "type": "wms",
@@ -130,7 +131,8 @@
       "attributes": [],
       "serviceUrl": "https://openmaps.gov.bc.ca/geo/pub/ows",
       "layerName": "pub:WHSE_BASEMAPPING.GBA_RAILWAY_TRACKS_SP",
-      "styleName": "4756"
+      "styleName": "4756",
+      "geometryAttribute": "SHAPE"
     },
     {
       "type": "wms",
@@ -144,7 +146,8 @@
       "attributes": [],
       "serviceUrl": "https://openmaps.gov.bc.ca/geo/pub/ows",
       "layerName": "pub:WHSE_BASEMAPPING.GBA_RAILWAY_TRACKS_SP",
-      "styleName": "4790"
+      "styleName": "4790",
+      "geometryAttribute": "SHAPE"
     },
     {
       "type": "wms",
@@ -158,7 +161,8 @@
       "attributes": [],
       "serviceUrl": "https://openmaps.gov.bc.ca/geo/pub/ows",
       "layerName": "pub:WHSE_BASEMAPPING.GBA_RAILWAY_TRACKS_SP",
-      "styleName": "5234"
+      "styleName": "5234",
+      "geometryAttribute": "SHAPE"
     },
     {
       "type": "wms",
@@ -172,7 +176,8 @@
       "attributes": [],
       "serviceUrl": "https://openmaps.gov.bc.ca/geo/pub/ows",
       "layerName": "pub:WHSE_BASEMAPPING.GBA_RAILWAY_TRACKS_SP",
-      "styleName": "5235"
+      "styleName": "5235",
+      "geometryAttribute": "SHAPE"
     },
     {
       "type": "wms",
@@ -186,7 +191,8 @@
       "attributes": [],
       "serviceUrl": "https://openmaps.gov.bc.ca/geo/pub/ows",
       "layerName": "pub:WHSE_BASEMAPPING.GBA_RAILWAY_TRACKS_SP",
-      "styleName": "6631"
+      "styleName": "6631",
+      "geometryAttribute": "SHAPE"
     },
     {
       "type": "wms",
@@ -200,21 +206,8 @@
       "attributes": [],
       "serviceUrl": "https://openmaps.gov.bc.ca/geo/pub/ows",
       "layerName": "pub:WHSE_BASEMAPPING.TRIM_WATER_LINES",
-      "styleName": "3345"
-    },
-    {
-      "type": "wms",
-      "id": "pub:WHSE_BASEMAPPING.TRIM_WATER_LINES-3430",
-      "title": "TRIM Water Lines 1 20000 Water Rivers Creeks Shorelines etc",
-      "isVisible": true,
-      "attribution": "",
-      "metadataUrl": "",
-      "opacity": 0.65,
-      "isQueryable": true,
-      "attributes": [],
-      "serviceUrl": "https://openmaps.gov.bc.ca/geo/pub/ows",
-      "layerName": "pub:WHSE_BASEMAPPING.TRIM_WATER_LINES",
-      "styleName": "3430"
+      "styleName": "3345",
+      "geometryAttribute": "GEOMETRY"
     },
     {
       "type": "wms",
@@ -228,7 +221,8 @@
       "attributes": [],
       "serviceUrl": "https://openmaps.gov.bc.ca/geo/pub/ows",
       "layerName": "pub:WHSE_FOREST_TENURE.FTEN_MAP_NOTATN_POLY_SVW",
-      "styleName": "2904_2905"
+      "styleName": "2904_2905",
+      "geometryAttribute": "GEOMETRY"
     },
     {
       "type": "wms",
@@ -242,7 +236,8 @@
       "attributes": [],
       "serviceUrl": "https://openmaps.gov.bc.ca/geo/pub/ows",
       "layerName": "pub:WHSE_FOREST_TENURE.FTEN_RECREATION_POLY_SVW",
-      "styleName": "3213_3214"
+      "styleName": "3213_3214",
+      "geometryAttribute": "GEOMETRY"
     },
     {
       "type": "wms",
@@ -256,7 +251,8 @@
       "attributes": [],
       "serviceUrl": "https://openmaps.gov.bc.ca/geo/pub/ows",
       "layerName": "pub:WHSE_IMAGERY_AND_BASE_MAPS.DRP_BCTC_TRANSMISSION_LINES_SP",
-      "styleName": "4395"
+      "styleName": "4395",
+      "geometryAttribute": "GEOMETRY"
     },
     {
       "type": "esri-dynamic",

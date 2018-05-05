@@ -115,6 +115,7 @@ include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', '
         this.lmfId = smk.lmfId
         this.type = smk.viewer.type
         this.disconnected = smk.$option.disconnected
+        this.serviceUrl = smk.$option[ 'service-url' ]
 
         this.identified = new SMK.TYPE.FeatureSet()
         this.selected = new SMK.TYPE.FeatureSet()
@@ -148,7 +149,7 @@ include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', '
 
                 if ( cfg.queries )
                     cfg.queries.forEach( function ( q ) {
-                        var query = new SMK.TYPE.Query[ cfg.type ]( ly, q )
+                        var query = new SMK.TYPE.Query[ cfg.type ]( ly.id, q )
 
                         self.query[ query.id ] = query
                         self.queried[ query.id ] = new SMK.TYPE.FeatureSet()
@@ -156,16 +157,35 @@ include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', '
             } )
 
         this.pickedLocation( function ( ev ) {
-            var pickHandler = self.handler.pick
-            if ( !pickHandler ) return
+            var pickToolIds = Object.keys( self.handler.pick )
+            if ( pickToolIds.length == 0 ) return
 
-            var h = 'identify'
-            Object.keys( pickHandler ).forEach( function ( t ) {
-                if ( smk.$tool[ t ].active ) h = t
-            } )
-            if ( typeof pickHandler[ h ] != 'function' ) return
+            var toolId
+            if ( pickToolIds.length > 1 ) {
+                var activePickTools = pickToolIds.filter( function ( toolId ) {
+                    return smk.$tool[ toolId ].active
+                } )
 
-            pickHandler[ h ].call( smk.$tool[ h ], ev )
+                if ( activePickTools.length != 1 ) {
+                    if ( activePickTools.length == 0 )
+                        var pickToolId = SMK.UTIL.makeSet( pickToolIds )
+                    else
+                        var pickToolId = SMK.UTIL.makeSet( activePickTools )
+
+                    var toolIds = pickToolIds.filter( function ( id ) { return smk.$tool[ id ].hasPickPriority( pickToolId ) } )
+                    if ( toolIds.length == 0 ) return
+                    if ( toolIds.length > 1 ) throw new Error( 'pick priority ambiguous: ' + toolIds.join( ', ' ) )
+                    toolId = toolIds[ 0 ]
+                }
+                else {
+                    toolId = activePickTools[ 0 ]
+                }
+            }
+            else {
+                toolId = pickToolIds[ 0 ]
+            }
+
+            self.handler.pick[ toolId ].call( smk.$tool[ toolId ], ev )
         } )
 
         function constructLayers( layerConfigs, index, parentId, cb ) {
@@ -179,9 +199,20 @@ include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', '
         function constructLayer( layerConfig, index, parentId, cb ) {
             var id = ( parentId ? parentId + '==' : '' ) + layerConfig.id
 
-            var ly = new SMK.TYPE.Layer[ layerConfig.type ][ smk.viewer.type ]( layerConfig )
+            try {
+                if ( !( layerConfig.type in SMK.TYPE.Layer ) )
+                    throw new Error( 'layer type "' + layerConfig.type + '" not defined' )
 
-            ly.initialize( id, index, parentId )
+                if ( !( smk.viewer.type in SMK.TYPE.Layer[ layerConfig.type ] ) )
+                    throw new Error( 'layer type "' + layerConfig.type + '" not defined for viewer "' + smk.viewer.type + '"' )
+
+                var ly = new SMK.TYPE.Layer[ layerConfig.type ][ smk.viewer.type ]( layerConfig )
+                ly.initialize( id, index, parentId )
+            }
+            catch ( e ) {
+                e.message += ', when creating layer id "' + id + '"'
+                throw e
+            }
 
             cb( ly, layerConfig )
 
@@ -362,12 +393,16 @@ include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', '
         var self = this
 
         option = Object.assign( {
-            tolerance: 3
+            tolerance: 5
         }, option )
 
         var view = this.getView()
 
-        this.startedIdentify()
+        var searchArea = turf.polygon( [ SMK.UTIL.circlePoints( location.screen, option.tolerance, 12 ).map( function ( p ) { return self.screenToMap( p ) } ) ] )
+
+        // var searchArea = turf.circle( [ location.map.longitude, location.map.latitude ], option.tolerance * view.metersPerPixelAtY( location.screen.y ) / 1000 )
+
+        this.startedIdentify( { area: searchArea } )
 
         this.identified.clear()
 
@@ -381,7 +416,8 @@ include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', '
 
             option.layer = self.visibleLayer[ id ]
 
-            var p = ly.getFeaturesAtPoint( location, view, option )
+            var p = ly.getFeaturesInArea( searchArea, view, option )
+            // var p = ly.getFeaturesAtPoint( location, view, option )
             if ( !p ) return
 
             promises.push(
@@ -442,11 +478,22 @@ include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', '
     }
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
-    Viewer.prototype.resolveAttachmentUrl = function ( attachmentId, type ) {
+    Viewer.prototype.resolveAttachmentUrl = function ( url, id, type ) {
+        if ( url && url.startsWith( '@' ) ) {
+            id = url.substr( 1 )
+            url = null
+        }
+
+        if ( url )
+            return url
+
+        if ( !id )
+            throw new Error( 'attachment without URL or Id' )
+
         if ( this.disconnected )
-            return 'attachments/' + attachmentId + ( type ? '.' + type : '' )
+            return 'attachments/' + id + ( type ? '.' + type : '' )
         else
-            return '../smks-api/MapConfigurations/' + this.lmfId + '/Attachments/' + attachmentId
+            return this.serviceUrl + '/MapConfigurations/' + this.lmfId + '/Attachments/' + id
     }
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //

@@ -24,7 +24,7 @@ include.module( 'util', null, function ( inc ) {
             if ( val === null ) return 'null'
             return 'object'
         },
-            
+
         templatePattern: /<%=\s*(.*?)\s*%>/g,
         templateReplace: function ( template, replacer ) {
             if ( !replacer ) return template
@@ -96,6 +96,35 @@ include.module( 'util', null, function ( inc ) {
                 case 1: return one == null ? '' : one.replace( '{}', num )
                 default: return many == null ? '' : many.replace( '{}', num )
             }
+        },
+
+        makeSet: function ( values ) {
+            return values.reduce( function ( accum, v ) { accum[ v ] = true; return accum }, {} )
+        },
+
+        makeDelayedCall: function ( fn, option ) {
+            var timeoutId
+
+            function cancel() {
+                if ( timeoutId ) clearTimeout( timeoutId )
+                timeoutId = null
+            }
+
+            var delayedCall = function () {
+                var ctxt = option.context || this
+                var args = option.arguments || [].slice.call( arguments )
+
+                cancel()
+
+                timeoutId = setTimeout( function () {
+                    timeoutId = null
+                    fn.apply( ctxt, args )
+                }, option.delay || 200 )
+            }
+
+            delayedCall.cancel = cancel
+
+            return delayedCall
         },
 
         extractCRS: function ( obj ) {
@@ -194,6 +223,17 @@ include.module( 'util', null, function ( inc ) {
                     properties: obj.properties
                 }
             }
+        },
+
+        circlePoints: function ( center, radius, segmentCount ) {
+            var points = []
+            for( var i = 0; i <= segmentCount; i++ )
+                points.push( [
+                    center.x + radius * Math.cos( 2 * Math.PI * i / segmentCount ),
+                    center.y + radius * Math.sin( 2 * Math.PI * i / segmentCount )
+                ] )
+
+            return points
         }
 
     } )

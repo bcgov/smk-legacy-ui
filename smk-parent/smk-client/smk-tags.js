@@ -5,30 +5,38 @@ exports.gen = function () {
 
     var t = new tg.TagSet()
 
-    t.script( 'jquery', 'lib/jquery-1.11.2.js' )
+    t.script( 'jquery', 'lib/jquery-3.3.1.min.js' )
     t.script( 'vue', 'lib/vue-2.5.11.js' )
 
     t.script( 'util', 'util.js' )
     t.script( 'event', 'event.js' )
-    t.script( 'smk-map', 'smk-map.js' )
     t.script( 'viewer', 'viewer.js' )
-    t.script( 'layer', 'layer.js' )
+    // t.script( 'layer', 'layer.js' )
     t.script( 'tool', 'tool.js' )
-    t.script( 'query', 'query.js' )
     t.script( 'feature-set', 'feature-set.js' )
 
-    t.sequence( 'map-frame-styles' )
-        .style( 'resources/css/smk-map-frame.css' )
-        .style( 'https://fonts.googleapis.com/icon?family=Material+Icons' )
+    t.group( 'smk-map' )
+        .script( 'smk-map.js' )
+        .style( 'smk-map-frame.css' )
+
+    t.group( 'layer' )
+        .dir( 'layer/**/*', { cwd: baseDir } )
+
+    t.group( 'query' )
+        .dir( 'query/**/*', { cwd: baseDir } )
 
     t.group( 'surround' )
         .dir( 'surround/**/*', { cwd: baseDir } )
 
+    t.style( 'material-icons', 'https://fonts.googleapis.com/icon?family=Material+Icons' )
+
     t.group( 'toolbar' )
         .dir( 'toolbar/**/*', { cwd: baseDir } )
+        .tag( 'material-icons' )
 
     t.group( 'sidepanel' )
         .dir( 'sidepanel/**/*', { cwd: baseDir } )
+        .tag( 'material-icons' )
 
     t.group( 'widgets' )
         .dir( 'widgets/**/*', { cwd: baseDir } )
@@ -38,7 +46,6 @@ exports.gen = function () {
 
     t.group( 'feature-list' )
         .dir( 'feature-list/**/*', { cwd: baseDir } )
-
 
     t.group( 'tool-menu' )
         .dir( 'tool/menu/**/*', { cwd: baseDir } )
@@ -145,18 +152,20 @@ exports.gen = function () {
     t.group( 'tool-search-leaflet' )
         .dir( 'viewer-leaflet/tool/search/**/*', { cwd: baseDir } )
 
-    t.script( 'layer-leaflet', 'viewer-leaflet/layer-leaflet.js' )
+    t.group( 'layer-leaflet' )
+        .dir( 'viewer-leaflet/layer/**/*', { cwd: baseDir } )
 
     t.script( 'feature-list-leaflet', 'viewer-leaflet/feature-list-leaflet.js' )
+    t.script( 'feature-list-clustering-leaflet', 'viewer-leaflet/feature-list-clustering-leaflet.js' )
 
     t.group( 'viewer-leaflet' )
         .script( 'viewer-leaflet/viewer-leaflet.js' )
-        .tag( 'layer-leaflet' )
         .style( 'viewer-leaflet/viewer-leaflet.css' )
-        .tag( 'leaflet-extensions' )
-        .tag( 'feature-list-leaflet' )
 
-    t.script( 'feature-list-clustering-leaflet', 'viewer-leaflet/feature-list-clustering-leaflet.js' )
+        // .tag( 'layer-leaflet' )
+        // .tag( 'leaflet-extensions' )
+        // .tag( 'feature-list-leaflet' )
+
 
     t.sequence( 'leaflet' )
         .script( 'https://unpkg.com/leaflet@1.2.0/dist/leaflet.js', { 'integrity': 'sha512-lInM/apFSqyy1o6s89K4iQUKg6ppXEgsVxT35HbzUupEVRh2Eu9Wdl4tHj7dZO0s1uvplcYGmt3498TtHq+log==' } )
@@ -165,7 +174,7 @@ exports.gen = function () {
 
     t.sequence( 'leaflet-extensions' )
         .tag( 'leaflet' )
-        .script( 'resources/js/NonTiledLayer-src.js' )
+        .script( 'lib/NonTiledLayer-src.js' )
         .script( 'https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-omnivore/v0.3.1/leaflet-omnivore.min.js' )
         .script( 'https://unpkg.com/terraformer@1.0.7' )
         .script( 'https://unpkg.com/terraformer-arcgis-parser@1.0.5' )
@@ -174,7 +183,7 @@ exports.gen = function () {
     	.style( "https://unpkg.com/leaflet.markercluster@1.0.6/dist/MarkerCluster.css" )
     	.style( "https://unpkg.com/leaflet.markercluster@1.0.6/dist/MarkerCluster.Default.css" )
     	.script( "https://unpkg.com/leaflet.markercluster@1.0.6/dist/leaflet.markercluster-src.js" )
-    	.script( "resources/js/leaflet-heat.js" )
+    	.script( "lib/leaflet-heat.js" )
 
     // esri3d
 
@@ -221,7 +230,7 @@ exports.gen = function () {
         .tag( 'leaflet' )
         .style( 'https://js.arcgis.com/4.6/esri/css/main.css' )
         .script( 'https://js.arcgis.com/4.6/' )
-        .script( 'resources/js/toGeoJSON.js' )
+        .script( 'lib/toGeoJSON.js' )
         .script( 'https://unpkg.com/terraformer@1.0.7' )
         .script( 'https://unpkg.com/terraformer-arcgis-parser@1.0.5' )
         .script( 'https://unpkg.com/terraformer-wkt-parser@1.1.2' )

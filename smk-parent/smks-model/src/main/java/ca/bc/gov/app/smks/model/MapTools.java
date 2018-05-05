@@ -13,7 +13,6 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 import ca.bc.gov.app.smks.model.tool.About;
 import ca.bc.gov.app.smks.model.tool.Scale;
-import ca.bc.gov.app.smks.model.tool.Sidebar;
 import ca.bc.gov.app.smks.model.tool.Zoom;
 
 @JsonInclude(Include.NON_NULL)
@@ -30,7 +29,6 @@ public class MapTools implements Cloneable
     private boolean pan;
     private boolean attribution;
     private Zoom zoom;
-    private Sidebar sidebar;
     private About about;
     private boolean baseMaps;
     private boolean layers;
@@ -49,7 +47,6 @@ public class MapTools implements Cloneable
 		this.setPan(mapTools.getPan());
 		this.setAttribution(mapTools.getAttribution());
 		this.setZoom(mapTools.getZoom().clone());
-		this.setSidebar(mapTools.getSidebar().clone());
 		this.setAbout(mapTools.getAbout().clone());
 		this.setBaseMaps(mapTools.getBaseMaps());
 		this.setLayers(mapTools.getLayers());
@@ -89,12 +86,6 @@ public class MapTools implements Cloneable
 		return zoom;
 	}
 	public void setZoom(Zoom zoom) { this.zoom = zoom; }
-
-	public Sidebar getSidebar() {
-		if ( sidebar == null ) sidebar = new Sidebar();
-		return sidebar;
-	}
-	public void setSidebar(Sidebar sidebar) { this.sidebar = sidebar; }
 
 	public About getAbout() {
 		if ( about == null ) about = new About();

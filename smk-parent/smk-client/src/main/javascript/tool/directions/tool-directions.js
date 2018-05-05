@@ -210,7 +210,7 @@ include.module( 'tool-directions', [ 'tool', 'widgets', 'tool-directions.panel-d
 
         self.changedActive( function () {
             if ( self.active ) {
-                smk.$tool.location.enabled = false
+                smk.withTool( 'location', function () { this.active = false } )
 
                 if ( self.waypoints.length == 0 ) {
                     self.activating = self.activating.then( function () {
@@ -224,7 +224,7 @@ include.module( 'tool-directions', [ 'tool', 'widgets', 'tool-directions.panel-d
                 }
             }
             else {
-                smk.$tool.location.enabled = true
+                smk.withTool( 'location', function () { this.active = true } )
             }
         } )
 
@@ -245,16 +245,20 @@ include.module( 'tool-directions', [ 'tool', 'widgets', 'tool-directions.panel-d
 
         smk.$viewer.handlePick( this, function ( location ) {
             return smk.$viewer.findNearestSite( location.map ).then( function ( site ) {
-                var empty = self.waypoints.find( function ( w ) { return !w.location } )
+                self.active = true
 
-                if ( !empty )
-                    throw new Error( 'shouldnt happen' )
+                return self.activating.then( function () {
+                    var empty = self.waypoints.find( function ( w ) { return !w.location } )
 
-                empty.description = site.fullAddress
-                empty.location = location.map
-                self.addWaypoint()
+                    if ( !empty )
+                        throw new Error( 'shouldnt happen' )
 
-                return self.findRoute()
+                    empty.description = site.fullAddress
+                    empty.location = location.map
+                    self.addWaypoint()
+
+                    return self.findRoute()
+                } )
             } )
             .catch( function ( err ) {
                 console.warn( err )

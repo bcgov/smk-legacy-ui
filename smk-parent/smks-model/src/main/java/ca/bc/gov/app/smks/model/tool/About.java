@@ -4,9 +4,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 import ca.bc.gov.app.smks.model.Tool;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

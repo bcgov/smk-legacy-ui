@@ -1,4 +1,10 @@
-include.module( 'feature-list', [ 'tool', 'widgets', 'feature-list.panel-feature-list-html', 'feature-list.popup-feature-html' ], function ( inc ) {
+include.module( 'feature-list', [ 'tool', 'widgets',
+    'feature-list.panel-feature-list-html',
+    'feature-list.popup-feature-html',
+    'feature-list.feature-attributes-html',
+    'feature-list.feature-properties-html',
+    'feature-list.feature-description-html'
+], function ( inc ) {
 
     Vue.component( 'feature-list-panel', {
         extends: inc.widgets.toolPanel,
@@ -11,6 +17,30 @@ include.module( 'feature-list', [ 'tool', 'widgets', 'feature-list.panel-feature
                 }
             }
         },
+    } )
+
+    var featurePopup = Vue.extend( {
+        props: [ 'feature', 'layer' ],
+        methods: {
+            insertWordBreaks: function ( str ) {
+                return str.replace( /[^a-z0-9 ]+/ig, function ( m ) { return '<wbr>' + m } )
+            }
+        }
+    } )
+
+    Vue.component( 'feature-attributes', {
+        extends: featurePopup,
+        template: inc[ 'feature-list.feature-attributes-html' ],
+    } )
+
+    Vue.component( 'feature-properties', {
+        extends: featurePopup,
+        template: inc[ 'feature-list.feature-properties-html' ],
+    } )
+
+    Vue.component( 'feature-description', {
+        extends: featurePopup,
+        template: inc[ 'feature-list.feature-description-html' ],
     } )
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
@@ -68,6 +98,9 @@ include.module( 'feature-list', [ 'tool', 'widgets', 'feature-list.panel-feature
                 } )
 
             Vue.set( self.layers[ ly.index ], 'features', self.layers[ ly.index ].features.concat( ev.features.map( function ( ft ) {
+                if ( !self.firstId )
+                    self.firstId = ft.id
+
                 return {
                     id:     ft.id,
                     title:  ft.title
@@ -77,6 +110,7 @@ include.module( 'feature-list', [ 'tool', 'widgets', 'feature-list.panel-feature
 
         self.featureSet.clearedFeatures( function ( ev ) {
             self.layers = []
+            self.firstId = null
         } )
 
         self.featureSet.removedFeatures( function ( ev ) {
@@ -115,6 +149,8 @@ include.module( 'feature-list', [ 'tool', 'widgets', 'feature-list.panel-feature
                 title:      ev.feature.title,
                 properties: Object.assign( {}, ev.feature.properties )
             }
+
+            self.setPopupAttributeComponent( ly, ev.feature, ly.config.featureTemplate )
         } )
 
         // = : = : = : = : = : = : = : = : = : = : = : = : = : = : = : = : = : = : =
@@ -122,6 +158,7 @@ include.module( 'feature-list', [ 'tool', 'widgets', 'feature-list.panel-feature
         this.popupModel = {
             feature: null,
             layer: null,
+            attributeComponent: null,
             tool: {},
             hasMultiple: false,
             position: null
@@ -165,10 +202,61 @@ include.module( 'feature-list', [ 'tool', 'widgets', 'feature-list.panel-feature
                     this.position = ( self.popupCurrentIndex + 1 ) + ' / ' + l
                     self.featureSet.pick( self.popupFeatureIds[ self.popupCurrentIndex ] )
                 },
+            },
+            updated: function () {
+                self.updatePopup()
             }
         } )
 
     } )
+
+    FeatureList.prototype.setPopupAttributeComponent = function ( layer, feature ) {
+        if ( layer.config.popupTemplate ) {
+            var template
+
+            if ( layer.config.popupTemplate.startsWith( '@' ) ) {
+                this.popupModel.attributeComponent = layer.config.popupTemplate.substr( 1 )
+            }
+            else {
+                this.popupModel.attributeComponent = 'feature-template-' + layer.config.id
+                template = layer.config.popupTemplate
+            }
+
+            if ( !Vue.component( this.popupModel.attributeComponent ) ) {
+                if ( template ) {
+                    try {
+                        Vue.component( this.popupModel.attributeComponent, {
+                            template:           template,
+                            extends:            featurePopup,
+                        } )
+                    }
+                    catch ( e ) {
+                        console.warn( 'failed compiling template:', this.popupModel.attributeComponent, e )
+                        layer.config.popupTemplate = null
+                    }
+                }
+                else {
+                    console.warn( 'component not found:', this.popupModel.attributeComponent )
+                    layer.config.popupTemplate = null
+                }
+            }
+
+            if ( Vue.component( this.popupModel.attributeComponent ) )
+                return
+        }
+
+        if ( feature.properties.description ) {
+            this.popupModel.attributeComponent = 'feature-description'
+            return
+        }
+
+        if ( layer.config.attributes ) {
+            this.popupModel.attributeComponent = 'feature-attributes'
+            return
+        }
+
+        this.popupModel.attributeComponent = 'feature-properties'
+    }
 
     FeatureList.prototype.setMessage = function ( message, Class, delay ) {
         this.message = message

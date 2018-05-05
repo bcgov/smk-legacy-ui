@@ -46,7 +46,8 @@ public class MapConfiguration extends CouchDbDocument implements Cloneable
 
 	public MapConfiguration() {}
 
-	protected MapConfiguration( MapConfiguration mapConfiguration ) {
+	protected MapConfiguration( MapConfiguration mapConfiguration ) 
+	{
 		this.setLmfId(mapConfiguration.getLmfId());
 		this.setLmfRevision(mapConfiguration.getLmfRevision());
 		this.setName(mapConfiguration.getName());
