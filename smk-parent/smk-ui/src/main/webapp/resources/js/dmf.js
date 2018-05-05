@@ -1564,7 +1564,7 @@ function deleteQuery(id)
 
 function addNewQuery()
 {
-	selectedLayerNode.data.queries = [];
+	if(selectedLayerNode.data.queries == null) selectedLayerNode.data.queries = [];
 	var query = {};
 	query.predicate = {};
 	selectedQuery = query;
