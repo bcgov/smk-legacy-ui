@@ -6,10 +6,7 @@ include.module( 'tool-location', [ 'tool', 'widgets', 'tool-location.popup-locat
         this.makePropWidget( 'tool', {} )
 
         SMK.TYPE.Tool.prototype.constructor.call( this, $.extend( {
-            // order:          4,
             title:          'Location',
-            // widgetComponent:'identify-widget',
-            // panelComponent: 'identify-panel',
         }, option ) )
     }
 
@@ -56,9 +53,7 @@ include.module( 'tool-location', [ 'tool', 'widgets', 'tool-location.popup-locat
             }
         } )
 
-        smk.$viewer.pickedLocation( function ( location ) {
-            if ( !self.enabled ) return
-
+        smk.$viewer.handlePick( this, function ( location ) {
             self.location = location
             self.site = {}
 
@@ -74,15 +69,20 @@ include.module( 'tool-location', [ 'tool', 'widgets', 'tool-location.popup-locat
             self.location = {}
         } )
 
-        self.changedEnabled( function () {
-            if ( !self.enabled )
+        self.changedActive( function () {
+            if ( !self.active )
                 self.location = {}
         } )
 
+        self.active = true
     } )
 
     LocationTool.prototype.reset = function () {
         this.location = {}
+    }
+
+    LocationTool.prototype.hasPickPriority = function () {
+        return true
     }
 
     return LocationTool

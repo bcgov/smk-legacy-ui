@@ -155,7 +155,7 @@
             "mpcmId": 746,
             "mpcmWorkspace": "MPCM_ALL_PUB",
             "serviceUrl": "https://maps.gov.bc.ca/arcgis/rest/services/mpcm/bcgw/MapServer",
-            "xdynamicLayers": [
+            "dynamicLayers": [
                 "{\"id\":746,\"source\":{\"type\":\"dataLayer\",\"dataSource\":{\"type\":\"table\",\"workspaceId\":\"MPCM_ALL_PUB\",\"dataSourceName\":\"WHSE_FISH.FISS_FISH_OBSRVTN_PNT_SP\",\"gdbVersion\":\"\"}},\"drawingInfo\":{\"renderer\":{\"type\":\"uniqueValue\",\"field1\":\"POINT_TYPE_CODE\",\"field2\":null,\"field3\":null,\"fieldDelimiter\":\", \",\"defaultSymbol\":null,\"defaultLabel\":null,\"uniqueValueInfos\":[{\"symbol\":{\"type\":\"esriSMS\",\"style\":\"esriSMSCircle\",\"color\":[255,0,0,255],\"size\":6,\"angle\":0,\"xoffset\":0,\"yoffset\":0,\"outline\":{\"color\":[0,0,0,255],\"width\":1}},\"value\":\"Observation\",\"label\":\"Observation\",\"description\":\"\"},{\"symbol\":{\"type\":\"esriSMS\",\"style\":\"esriSMSCircle\",\"color\":[0,77,168,255],\"size\":7,\"angle\":0,\"xoffset\":0,\"yoffset\":0,\"outline\":{\"color\":[0,0,0,255],\"width\":1}},\"value\":\"Summary\",\"label\":\"Summary\",\"description\":\"\"}]},\"transparency\":0,\"labelingInfo\":null}}"
             ]
         }

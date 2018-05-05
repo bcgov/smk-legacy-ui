@@ -262,6 +262,9 @@ include.module( 'smk-map', [ 'jquery', 'util' ], function () {
         }
 
         function initViewer() {
+            if ( !( self.viewer.type in SMK.TYPE.Viewer ) )
+                throw new Error( 'viewer type "' + self.viewer.type + '" not defined' )
+
             self.$viewer = new SMK.TYPE.Viewer[ self.viewer.type ]()
             return SMK.UTIL.resolved()
                 .then( function () {
@@ -276,8 +279,6 @@ include.module( 'smk-map', [ 'jquery', 'util' ], function () {
             self.$tool = {}
 
             if ( !self.tools || self.tools.length == 0 ) return
-
-            self.tools.push( { type: 'location' } )
 
             return SMK.UTIL.waitAll( self.tools.filter( function ( t ) { return t.enabled !== false } ).map( function ( t ) {
                 var tag = 'tool-' + t.type
@@ -384,4 +385,13 @@ include.module( 'smk-map', [ 'jquery', 'util' ], function () {
 
         return this
     }
+
+    SmkMap.prototype.withTool = function ( toolId, action ) {
+        var self = this
+
+        if ( !this.$tool[ toolId ] ) return
+
+        return action.call( this.$tool[ toolId ] )
+    }
+
 } )
