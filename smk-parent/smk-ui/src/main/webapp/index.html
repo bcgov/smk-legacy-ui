@@ -1232,7 +1232,9 @@
 			<h5>Layer Popup Template</h5>
 		</div>
 		<div class="row">
-			<p>Dropdown choices are seen below as a comma separated list. To add options, enter them in the text box below.</p>
+			<p>Add any HTML elements you need to customize your layers popup. You can use <a href="https://vuejs.org/" target="_blank">Vue</a> syntax to develop highly complicated popup templates!</p>
+			<p>To reference the layer, use double moustaches with the variable "layer" ex: {{ layer.title }}</p>
+			<p>To reference the feature, use double moustaches with the variable "feature" ex: {{ feature.title }} or {{ feature.properties['attribute_name'] }}</p>
 		</div>
 	    <div class="row">
 	    	<div id="layer-popup-content" style="height: 75%"></div>
