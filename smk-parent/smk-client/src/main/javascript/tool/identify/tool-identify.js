@@ -47,6 +47,7 @@ include.module( 'tool-identify', [ 'feature-list', 'widgets', 'tool-identify.pan
 
         smk.$viewer.handlePick( this, function ( location ) {
             smk.$viewer.identifyFeatures( location )
+            self.pickedLocation = location
         } )
 
         smk.on( this.id, {
@@ -123,7 +124,14 @@ include.module( 'tool-identify', [ 'feature-list', 'widgets', 'tool-identify.pan
             if ( ev.after == 'end' ) return onChangedViewEnd()
         } )
 
+        if ( smk.$tool.directions && !smk.$tool.location )
+            this.popupModel.tool.directions = true
+
     } )
+
+    IdentifyTool.prototype.getLocation = function () {
+        return this.pickedLocation.map
+    }
 
     IdentifyTool.prototype.hasPickPriority = function ( toolIdSet ) {
         return !toolIdSet.location

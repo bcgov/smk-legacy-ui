@@ -189,6 +189,24 @@ include.module( 'feature-list', [ 'tool', 'widgets',
                     smk.$viewer.selected.add( layerId, [ self.featureSet.get( featureId ) ] )
                 },
 
+                startDirections: function () {
+                    smk.$tool.directions.active = true
+
+                    smk.$tool.directions.activating
+                        .then( function () {
+                            var loc = self.getLocation()
+                            return smk.$viewer.findNearestSite( loc ).then( function ( site ) {
+                                return {
+                                    desc: site.fullAddress,
+                                    loc: loc
+                                }
+                            } )
+                        } )
+                        .then( function ( start ) {
+                            return smk.$tool.directions.startAtCurrentLocation( start.loc, start.desc )
+                        } )
+                },
+
                 movePrevious: function () {
                     var l = self.popupFeatureIds.length
                     self.popupCurrentIndex = ( self.popupCurrentIndex + l - 1 ) % l

@@ -19,6 +19,11 @@
             v-on:click="selectFeature( layer.id, feature.id )"
         >Add to selection</span>
 
+        <span class="smk-command"
+            v-if="tool.directions"
+            v-on:click="startDirections()"
+        >Directions to here</span>
+
         <span class="smk-navigator"
             v-bind:class="{ 'smk-hidden': !hasMultiple }"
         >
