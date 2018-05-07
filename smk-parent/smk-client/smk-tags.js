@@ -217,13 +217,16 @@ exports.gen = function () {
     t.group( 'tool-search-esri3d' )
         .dir( 'viewer-esri3d/tool/search/**/*', { cwd: baseDir } )
 
-    t.script( 'layer-esri3d', 'viewer-esri3d/layer-esri3d.js' )
+    // t.script( 'layer-esri3d', 'viewer-esri3d/layer-esri3d.js' )
+
+    t.group( 'layer-esri3d' )
+        .dir( 'viewer-esri3d/layer/**/*', { cwd: baseDir } )
 
     t.script( 'types-esri3d', 'viewer-esri3d/types-esri3d.js' )
 
     t.group( 'viewer-esri3d' )
         .script( 'viewer-esri3d/viewer-esri3d.js' )
-        .tag( 'layer-esri3d' )
+        // .tag( 'layer-esri3d' )
         .style( 'viewer-esri3d/viewer-esri3d.css' )
 
     t.sequence( 'esri3d' )

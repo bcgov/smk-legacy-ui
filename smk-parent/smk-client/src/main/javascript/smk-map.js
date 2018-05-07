@@ -256,8 +256,10 @@ include.module( 'smk-map', [ 'jquery', 'util' ], function () {
 
         function loadViewer() {
             return include( 'viewer-' + self.viewer.type )
-                .catch( function () {
-                    throw new Error( 'viewer type ' + ( self.viewer.type ? '"' + self.viewer.type + '" ' : '' ) + 'is not defined' )
+                .catch( function ( e ) {
+                    e.message += ', viewer type ' + ( self.viewer.type ? '"' + self.viewer.type + '" ' : '' ) + 'is not defined'
+                    throw e
+                    // throw new Error( 'viewer type ' + ( self.viewer.type ? '"' + self.viewer.type + '" ' : '' ) + 'is not defined' )
                 } )
         }
 
