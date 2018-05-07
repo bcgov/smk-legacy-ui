@@ -78,7 +78,10 @@ include.module( 'tool-directions-leaflet', [ 'leaflet', 'tool-directions' ], fun
 
             bounds = self.routeLayer.getBounds()
 
-            smk.$viewer.map.fitBounds( bounds.pad( 0.25 ) )
+            smk.$viewer.map.fitBounds( bounds.pad( 0.25 ), {
+                paddingTopLeft: L.point( 340, 40 ),
+                paddingBottomRight: L.point( 40, 40 )
+            } )
         }
 
         this.displayWaypoints = function () {
@@ -112,7 +115,10 @@ include.module( 'tool-directions-leaflet', [ 'leaflet', 'tool-directions' ], fun
                             title: prefix + w.description,
                             icon: icon
                         } )
-                        .bindPopup( $( '<pre class="smk-popup">' ).text( prefix + w.description ).get( 0 ) )
+                        .bindPopup( $( '<pre class="smk-popup">' ).text( prefix + w.description ).get( 0 ), {
+                            autoPanPaddingTopLeft: L.point( 340, 40 ),
+                            autoPanPaddingBottomRight: L.point( 40, 40 )
+                        } )
                         .addTo( smk.$viewer.map )
                 } )
         }
@@ -150,7 +156,11 @@ include.module( 'tool-directions-leaflet', [ 'leaflet', 'tool-directions' ], fun
 
                 var p = self.directions[ ev.highlight ].point
                 self.directionHighlightLayer = L.circleMarker( [ p[ 1 ], p[ 0 ] ] )
-                    .bindPopup( self.directions[ ev.highlight ].instruction, { closeButton: false } )
+                    .bindPopup( self.directions[ ev.highlight ].instruction, {
+                        closeButton: false,
+                        autoPanPaddingTopLeft: L.point( 340, 40 ),
+                        autoPanPaddingBottomRight: L.point( 40, 40 )
+                    } )
                     .addTo( smk.$viewer.map )
                     .openPopup()
             },
@@ -166,7 +176,10 @@ include.module( 'tool-directions-leaflet', [ 'leaflet', 'tool-directions' ], fun
 
                 var p = self.directions[ ev.pick ].point
                 self.directionPickLayer = L.circleMarker( [ p[ 1 ], p[ 0 ] ], { radius: 15 } )
-                    .bindPopup( self.directions[ ev.pick ].instruction )
+                    .bindPopup( self.directions[ ev.pick ].instruction, {
+                        autoPanPaddingTopLeft: L.point( 340, 40 ),
+                        autoPanPaddingBottomRight: L.point( 40, 40 )
+                    } )
                     .addTo( smk.$viewer.map )
                     .openPopup()
 
