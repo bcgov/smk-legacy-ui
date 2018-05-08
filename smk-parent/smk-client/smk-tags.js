@@ -231,14 +231,12 @@ exports.gen = function () {
 
     t.sequence( 'esri3d' )
         .tag( 'leaflet' )
-        .style( 'https://js.arcgis.com/4.6/esri/css/main.css' )
-        .script( 'https://js.arcgis.com/4.6/' )
+        .style( 'https://js.arcgis.com/4.7/esri/css/main.css' )
+        .script( 'https://js.arcgis.com/4.7/' )
         .script( 'lib/toGeoJSON.js' )
         .script( 'https://unpkg.com/terraformer@1.0.7' )
         .script( 'https://unpkg.com/terraformer-arcgis-parser@1.0.5' )
         .script( 'https://unpkg.com/terraformer-wkt-parser@1.1.2' )
-        // .style( 'https://js.arcgis.com/4.4/esri/css/main.css' )
-        // .script( 'https://js.arcgis.com/4.4/' )
 
     t.sequence( 'proj4' )
         .script( 'https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.4.4/proj4.js' )
