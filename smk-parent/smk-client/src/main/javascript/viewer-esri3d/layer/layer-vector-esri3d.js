@@ -1,5 +1,8 @@
 include.module( 'layer-esri3d.layer-vector-esri3d-js', [ 'layer.layer-vector-js', 'types-esri3d' ], function () {
 
+    var E = SMK.TYPE.Esri3d
+    // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+    //
     function VectorEsri3dLayer() {
         SMK.TYPE.Layer[ 'vector' ].prototype.constructor.apply( this, arguments )
     }
@@ -9,208 +12,12 @@ include.module( 'layer-esri3d.layer-vector-esri3d-js', [ 'layer.layer-vector-js'
     SMK.TYPE.Layer[ 'vector' ][ 'esri3d' ] = VectorEsri3dLayer
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
-// include.module( 'layer-esri3d', [ 'layer', 'util', 'types-esri3d' ], function () {
-
-    var E = SMK.TYPE.Esri3d
-
-//     function defineLayerType( name, def ) {
-//         var base = SMK.TYPE.Layer[ name ].base
-
-//         var lt = function () {
-//             base.prototype.constructor.apply( this, arguments )
-//         }
-
-//         $.extend( lt.prototype, base.prototype, def )
-
-//         SMK.TYPE.Layer[ name ].esri3d = lt
-//     }
-
-//     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-//     defineLayerType( 'folder' )
-
-//     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-//     defineLayerType( 'group' )
-
-//     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-//     var WMSLayer = E.layers.BaseDynamicLayer.createSubclass( {
-//         properties: {
-//             serviceUrl: null,
-//             layerNames: [],
-//             styleNames: [],
-//             // imageMaxWidth: 1024,
-//             // imageMaxHeight: 1024,
-//         },
-
-//         getImageUrl: function ( extent, width, height ) {
-//             var epsg = extent.spatialReference.isWebMercator ? 3857 : extent.spatialReference.wkid
-
-//             var param = {
-//                 service:        'WMS',
-//                 request:        'GetMap',
-//                 version:        '1.1.1',
-//                 layers:         this.layerNames.join( ',' ),
-//                 styles:         this.styleNames.join( ',' ),
-//                 format:         'image/png',
-//                 transparent:    'true',
-//                 srs:            'EPSG:' + epsg,
-//                 width:          width,
-//                 height:         height,
-//                 bbox:           [ extent.xmin, extent.ymin, extent.xmax, extent.ymax ].join( ',' )
-//             }
-
-//             return this.serviceUrl + '?' + Object.keys( param ).map( function ( p ) {
-//                 return p + '=' + encodeURIComponent( param[ p ] )
-//             } ).join( '&' )
-//         }
-//     } )
-
-//     defineLayerType( 'wms' )
-
-//     SMK.TYPE.Layer[ 'wms' ].esri3d.create = function ( layers, zIndex ) {
-//         var serviceUrl  = layers[ 0 ].config.serviceUrl
-//         // var version     = layers[ 0 ].config.version || '1.1.1'
-//         // var attribution = layers[ 0 ].config.attribution
-//         var opacity     = layers[ 0 ].config.opacity
-
-//         var host = serviceUrl.replace( /^(\w+:)?[/][/]/, '' ).replace( /[/].*$/, '' )
-//         if ( E.config.request.corsEnabledServers.indexOf( host ) == -1 )
-//             E.config.request.corsEnabledServers.push( host );
-
-//         var layer = WMSLayer( {
-//             serviceUrl: serviceUrl,
-//             layerNames: layers.map( function ( c ) { return c.config.layerName } ),
-//             styleNames: layers.map( function ( c ) { return c.config.styleName } ),
-//             opacity:    opacity,
-//         } )
-
-//         layer.on( 'layerview-create', function ( ev ) {
-//             E.core.watchUtils.watch( ev.layerView, "updating", function( val ) {
-//                 layers.forEach( function ( ly ) {
-//                     ly.loading = val
-//                 } )
-//             } )
-//         } )
-
-//         return layer
-//     }
-
-//     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-//     var DynamicMapLayer = E.layers.BaseDynamicLayer.createSubclass( {
-//         properties: {
-//             serviceUrl: null,
-//             dynamicLayers: null,
-//             // imageMaxWidth: 1024,
-//             // imageMaxHeight: 1024,
-//         },
-
-//         getImageUrl: function ( extent, width, height ) {
-//             var epsg = extent.spatialReference.isWebMercator ? 3857 : extent.spatialReference.wkid
-
-//             var param = {
-//                 bbox:           [ extent.xmin, extent.ymin, extent.xmax, extent.ymax ].join( ',' ),
-//                 size:           width + ',' + height,
-//                 dpi:            96,
-//                 format:         'png24',
-//                 transparent:    true,
-//                 bboxSR:         epsg,
-//                 imageSR:        epsg,
-//                 dynamicLayers:  JSON.stringify( this.dynamicLayers ),
-//                 f:              'json'
-//             }
-
-//             var url = this.serviceUrl + '/export?' + Object.keys( param ).map( function ( p ) {
-//                 return p + '=' + encodeURIComponent( param[ p ] )
-//             } ).join( '&' )
-
-//             return E.request( url )
-//                 .then( function ( res ) {
-//                     return res.data.href
-//                 } )
-//         },
-//     } )
-
-//     defineLayerType( 'esri-dynamic' )
-
-//     SMK.TYPE.Layer[ 'esri-dynamic' ].esri3d.create = function ( layers, zIndex ) {
-//         if ( layers.length != 1 ) throw new Error( 'only 1 config allowed' )
-
-//         var serviceUrl  = layers[ 0 ].config.serviceUrl
-//         var layerNames  = ( layers[ 0 ].config.layers || [] ).join( ',' )
-//         var dynamicLayers  = layers[ 0 ].config.dynamicLayers.map( function( dl ) { return JSON.parse( dl ) } )
-//         // var version     = layers[ 0 ].config.version
-//         // var attribution = layers[ 0 ].config.attribution
-//         var opacity     = layers[ 0 ].config.opacity
-
-//         var host = serviceUrl.replace( /^(\w+:)?[/][/]/, '' ).replace( /[/].*$/, '' )
-//         if ( E.config.request.corsEnabledServers.indexOf( host ) == -1 )
-//             E.config.request.corsEnabledServers.push( host );
-
-//         var layer = DynamicMapLayer( {
-//             serviceUrl: serviceUrl,
-//             dynamicLayers: dynamicLayers,
-//             opacity:    opacity,
-//         } )
-
-//         layer.on( 'layerview-create', function ( ev ) {
-//             E.core.watchUtils.watch( ev.layerView, "updating", function( val ) {
-//                 layers.forEach( function ( ly ) {
-//                     ly.loading = val
-//                 } )
-//             } )
-//         } )
-
-//         return layer
-//     }
-
-//     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-//     defineLayerType( 'kml', {
-
-//         getFeaturesAtPoint: getVectorFeaturesAtPoint
-
-//     } )
-
-//     SMK.TYPE.Layer[ 'kml' ].esri3d.create = function ( layers, zIndex ) {
-//         var self = this;
-
-//         if ( layers.length != 1 ) throw new Error( 'only 1 config allowed' )
-
-//         var url = this.resolveAttachmentUrl( layers[ 0 ].config.dataUrl, layers[ 0 ].config.id, 'kml' )
-
-//         return SMK.UTIL.makePromise( function ( res, rej ) {
-//             $.get( url, null, null, 'xml' ).then( function ( doc ) {
-//                 res( doc )
-//             }, function () {
-//                 rej( 'request to ' + url + ' failed' )
-//             } )
-//         } )
-//         .then( function ( doc ) {
-//             var geojson = toGeoJSON.kml( doc )
-
-//             return new E.layers.GraphicsLayer( {
-//                 graphics: geoJsonToEsriGeometry( geojson, convertStyle( layers[ 0 ].config.style ) )
-//             } )
-//         } )
-//     }
-
-//     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-//     defineLayerType( 'vector', {
-
-//         getFeaturesAtPoint: getVectorFeaturesAtPoint
-
-//     } )
-
     SMK.TYPE.Layer[ 'vector' ][ 'esri3d' ].create = function ( layers, zIndex ) {
         var self = this;
 
         if ( layers.length != 1 ) throw new Error( 'only 1 config allowed' )
 
-        var url = this.resolveAttachmentUrl( layers[ 0 ].config.dataUrl, layers[ 0 ].config.id, 'geojson' )
+        var url = this.resolveAttachmentUrl( layers[ 0 ].config.dataUrl, layers[ 0 ].config.id, 'json' )
 
         return SMK.UTIL.makePromise( function ( res, rej ) {
             $.get( url, null, null, 'json' ).then( function ( doc ) {
@@ -229,30 +36,50 @@ include.module( 'layer-esri3d.layer-vector-esri3d-js', [ 'layer.layer-vector-js'
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
     function convertStyle( styleConfig ) {
-        var point = {
-            type: 'simple-marker',
-            color: color( styleConfig.fillColor, styleConfig.fillOpacity ),
-            size: styleConfig.strokeWidth,
-            style: 'circle'
+        var line = {
+            type: 'line-3d',
+            symbolLayers: [ {
+                type: 'line',
+                size: styleConfig.strokeWidth,
+                material: {
+                    color: color( styleConfig.strokeColor, styleConfig.strokeOpacity ),
+                }
+            } ]
         }
 
-        var line = {
-            type: 'simple-line',
-            color: color( styleConfig.strokeColor, styleConfig.strokeOpacity ),
-            width: styleConfig.strokeWidth,
+        var point = {
+            type: 'point-3d',
+            symbolLayers: [ {
+                type: 'icon',
+                size: styleConfig.strokeWidth,
+                resource: {
+                    primitive: 'circle'
+                },
+                material: {
+                    color: color( styleConfig.fillColor, styleConfig.fillOpacity ),
+                },
+                outline: {
+                    size: 1,
+                    color: color( styleConfig.strokeColor, styleConfig.strokeOpacity ),
+                }
+            } ]
         }
 
         var fill = {
-            type: 'simple-fill',
-            color: color( styleConfig.fillColor, styleConfig.fillOpacity ),
-            style: 'solid',
+            type: 'polygon-3d',
+            symbolLayers: [ {
+                type: 'fill',
+                material: {
+                    color: color( styleConfig.fillColor, styleConfig.fillOpacity )
+                },
+            }, line.symbolLayers[ 0 ] ]
         }
 
         return {
-            point: Object.assign( point, { outline: line } ),
-            multipoint: Object.assign( point, { outline: line } ),
+            point: point,
+            // multipoint: Object.assign( point, { outline: line } ),
             polyline: line,
-            polygon: Object.assign( fill, { outline: line } )
+            polygon: fill
         }
 
         function color( c, a ) {
@@ -274,7 +101,10 @@ include.module( 'layer-esri3d.layer-vector-esri3d-js', [ 'layer.layer-vector-js'
         },
 
         MultiPoint: function ( obj ) {
-            return [ Object.assign( { type: 'multipoint' }, Terraformer.ArcGIS.convert( obj ) ) ]
+            return obj.coordinates.map( function ( c ) {
+                return geoJsonHandler.Point( { type: 'Point', coordinates: c } )
+            } )
+            .reduce( function( acc, val ) { return acc.concat( val ) }, [] )
         },
 
         LineString: function ( obj ) {
