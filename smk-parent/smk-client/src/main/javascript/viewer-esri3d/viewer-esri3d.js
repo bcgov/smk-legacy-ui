@@ -95,10 +95,10 @@ include.module( 'viewer-esri3d', [ 'viewer', 'esri3d', 'types-esri3d', 'layer-es
 
         // Watch view's stationary property for becoming true.
         E.core.watchUtils.whenTrue( this.view, "stationary", function() {
-            self.changedView( self.getView() )
+            self.changedView()
         } )
 
-        this.changedView( this.getView() )
+        this.changedView()
 
         self.finishedLoading( function () {
             self.map.layers.forEach( function ( ly ) {
@@ -140,6 +140,8 @@ include.module( 'viewer-esri3d', [ 'viewer', 'esri3d', 'types-esri3d', 'layer-es
                 width:  this.view.width,
                 height: this.view.height
             }
+            // scale: mapDist / this.screenpixelsToMeters,
+            // metersPerPixel: mapDist / 100,
         }
     }
 
