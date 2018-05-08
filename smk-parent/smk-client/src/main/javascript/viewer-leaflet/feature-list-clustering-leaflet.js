@@ -126,7 +126,9 @@ include.module( 'feature-list-clustering-leaflet', [ 'leaflet', 'feature-list-le
                                 self.featureSet.pick( old )
                         } )
                         .fitBounds( self.highlight[ ev.feature.id ].getBounds(), {
-                            paddingTopLeft: L.point( 300, 100 ),
+                            paddingTopLeft: self.tlPadding,
+                            paddingBottomRight: self.brPadding,
+                                        // paddingTopLeft: L.point( 300, 100 ),
                             animate: true
                         } )
             }

@@ -10,18 +10,18 @@ include.module( 'feature-list-leaflet', [ 'leaflet', 'feature-list' ], function 
         this.featureHighlights = L.layerGroup( { pane: 'markerPane' } )
 
         if ( this.showPanel ) {
-            var tlPadding = L.point( 340, 40 )
-            var brPadding = L.point( 40, 40 )
+            this.tlPadding = L.point( 340, 40 )
+            this.brPadding = L.point( 40, 40 )
         }
         else {
-            var tlPadding = L.point( 40, 40 )
-            var brPadding = L.point( 40, 40 )
+            this.tlPadding = L.point( 40, 40 )
+            this.brPadding = L.point( 40, 40 )
         }
 
         this.popup = L.popup( {
                 maxWidth: 400,
-                autoPanPaddingTopLeft: tlPadding,
-                autoPanPaddingBottomRight: brPadding,
+                autoPanPaddingTopLeft: this.tlPadding,
+                autoPanPaddingBottomRight: this.brPadding,
                 offset: [ 0, -10 ]
             } )
             .setContent( function () { return self.popupVm.$el } )
