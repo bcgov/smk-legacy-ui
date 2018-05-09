@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>SMK launcher</title>
+        <script src="../lib/vue-2.5.11.js"></script>
+        <link rel="stylesheet" href="index.css">
+    </head>
+    <body>
+        <div id="launcher">
+            <div id="url-list">
+                <div class="url-item"
+                    v-for="url in urls"
+                >{{ url }}</div>
+            </div>
+
+            <div id="url-config">
+
+                <div id="url-config-left">
+                    <div id="available-pages">
+                        <div class="page-item"
+                            v-for="page in availablePages"
+                        >{{ page }}</div>
+                    </div>
+
+                    <div class="commands">
+                        <input id="remove-arg" type="button" value="Remove">
+                        <input id="up-arg" type="button" value="Up">
+                        <input id="down-arg" type="button" value="Down">
+                    </div>
+
+                    <div id="current-args">
+                        <div class="arg-item"
+                            v-for="arg in currentArgs"
+                        >{{ arg }}</div>
+                    </div>
+                </div>
+
+                <div id="url-config-left">
+                    <input id="prefix" type="text">
+
+                    <div class="commands">
+                        <input id="add-arg" type="button" value="Add">
+                    </div>
+
+                    <div id="available-args">
+                        <div class="arg-item"
+                            v-for="arg in availableArgs"
+                        >{{ arg }}</div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <script src="index.js"></script>
+    </body>
+</html>
+

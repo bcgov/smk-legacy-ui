@@ -593,9 +593,9 @@
                     ">\
                         <h1>SMK Client</h1>\
                         <h2>Initialization failed</h2>\
-                        <pre>{}</pre>\
+                        <pre style="white-space: normal">{}</pre>\
                     </div>\
-                '.replace( /\s+/g, ' ' ).replace( '{}', e ? e.stack || '' : '' )
+                '.replace( /\s+/g, ' ' ).replace( '{}', e || '' )
 
                 document.querySelector( 'body' ).appendChild( message )
             }
