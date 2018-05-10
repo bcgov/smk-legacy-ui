@@ -1,4 +1,4 @@
-include.module( 'tool-directions', [ 'tool', 'widgets', 'tool-directions.panel-directions-html', 'tool-directions.address-search-html' ], function ( inc ) {
+include.module( 'tool-directions', [ 'tool', 'widgets', 'tool-directions.panel-directions-html', 'tool-directions.popup-directions-html', 'tool-directions.address-search-html' ], function ( inc ) {
 
     var request
 
@@ -232,11 +232,11 @@ include.module( 'tool-directions', [ 'tool', 'widgets', 'tool-directions.panel-d
             self.setMessage( 'Finding current location', 'progress' )
             self.busy = true
 
-            return smk.$viewer.getCurrentLocation().then( function ( loc ) {
-                return SMK.UTIL.findNearestSite( loc ).then( function ( site ) {
-                    return { location: loc, description: site.fullAddress }
-                } )
-            } )
+            return smk.$viewer.getCurrentLocation() //.then( function ( loc ) {
+                // return SMK.UTIL.findNearestSite( loc ).then( function ( site ) {
+                //     return { location: loc, description: site.fullAddress }
+                // } )
+            // } )
             .finally( function () {
                 self.busy = false
                 self.setMessage()
@@ -254,6 +254,7 @@ include.module( 'tool-directions', [ 'tool', 'widgets', 'tool-directions.panel-d
                         throw new Error( 'shouldnt happen' )
 
                     empty.description = site.fullAddress
+                    empty.site = site
                     empty.location = location.map
                     self.addWaypoint()
 
@@ -343,6 +344,25 @@ include.module( 'tool-directions', [ 'tool', 'widgets', 'tool-directions.panel-d
 
                 self.findRoute()
             }
+        } )
+
+        // = : = : = : = : = : = : = : = : = : = : = : = : = : = : = : = : = : = : =
+
+        this.popupModel = {
+            position:   null,
+            last:       null,
+            location:   null,
+            site:       null
+        }
+
+        this.popupVm = new Vue( {
+            el: smk.addToContainer( inc[ 'tool-directions.popup-directions-html' ] ),
+            data: this.popupModel,
+            methods: {
+            },
+            // updated: function () {
+            //     self.updatePopup()
+            // }
         } )
 
     } )

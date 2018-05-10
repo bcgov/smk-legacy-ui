@@ -195,7 +195,7 @@ include.module( 'feature-list', [ 'tool', 'widgets',
                     smk.$tool.directions.activating
                         .then( function () {
                             var loc = self.getLocation()
-                            return smk.$viewer.findNearestSite( loc ).then( function ( site ) {
+                            return SMK.UTIL.findNearestSite( loc ).then( function ( site ) {
                                 return {
                                     desc: site.fullAddress,
                                     loc: loc
