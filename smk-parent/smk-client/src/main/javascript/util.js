@@ -253,7 +253,36 @@ include.module( 'util', null, function ( inc ) {
                 } ).then( res, rej )
             } )
             .then( function ( data ) {
-                return data.properties
+                return {
+                    longitude:           data.geometry.coordinates[ 0 ],
+                    latitude:            data.geometry.coordinates[ 1 ],
+                    civicNumber:         data.properties.civicNumber,
+                    civicNumberSuffix:   data.properties.civicNumberSuffix,
+                    fullAddress:         data.properties.fullAddress,
+                    localityName:        data.properties.localityName,
+                    localityType:        data.properties.localityType,
+                    streetName:          data.properties.streetName,
+                    streetType:          data.properties.streetType,
+                    // blockID
+                    // changeDate1
+                    // electoralArea
+                    // fullSiteDescriptor
+                    // isOfficial
+                    // isStreetDirectionPrefix
+                    // isStreetTypePrefix
+                    // locationDescriptor
+                    // locationPositionalAccuracy
+                    // provinceCode
+                    // siteID
+                    // siteName
+                    // siteRetireDate
+                    // siteStatus
+                    // streetDirection
+                    // streetQualifier
+                    // unitDesignator
+                    // unitNumber
+                    // unitNumberSuffix
+                }
             } )
         }
 

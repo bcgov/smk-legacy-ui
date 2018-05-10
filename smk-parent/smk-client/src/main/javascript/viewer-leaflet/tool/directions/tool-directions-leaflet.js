@@ -91,31 +91,39 @@ include.module( 'tool-directions-leaflet', [ 'leaflet', 'tool-directions' ], fun
                 } )
             }
 
-            var last = self.waypoints.length - 2
+            var last = self.waypoints.length - 1
             self.waypointLayers = self.waypoints
-                .filter( function ( w ) { return !!w.location } )
                 .map( function ( w, i ) {
-                    var icon, prefix
+                    var icon
+                    var popup = Object.assign( {
+                        index: i
+                    }, w )
+
                     switch ( i ) {
                     case 0:
                         icon = greenIcon
-                        prefix = 'START HERE:\n'
+                        popup.first = true
                         break;
+
                     case last:
                         icon = redIcon
-                        prefix = 'END HERE:\n'
+                        popup.last = true
                         break;
+
                     default:
                         icon = new L.NumberedIcon( { number: i } )
-                        prefix = 'STOPOVER ' + i + ':\n'
                         break;
                     }
 
-                    return L.marker( [ w.location.latitude, w.location.longitude ], {
-                            title: prefix + w.description,
+                    return L.marker( [ w.latitude, w.longitude ], {
+                            title: w.fullAddress,
                             icon: icon
                         } )
-                        .bindPopup( $( '<pre class="smk-popup">' ).text( prefix + w.description ).get( 0 ), {
+                        .bindPopup( function () {
+                            self.popupModel.site = popup
+                            return self.popupVm.$el
+                        }, {
+                            maxWidth: 100,
                             autoPanPaddingTopLeft: L.point( 340, 40 ),
                             autoPanPaddingBottomRight: L.point( 40, 40 )
                         } )
@@ -158,6 +166,7 @@ include.module( 'tool-directions-leaflet', [ 'leaflet', 'tool-directions' ], fun
                 self.directionHighlightLayer = L.circleMarker( [ p[ 1 ], p[ 0 ] ] )
                     .bindPopup( self.directions[ ev.highlight ].instruction, {
                         closeButton: false,
+                        maxWidth: 100,
                         autoPanPaddingTopLeft: L.point( 340, 40 ),
                         autoPanPaddingBottomRight: L.point( 40, 40 )
                     } )
@@ -177,6 +186,7 @@ include.module( 'tool-directions-leaflet', [ 'leaflet', 'tool-directions' ], fun
                 var p = self.directions[ ev.pick ].point
                 self.directionPickLayer = L.circleMarker( [ p[ 1 ], p[ 0 ] ], { radius: 15 } )
                     .bindPopup( self.directions[ ev.pick ].instruction, {
+                        maxWidth: 100,
                         autoPanPaddingTopLeft: L.point( 340, 40 ),
                         autoPanPaddingBottomRight: L.point( 40, 40 )
                     } )
@@ -191,7 +201,7 @@ include.module( 'tool-directions-leaflet', [ 'leaflet', 'tool-directions' ], fun
             },
 
             'zoom-waypoint': function ( ev ) {
-                smk.$viewer.map.flyTo( [ ev.location.latitude, ev.location.longitude ], 12 )
+                smk.$viewer.map.flyTo( [ ev.waypoint.latitude, ev.waypoint.longitude ], 12 )
                 self.waypointLayers[ ev.index ].openPopup()
             }
         } )

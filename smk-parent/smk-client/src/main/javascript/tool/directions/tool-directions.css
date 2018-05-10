@@ -24,11 +24,12 @@
 }
 
 .smk-directions-panel .smk-description {
-    align-self: stretch;
+    align-self: center;
     flex-basis: 100%;
     margin: 2px 0;
     background-color: transparent;
     margin-right: 5px;
+    font: 400 11px system-ui;
 }
 
 .smk-directions-panel .smk-description input {
@@ -59,6 +60,13 @@
 
 .smk-directions-panel .smk-waypoint .smk-zoomto.smk-last {
     color: red;
+}
+
+.smk-directions-panel .smk-waypoint .smk-address-search {
+    margin-left: 22px;
+    margin-right: 50px;
+    margin-top: 3px;
+    margin-bottom: 3px;
 }
 
 .smk-directions-panel div.smk-message {

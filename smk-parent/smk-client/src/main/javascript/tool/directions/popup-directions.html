@@ -1,4 +1,11 @@
-<div class="smk-directions-popup" v-if="location.map">
+<div class="smk-directions-popup">
+    <div class="smk-message">
+        <span v-if="site.current">[CURRENT]</span>
+        <span v-if="site.first">Start here:</span>
+        <span v-if="site.last">End here:</span>
+        <span v-if="!site.first && !site.last">Stopover #{{ site.index }}:</span>
+    </div>
+
     <div class="smk-address" v-if="site.fullAddress">
         <div class="smk-street">
             <span class="smk-civic-number">{{ site.civicNumber }}</span>
@@ -13,10 +20,10 @@
 
     <div class="smk-coordinate">
         <span class="smk-ordinate">
-            <label>latitude<div>{{ formatDD( location.map.latitude ) }}</div></label>
+            <label>latitude<div>{{ formatDD( site.latitude ) }}</div></label>
         </span>
         <span class="smk-ordinate">
-            <label>longitude<div>{{ formatDD( location.map.longitude ) }}</div></label>
+            <label>longitude<div>{{ formatDD( site.longitude ) }}</div></label>
         </span>
     </div>
 </div>
