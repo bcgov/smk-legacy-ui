@@ -208,7 +208,7 @@ include.module( 'tool-directions', [ 'tool', 'widgets', 'tool-directions.panel-d
     DirectionsTool.prototype.afterInitialize.push( function ( smk ) {
         var self = this
 
-        self.changedActive( function () {
+        this.changedActive( function () {
             if ( self.active ) {
                 smk.withTool( 'location', function () { this.active = false } )
 
@@ -228,12 +228,12 @@ include.module( 'tool-directions', [ 'tool', 'widgets', 'tool-directions.panel-d
             }
         } )
 
-        self.getCurrentLocation = function () {
+        this.getCurrentLocation = function () {
             self.setMessage( 'Finding current location', 'progress' )
             self.busy = true
 
             return smk.$viewer.getCurrentLocation().then( function ( loc ) {
-                return smk.$viewer.findNearestSite( loc ).then( function ( site ) {
+                return SMK.UTIL.findNearestSite( loc ).then( function ( site ) {
                     return { location: loc, description: site.fullAddress }
                 } )
             } )
@@ -243,8 +243,8 @@ include.module( 'tool-directions', [ 'tool', 'widgets', 'tool-directions.panel-d
             } )
         }
 
-        smk.$viewer.handlePick( this, function ( location ) {
-            return smk.$viewer.findNearestSite( location.map ).then( function ( site ) {
+        this.pickLocation = function ( location ) {
+            return SMK.UTIL.findNearestSite( location.map ).then( function ( site ) {
                 self.active = true
 
                 return self.activating.then( function () {
@@ -264,6 +264,30 @@ include.module( 'tool-directions', [ 'tool', 'widgets', 'tool-directions.panel-d
                 console.warn( err )
                 self.setMessage( 'Unable to find address', 'error' )
             } )
+        }
+
+        smk.$viewer.handlePick( this, function ( location ) {
+            return self.pickLocation( location )
+            // return smk.$viewer.findNearestSite( location.map ).then( function ( site ) {
+            //     self.active = true
+
+            //     return self.activating.then( function () {
+            //         var empty = self.waypoints.find( function ( w ) { return !w.location } )
+
+            //         if ( !empty )
+            //             throw new Error( 'shouldnt happen' )
+
+            //         empty.description = site.fullAddress
+            //         empty.location = location.map
+            //         self.addWaypoint()
+
+            //         return self.findRoute()
+            //     } )
+            // } )
+            // .catch( function ( err ) {
+            //     console.warn( err )
+            //     self.setMessage( 'Unable to find address', 'error' )
+            // } )
         } )
 
         smk.on( this.id, {

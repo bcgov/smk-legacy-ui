@@ -234,6 +234,27 @@ include.module( 'util', null, function ( inc ) {
                 ] )
 
             return points
+        },
+
+        findNearestSite: function ( location ) {
+            var query = {
+                point:              [ location.longitude, location.latitude ].join( ',' ),
+                outputSRS:          4326,
+                locationDescriptor: 'routingPoint',
+                maxDistance:        1000,
+            }
+
+            return SMK.UTIL.makePromise( function ( res, rej ) {
+                $.ajax( {
+                    timeout:    10 * 1000,
+                    dataType:   'json',
+                    url:        'https://geocoder.api.gov.bc.ca/sites/nearest.geojson',
+                    data:       query,
+                } ).then( res, rej )
+            } )
+            .then( function ( data ) {
+                return data.properties
+            } )
         }
 
     } )

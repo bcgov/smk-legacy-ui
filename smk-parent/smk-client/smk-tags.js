@@ -187,35 +187,39 @@ exports.gen = function () {
 
     // esri3d
 
-    t.group( 'tool-pan-esri3d' )
-        .dir( 'viewer-esri3d/tool/pan/**/*', { cwd: baseDir } )
-
-    t.group( 'tool-zoom-esri3d' )
-        .dir( 'viewer-esri3d/tool/zoom/**/*', { cwd: baseDir } )
-
-    t.group( 'tool-measure-esri3d' )
-        .dir( 'viewer-esri3d/tool/measure/**/*', { cwd: baseDir } )
-
-    t.group( 'tool-scale-esri3d' )
-        .dir( 'viewer-esri3d/tool/scale/**/*', { cwd: baseDir } )
-
     t.group( 'tool-coordinate-esri3d' )
         .dir( 'viewer-esri3d/tool/coordinate/**/*', { cwd: baseDir } )
 
-    t.group( 'tool-minimap-esri3d' )
-        .dir( 'viewer-esri3d/tool/minimap/**/*', { cwd: baseDir } )
-
-    t.group( 'tool-markup-esri3d' )
-        .dir( 'viewer-esri3d/tool/markup/**/*', { cwd: baseDir } )
+    t.group( 'tool-directions-esri3d' )
+        .dir( 'viewer-esri3d/tool/directions/**/*', { cwd: baseDir } )
 
     t.group( 'tool-identify-esri3d' )
         .dir( 'viewer-esri3d/tool/identify/**/*', { cwd: baseDir } )
 
-    t.group( 'tool-select-esri3d' )
-        .dir( 'viewer-esri3d/tool/select/**/*', { cwd: baseDir } )
+    t.group( 'tool-markup-esri3d' )
+        .dir( 'viewer-esri3d/tool/markup/**/*', { cwd: baseDir } )
+
+    t.group( 'tool-measure-esri3d' )
+        .dir( 'viewer-esri3d/tool/measure/**/*', { cwd: baseDir } )
+
+    t.group( 'tool-minimap-esri3d' )
+        .dir( 'viewer-esri3d/tool/minimap/**/*', { cwd: baseDir } )
+
+    t.group( 'tool-pan-esri3d' )
+        .dir( 'viewer-esri3d/tool/pan/**/*', { cwd: baseDir } )
+
+    t.group( 'tool-scale-esri3d' )
+        .dir( 'viewer-esri3d/tool/scale/**/*', { cwd: baseDir } )
 
     t.group( 'tool-search-esri3d' )
         .dir( 'viewer-esri3d/tool/search/**/*', { cwd: baseDir } )
+
+    t.group( 'tool-select-esri3d' )
+        .dir( 'viewer-esri3d/tool/select/**/*', { cwd: baseDir } )
+
+    t.group( 'tool-zoom-esri3d' )
+        .dir( 'viewer-esri3d/tool/zoom/**/*', { cwd: baseDir } )
+
 
     // t.script( 'layer-esri3d', 'viewer-esri3d/layer-esri3d.js' )
 
@@ -223,6 +227,8 @@ exports.gen = function () {
         .dir( 'viewer-esri3d/layer/**/*', { cwd: baseDir } )
 
     t.script( 'types-esri3d', 'viewer-esri3d/types-esri3d.js' )
+
+    t.script( 'util-esri3d', 'viewer-esri3d/util-esri3d.js' )
 
     t.group( 'viewer-esri3d' )
         .script( 'viewer-esri3d/viewer-esri3d.js' )

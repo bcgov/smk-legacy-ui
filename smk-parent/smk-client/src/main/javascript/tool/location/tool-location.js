@@ -57,7 +57,7 @@ include.module( 'tool-location', [ 'tool', 'widgets', 'tool-location.popup-locat
             self.location = location
             self.site = {}
 
-            smk.$viewer.findNearestSite( location.map ).then( function ( site ) {
+            SMK.UTIL.findNearestSite( location.map ).then( function ( site ) {
                 self.site = site
             } )
             .catch( function ( err ) {
