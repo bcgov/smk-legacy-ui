@@ -317,8 +317,13 @@ include.module( 'tool-directions', [ 'tool', 'widgets', 'tool-directions.panel-d
                 formatDD: function ( dd ) {
                     return dd.toFixed( 4 )
                 }
+            },
+            updated: function () {
+                self.updatePopup()
             }
         } )
+
+        this.updatePopup = function () {}
 
     } )
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
