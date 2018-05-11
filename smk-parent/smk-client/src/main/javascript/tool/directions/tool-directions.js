@@ -402,7 +402,8 @@ include.module( 'tool-directions', [ 'tool', 'widgets', 'tool-directions.panel-d
 
             self.setMessage( 'Route travels ' + data.distance + ' km in ' + data.timeText, 'summary' )
 
-            self.directions = data.directions.map( function ( dir ) {
+            var l = data.directions.length
+            self.directions = data.directions.map( function ( dir, i ) {
                 dir.instruction = dir.text.replace( /^"|"$/g, '' ).replace( /\sfor\s(\d+.?\d*\sk?m)\s[(](\d+).+?((\d+).+)?$/, function ( m, a, b, c, d ) {
                     dir.distance = a
                     if ( d )
@@ -410,6 +411,9 @@ include.module( 'tool-directions', [ 'tool', 'widgets', 'tool-directions.panel-d
                     else
                         dir.time = '00:' + ( '0' + b ).substr( -2 )
 
+                    dir.first = i == 0
+                    dir.last = i == l - 1
+                    // dir.index = i
                     return ''
                 } )
                 return dir
