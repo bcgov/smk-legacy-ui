@@ -1,4 +1,4 @@
-<div class="smk-location-popup">
+<div class="smk-location-popup" v-if="site.latitude">
     <div class="smk-address" v-if="site.fullAddress">
         <div class="smk-street">
             <span class="smk-civic-number">{{ site.civicNumber }}</span>
@@ -11,7 +11,7 @@
         </div>
     </div>
 
-    <div class="smk-coordinate" v-if="site.latitude">
+    <div class="smk-coordinate">
         <span class="smk-ordinate">
             <label>latitude<div>{{ formatDD( site.latitude ) }}</div></label>
         </span>
