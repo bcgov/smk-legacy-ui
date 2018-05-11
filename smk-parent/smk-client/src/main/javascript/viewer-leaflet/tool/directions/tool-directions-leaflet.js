@@ -159,8 +159,7 @@ include.module( 'tool-directions-leaflet', [ 'leaflet', 'tool-directions' ], fun
                     self.directionHighlightLayer = null
                 }
 
-                if ( !ev.highlight )
-                    return
+                if ( ev.highlight == null ) return
 
                 var p = self.directions[ ev.highlight ].point
                 self.directionHighlightLayer = L.circleMarker( [ p[ 1 ], p[ 0 ] ] )
@@ -168,7 +167,6 @@ include.module( 'tool-directions-leaflet', [ 'leaflet', 'tool-directions' ], fun
                         self.popupModel.site = self.directions[ ev.highlight ]
                         return self.popupVm.$el
                     }, {
-                    // .bindPopup( self.directions[ ev.highlight ].instruction, {
                         closeButton: false,
                         maxWidth: 100,
                         autoPanPaddingTopLeft: L.point( 340, 40 ),
@@ -184,8 +182,7 @@ include.module( 'tool-directions-leaflet', [ 'leaflet', 'tool-directions' ], fun
                     self.directionPickLayer = null
                 }
 
-                if ( !ev.pick )
-                    return
+                if ( ev.pick == null ) return
 
                 var p = self.directions[ ev.pick ].point
                 self.directionPickLayer = L.circleMarker( [ p[ 1 ], p[ 0 ] ], { radius: 15 } )
@@ -193,7 +190,6 @@ include.module( 'tool-directions-leaflet', [ 'leaflet', 'tool-directions' ], fun
                         self.popupModel.site = self.directions[ ev.pick ]
                         return self.popupVm.$el
                     }, {
-                    // .bindPopup( self.directions[ ev.pick ].instruction, {
                         maxWidth: 100,
                         autoPanPaddingTopLeft: L.point( 340, 40 ),
                         autoPanPaddingBottomRight: L.point( 40, 40 )

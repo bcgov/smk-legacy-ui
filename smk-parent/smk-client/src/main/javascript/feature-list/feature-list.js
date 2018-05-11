@@ -194,17 +194,27 @@ include.module( 'feature-list', [ 'tool', 'widgets',
 
                     smk.$tool.directions.activating
                         .then( function () {
-                            var loc = self.getLocation()
-                            return SMK.UTIL.findNearestSite( loc ).then( function ( site ) {
-                                return {
-                                    desc: site.fullAddress,
-                                    loc: loc
-                                }
-                            } )
+                            return smk.$tool.directions.startAtCurrentLocation()
                         } )
-                        .then( function ( start ) {
-                            return smk.$tool.directions.startAtCurrentLocation( start.loc, start.desc )
+                        .then( function () {
+                            return SMK.UTIL.findNearestSite( self.getLocation() )
                         } )
+                        .then( function ( site ) {
+                            return smk.$tool.directions.addWaypoint( site )
+                        } )
+
+                        // .then( function () {
+                        //     var loc = self.getLocation()
+                        //     return SMK.UTIL.findNearestSite( loc ).then( function ( site ) {
+                        //         return {
+                        //             desc: site.fullAddress,
+                        //             loc: loc
+                        //         }
+                        //     } )
+                        // } )
+                        // .then( function ( start ) {
+                        //     return smk.$tool.directions.startAtCurrentLocation( start.loc, start.desc )
+                        // } )
                 },
 
                 movePrevious: function () {

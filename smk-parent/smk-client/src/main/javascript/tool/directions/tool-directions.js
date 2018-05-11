@@ -347,13 +347,6 @@ include.module( 'tool-directions', [ 'tool', 'widgets', 'tool-directions.panel-d
                         return self.setMessage( 'Unable to get current location', 'error', 1000 )
                     } )
             } )
-            // .then( function () {
-            //     if ( location && description ) {
-            //         self.addWaypoint( location, description )
-            //     }
-            //     self.addWaypoint()
-            //     return self.findRoute()
-            // } )
     }
 
     DirectionsTool.prototype.resetWaypoints = function ( ) {
@@ -411,12 +404,14 @@ include.module( 'tool-directions', [ 'tool', 'widgets', 'tool-directions.panel-d
                     else
                         dir.time = '00:' + ( '0' + b ).substr( -2 )
 
-                    dir.first = i == 0
-                    dir.last = i == l - 1
-                    // dir.index = i
                     return ''
                 } )
                 return dir
+            } )
+
+            self.directions.unshift( {
+                instruction: 'Start!',
+                point: [ points[ 0 ].longitude, points[ 0 ].latitude ]
             } )
         } )
         .finally( function () {
