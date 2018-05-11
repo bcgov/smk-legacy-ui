@@ -11,6 +11,7 @@
             "layerName": "WHSE_TANTALIS.TA_CROWN_LEASES_SVW",
             "styleName": "Lease_Applications_Tantalis_Colour_Filled",
             "titleAttribute": "INTRID_SID",
+            "geometryAttribute": "SHAPE",
             "attributes": [
                 {
                     "name": "INTRID_SID",

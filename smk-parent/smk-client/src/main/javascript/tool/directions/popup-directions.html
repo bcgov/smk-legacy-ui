@@ -1,4 +1,19 @@
-<div class="smk-location-popup">
+<div class="smk-directions-popup">
+    <div class="smk-message">
+        <span v-if="site.current">[CURRENT]</span>
+        <span v-if="site.first">Start here:</span>
+        <span v-if="site.last">End here:</span>
+        <span v-if="site.index && !site.first && !site.last">Stopover #{{ site.index }}:</span>
+    </div>
+
+    <div class="smk-direction" v-if="site.instruction">
+        <div class="smk-instruction">{{ site.instruction }}</div>
+        <div v-if="site.distance">
+            <span class="smk-distance" >for {{ site.distance }}</span>
+            <span class="smk-time">({{ site.time }})</span>
+        </div>
+    </div>    
+
     <div class="smk-address" v-if="site.fullAddress">
         <div class="smk-street">
             <span class="smk-civic-number">{{ site.civicNumber }}</span>
@@ -18,11 +33,5 @@
         <span class="smk-ordinate">
             <label>longitude<div>{{ formatDD( site.longitude ) }}</div></label>
         </span>
-    </div>
-
-    <div class="smk-commands">
-        <span class="smk-command" v-if="tool.identify" v-on:click="identifyFeatures()">Identify features</span>
-        <span class="smk-command" v-if="tool.measure" v-on:click="startMeasurement()">Start measurement</span>
-        <span class="smk-command" v-if="tool.directions" v-on:click="startDirections()">Directions to here</span>
     </div>
 </div>

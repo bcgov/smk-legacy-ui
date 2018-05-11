@@ -234,6 +234,56 @@ include.module( 'util', null, function ( inc ) {
                 ] )
 
             return points
+        },
+
+        findNearestSite: function ( location ) {
+            var query = {
+                point:              [ location.longitude, location.latitude ].join( ',' ),
+                outputSRS:          4326,
+                locationDescriptor: 'routingPoint',
+                maxDistance:        1000,
+            }
+
+            return SMK.UTIL.makePromise( function ( res, rej ) {
+                $.ajax( {
+                    timeout:    10 * 1000,
+                    dataType:   'json',
+                    url:        'https://geocoder.api.gov.bc.ca/sites/nearest.geojson',
+                    data:       query,
+                } ).then( res, rej )
+            } )
+            .then( function ( data ) {
+                return {
+                    longitude:           data.geometry.coordinates[ 0 ],
+                    latitude:            data.geometry.coordinates[ 1 ],
+                    civicNumber:         data.properties.civicNumber,
+                    civicNumberSuffix:   data.properties.civicNumberSuffix,
+                    fullAddress:         data.properties.fullAddress,
+                    localityName:        data.properties.localityName,
+                    localityType:        data.properties.localityType,
+                    streetName:          data.properties.streetName,
+                    streetType:          data.properties.streetType,
+                    // blockID
+                    // changeDate1
+                    // electoralArea
+                    // fullSiteDescriptor
+                    // isOfficial
+                    // isStreetDirectionPrefix
+                    // isStreetTypePrefix
+                    // locationDescriptor
+                    // locationPositionalAccuracy
+                    // provinceCode
+                    // siteID
+                    // siteName
+                    // siteRetireDate
+                    // siteStatus
+                    // streetDirection
+                    // streetQualifier
+                    // unitDesignator
+                    // unitNumber
+                    // unitNumberSuffix
+                }
+            } )
         }
 
     } )
