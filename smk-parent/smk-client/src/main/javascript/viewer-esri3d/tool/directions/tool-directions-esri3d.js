@@ -217,9 +217,7 @@ include.module( 'tool-directions-esri3d', [ 'esri3d', 'types-esri3d', 'util-esri
                 smk.$viewer.map.remove( self.routeLayer )
             self.routeLayer = null
 
-            if ( self.directionHighlightLayer )
-                smk.$viewer.map.remove( self.directionHighlightLayer )
-            self.directionHighlightLayer = null
+            self.directionHighlightLayer.removeAll()
 
             if ( self.directionPickLayer )
                 smk.$viewer.map.remove( self.directionPickLayer )
@@ -233,46 +231,67 @@ include.module( 'tool-directions-esri3d', [ 'esri3d', 'types-esri3d', 'util-esri
             smk.$viewer.view.popup.close()
         }
 
+        self.directionHighlightLayer = new E.layers.GraphicsLayer()
+        smk.$viewer.map.add( self.directionHighlightLayer )
+
+
         smk.on( this.id, {
             'hover-direction': function ( ev ) {
-                if ( self.directionHighlightLayer ) {
-                    smk.$viewer.map.removeLayer( self.directionHighlightLayer )
-                    self.directionHighlightLayer = null
-                }
+                self.directionHighlightLayer.removeAll()
 
-                if ( !ev.highlight )
-                    return
+                if ( ev.highlight == null ) return
 
                 var p = self.directions[ ev.highlight ].point
-                self.directionHighlightLayer = L.circleMarker( [ p[ 1 ], p[ 0 ] ] )
-                    .bindPopup( self.directions[ ev.highlight ].instruction, {
-                        closeButton: false,
-                        autoPanPaddingTopLeft: L.point( 340, 40 ),
-                        autoPanPaddingBottomRight: L.point( 40, 40 )
-                    } )
-                    .addTo( smk.$viewer.map )
-                    .openPopup()
+                var g = { type: 'point', latitude: p[ 1 ], longitude: p[ 0 ] }
+
+                self.directionHighlightLayer.add( new E.Graphic( {
+                    geometry: g,
+                    symbol: {
+                        type: 'point-3d',
+                        symbolLayers: [
+                            {
+                                type:       'icon',
+                                size:       '20px',
+                                anchor:     'center',
+                                material: {
+                                    color: [ 0, 0, 0, 0 ]
+                                },
+                                resource: {
+                                    primitive: 'circle'
+                                },
+                                outline: {
+                                    color: 'blue',
+                                    size: '2px'
+                                }
+                            }
+                        ]
+                    }
+                } ) )
+
+                smk.$viewer.view.goTo( { center: p, zoom: 12 } ).then( function () {
+                    self.showPopup( self.directions[ ev.highlight ], g )
+                } )
             },
 
             'pick-direction': function ( ev ) {
-                if ( self.directionPickLayer ) {
-                    smk.$viewer.map.removeLayer( self.directionPickLayer )
-                    self.directionPickLayer = null
-                }
+                // if ( self.directionPickLayer ) {
+                //     smk.$viewer.map.removeLayer( self.directionPickLayer )
+                //     self.directionPickLayer = null
+                // }
 
-                if ( !ev.pick )
-                    return
+                // if ( !ev.pick )
+                //     return
 
-                var p = self.directions[ ev.pick ].point
-                self.directionPickLayer = L.circleMarker( [ p[ 1 ], p[ 0 ] ], { radius: 15 } )
-                    .bindPopup( self.directions[ ev.pick ].instruction, {
-                        autoPanPaddingTopLeft: L.point( 340, 40 ),
-                        autoPanPaddingBottomRight: L.point( 40, 40 )
-                    } )
-                    .addTo( smk.$viewer.map )
-                    .openPopup()
+                // var p = self.directions[ ev.pick ].point
+                // self.directionPickLayer = L.circleMarker( [ p[ 1 ], p[ 0 ] ], { radius: 15 } )
+                //     .bindPopup( self.directions[ ev.pick ].instruction, {
+                //         autoPanPaddingTopLeft: L.point( 340, 40 ),
+                //         autoPanPaddingBottomRight: L.point( 40, 40 )
+                //     } )
+                //     .addTo( smk.$viewer.map )
+                //     .openPopup()
 
-                smk.$viewer.map.panTo( [ p[ 1 ], p[ 0 ] ] )
+                // smk.$viewer.map.panTo( [ p[ 1 ], p[ 0 ] ] )
             },
 
             'clear': function ( ev ) {
