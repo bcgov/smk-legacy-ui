@@ -245,7 +245,7 @@ include.module( 'tool-directions', [ 'tool', 'widgets', 'tool-directions.panel-d
             } )
             .catch( function ( err ) {
                 console.warn( err )
-                self.setMessage( 'Unable to find address', 'error' )
+                return self.addWaypoint()
             } )
         }
 
@@ -298,7 +298,7 @@ include.module( 'tool-directions', [ 'tool', 'widgets', 'tool-directions.panel-d
                     self.addWaypoint( ev )
 
                     Vue.nextTick( function () {
-                        self.panel.config = { newAddress: null }
+                        self.panel.config = Object.assign( {}, self.panel.config, { newAddress: null } )
                     } )
                 }
             },
@@ -329,6 +329,14 @@ include.module( 'tool-directions', [ 'tool', 'widgets', 'tool-directions.panel-d
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
     DirectionsTool.prototype.addWaypoint = function ( site ) {
+        var self = this
+
+        if ( !site || !site.fullAddress )
+            return this.setMessage( 'Unable to find address', 'error', 1000 )
+                .then( function () {
+                    self.findRoute()
+                } )
+
         this.waypoints.push( site )
 
         return this.findRoute()

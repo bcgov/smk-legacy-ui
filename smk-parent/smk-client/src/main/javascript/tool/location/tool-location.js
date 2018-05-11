@@ -67,7 +67,9 @@ include.module( 'tool-location', [ 'tool', 'widgets', 'tool-location.popup-locat
                 .then( function ( site ) {
                     self.site = site
                 } )
-                .catch( function ( err ) {} )
+                .catch( function ( err ) {
+                    self.site = location.map
+                } )
         } )
 
         this.setLocation = function ( location ) {
