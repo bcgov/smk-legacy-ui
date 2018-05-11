@@ -1,10 +1,7 @@
 include.module( 'feature-list-leaflet', [ 'leaflet', 'feature-list' ], function ( inc ) {
 
-    SMK.TYPE.FeatureList.prototype.afterInitialize.push( function ( smk ) {
+    return function ( smk ) {
         var self = this
-
-        var vw = smk.$viewer
-        // var self.featureSet = smk.$viewer[ self.featureSetProperty ]
 
         this.highlight = {}
         this.featureHighlights = L.layerGroup( { pane: 'markerPane' } )
@@ -26,16 +23,11 @@ include.module( 'feature-list-leaflet', [ 'leaflet', 'feature-list' ], function 
             } )
             .setContent( function () { return self.popupVm.$el } )
 
-        vw.map.on( {
-            popupopen: function ( ev ) {
-                if ( ev.popup !== self.popup ) return
+        this.updatePopup = SMK.UTIL.makeDelayedCall( function () {
+            self.popup.update()
+        }, { delay: 500 } )
 
-                // var px = vw.map.project( ev.popup._latlng )
-                // px.y -= ev.popup._container.clientHeight / 2
-                // px.x -= 150
-                // vw.map.panTo( vw.map.unproject( px ), { animate: true } )
-            },
-
+        smk.$viewer.map.on( {
             popupclose: function ( ev ) {
                 if ( ev.popup !== self.popup ) return
 
@@ -45,10 +37,10 @@ include.module( 'feature-list-leaflet', [ 'leaflet', 'feature-list' ], function 
 
         self.changedActive( function () {
             if ( self.active ) {
-                self.featureHighlights.addTo( vw.map )
+                self.featureHighlights.addTo( smk.$viewer.map )
             }
             else {
-                vw.map.removeLayer( self.featureHighlights )
+                smk.$viewer.map.removeLayer( self.featureHighlights )
                 self.popup.remove()
             }
         } )
@@ -107,10 +99,6 @@ include.module( 'feature-list-leaflet', [ 'leaflet', 'feature-list' ], function 
                 self.featureHighlights.removeLayer( hl )
             }
         }
-    } )
-
-    SMK.TYPE.FeatureList.prototype.updatePopup = SMK.UTIL.makeDelayedCall( function () {
-        this.popup.update()
-    }, { delay: 500 } )
+    }
 
 } )

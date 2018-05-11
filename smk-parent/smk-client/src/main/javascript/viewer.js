@@ -554,29 +554,12 @@ include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', '
             catch ( e ) {}
             return Promise.reject( err )
         } )
-    }
-    // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-    //
-    Viewer.prototype.findNearestSite = function ( location ) {
-        var self = this
-
-        var query = {
-            point:              [ location.longitude, location.latitude ].join( ',' ),
-            outputSRS:          4326,
-            locationDescriptor: 'routingPoint',
-            maxDistance:        1000,
-        }
-
-        return SMK.UTIL.makePromise( function ( res, rej ) {
-            $.ajax( {
-                timeout:    10 * 1000,
-                dataType:   'json',
-                url:        'https://geocoder.api.gov.bc.ca/sites/nearest.geojson',
-                data:       query,
-            } ).then( res, rej )
-        } )
-        .then( function ( data ) {
-            return data.properties
+        .then( function ( loc ) {
+            return SMK.UTIL.findNearestSite( loc )
+                .then( function ( site ) {
+                    site.current = true
+                    return site
+                } )
         } )
     }
 

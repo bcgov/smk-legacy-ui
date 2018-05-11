@@ -3,8 +3,7 @@ include.module( 'feature-list-clustering-leaflet', [ 'leaflet', 'feature-list-le
     return function ( smk ) {
         var self = this
 
-        // var  smk.$viewer = smk.$viewer
-        // var self.featureSet = smk.$viewer.identified
+        inc[ 'feature-list-leaflet' ].call( this, smk )
 
         this.marker = {}
         this.cluster = L.markerClusterGroup( {

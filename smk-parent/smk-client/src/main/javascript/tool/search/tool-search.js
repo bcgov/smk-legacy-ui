@@ -189,9 +189,20 @@ include.module( 'tool-search', [ 'tool', 'widgets', 'tool-search.widget-search-h
                 directionsToFeature: function ( feature ) {
                     smk.$tool.directions.active = true
 
-                    smk.$tool.directions.activating.then( function () {
-                        return smk.$tool.directions.startAtCurrentLocation( { latitude: feature.geometry.coordinates[ 1 ], longitude: feature.geometry.coordinates[ 0 ] }, feature.properties.fullAddress )
-                    } )
+                    smk.$tool.directions.activating
+                        .then( function () {
+                            return smk.$tool.directions.startAtCurrentLocation()
+                        } )
+                        .then( function () {
+                            return SMK.UTIL.findNearestSite( { latitude: feature.geometry.coordinates[ 1 ], longitude: feature.geometry.coordinates[ 0 ] } )
+                                .then( function ( site ) {
+                                    return smk.$tool.directions.addWaypoint( site )
+                                } )
+                                .catch( function ( err ) {
+                                    console.warn( err )
+                                    return smk.$tool.directions.addWaypoint()
+                                } )
+                        } )
                 },
             }
         } )
