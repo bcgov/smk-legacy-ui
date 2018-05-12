@@ -55,8 +55,13 @@ include.module( 'tool-location', [ 'tool', 'widgets', 'tool-location.popup-locat
                             return smk.$tool.directions.addWaypoint( site )
                         } )
                 },
+            },
+            updated: function () {
+                self.updatePopup()
             }
         } )
+
+        this.updatePopup = function () {}
 
         smk.$viewer.handlePick( this, function ( location ) {
             self.reset()
@@ -76,6 +81,10 @@ include.module( 'tool-location', [ 'tool', 'widgets', 'tool-location.popup-locat
             this.location = location
         }
 
+        this.reset = function () {
+            this.site = {}
+        }
+
         smk.$viewer.changedView( function () {
             self.reset()
         } )
@@ -87,10 +96,6 @@ include.module( 'tool-location', [ 'tool', 'widgets', 'tool-location.popup-locat
 
         self.active = true
     } )
-
-    LocationTool.prototype.reset = function () {
-        this.site = {}
-    }
 
     LocationTool.prototype.hasPickPriority = function () {
         return true
