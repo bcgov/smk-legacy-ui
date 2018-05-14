@@ -198,23 +198,14 @@ include.module( 'feature-list', [ 'tool', 'widgets',
                         } )
                         .then( function () {
                             return SMK.UTIL.findNearestSite( self.getLocation() )
+                                .then( function ( site ) {
+                                    return smk.$tool.directions.addWaypoint( site )
+                                } )
+                                .catch( function ( err ) {
+                                    console.warn( err )
+                                    return smk.$tool.directions.addWaypoint()
+                                } )
                         } )
-                        .then( function ( site ) {
-                            return smk.$tool.directions.addWaypoint( site )
-                        } )
-
-                        // .then( function () {
-                        //     var loc = self.getLocation()
-                        //     return SMK.UTIL.findNearestSite( loc ).then( function ( site ) {
-                        //         return {
-                        //             desc: site.fullAddress,
-                        //             loc: loc
-                        //         }
-                        //     } )
-                        // } )
-                        // .then( function ( start ) {
-                        //     return smk.$tool.directions.startAtCurrentLocation( start.loc, start.desc )
-                        // } )
                 },
 
                 movePrevious: function () {

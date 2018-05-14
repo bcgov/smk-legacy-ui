@@ -199,6 +199,9 @@ exports.gen = function () {
     t.group( 'tool-markup-esri3d' )
         .dir( 'viewer-esri3d/tool/markup/**/*', { cwd: baseDir } )
 
+    t.group( 'tool-location-esri3d' )
+        .dir( 'viewer-esri3d/tool/location/**/*', { cwd: baseDir } )
+
     t.group( 'tool-measure-esri3d' )
         .dir( 'viewer-esri3d/tool/measure/**/*', { cwd: baseDir } )
 

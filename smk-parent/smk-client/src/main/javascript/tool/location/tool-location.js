@@ -5,7 +5,7 @@ include.module( 'tool-location', [ 'tool', 'widgets', 'tool-location.popup-locat
         this.makePropWidget( 'tool', {} )
 
         SMK.TYPE.Tool.prototype.constructor.call( this, $.extend( {
-            title:          'Location',
+            title:  'Location'
         }, option ) )
     }
 
@@ -55,23 +55,33 @@ include.module( 'tool-location', [ 'tool', 'widgets', 'tool-location.popup-locat
                             return smk.$tool.directions.addWaypoint( site )
                         } )
                 },
+            },
+            updated: function () {
+                if ( self.visible )
+                    self.updatePopup()
             }
         } )
+
+        this.updatePopup = function () {}
 
         smk.$viewer.handlePick( this, function ( location ) {
             self.reset()
 
-            self.setLocation( location )
+            self.location = location
+            self.visible = true
 
             SMK.UTIL.findNearestSite( location.map )
                 .then( function ( site ) {
                     self.site = site
                 } )
-                .catch( function ( err ) {} )
+                .catch( function ( err ) {
+                    self.site = location.map
+                } )
         } )
 
-        this.setLocation = function ( location ) {
-            this.location = location
+        this.reset = function () {
+            this.site = {}
+            this.visible = false
         }
 
         smk.$viewer.changedView( function () {
@@ -85,10 +95,6 @@ include.module( 'tool-location', [ 'tool', 'widgets', 'tool-location.popup-locat
 
         self.active = true
     } )
-
-    LocationTool.prototype.reset = function () {
-        this.site = {}
-    }
 
     LocationTool.prototype.hasPickPriority = function () {
         return true
