@@ -188,6 +188,11 @@ include.module( 'viewer-esri3d', [ 'viewer', 'esri3d', 'types-esri3d', 'layer-es
     }
 
     ViewerEsri3d.prototype.showPopup = function ( contentEl, location, option ) {
+        if ( location == null )
+            location = this.popupLocation
+        else
+            this.popupLocation = location
+
         this.view.popup.actions = []
         this.view.popup.dockOptions = { buttonEnabled: false }
         this.view.popup.open( Object.assign( {
