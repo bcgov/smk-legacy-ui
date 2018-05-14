@@ -98,6 +98,10 @@ include.module( 'viewer-esri3d', [ 'viewer', 'esri3d', 'types-esri3d', 'layer-es
             self.changedView()
         } )
 
+        E.core.watchUtils.whenFalse( this.view, "stationary", function() {
+            self.changedView()
+        } )
+
         this.changedView()
 
         self.finishedLoading( function () {
@@ -183,5 +187,13 @@ include.module( 'viewer-esri3d', [ 'viewer', 'esri3d', 'types-esri3d', 'layer-es
         }
     }
 
+    ViewerEsri3d.prototype.showPopup = function ( contentEl, location, option ) {
+        this.view.popup.actions = []
+        this.view.popup.dockOptions = { buttonEnabled: false }
+        this.view.popup.open( Object.assign( {
+            content: contentEl,
+            location: { type: 'point', latitude: location.latitude, longitude: location.longitude }
+        }, option ) )
+    }
 } )
 

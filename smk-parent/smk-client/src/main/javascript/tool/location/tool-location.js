@@ -5,7 +5,7 @@ include.module( 'tool-location', [ 'tool', 'widgets', 'tool-location.popup-locat
         this.makePropWidget( 'tool', {} )
 
         SMK.TYPE.Tool.prototype.constructor.call( this, $.extend( {
-            title:          'Location',
+            title:  'Location'
         }, option ) )
     }
 
@@ -57,7 +57,8 @@ include.module( 'tool-location', [ 'tool', 'widgets', 'tool-location.popup-locat
                 },
             },
             updated: function () {
-                self.updatePopup()
+                if ( self.visible )
+                    self.updatePopup()
             }
         } )
 
@@ -66,7 +67,8 @@ include.module( 'tool-location', [ 'tool', 'widgets', 'tool-location.popup-locat
         smk.$viewer.handlePick( this, function ( location ) {
             self.reset()
 
-            self.setLocation( location )
+            self.location = location
+            self.visible = true
 
             SMK.UTIL.findNearestSite( location.map )
                 .then( function ( site ) {
@@ -77,12 +79,9 @@ include.module( 'tool-location', [ 'tool', 'widgets', 'tool-location.popup-locat
                 } )
         } )
 
-        this.setLocation = function ( location ) {
-            this.location = location
-        }
-
         this.reset = function () {
             this.site = {}
+            this.visible = false
         }
 
         smk.$viewer.changedView( function () {
