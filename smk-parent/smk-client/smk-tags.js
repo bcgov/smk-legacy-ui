@@ -7,6 +7,7 @@ exports.gen = function () {
 
     t.script( 'jquery', 'lib/jquery-3.3.1.min.js' )
     t.script( 'vue', 'lib/vue-2.5.11.js' )
+    t.script( 'turf', 'https://npmcdn.com/@turf/turf/turf.min.js' )
 
     t.script( 'util', 'util.js' )
     t.script( 'event', 'event.js' )
@@ -179,7 +180,7 @@ exports.gen = function () {
         .script( 'https://unpkg.com/terraformer@1.0.7' )
         .script( 'https://unpkg.com/terraformer-arcgis-parser@1.0.5' )
         .script( 'https://unpkg.com/terraformer-wkt-parser@1.1.2' )
-        .script( 'https://npmcdn.com/@turf/turf/turf.min.js' )
+        // .script( 'https://npmcdn.com/@turf/turf/turf.min.js' )
     	.style( "https://unpkg.com/leaflet.markercluster@1.0.6/dist/MarkerCluster.css" )
     	.style( "https://unpkg.com/leaflet.markercluster@1.0.6/dist/MarkerCluster.Default.css" )
     	.script( "https://unpkg.com/leaflet.markercluster@1.0.6/dist/leaflet.markercluster-src.js" )
@@ -238,6 +239,8 @@ exports.gen = function () {
         // .tag( 'layer-esri3d' )
         .style( 'viewer-esri3d/viewer-esri3d.css' )
 
+    t.script( 'feature-list-esri3d', 'viewer-esri3d/feature-list-esri3d.js' )
+        
     t.sequence( 'esri3d' )
         .tag( 'leaflet' )
         .style( 'https://js.arcgis.com/4.7/esri/css/main.css' )
