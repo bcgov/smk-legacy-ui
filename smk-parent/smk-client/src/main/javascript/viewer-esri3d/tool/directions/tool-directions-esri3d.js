@@ -91,11 +91,11 @@ include.module( 'tool-directions-esri3d', [ 'esri3d', 'types-esri3d', 'util-esri
         this.showPopup = function ( site, loc ) {
             self.popupModel.site = site
 
-            smk.$viewer.showPopup( self.popupVm.$el, loc, { title: 'Directions' } )
+            smk.$viewer.showPopup( self.popupVm.$el, loc, { title: self.title } )
         }
 
         this.updatePopup = function () {
-            smk.$viewer.showPopup( self.popupVm.$el, null, { title: 'Directions' } )
+            smk.$viewer.showPopup( self.popupVm.$el, null, { title: self.title } )
         }
 
         this.pickLocation = ( function ( outer ) {
