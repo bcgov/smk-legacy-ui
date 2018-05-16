@@ -1,12 +1,36 @@
-include.module( 'feature-list-leaflet', [ 'leaflet', 'feature-list' ], function ( inc ) {
+include.module( 'feature-list-esri3d', [ 'esri3d', 'types-esri3d', 'util-esri3d', 'feature-list' ], function ( inc ) {
+
+    var E = SMK.TYPE.Esri3d
+
+    var markerSymbol = {
+        type: 'point-3d',
+        symbolLayers: [
+            {
+                type:       'icon',
+                size:       '20px',
+                anchor:     'center',
+                material: {
+                    color: 'white'
+                },
+                resource: {
+                    primitive: 'circle'
+                },
+                outline: {
+                    color: 'blue',
+                    size: '2px'
+                }
+            }
+        ]
+    }
 
     return function ( smk ) {
         var self = this
 
-        self.featureListLayer = new E.layers.GraphicsLayer( { visible: false } )
-        smk.$viewer.map.add( self.featureListLayer )
-// 
-        // this.highlight = {}
+        this.featureListLayer = new E.layers.GraphicsLayer( { visible: false } )
+        smk.$viewer.map.add( this.featureListLayer )
+//
+        this.highlight = {}
+        // this.marker = {}
         // this.featureHighlights = L.layerGroup( { pane: 'markerPane' } )
 
         this.changedActive( function () {
@@ -22,18 +46,36 @@ include.module( 'feature-list-leaflet', [ 'leaflet', 'feature-list' ], function 
             }
         } )
 
+        this.pickLocation = ( function ( outer ) {
+            return function ( location ) {
+                smk.$viewer.view.hitTest( location.screen )
+                    .then( function ( hit ) {
+                        // console.log( arguments  )
+                        if ( hit.results.length > 0 ) {
+                            if ( hit.results[ 0 ].graphic ) {
+                                self.showPopup( hit.results[ 0 ].graphic.geometry )
+                                return
+                            }
+                        }
+                        return outer( location )
+                    } )
+            }
+        } )( this.pickLocation )
+
         this.showPopup = function ( loc ) {
             // self.popupModel.site = site
 
             smk.$viewer.showPopup( self.popupVm.$el, loc, { title: self.title } )
+            this.popupVisible = true
         }
 
         this.updatePopup = function () {
             smk.$viewer.showPopup( self.popupVm.$el, null, { title: self.title } )
+            this.popupVisible = true
         }
-        
+
         // if ( this.showPanel ) {
-            
+
         //     this.tlPadding = L.point( 340, 40 )
         //     this.brPadding = L.point( 40, 40 )
         // }
@@ -93,7 +135,8 @@ include.module( 'feature-list-leaflet', [ 'leaflet', 'feature-list' ], function 
             self.featureListLayer.removeAll()
             // self.featureHighlights.clearLayers()
             // self.popup.remove()
-            // self.highlight = {}
+            self.highlight = {}
+            // self.marker = {}
         } )
 
         self.featureSet.removedFeatures( function ( ev ) {
@@ -106,76 +149,89 @@ include.module( 'feature-list-leaflet', [ 'leaflet', 'feature-list' ], function 
             } )
         } )
 
+        var styleHighlight = SMK.UTIL.smkStyleToEsriSymbol( self.styleFeature( { strokeWidth: 4, strokeOpacity: 0.2, fillOpacity: 0.3 } ) ),
+            styleHighlightFn = function ( type ) { return styleHighlight[ type ] }
+
+        var stylePick = SMK.UTIL.smkStyleToEsriSymbol( self.styleFeature() ),
+            stylePickFn = function ( type ) { return stylePick[ type ] }
+
         self.featureSet.addedFeatures( function ( ev ) {
+            // var style = SMK.UTIL.smkStyleToEsriSymbol( self.styleFeature( { strokeOpacity: 0.4, fillOpacity: 0.3 }) ),
+            //     styleFn = function ( type ) { return style[ type ] }
+
             ev.features.forEach( function ( f ) {
                 var center
-                switch ( turf.getType( f ) ) {
-                case 'Point':
-                    center = { latitude: f.geometry.coordinates[ 1 ], longitude: f.geometry.coordinates[ 0 ] }
-                    break;
 
-                case 'MultiPoint':
-                    if ( f._identifyPoint )
-                        center = f._identifyPoint //.latitude, f._identifyPoint.longitude ]
-                    break;
+                self.highlight[ f.id ] = SMK.UTIL.geoJsonToEsriGeometry( f, styleHighlightFn ).map( function ( g ) { return new E.Graphic( g ) } )
 
-                default:
-                    if ( f._identifyPoint )
-                        center = f._identifyPoint //.latitude, f._identifyPoint.longitude ]
+                // switch ( turf.getType( f ) ) {
+                // case 'Point':
+                //     center = { latitude: f.geometry.coordinates[ 1 ], longitude: f.geometry.coordinates[ 0 ] }
+                //     break;
 
-                    self.highlight[ f.id ] = new E.Graphic( SMK.UTIL.geoJsonToEsriGeometry( f, 
-                        SMK.UTIL.smkStyleToEsriSymbol( self.styleFeature()() ) 
-                    ) )
-                                    
-                    // self.highlight[ f.id ] = L.geoJSON( f.geometry, {
-                    //     style: self.styleFeature()
-                    // } )
-                }
+                // case 'MultiPoint':
+                //     // if ( f._identifyPoint )
+                //         // center = f._identifyPoint //.latitude, f._identifyPoint.longitude ]
+                //     break;
 
-                if ( !center ) {
-                    var c = turf.centerOfMass( f.geometry ).geometry.coordinates
-                    center = { latitude: c[ 1 ], longitude: c[ 0 ] }
-                }
+                // default:
+                //     // if ( f._identifyPoint )
+                //         // center = f._identifyPoint //.latitude, f._identifyPoint.longitude ]
 
-                self.marker[ f.id ] = new E.Graphic( {
-                    geoemtry: Object.assign( { type: 'point' }, center ),
-                    symbol: markerSymbol,
-                    attributes: f.properties
-                } )
+                //     self.highlight[ f.id ] = new E.Graphic( SMK.UTIL.geoJsonToEsriGeometry( f,
+                //         SMK.UTIL.smkStyleToEsriSymbol( self.styleFeature()() )
+                //     )[ 0 ] )
 
-                self.featureListLayer.add( self.marker[ f.id ] )
+                //     // self.highlight[ f.id ] = L.geoJSON( f.geometry, {
+                //     //     style: self.styleFeature()
+                //     // } )
+                // }
+
+                // if ( !center ) {
+                //     var c = turf.centerOfMass( f.geometry ).geometry.coordinates
+                //     center = { latitude: c[ 1 ], longitude: c[ 0 ] }
+                // }
+
+                // self.marker[ f.id ] = new E.Graphic( {
+                //     geometry: { type: 'point', latitude: center.latitude, longitude: center.longitude },
+                //     symbol: markerSymbol,
+                //     attributes: f.properties
+                // } )
+
+                self.featureListLayer.addMany( self.highlight[ f.id ] )
                 // self.cluster.addLayer( self.marker[ f.id ] )
             } )
         } )
 
         self.featureSet.pickedFeature( function ( ev ) {
-            if ( !ev.feature ) return
-
-            var ly = self.marker[ ev.feature.id ]
-            var parent = self.cluster.getVisibleParent( ly )
-
-            if ( ly === parent || !parent ) {
-                self.popupModel.hasMultiple = false
-                self.popupFeatureIds = null
-                self.popupCurrentIndex = null
-
-                self.popup
-                    .setLatLng( ly.getLatLng() )
-                    .openOn( smk.$viewer.map )
-            }
-            else {
-                var featureIds = parent.getAllChildMarkers().map( function ( m ) {
-                    return m.options.featureId
-                } )
+            if ( ev.feature ) {
+                var featureIds = Object.keys( self.highlight )
 
                 self.popupModel.hasMultiple = true
                 self.popupCurrentIndex = featureIds.indexOf( ev.feature.id )
                 self.popupModel.position = ( self.popupCurrentIndex + 1 ) + ' / ' + featureIds.length
                 self.popupFeatureIds = featureIds
+            }
 
-                self.popup
-                    .setLatLng( parent.getLatLng() )
-                    .openOn( smk.$viewer.map )
+            if ( self.picks )
+                self.featureListLayer.removeMany( self.picks )
+
+            if ( ev.was ) {
+                self.featureListLayer.addMany( self.highlight[ ev.was.id ] )
+            }
+
+            if ( ev.feature ) {
+                self.picks = self.highlight[ ev.feature.id ].map( function( g ) {
+                    return new E.Graphic( {
+                        geometry: g.geometry,
+                        symbol: stylePickFn( g.geometry.type )
+                    } )
+
+                    g.visible = false
+                } )
+                self.featureListLayer.addMany( self.picks )
+
+                self.featureListLayer.removeMany( self.highlight[ ev.feature.id ] )
             }
         } )
 
@@ -205,16 +261,16 @@ include.module( 'feature-list-leaflet', [ 'leaflet', 'feature-list' ], function 
                         } )
             }
         } )
-        
+
         function showHighlight( id, show ) {
             var hl = self.highlight[ id ]
             if ( !hl ) return
 
             if ( show ) {
-                self.featureHighlights.addLayer( hl )
+                self.featureListLayer.add( hl )
             }
             else {
-                self.featureHighlights.removeLayer( hl )
+                self.featureListLayer.remove( hl )
             }
         }
     }

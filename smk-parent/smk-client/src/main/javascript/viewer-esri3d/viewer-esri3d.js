@@ -95,14 +95,14 @@ include.module( 'viewer-esri3d', [ 'viewer', 'esri3d', 'types-esri3d', 'layer-es
 
         // Watch view's stationary property for becoming true.
         E.core.watchUtils.whenTrue( this.view, "stationary", function() {
-            self.changedView()
+            self.changedView( { operation: 'move', after: 'end' } )
         } )
 
         E.core.watchUtils.whenFalse( this.view, "stationary", function() {
-            self.changedView()
+            self.changedView( { operation: 'move', after: 'start' } )
         } )
 
-        this.changedView()
+        this.changedView( {} )
 
         self.finishedLoading( function () {
             self.map.layers.forEach( function ( ly ) {
@@ -147,6 +147,15 @@ include.module( 'viewer-esri3d', [ 'viewer', 'esri3d', 'types-esri3d', 'layer-es
             // scale: mapDist / this.screenpixelsToMeters,
             // metersPerPixel: mapDist / 100,
         }
+    }
+
+    ViewerEsri3d.prototype.screenToMap = function ( screen ) {
+        if ( Array.isArray( screen ) )
+            var ll = this.view.toMap( { x: screen[ 0 ], y: screen[ 1 ] } )
+        else
+            var ll = this.view.toMap( screen )
+
+        return [ ll.longitude, ll.latitude ]
     }
 
     ViewerEsri3d.prototype.setBasemap = function ( basemapId ) {
