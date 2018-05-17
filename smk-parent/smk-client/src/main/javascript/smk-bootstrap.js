@@ -465,6 +465,14 @@
                 return include( 'vue' )
             } )
             .then( function () {
+                if ( window.turf ) {
+                    include.tag( 'turf' ).include = Promise.resolve( window.turf )
+                    return
+                }
+
+                return include( 'turf' )
+            } )
+            .then( function () {
                 return include( 'smk-map' ).then( function ( inc ) {
                     var map = SMK.MAP[ attr[ 'container-id' ] ] = new SMK.TYPE.SmkMap( attr )
                     return map.initialize()

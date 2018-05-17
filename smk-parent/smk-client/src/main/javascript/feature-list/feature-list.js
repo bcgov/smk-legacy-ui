@@ -223,7 +223,8 @@ include.module( 'feature-list', [ 'tool', 'widgets',
                 },
             },
             updated: function () {
-                self.updatePopup()
+                if ( self.active && this.feature )
+                    self.updatePopup()
             }
         } )
 

@@ -30,34 +30,55 @@ include.module( 'util-esri3d', [ 'types-esri3d' ], function ( inc ) {
                     return [ Object.assign( { type: 'polygon' }, Terraformer.ArcGIS.convert( obj ) ) ]
                 },
 
-                GeometryCollection: function ( obj, symbol ) {
+                GeometryCollection: function ( obj ) {
                     return obj.geometries.map( function ( g ) {
-                        return geoJsonHandler[ g.type ]( g, symbol )
+                        return geoJsonHandler[ g.type ]( g )
                     } )
                     .reduce( function( acc, val ) { return acc.concat( val ) }, [] )
                 },
 
                 FeatureCollection:  function ( obj, symbol ) {
                     return obj.features.map( function ( f ) {
-                        var geoms = geoJsonHandler[ f.geometry.type ]( f.geometry, symbol )
-                        return geoms.map( function ( g ) {
-                            return {
-                                attributes: f.properties,
-                                geometry:   g,
-                                symbol:     symbol[ g.type ]
-                            }
-                        } )
+                        return geoJsonHandler[ f.type ]( f, symbol )
+                        // var geoms = geoJsonHandler[ f.geometry.type ]( f.geometry, symbol )
+                        // return geoms.map( function ( g ) {
+                        //     return {
+                        //         attributes: f.properties,
+                        //         geometry:   g,
+                        //         symbol:     symbol[ g.type ]
+                        //     }
+                        // } )
+                    } )
+                    .reduce( function( acc, val ) { return acc.concat( val ) }, [] )
+                },
+
+                Feature:  function ( obj, symbol ) {
+                    var geoms = geoJsonHandler[ obj.geometry.type ]( obj.geometry )
+                    return geoms.map( function ( g ) {
+                        return {
+                            attributes: obj.properties,
+                            geometry:   g,
+                            symbol:     symbol( g.type, obj.properties )
+                        }
                     } )
                     .reduce( function( acc, val ) { return acc.concat( val ) }, [] )
                 },
             }
 
             return function ( geojson, symbol ) {
-                var eg = geoJsonHandler[ geojson.type ]( geojson, symbol )
+                if ( !symbol ) symbol = function () {}
+
+                var eg = geoJsonHandler[ geojson.type || 'Feature' ]( geojson, symbol )
                 // console.log( geojson, eg )
                 return eg
             }
         } )(),
+
+
+                    // self.highlight[ f.id ] = new E.Graphic( SMK.UTIL.geoJsonToEsriGeometry( f,
+                        // SMK.UTIL.smkStyleToEsriSymbol( self.styleFeature()() )
+                    // )[ 0 ] )
+
 
         smkStyleToEsriSymbol: function ( styleConfig ) {
             var line = {
@@ -75,7 +96,7 @@ include.module( 'util-esri3d', [ 'types-esri3d' ], function ( inc ) {
                 type: 'point-3d',
                 symbolLayers: [ {
                     type: 'icon',
-                    size: styleConfig.strokeWidth,
+                    size: styleConfig.strokeWidth * 2,
                     resource: {
                         primitive: 'circle'
                     },
@@ -83,7 +104,7 @@ include.module( 'util-esri3d', [ 'types-esri3d' ], function ( inc ) {
                         color: color( styleConfig.fillColor, styleConfig.fillOpacity ),
                     },
                     outline: {
-                        size: 1,
+                        size: styleConfig.strokeWidth / 2,
                         color: color( styleConfig.strokeColor, styleConfig.strokeOpacity ),
                     }
                 } ]
