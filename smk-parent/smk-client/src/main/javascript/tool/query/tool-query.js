@@ -1,4 +1,4 @@
-include.module( 'tool-query', [ 'tool', 'widgets', 'tool-query.panel-query-html', 'tool-query.parameter-input-html', 'tool-query.parameter-select-html', 'tool-query.parameter-constant-html' ], function ( inc ) {
+include.module( 'tool-query', [ 'feature-list', 'widgets', 'tool-query.panel-query-html', 'tool-query.parameter-input-html', 'tool-query.parameter-select-html', 'tool-query.parameter-constant-html' ], function ( inc ) {
 
     Vue.component( 'parameter-constant', {
         template: inc[ 'tool-query.parameter-constant-html' ],
