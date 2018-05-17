@@ -212,6 +212,9 @@ exports.gen = function () {
     t.group( 'tool-pan-esri3d' )
         .dir( 'viewer-esri3d/tool/pan/**/*', { cwd: baseDir } )
 
+    t.group( 'tool-query-esri3d' )
+        .dir( 'viewer-esri3d/tool/query/**/*', { cwd: baseDir } )
+
     t.group( 'tool-scale-esri3d' )
         .dir( 'viewer-esri3d/tool/scale/**/*', { cwd: baseDir } )
 
@@ -240,7 +243,7 @@ exports.gen = function () {
         .style( 'viewer-esri3d/viewer-esri3d.css' )
 
     t.script( 'feature-list-esri3d', 'viewer-esri3d/feature-list-esri3d.js' )
-        
+
     t.sequence( 'esri3d' )
         .tag( 'leaflet' )
         .style( 'https://js.arcgis.com/4.7/esri/css/main.css' )

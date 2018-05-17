@@ -116,7 +116,10 @@ include.module( 'feature-list-esri3d', [ 'esri3d', 'types-esri3d', 'util-esri3d'
 
                 self.featureListLayer.removeMany( self.highlight[ ev.feature.id ] )
 
-                self.showPopup( self.clickLocation.geometry )
+                var loc = self.clickLocation ? self.clickLocation.geometry : self.highlight[ ev.feature.id ][ 0 ].geometry
+                smk.$viewer.view.goTo( loc ).then( function () {
+                    self.showPopup( loc )
+                } )
             }
 
             if ( ev.was && !ev.feature )
