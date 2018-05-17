@@ -98,22 +98,26 @@ include.module( 'tool-directions-esri3d', [ 'esri3d', 'types-esri3d', 'util-esri
             smk.$viewer.showPopup( self.popupVm.$el, null, { title: self.title } )
         }
 
-        this.pickLocation = ( function ( outer ) {
-            return function ( location ) {
-                smk.$viewer.view.hitTest( location.screen )
-                    .then( function ( hit ) {
-                        // console.log( arguments  )
-                        if ( hit.results.length > 0 ) {
-                            if ( hit.results[ 0 ].graphic ) {
-                                self.showPopup( hit.results[ 0 ].graphic.attributes, hit.results[ 0 ].graphic.geometry )
-                                return
-                            }
-                        }
-                        return outer( location )
-                    } )
-            }
-         } )( this.pickLocation )
+        smk.$viewer.handlePick( 3, function ( location ) {
+            if ( !self.active ) return
 
+            return smk.$viewer.view.hitTest( location.screen )
+                .then( function ( hit ) {
+                    // console.log( arguments  )
+                    if ( hit.results.length == 0 ) return
+                    if ( !hit.results[ 0 ].graphic ) return
+
+                    self.showPopup( hit.results[ 0 ].graphic.attributes, hit.results[ 0 ].graphic.geometry )
+                    return true
+                } )
+        } )
+
+        var styleRoute = SMK.UTIL.smkStyleToEsriSymbol( {
+                strokeColor: '#0000FF',
+                strokeOpacity: 0.5,
+                strokeWidth: 7,
+            } ),
+            styleRouteFn = function ( type ) { return styleRoute[ type ] }
 
         this.displayRoute = function ( points ) {
             reset()
@@ -121,20 +125,14 @@ include.module( 'tool-directions-esri3d', [ 'esri3d', 'types-esri3d', 'util-esri
             if ( !points ) return
 
             var geojson = {
-                type: 'FeatureCollection',
-                features: [ {
-                    geometry: {
-                        type: 'LineString',
-                        coordinates: points
-                    }
-                } ]
+                type: 'Feature',
+                geometry: {
+                    type: 'LineString',
+                    coordinates: points
+                }
             }
 
-            self.routeGraphic = new E.Graphic( SMK.UTIL.geoJsonToEsriGeometry( geojson, SMK.UTIL.smkStyleToEsriSymbol( {
-                strokeColor: '#0000FF',
-                strokeOpacity: 0.5,
-                strokeWidth: 7,
-            } ) )[ 0 ] )
+            self.routeGraphic = new E.Graphic( SMK.UTIL.geoJsonToEsriGeometry( geojson, styleRouteFn )[ 0 ] )
 
             self.directionsLayer.add( self.routeGraphic )
 

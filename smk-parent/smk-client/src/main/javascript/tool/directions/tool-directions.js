@@ -235,7 +235,9 @@ include.module( 'tool-directions', [ 'tool', 'widgets', 'tool-directions.panel-d
             } )
         }
 
-        this.pickLocation = function ( location ) {
+        smk.$viewer.handlePick( 2, function ( location ) {
+            if ( !self.active ) return
+
             return SMK.UTIL.findNearestSite( location.map ).then( function ( site ) {
                 self.active = true
 
@@ -247,10 +249,9 @@ include.module( 'tool-directions', [ 'tool', 'widgets', 'tool-directions.panel-d
                 console.warn( err )
                 return self.addWaypoint()
             } )
-        }
-
-        smk.$viewer.handlePick( this, function ( location ) {
-            return self.pickLocation( location )
+            .then( function () {
+                return true
+            } )
         } )
 
         smk.on( this.id, {

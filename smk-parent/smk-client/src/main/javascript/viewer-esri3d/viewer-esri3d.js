@@ -129,6 +129,10 @@ include.module( 'viewer-esri3d', [ 'viewer', 'esri3d', 'types-esri3d', 'layer-es
             } )
         } )
 
+        E.core.watchUtils.watch( this.view.popup, "visible", function() {
+            self.changedPopup()
+        } )
+
     }
 
     ViewerEsri3d.prototype.getView = function () {
@@ -199,15 +203,27 @@ include.module( 'viewer-esri3d', [ 'viewer', 'esri3d', 'types-esri3d', 'layer-es
     ViewerEsri3d.prototype.showPopup = function ( contentEl, location, option ) {
         if ( location == null )
             location = this.popupLocation
-        else
-            this.popupLocation = location
+
+        if ( location == null ) return
+
+        this.popupLocation = location
 
         this.view.popup.actions = []
         this.view.popup.dockOptions = { buttonEnabled: false }
+
         this.view.popup.open( Object.assign( {
             content: contentEl,
             location: { type: 'point', latitude: location.latitude, longitude: location.longitude }
         }, option ) )
     }
+
+    ViewerEsri3d.prototype.hidePopup = function () {
+        this.view.popup.close()
+    }
+
+    ViewerEsri3d.prototype.isPopupVisible = function () {
+        return this.view.popup.visible
+    }
+
 } )
 

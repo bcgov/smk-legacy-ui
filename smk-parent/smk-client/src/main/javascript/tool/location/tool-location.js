@@ -75,9 +75,11 @@ include.module( 'tool-location', [ 'tool', 'widgets', 'tool-location.popup-locat
             return SMK.UTIL.findNearestSite( location.map )
                 .then( function ( site ) {
                     self.site = site
+                    return true
                 } )
                 .catch( function ( err ) {
                     self.site = location.map
+                    return true
                 } )
         } )
 
