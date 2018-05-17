@@ -12,29 +12,19 @@ include.module( 'tool-location-leaflet', [ 'leaflet', 'tool-location' ], functio
         this.locationMarker = L.marker()
             .bindPopup( this.popup )
 
-        smk.$viewer.pickedLocation( function ( location ) {
-            if ( !self.enabled ) return
-
-            self.locationMarker
-                .setLatLng( [ location.map.latitude, location.map.longitude ] )
-                .addTo( smk.$viewer.map )
-                .openPopup()
-        } )
-
-        smk.$viewer.changedView( function () {
-            self.reset()
-        } )
-
-        self.changedEnabled( function () {
-            if ( !self.enabled )
-                self.reset()
+        self.changedVisible( function () {
+            if ( self.visible ) {
+                self.locationMarker
+                    .setLatLng( [ self.location.map.latitude, self.location.map.longitude ] )
+                    .addTo( smk.$viewer.map )
+                    .openPopup()
+            }
+            else {
+                self.popup.remove()
+                self.locationMarker.remove()
+            }
         } )
     } )
 
-    SMK.TYPE.LocationTool.prototype.reset = function () {
-        this.popup.remove()
-        this.locationMarker.remove()
-        this.location = {}
-    }
 
 } )

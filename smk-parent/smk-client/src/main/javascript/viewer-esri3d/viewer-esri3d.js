@@ -1,4 +1,4 @@
-include.module( 'viewer-esri3d', [ 'viewer', 'esri3d', 'types-esri3d' ], function () {
+include.module( 'viewer-esri3d', [ 'viewer', 'esri3d', 'types-esri3d', 'layer-esri3d' ], function () {
 
     var E = SMK.TYPE.Esri3d
 
@@ -36,7 +36,7 @@ include.module( 'viewer-esri3d', [ 'viewer', 'esri3d', 'types-esri3d' ], functio
             ground: "world-elevation"
         } )
 
-        var bx = smk.viewer.initialExtent
+        var bx = smk.viewer.location.extent
 
         this.view = new E.views.SceneView( {
             container: el,
@@ -95,10 +95,14 @@ include.module( 'viewer-esri3d', [ 'viewer', 'esri3d', 'types-esri3d' ], functio
 
         // Watch view's stationary property for becoming true.
         E.core.watchUtils.whenTrue( this.view, "stationary", function() {
-            self.changedView( self.getView() )
+            self.changedView( { operation: 'move', after: 'end' } )
         } )
 
-        this.changedView( this.getView() )
+        E.core.watchUtils.whenFalse( this.view, "stationary", function() {
+            self.changedView( { operation: 'move', after: 'start' } )
+        } )
+
+        this.changedView( {} )
 
         self.finishedLoading( function () {
             self.map.layers.forEach( function ( ly ) {
@@ -125,6 +129,10 @@ include.module( 'viewer-esri3d', [ 'viewer', 'esri3d', 'types-esri3d' ], functio
             } )
         } )
 
+        E.core.watchUtils.watch( this.view.popup, "visible", function() {
+            self.changedPopup()
+        } )
+
     }
 
     ViewerEsri3d.prototype.getView = function () {
@@ -140,7 +148,18 @@ include.module( 'viewer-esri3d', [ 'viewer', 'esri3d', 'types-esri3d' ], functio
                 width:  this.view.width,
                 height: this.view.height
             }
+            // scale: mapDist / this.screenpixelsToMeters,
+            // metersPerPixel: mapDist / 100,
         }
+    }
+
+    ViewerEsri3d.prototype.screenToMap = function ( screen ) {
+        if ( Array.isArray( screen ) )
+            var ll = this.view.toMap( { x: screen[ 0 ], y: screen[ 1 ] } )
+        else
+            var ll = this.view.toMap( screen )
+
+        return [ ll.longitude, ll.latitude ]
     }
 
     ViewerEsri3d.prototype.setBasemap = function ( basemapId ) {
@@ -179,6 +198,31 @@ include.module( 'viewer-esri3d', [ 'viewer', 'esri3d', 'types-esri3d' ], functio
             features: L.esri.basemapLayer( basemapName, { detectRetina: true } ),
             labels: basemapHasLabels[ basemapName ] && L.esri.basemapLayer( basemapName + 'Labels' )
         }
+    }
+
+    ViewerEsri3d.prototype.showPopup = function ( contentEl, location, option ) {
+        if ( location == null )
+            location = this.popupLocation
+
+        if ( location == null ) return
+
+        this.popupLocation = location
+
+        this.view.popup.actions = []
+        this.view.popup.dockOptions = { buttonEnabled: false }
+
+        this.view.popup.open( Object.assign( {
+            content: contentEl,
+            location: { type: 'point', latitude: location.latitude, longitude: location.longitude }
+        }, option ) )
+    }
+
+    ViewerEsri3d.prototype.hidePopup = function () {
+        this.view.popup.close()
+    }
+
+    ViewerEsri3d.prototype.isPopupVisible = function () {
+        return this.view.popup.visible
     }
 
 } )

@@ -1,12 +1,11 @@
 include.module( 'tool-location', [ 'tool', 'widgets', 'tool-location.popup-location-html' ], function ( inc ) {
 
     function LocationTool( option ) {
-        this.makePropWidget( 'location', {} )
         this.makePropWidget( 'site', {} )
         this.makePropWidget( 'tool', {} )
 
         SMK.TYPE.Tool.prototype.constructor.call( this, $.extend( {
-            title:          'Location',
+            title:  'Location'
         }, option ) )
     }
 
@@ -35,51 +34,71 @@ include.module( 'tool-location', [ 'tool', 'widgets', 'tool-location.popup-locat
                 formatDD: function ( dd ) {
                     return dd.toFixed( 4 )
                 },
-                identifyFeatures: function ( location ) {
+                identifyFeatures: function () {
+                    var site = self.site
                     self.reset()
-                    smk.$viewer.identifyFeatures( location )
+                    smk.$viewer.identifyFeatures( self.location )
                 },
-                startMeasurement: function ( location ) {
+                startMeasurement: function () {
 
                 },
-                startDirections: function ( location, site ) {
+                startDirections: function () {
+                    var site = self.site
                     self.reset()
                     smk.$tool.directions.active = true
 
-                    smk.$tool.directions.activating.then( function () {
-                        return smk.$tool.directions.startAtCurrentLocation( location.map, site.fullAddress )
-                    } )
+                    smk.$tool.directions.activating
+                        .then( function () {
+                            return smk.$tool.directions.startAtCurrentLocation()
+                        } )
+                        .then( function () {
+                            return smk.$tool.directions.addWaypoint( site )
+                        } )
                 },
+            },
+            updated: function () {
+                if ( self.visible )
+                    self.updatePopup()
             }
         } )
 
-        smk.$viewer.handlePick( this, function ( location ) {
-            self.location = location
-            self.site = {}
+        this.updatePopup = function () {}
 
-            smk.$viewer.findNearestSite( location.map ).then( function ( site ) {
-                self.site = site
-            } )
-            .catch( function ( err ) {
-                // console.warn( err )
-            } )
+        smk.$viewer.handlePick( 1, function ( location ) {
+            // if ( !self.active ) return
+
+            self.reset()
+
+            self.location = location
+            self.visible = true
+
+            return SMK.UTIL.findNearestSite( location.map )
+                .then( function ( site ) {
+                    self.site = site
+                    return true
+                } )
+                .catch( function ( err ) {
+                    self.site = location.map
+                    return true
+                } )
         } )
 
+        this.reset = function () {
+            this.site = {}
+            this.visible = false
+        }
+
         smk.$viewer.changedView( function () {
-            self.location = {}
+            self.reset()
         } )
 
         self.changedActive( function () {
             if ( !self.active )
-                self.location = {}
+                self.reset()
         } )
 
         self.active = true
     } )
-
-    LocationTool.prototype.reset = function () {
-        this.location = {}
-    }
 
     LocationTool.prototype.hasPickPriority = function () {
         return true

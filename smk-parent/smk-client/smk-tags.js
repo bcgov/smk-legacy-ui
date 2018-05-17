@@ -7,6 +7,7 @@ exports.gen = function () {
 
     t.script( 'jquery', 'lib/jquery-3.3.1.min.js' )
     t.script( 'vue', 'lib/vue-2.5.11.js' )
+    t.script( 'turf', 'https://npmcdn.com/@turf/turf/turf.min.js' )
 
     t.script( 'util', 'util.js' )
     t.script( 'event', 'event.js' )
@@ -179,7 +180,7 @@ exports.gen = function () {
         .script( 'https://unpkg.com/terraformer@1.0.7' )
         .script( 'https://unpkg.com/terraformer-arcgis-parser@1.0.5' )
         .script( 'https://unpkg.com/terraformer-wkt-parser@1.1.2' )
-        .script( 'https://npmcdn.com/@turf/turf/turf.min.js' )
+        // .script( 'https://npmcdn.com/@turf/turf/turf.min.js' )
     	.style( "https://unpkg.com/leaflet.markercluster@1.0.6/dist/MarkerCluster.css" )
     	.style( "https://unpkg.com/leaflet.markercluster@1.0.6/dist/MarkerCluster.Default.css" )
     	.script( "https://unpkg.com/leaflet.markercluster@1.0.6/dist/leaflet.markercluster-src.js" )
@@ -187,55 +188,70 @@ exports.gen = function () {
 
     // esri3d
 
-    t.group( 'tool-pan-esri3d' )
-        .dir( 'viewer-esri3d/tool/pan/**/*', { cwd: baseDir } )
-
-    t.group( 'tool-zoom-esri3d' )
-        .dir( 'viewer-esri3d/tool/zoom/**/*', { cwd: baseDir } )
-
-    t.group( 'tool-measure-esri3d' )
-        .dir( 'viewer-esri3d/tool/measure/**/*', { cwd: baseDir } )
-
-    t.group( 'tool-scale-esri3d' )
-        .dir( 'viewer-esri3d/tool/scale/**/*', { cwd: baseDir } )
-
     t.group( 'tool-coordinate-esri3d' )
         .dir( 'viewer-esri3d/tool/coordinate/**/*', { cwd: baseDir } )
 
-    t.group( 'tool-minimap-esri3d' )
-        .dir( 'viewer-esri3d/tool/minimap/**/*', { cwd: baseDir } )
-
-    t.group( 'tool-markup-esri3d' )
-        .dir( 'viewer-esri3d/tool/markup/**/*', { cwd: baseDir } )
+    t.group( 'tool-directions-esri3d' )
+        .dir( 'viewer-esri3d/tool/directions/**/*', { cwd: baseDir } )
 
     t.group( 'tool-identify-esri3d' )
         .dir( 'viewer-esri3d/tool/identify/**/*', { cwd: baseDir } )
 
-    t.group( 'tool-select-esri3d' )
-        .dir( 'viewer-esri3d/tool/select/**/*', { cwd: baseDir } )
+    t.group( 'tool-markup-esri3d' )
+        .dir( 'viewer-esri3d/tool/markup/**/*', { cwd: baseDir } )
+
+    t.group( 'tool-location-esri3d' )
+        .dir( 'viewer-esri3d/tool/location/**/*', { cwd: baseDir } )
+
+    t.group( 'tool-measure-esri3d' )
+        .dir( 'viewer-esri3d/tool/measure/**/*', { cwd: baseDir } )
+
+    t.group( 'tool-minimap-esri3d' )
+        .dir( 'viewer-esri3d/tool/minimap/**/*', { cwd: baseDir } )
+
+    t.group( 'tool-pan-esri3d' )
+        .dir( 'viewer-esri3d/tool/pan/**/*', { cwd: baseDir } )
+
+    t.group( 'tool-query-esri3d' )
+        .dir( 'viewer-esri3d/tool/query/**/*', { cwd: baseDir } )
+
+    t.group( 'tool-scale-esri3d' )
+        .dir( 'viewer-esri3d/tool/scale/**/*', { cwd: baseDir } )
 
     t.group( 'tool-search-esri3d' )
         .dir( 'viewer-esri3d/tool/search/**/*', { cwd: baseDir } )
 
-    t.script( 'layer-esri3d', 'viewer-esri3d/layer-esri3d.js' )
+    t.group( 'tool-select-esri3d' )
+        .dir( 'viewer-esri3d/tool/select/**/*', { cwd: baseDir } )
+
+    t.group( 'tool-zoom-esri3d' )
+        .dir( 'viewer-esri3d/tool/zoom/**/*', { cwd: baseDir } )
+
+
+    // t.script( 'layer-esri3d', 'viewer-esri3d/layer-esri3d.js' )
+
+    t.group( 'layer-esri3d' )
+        .dir( 'viewer-esri3d/layer/**/*', { cwd: baseDir } )
 
     t.script( 'types-esri3d', 'viewer-esri3d/types-esri3d.js' )
 
+    t.script( 'util-esri3d', 'viewer-esri3d/util-esri3d.js' )
+
     t.group( 'viewer-esri3d' )
         .script( 'viewer-esri3d/viewer-esri3d.js' )
-        .tag( 'layer-esri3d' )
+        // .tag( 'layer-esri3d' )
         .style( 'viewer-esri3d/viewer-esri3d.css' )
+
+    t.script( 'feature-list-esri3d', 'viewer-esri3d/feature-list-esri3d.js' )
 
     t.sequence( 'esri3d' )
         .tag( 'leaflet' )
-        .style( 'https://js.arcgis.com/4.6/esri/css/main.css' )
-        .script( 'https://js.arcgis.com/4.6/' )
+        .style( 'https://js.arcgis.com/4.7/esri/css/main.css' )
+        .script( 'https://js.arcgis.com/4.7/' )
         .script( 'lib/toGeoJSON.js' )
         .script( 'https://unpkg.com/terraformer@1.0.7' )
         .script( 'https://unpkg.com/terraformer-arcgis-parser@1.0.5' )
         .script( 'https://unpkg.com/terraformer-wkt-parser@1.1.2' )
-        // .style( 'https://js.arcgis.com/4.4/esri/css/main.css' )
-        // .script( 'https://js.arcgis.com/4.4/' )
 
     t.sequence( 'proj4' )
         .script( 'https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.4.4/proj4.js' )

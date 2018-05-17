@@ -3,8 +3,7 @@ include.module( 'feature-list-clustering-leaflet', [ 'leaflet', 'feature-list-le
     return function ( smk ) {
         var self = this
 
-        // var  smk.$viewer = smk.$viewer
-        // var self.featureSet = smk.$viewer.identified
+        inc[ 'feature-list-leaflet' ].call( this, smk )
 
         this.marker = {}
         this.cluster = L.markerClusterGroup( {
@@ -126,7 +125,9 @@ include.module( 'feature-list-clustering-leaflet', [ 'leaflet', 'feature-list-le
                                 self.featureSet.pick( old )
                         } )
                         .fitBounds( self.highlight[ ev.feature.id ].getBounds(), {
-                            paddingTopLeft: L.point( 300, 100 ),
+                            paddingTopLeft: self.tlPadding,
+                            paddingBottomRight: self.brPadding,
+                                        // paddingTopLeft: L.point( 300, 100 ),
                             animate: true
                         } )
             }
