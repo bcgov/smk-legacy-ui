@@ -127,9 +127,10 @@ include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', '
         this.visibleLayer = {}
         this.layerIdPromise = {}
         this.deadViewerLayer = {}
-        this.handler = {
-            pick: {}
-        }
+        this.pickHandlers = []
+        // this.handler = {
+            // pick: {}
+        // }
         this.query = {}
 
         if ( Array.isArray( smk.layers ) )
@@ -157,36 +158,42 @@ include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', '
             } )
 
         this.pickedLocation( function ( ev ) {
-            var pickToolIds = Object.keys( self.handler.pick )
-            if ( pickToolIds.length == 0 ) return
-
-            var toolId
-            if ( pickToolIds.length > 1 ) {
-                var activePickTools = pickToolIds.filter( function ( toolId ) {
-                    return smk.$tool[ toolId ].active
-                } )
-
-                if ( activePickTools.length != 1 ) {
-                    if ( activePickTools.length == 0 )
-                        var pickToolId = SMK.UTIL.makeSet( pickToolIds )
-                    else
-                        var pickToolId = SMK.UTIL.makeSet( activePickTools )
-
-                    var toolIds = pickToolIds.filter( function ( id ) { return smk.$tool[ id ].hasPickPriority( pickToolId ) } )
-                    if ( toolIds.length == 0 ) return
-                    if ( toolIds.length > 1 ) throw new Error( 'pick priority ambiguous: ' + toolIds.join( ', ' ) )
-                    toolId = toolIds[ 0 ]
-                }
-                else {
-                    toolId = activePickTools[ 0 ]
-                }
-            }
-            else {
-                toolId = pickToolIds[ 0 ]
-            }
-
-            self.handler.pick[ toolId ].call( smk.$tool[ toolId ], ev )
+            for ( var i = self.pickHandlers.length - 1 ; i >= 0 ; i -= 1 )
+                if ( self.pickHandlers[ i ] && self.pickHandlers[ i ].some( function ( h ) { return h.call( self, ev ) } ) ) 
+                    return 
         } )
+
+        // this.pickedLocation( function ( ev ) {
+        //     var pickToolIds = Object.keys( self.handler.pick )
+        //     if ( pickToolIds.length == 0 ) return
+
+        //     var toolId
+        //     if ( pickToolIds.length > 1 ) {
+        //         var activePickTools = pickToolIds.filter( function ( toolId ) {
+        //             return smk.$tool[ toolId ].active
+        //         } )
+
+        //         if ( activePickTools.length != 1 ) {
+        //             if ( activePickTools.length == 0 )
+        //                 var pickToolId = SMK.UTIL.makeSet( pickToolIds )
+        //             else
+        //                 var pickToolId = SMK.UTIL.makeSet( activePickTools )
+
+        //             var toolIds = pickToolIds.filter( function ( id ) { return smk.$tool[ id ].hasPickPriority( pickToolId ) } )
+        //             if ( toolIds.length == 0 ) return
+        //             if ( toolIds.length > 1 ) throw new Error( 'pick priority ambiguous: ' + toolIds.join( ', ' ) )
+        //             toolId = toolIds[ 0 ]
+        //         }
+        //         else {
+        //             toolId = activePickTools[ 0 ]
+        //         }
+        //     }
+        //     else {
+        //         toolId = pickToolIds[ 0 ]
+        //     }
+
+        //     self.handler.pick[ toolId ].call( smk.$tool[ toolId ], ev )
+        // } )
 
         function constructLayers( layerConfigs, index, parentId, cb ) {
             layerConfigs.forEach( function ( layerConfig, i ) {
@@ -230,6 +237,12 @@ include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', '
 
         return self.setLayersVisible( self.layerIds.filter( function ( id ) { return self.layerId[ id ].config.isVisible } ), true )
             .catch( function () {} )
+    }
+
+    Viewer.prototype.handlePick = function ( priority, handler ) {
+        if ( !this.pickHandlers[ priority ] ) this.pickHandlers[ priority ] = []
+
+        this.pickHandlers[ priority ].push( handler )
     }
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
@@ -497,9 +510,9 @@ include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', '
     }
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
-    Viewer.prototype.handlePick = function ( tool, handler ) {
-        this.handler.pick[ tool.id ] = handler
-    }
+    // Viewer.prototype.handlePick = function ( tool, handler ) {
+    //     this.handler.pick[ tool.id ] = handler
+    // }
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
     Viewer.prototype.pixelsToMillimeters = ( function () {

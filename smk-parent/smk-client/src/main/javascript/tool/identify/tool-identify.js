@@ -45,7 +45,14 @@ include.module( 'tool-identify', [ 'feature-list', 'widgets', 'tool-identify.pan
             }
         } )
 
-        smk.$viewer.handlePick( this, function ( location ) {
+        smk.$viewer.handlePick( 2, function ( location ) {
+            if ( !self.active ) return
+
+            smk.$viewer.identifyFeatures( location )
+            self.pickedLocation = location
+        } )
+        
+        smk.$viewer.handlePick( 0, function ( location ) {
             smk.$viewer.identifyFeatures( location )
             self.pickedLocation = location
         } )
