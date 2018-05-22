@@ -1,0 +1,19 @@
+<side-panel class="smk-measure-panel">
+    <h1 slot="header">Measurement</h1>
+
+    <template slot="commands">
+        <div class="smk-command"
+            v-bind:class="{ 'smk-disabled': busy }"
+            v-on:click="!busy && $$emit( 'start-area' )"
+        >Area</div>
+
+        <div class="smk-command"
+            v-bind:class="{ 'smk-disabled': busy }"
+            v-on:click="!busy && $$emit( 'start-distance' )"
+        >Distance</div>
+    </template>
+
+    <div class="smk-measure-container"
+        v-container=""
+    ></div>
+</side-panel>
