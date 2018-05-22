@@ -70,76 +70,54 @@ include.module( 'tool-directions-esri3d', [ 'esri3d', 'types-esri3d', 'util-esri
         ]
     }
 
-    // L.NumberedIcon = L.Icon.extend( {
-    //     options: {
-    //         number:         '',
-    //         iconUrl:        base + '/marker-icon-hole.png',
-    //         shadowUrl:      base + '/marker-shadow.png',
-    //         iconSize:       [ 25, 41 ],
-    //         iconAnchor:     [ 13, 41 ],
-    //         popupAnchor:    [ 0, -33 ],
-    //         shadowSize:     [ 41, 41 ]
-    //     },
-
-    //     createIcon: function () {
-    //         var div = document.createElement( 'div' )
-    //         var img = this._createImg( this.options.iconUrl )
-    //         var numdiv = document.createElement( 'div' )
-    //         numdiv.setAttribute ( 'class', 'number' )
-    //         numdiv.innerHTML = this.options.number || ''
-    //         div.appendChild ( img )
-    //         div.appendChild ( numdiv )
-    //         this._setIconStyles( div, 'icon' )
-    //         return div
-    //     }
-    // } )
-
-
     SMK.TYPE.DirectionsTool.prototype.afterInitialize.push( function ( smk ) {
         var self = this
+
+        self.directionsLayer = new E.layers.GraphicsLayer( { visible: false } )
+        smk.$viewer.map.add( self.directionsLayer )
 
         this.changedActive( function () {
             if ( self.active ) {
                 smk.$viewer.view.padding = { left: 340 }
+                self.directionsLayer.visible = true
             }
             else {
                 reset()
                 smk.$viewer.view.padding = { left: 0 }
+                self.directionsLayer.visible = false
             }
         } )
 
         this.showPopup = function ( site, loc ) {
             self.popupModel.site = site
 
-            smk.$viewer.view.popup.actions = []
-            smk.$viewer.view.popup.dockOptions = { buttonEnabled: false }
-
-            smk.$viewer.view.popup.open( {
-                content: self.popupVm.$el,
-                location: loc
-            } )
+            smk.$viewer.showPopup( self.popupVm.$el, loc, { title: self.title } )
         }
 
         this.updatePopup = function () {
-            smk.$viewer.view.popup.content = self.popupVm.$el
+            smk.$viewer.showPopup( self.popupVm.$el, null, { title: self.title } )
         }
 
-        this.pickLocation = ( function ( outer ) {
-            return function ( location ) {
-                smk.$viewer.view.hitTest( location.screen )
-                    .then( function ( hit ) {
-                        // console.log( arguments  )
-                        if ( hit.results.length > 0 ) {
-                            if ( hit.results[ 0 ].graphic ) {
-                                self.showPopup( hit.results[ 0 ].graphic.attributes, hit.results[ 0 ].graphic.geometry )
-                                return
-                            }
-                        }
-                        return outer( location )
-                    } )
-            }
-         } )( this.pickLocation )
+        smk.$viewer.handlePick( 3, function ( location ) {
+            if ( !self.active ) return
 
+            return smk.$viewer.view.hitTest( location.screen )
+                .then( function ( hit ) {
+                    // console.log( arguments  )
+                    if ( hit.results.length == 0 ) return
+                    if ( !hit.results[ 0 ].graphic ) return
+
+                    self.showPopup( hit.results[ 0 ].graphic.attributes, hit.results[ 0 ].graphic.geometry )
+                    return true
+                } )
+        } )
+
+        var styleRoute = SMK.UTIL.smkStyleToEsriSymbol( {
+                strokeColor: '#0000FF',
+                strokeOpacity: 0.5,
+                strokeWidth: 7,
+            } ),
+            styleRouteFn = function ( type ) { return styleRoute[ type ] }
 
         this.displayRoute = function ( points ) {
             reset()
@@ -147,35 +125,23 @@ include.module( 'tool-directions-esri3d', [ 'esri3d', 'types-esri3d', 'util-esri
             if ( !points ) return
 
             var geojson = {
-                type: 'FeatureCollection',
-                features: [ {
-                    geometry: {
-                        type: 'LineString',
-                        coordinates: points
-                    }
-                } ]
+                type: 'Feature',
+                geometry: {
+                    type: 'LineString',
+                    coordinates: points
+                }
             }
 
-            self.routeLayer = new E.layers.GraphicsLayer( {
-                graphics: SMK.UTIL.geoJsonToEsriGeometry( geojson, SMK.UTIL.smkStyleToEsriSymbol( {
-                    strokeColor: '#0000FF',
-                    strokeOpacity: 0.5,
-                    strokeWidth: 7,
-                } ) )
-            } )
+            self.routeGraphic = new E.Graphic( SMK.UTIL.geoJsonToEsriGeometry( geojson, styleRouteFn )[ 0 ] )
 
-            smk.$viewer.map.add( self.routeLayer )
+            self.directionsLayer.add( self.routeGraphic )
 
-            smk.$viewer.view.goTo( self.routeLayer.graphics )
+            smk.$viewer.view.goTo( self.routeGraphic )
         }
 
         this.displayWaypoints = function () {
-            if ( self.waypointLayers && self.waypointLayers.length > 0 ) {
-                smk.$viewer.map.removeMany( self.waypointLayers )
-            }
-
             var last = self.waypoints.length - 1
-            self.waypointLayers = self.waypoints
+            self.waypointGraphics = self.waypoints
                 .map( function ( w, i ) {
                     var symbol
                     var popup = Object.assign( {
@@ -198,35 +164,18 @@ include.module( 'tool-directions-esri3d', [ 'esri3d', 'types-esri3d', 'util-esri
                         break;
                     }
 
-                    var ly = new E.layers.GraphicsLayer( {
-                        graphics: [ new E.Graphic( {
-                            geometry: { type: 'point', latitude: w.latitude, longitude: w.longitude },
-                            symbol: symbol,
-                            attributes: popup
-                        } ) ]
+                    return new E.Graphic( {
+                        geometry: { type: 'point', latitude: w.latitude, longitude: w.longitude },
+                        symbol: symbol,
+                        attributes: popup
                     } )
-
-                    smk.$viewer.map.add( ly )
-
-                    return ly
                 } )
+
+            self.directionsLayer.addMany( self.waypointGraphics )
         }
 
         function reset() {
-            if ( self.routeLayer )
-                smk.$viewer.map.remove( self.routeLayer )
-            self.routeLayer = null
-
-            self.directionHighlightLayer.removeAll()
-
-            if ( self.directionPickLayer )
-                smk.$viewer.map.remove( self.directionPickLayer )
-            self.directionPickLayer = null
-
-            if ( self.waypointLayers && self.waypointLayers.length > 0 ) {
-                smk.$viewer.map.removeMany( self.waypointLayers )
-            }
-            self.waypointLayers = null
+            self.directionsLayer.removeAll()
 
             smk.$viewer.view.popup.close()
         }
@@ -237,14 +186,14 @@ include.module( 'tool-directions-esri3d', [ 'esri3d', 'types-esri3d', 'util-esri
 
         smk.on( this.id, {
             'hover-direction': function ( ev ) {
-                self.directionHighlightLayer.removeAll()
+                self.directionsLayer.remove( self.highlightGraphic )
 
                 if ( ev.highlight == null ) return
 
                 var p = self.directions[ ev.highlight ].point
                 var g = { type: 'point', latitude: p[ 1 ], longitude: p[ 0 ] }
 
-                self.directionHighlightLayer.add( new E.Graphic( {
+                self.highlightGraphic = new E.Graphic( {
                     geometry: g,
                     symbol: {
                         type: 'point-3d',
@@ -266,7 +215,9 @@ include.module( 'tool-directions-esri3d', [ 'esri3d', 'types-esri3d', 'util-esri
                             }
                         ]
                     }
-                } ) )
+                } )
+
+                self.directionsLayer.add( self.highlightGraphic )
 
                 smk.$viewer.view.goTo( { center: p, zoom: 12 } ).then( function () {
                     self.showPopup( self.directions[ ev.highlight ], g )
@@ -299,11 +250,11 @@ include.module( 'tool-directions-esri3d', [ 'esri3d', 'types-esri3d', 'util-esri
             },
 
             'zoom-waypoint': function ( ev ) {
-                var ly = self.waypointLayers[ ev.index ].graphics.items[ 0 ]
+                var gr = self.waypointGraphics[ ev.index ]
                 var w = ev.waypoint
 
                 smk.$viewer.view.goTo( { center: [ w.longitude, w.latitude ], zoom: 12 } ).then( function () {
-                    self.showPopup( ly.attributes, { type: 'point', latitude: w.latitude, longitude: w.longitude } )
+                    self.showPopup( gr.attributes, { type: 'point', latitude: w.latitude, longitude: w.longitude } )
                 } )
             }
         } )
