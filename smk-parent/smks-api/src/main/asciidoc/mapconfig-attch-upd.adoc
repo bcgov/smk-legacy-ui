@@ -1,4 +1,6 @@
-== Retrieve generated API documents
+== {PUT} MapConfiguration/{config_id}/Attachments/{attachment_id} - Update an Attachment for a Map Configuration
+
+Executing a PUT at the MapConfiguration/{config_id}/Attachments/{attachment_id} endpoint, with a multipart formdata file attached, will replace the attachment with an updated attachment document
 
 Example of curl command:
 

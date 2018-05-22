@@ -1,0 +1,21 @@
+== {GET} MapConfiguration/Published/{id} - Fetch a published Map Configuration
+
+Executing a GET at the MapConfiguration/Published enpoint with a published map configuration ID will return the configuration details.
+
+Example of curl command:
+
+include::{snippets}/mapconfig-pub-get/curl-request.adoc[]
+
+Example of http request:
+
+include::{snippets}/mapconfig-pub-get/http-request.adoc[]
+
+Example of http response:
+
+include::{snippets}/mapconfig-pub-get/http-response.adoc[]
+
+Response body:
+
+include::{snippets}/mapconfig-pub-get/response-body.adoc[]
+
+For details on the published map config resource, see the Map Config documentation

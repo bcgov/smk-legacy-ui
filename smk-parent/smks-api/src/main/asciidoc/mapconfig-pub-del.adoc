@@ -1,0 +1,20 @@
+== {DELETE} MapConfiguration/Published/{id} - Un-Publish a published Map Configuration
+
+Executing a DELETE at the MapConfiguration/Published enpoint with a published map configuration ID will un-publish the configuration, removing it from availability in the published listing.
+This will not delete the configuration.
+
+Example of curl command:
+
+include::{snippets}/mapconfig-pub-del/curl-request.adoc[]
+
+Example of http request:
+
+include::{snippets}/mapconfig-pub-del/http-request.adoc[]
+
+Example of http response:
+
+include::{snippets}/mapconfig-pub-del/http-response.adoc[]
+
+Response body:
+
+include::{snippets}/mapconfig-pub-del/response-body.adoc[]
