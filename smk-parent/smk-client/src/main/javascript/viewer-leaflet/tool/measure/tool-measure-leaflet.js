@@ -80,21 +80,21 @@ include.module( 'tool-measure-leaflet', [ 'leaflet', 'tool-measure' ], function 
 
             if ( res.count && res.count > 2 ) {
                 self.panel.results.push( {
-                    title:  'Area has',
+                    title:  'Number of edges',
                     value:  res.count,
-                    unit:   'vertices'
+                    // unit:   'vertices'
                 } )
 
                 if ( res.area )
                     self.panel.results.push( {
-                        title:  'Area is',
+                        title:  'Area',
                         value:  res.area,
                         dim:    2
                     } )
 
                 if ( res.length )
                     self.panel.results.push( {
-                        title:  'Perimeter is',
+                        title:  'Perimeter',
                         value:  res.length,
                         dim:    1
                     } )
@@ -102,7 +102,7 @@ include.module( 'tool-measure-leaflet', [ 'leaflet', 'tool-measure' ], function 
             else {
                 if ( res.length )
                     self.panel.results.push( {
-                        title:  'Length is',
+                        title:  'Length',
                         value:  res.length,
                         dim:    1
                     } )

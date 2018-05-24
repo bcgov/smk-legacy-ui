@@ -134,7 +134,6 @@ include.module( 'tool-measure', [ 'tool', 'widgets', 'tool-measure.panel-measure
             case '1-yards':         return formatNumber( value / metersPerUnit[ 'yd' ] ) + ' yd'
             case '1-miles':         return formatNumber( value / metersPerUnit[ 'mi' ] ) + ' mi'
             case '1-nautical-miles':return formatNumber( value / metersPerUnit[ 'nmi' ] ) + ' nm'
-            // case '1-us-feet':
             case '1-meters':        return formatNumber( value ) + ' m'
             case '1-kilometers':    return formatNumber( value / 1000 ) + ' km'
             case '1-acres':         return formatNumber( value / metersPerUnit[ 'mi' ] ) + ' mi'
@@ -147,7 +146,6 @@ include.module( 'tool-measure', [ 'tool', 'widgets', 'tool-measure.panel-measure
             case '2-yards':         return formatNumber( value / metersPerUnit[ 'yd' ] / metersPerUnit[ 'yd' ] ) + ' yd²'
             case '2-miles':         return formatNumber( value / metersPerUnit[ 'mi' ] / metersPerUnit[ 'mi' ] ) + ' mi²'
             case '2-nautical-miles':return formatNumber( value / metersPerUnit[ 'nmi' ] / metersPerUnit[ 'nmi' ] ) + ' nmi²'
-            // case '2-us-feet':
             case '2-meters':        return formatNumber( value ) + ' m²'
             case '2-kilometers':    return formatNumber( value / 1000 / 1000 ) + ' km²'
             case '2-acres':         return formatNumber( value / metersPerUnit[ 'GunterChain' ] / metersPerUnit[ 'Furlong' ] ) + ' acres'

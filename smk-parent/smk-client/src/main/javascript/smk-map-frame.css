@@ -63,6 +63,14 @@
     border: 1px solid transparent;
 }
 
+.smk-map-frame select.smk-command {
+    background-color: white;
+}
+
+.smk-map-frame select.smk-command:focus {
+    outline: 0;
+}
+
 .smk-map-frame .smk-commands {
     margin-bottom: 1px;
 }
