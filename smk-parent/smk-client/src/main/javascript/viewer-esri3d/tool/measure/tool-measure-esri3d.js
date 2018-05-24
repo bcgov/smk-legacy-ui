@@ -3,51 +3,53 @@ include.module( 'tool-measure-esri3d', [ 'tool-measure', 'esri3d', 'types-esri3d
     var E = SMK.TYPE.Esri3d
 
     SMK.TYPE.MeasureTool.prototype.afterInitialize.push( function ( smk ) {
-        // this.changedActive( function () {
-        //     if ( self.active ) {
-        //         self.widget = new DirectLineMeasurement3D( {
-        //             view:       self.view,
-        //             container:
-        //         } )
-        //         smk.withTool( 'location', function () { this.active = false } )
+        var self = this
 
-        //         if ( self.waypoints.length == 0 ) {
-        //             self.activating = self.activating.then( function () {
-        //                 return self.startAtCurrentLocation()
-        //             } )
-        //         }
-        //         else {
-        //             self.activating = self.activating.then( function () {
-        //                 return self.findRoute()
-        //             } )
-        //         }
-        //     }
-        //     else {
-        //         smk.withTool( 'location', function () { this.active = true } )
-        //     }
-        // } )
+        function newContainer() {
+            return $( '<div>' ).appendTo( self.containerEl ).get( 0 )
+        }
+
+        function destroyWidget() {
+            if ( self.measureWidget )
+                self.measureWidget.destroy()
+
+            self.measureWidget = null
+        }
 
         smk.on( this.id, {
-            // 'activate': function () {
-            //     if ( !self.visible || !self.enabled ) return
-
-            //     self.active = !self.active
-            // },
-
             'container-inserted': function ( ev ) {
                 console.log( ev )
 
-                self.widget = new E.widgets.DirectLineMeasurement3D( {
-                    view:       smk.$viewer.view,
-                    container:  ev.el
-                } )
+                self.containerEl = ev.el
 
             },
 
             'container-unbind': function ( ev ) {
-                console.log( ev )
-                self.widget.destroy()
-            }
+                destroyWidget()
+            },
+
+            'start-area': function ( ev ) {
+                destroyWidget()
+
+                self.measureWidget = new E.widgets.AreaMeasurement3D( {
+                    view:       smk.$viewer.view,
+                    container:  newContainer()
+                } )
+            },
+
+            'start-distance': function ( ev ) {
+                destroyWidget()
+
+                self.measureWidget = new E.widgets.DirectLineMeasurement3D( {
+                    view:       smk.$viewer.view,
+                    container:  newContainer()
+                } )
+            },
+
+            'cancel': function ( ev ) {
+                destroyWidget()
+            },
+
         } )
 
     } )

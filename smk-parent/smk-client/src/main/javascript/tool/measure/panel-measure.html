@@ -13,11 +13,13 @@
         >Distance</span>
 
         <span class="smk-command"
+            v-if="viewer.leaflet"
             v-bind:class="{ 'smk-disabled': !busy }"
             v-on:click="busy && $$emit( 'cancel' )"
         >Cancel</span>
 
         <select class="smk-command"
+            v-if="viewer.leaflet"
             v-bind:disabled="busy"
             v-bind:class="{ 'smk-disabled': busy }"
             v-model="unit"

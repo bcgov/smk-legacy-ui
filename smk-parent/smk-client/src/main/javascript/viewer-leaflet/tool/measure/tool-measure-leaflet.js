@@ -3,6 +3,8 @@ include.module( 'tool-measure-leaflet', [ 'leaflet', 'tool-measure' ], function 
     SMK.TYPE.MeasureTool.prototype.afterInitialize.push( function ( smk ) {
         var self = this
 
+        self.viewer.leaflet = true
+
         smk.$viewer.map.createPane( 'hiddenPane', smk.addToContainer( '<div style="display:none"></div>' ) )
 
         this.control = L.control.measure( {
