@@ -53,7 +53,7 @@
     padding-right: 5px;
     padding-bottom: 5px;
     overflow-x: hidden;
-    overflow-y: scroll;
+    overflow-y: auto;
     height: 100%;
 }
 

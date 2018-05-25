@@ -4,7 +4,9 @@
         <h2>{{ feature.title }}</h2>
     </div>
 
-    <div class="smk-attributes">
+    <div class="smk-attributes"
+        v-if="layer.attributes && layer.attributes.length > 0"
+    >
         <div class="smk-attribute"
             v-for="attr in layer.attributes"
             v-if="attr.visible !== false"
