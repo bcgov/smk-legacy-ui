@@ -90,8 +90,8 @@ include.module( 'tool-identify', [ 'feature-list', 'widgets', 'tool-identify.pan
                 var stat = smk.$viewer.identified.getStats()
 
                 var sub = SMK.UTIL.grammaticalNumber( stat.layerCount, null, null, 'on {} layers' )
-                if ( stat.vertexCount > stat.featureCount )
-                    sub += ( sub == '' ? '' : ', ' ) + SMK.UTIL.grammaticalNumber( stat.vertexCount, null, null, 'with {} vertices' )
+                // if ( stat.vertexCount > stat.featureCount )
+                //     sub += ( sub == '' ? '' : ', ' ) + SMK.UTIL.grammaticalNumber( stat.vertexCount, null, null, 'with {} vertices' )
                 if ( sub != '' ) sub = '<div class="smk-submessage">' + sub + '</div>'
 
                 self.setMessage( '<div>Identified ' + SMK.UTIL.grammaticalNumber( stat.featureCount, null, 'a feature', '{} features' ) + '</div>' + sub )
