@@ -229,7 +229,7 @@ include.module( 'tool-directions', [ 'tool', 'widgets', 'tool-directions.panel-d
             self.setMessage( 'Finding current location', 'progress' )
             self.busy = true
 
-            return smk.$viewer.getCurrentLocation().finally( function () {
+            return SMK.UTIL.promiseFinally( smk.$viewer.getCurrentLocation(), function () {
                 self.busy = false
                 self.setMessage()
             } )
@@ -387,7 +387,7 @@ include.module( 'tool-directions', [ 'tool', 'widgets', 'tool-directions.panel-d
         this.setMessage( 'Calculating...', 'progress' )
         this.busy = true
 
-        return findRoute( points, this.config ).then( function ( data ) {
+        return SMK.UTIL.promiseFinally( findRoute( points, this.config ).then( function ( data ) {
             self.displayRoute( data.route )
 
             if ( data.visitOrder && data.visitOrder.findIndex( function ( v, i ) { return points[ v ].index != i } ) != -1 ) {
@@ -423,13 +423,12 @@ include.module( 'tool-directions', [ 'tool', 'widgets', 'tool-directions.panel-d
                 point: [ points[ 0 ].longitude, points[ 0 ].latitude ]
             } )
         } )
-        .finally( function () {
-            self.busy = false
-        } )
         .catch( function ( err ) {
             console.warn( err )
             self.setMessage( 'Unable to find route', 'error' )
             self.displayWaypoints()
+        } ), function () {
+            self.busy = false
         } )
     }
 

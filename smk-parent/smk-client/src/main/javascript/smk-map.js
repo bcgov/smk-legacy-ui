@@ -22,22 +22,24 @@ include.module( 'smk-map', [ 'jquery', 'util' ], function () {
         $( this.$container )
             .addClass( 'smk-hidden' )
 
-        return SMK.UTIL.resolved()
-            .then( loadConfigs )
-            .then( mergeConfigs )
-            .then( resolveConfig )
-            .then( initMapFrame )
-            .then( loadSurround )
-            .then( loadViewer )
-            .then( loadTools )
-            // .then( loadViewer )
-            .then( initViewer )
-            .then( initTools )
-            .then( initSurround )
-            .then( showMap )
-            .finally( function () {
+        return SMK.UTIL.promiseFinally(
+            SMK.UTIL.resolved()
+                .then( loadConfigs )
+                .then( mergeConfigs )
+                .then( resolveConfig )
+                .then( initMapFrame )
+                .then( loadSurround )
+                .then( loadViewer )
+                .then( loadTools )
+                // .then( loadViewer )
+                .then( initViewer )
+                .then( initTools )
+                .then( initSurround )
+                .then( showMap ),
+            function () {
                 console.groupEnd()
-            } )
+            }
+        )
 
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
