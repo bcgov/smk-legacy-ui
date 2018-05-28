@@ -16,10 +16,14 @@
     top: 40px;
     left: 0;
     bottom: 0;
+}
+
+.smk-elastic-panel {
     background-color: white;
     border-radius: 3px;
     box-shadow: 0 1px 5px rgba(0, 0, 0, 0.65);
     pointer-events: auto;
+    max-height: 100%;
 }
 
 .smk-sidepanel.expanded {
