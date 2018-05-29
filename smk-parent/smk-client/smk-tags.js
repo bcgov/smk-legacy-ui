@@ -12,7 +12,6 @@ exports.gen = function () {
     t.script( 'util', 'util.js' )
     t.script( 'event', 'event.js' )
     t.script( 'viewer', 'viewer.js' )
-    // t.script( 'layer', 'layer.js' )
     t.script( 'tool', 'tool.js' )
     t.script( 'feature-set', 'feature-set.js' )
 
@@ -60,10 +59,12 @@ exports.gen = function () {
     t.group( 'tool-coordinate' )
         .dir( 'tool/coordinate/**/*', { cwd: baseDir } )
 
-    t.group( 'tool-directions' )
-        .dir( 'tool/directions/**/*', { cwd: baseDir } )
+    t.group( 'check-directions' )
         .script( '//cdn.jsdelivr.net/npm/sortablejs@1.7.0/Sortable.min.js' )
         .script( '//cdnjs.cloudflare.com/ajax/libs/Vue.Draggable/2.16.0/vuedraggable.min.js' )
+
+    t.group( 'tool-directions' )
+        .dir( 'tool/directions/**/*', { cwd: baseDir } )
 
     t.group( 'tool-dropdown' )
         .dir( 'tool/dropdown/**/*', { cwd: baseDir } )
@@ -133,7 +134,7 @@ exports.gen = function () {
     t.group( 'tool-minimap-leaflet' )
         .dir( 'viewer-leaflet/tool/minimap/**/*', { cwd: baseDir } )
 
-    t.group( 'tool-markup-leaflet' )
+    t.sequence( 'tool-markup-leaflet' )
         .dir( 'viewer-leaflet/tool/markup/**/*', { cwd: baseDir } )
         .style( 'https://unpkg.com/leaflet.pm@0.17.3/dist/leaflet.pm.css' )
         .script( 'https://unpkg.com/leaflet.pm@0.17.3/dist/leaflet.pm.min.js' )
@@ -163,11 +164,6 @@ exports.gen = function () {
         .script( 'viewer-leaflet/viewer-leaflet.js' )
         .style( 'viewer-leaflet/viewer-leaflet.css' )
 
-        // .tag( 'layer-leaflet' )
-        // .tag( 'leaflet-extensions' )
-        // .tag( 'feature-list-leaflet' )
-
-
     t.sequence( 'leaflet' )
         .script( 'https://unpkg.com/leaflet@1.2.0/dist/leaflet.js', { 'integrity': 'sha512-lInM/apFSqyy1o6s89K4iQUKg6ppXEgsVxT35HbzUupEVRh2Eu9Wdl4tHj7dZO0s1uvplcYGmt3498TtHq+log==' } )
         .style( 'https://unpkg.com/leaflet@1.2.0/dist/leaflet.css', { 'integrity': 'sha512-M2wvCLH6DSRazYeZRIm1JnYyh22purTM+FDB5CsyxtQJYeKq83arPe5wgbNmcFXGqiSH2XR8dT/fJISVA1r/zQ==' } )
@@ -180,7 +176,6 @@ exports.gen = function () {
         .script( 'https://unpkg.com/terraformer@1.0.7' )
         .script( 'https://unpkg.com/terraformer-arcgis-parser@1.0.5' )
         .script( 'https://unpkg.com/terraformer-wkt-parser@1.1.2' )
-        // .script( 'https://npmcdn.com/@turf/turf/turf.min.js' )
     	.style( "https://unpkg.com/leaflet.markercluster@1.0.6/dist/MarkerCluster.css" )
     	.style( "https://unpkg.com/leaflet.markercluster@1.0.6/dist/MarkerCluster.Default.css" )
     	.script( "https://unpkg.com/leaflet.markercluster@1.0.6/dist/leaflet.markercluster-src.js" )
@@ -227,9 +222,6 @@ exports.gen = function () {
     t.group( 'tool-zoom-esri3d' )
         .dir( 'viewer-esri3d/tool/zoom/**/*', { cwd: baseDir } )
 
-
-    // t.script( 'layer-esri3d', 'viewer-esri3d/layer-esri3d.js' )
-
     t.group( 'layer-esri3d' )
         .dir( 'viewer-esri3d/layer/**/*', { cwd: baseDir } )
 
@@ -239,7 +231,6 @@ exports.gen = function () {
 
     t.group( 'viewer-esri3d' )
         .script( 'viewer-esri3d/viewer-esri3d.js' )
-        // .tag( 'layer-esri3d' )
         .style( 'viewer-esri3d/viewer-esri3d.css' )
 
     t.script( 'feature-list-esri3d', 'viewer-esri3d/feature-list-esri3d.js' )
@@ -256,5 +247,6 @@ exports.gen = function () {
     t.sequence( 'proj4' )
         .script( 'https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.4.4/proj4.js' )
         .script( 'projections.js' )
+
     return t
 }
