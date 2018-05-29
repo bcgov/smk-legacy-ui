@@ -39,12 +39,18 @@
         </select>
     </template>
 
+    <template slot="placeholder"
+        v-if="( !results || results.length == 0 ) && placeholder !== false"
+    >
+        {{ placeholder || "Select measurement method" }}
+    </template>
+
     <div class="smk-measure-container"
         v-container=""
     ></div>
 
     <div class="smk-results"
-        v-if="results"
+        v-if="results && results.length > 0"
     >
         <div class="smk-result"
             v-for="result in results"

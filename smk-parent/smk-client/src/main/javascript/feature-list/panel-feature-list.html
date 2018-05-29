@@ -20,9 +20,11 @@
 
     <div class="smk-message" v-bind:class="messageClass"><span v-html="message"></span></div>
 
-    <div v-if="isEmpty" class="smk-placeholder">
+    <template slot="placeholder"
+        v-if="isEmpty" 
+    >
         <slot name="placeholder"></slot>
-    </div>
+    </template>    
 
     <div class="smk-layer"
         v-for="layer in layers"

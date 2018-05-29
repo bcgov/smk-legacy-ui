@@ -92,7 +92,7 @@ include.module( 'tool-measure', [ 'tool', 'widgets', 'tool-measure.panel-measure
     Vue.component( 'measure-panel', {
         extends: inc.widgets.toolPanel,
         template: inc[ 'tool-measure.panel-measure-html' ],
-        props: [ 'busy', 'results', 'viewer' ],
+        props: [ 'busy', 'results', 'viewer', 'placeholder' ],
         data: function () {
             return {
                 unit: 'metric'
@@ -159,6 +159,7 @@ include.module( 'tool-measure', [ 'tool', 'widgets', 'tool-measure.panel-measure
         this.makePropPanel( 'busy', false )
         this.makePropPanel( 'results', [] )
         this.makePropPanel( 'viewer', {} )
+        this.makePropPanel( 'placeholder', null )
 
         SMK.TYPE.Tool.prototype.constructor.call( this, $.extend( {
             order:          2,
@@ -184,16 +185,6 @@ include.module( 'tool-measure', [ 'tool', 'widgets', 'tool-measure.panel-measure
 
                 self.active = !self.active
             },
-
-            // 'container-inserted': function ( ev ) {
-            //     console.log( ev )
-
-            // },
-
-            // 'container-unbind': function ( ev ) {
-            //     console.log( ev )
-
-            // }
         } )
     } )
 

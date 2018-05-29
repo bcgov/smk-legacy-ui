@@ -125,6 +125,7 @@ include.module( 'tool-measure-leaflet', [ 'leaflet', 'tool-measure' ], function 
                 self.busy = true
                 self.control._layer.clearLayers()
                 Vue.set( self.panel, 'results', [] )
+                self.panel.placeholder = "Click on map to set first point"
 
                 self.minPoints = 3
                 self.maxPoints = null
@@ -136,6 +137,7 @@ include.module( 'tool-measure-leaflet', [ 'leaflet', 'tool-measure' ], function 
                 self.busy = true
                 self.control._layer.clearLayers()
                 Vue.set( self.panel, 'results', [] )
+                self.panel.placeholder = "Click on map to set starting point"
 
                 self.minPoints = 2
                 self.maxPoints = 2
@@ -146,6 +148,7 @@ include.module( 'tool-measure-leaflet', [ 'leaflet', 'tool-measure' ], function 
             'cancel': function ( ev ) {
                 self.busy = false
                 Vue.set( self.panel, 'results', [] )
+                self.panel.placeholder = null
 
                 self.control._finishMeasure()
             },

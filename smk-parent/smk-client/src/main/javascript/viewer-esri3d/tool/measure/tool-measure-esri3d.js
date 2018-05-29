@@ -30,6 +30,7 @@ include.module( 'tool-measure-esri3d', [ 'tool-measure', 'esri3d', 'types-esri3d
 
             'start-area': function ( ev ) {
                 destroyWidget()
+                self.panel.placeholder = false
 
                 self.measureWidget = new E.widgets.AreaMeasurement3D( {
                     view:       smk.$viewer.view,
@@ -39,6 +40,7 @@ include.module( 'tool-measure-esri3d', [ 'tool-measure', 'esri3d', 'types-esri3d
 
             'start-distance': function ( ev ) {
                 destroyWidget()
+                self.panel.placeholder = false
 
                 self.measureWidget = new E.widgets.DirectLineMeasurement3D( {
                     view:       smk.$viewer.view,
