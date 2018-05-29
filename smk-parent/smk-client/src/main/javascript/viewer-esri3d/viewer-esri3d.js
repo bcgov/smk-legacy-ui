@@ -41,7 +41,7 @@ include.module( 'viewer-esri3d', [ 'viewer', 'esri3d', 'types-esri3d', 'layer-es
         this.view = new E.views.SceneView( {
             container: el,
             map: this.map,
-            ui: new E.views.ui.DefaultUI( {
+            ui: new E.views.ui[ '3d' ].DefaultUI3D( {
                 components: [ "attribution" ],
                 padding: {
                     top: 5,
