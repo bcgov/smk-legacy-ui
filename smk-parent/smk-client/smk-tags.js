@@ -7,6 +7,7 @@ exports.gen = function () {
 
     t.script( 'jquery', 'lib/jquery-3.3.1.min.js' )
     t.script( 'vue', 'lib/vue-2.5.11.js' )
+    t.script( 'vue-config', 'vue-config.js' )
     t.script( 'turf', 'https://npmcdn.com/@turf/turf/turf.min.js' )
 
     t.script( 'util', 'util.js' )
