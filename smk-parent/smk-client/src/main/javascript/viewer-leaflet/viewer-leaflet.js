@@ -78,9 +78,6 @@ include.module( 'viewer-leaflet', [ 'viewer', 'leaflet', 'layer-leaflet', 'leafl
                 screen: ev.containerPoint,
             } )
         } )
-
-        self.screenpixelsToMeters = self.pixelsToMillimeters( 100 ) / 1000
-
     }
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //

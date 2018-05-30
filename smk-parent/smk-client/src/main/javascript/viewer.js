@@ -131,6 +131,8 @@ include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', '
         this.pickHandlers = []
         this.query = {}
 
+        this.screenpixelsToMeters = self.pixelsToMillimeters( 100 ) / 1000
+
         if ( Array.isArray( smk.layers ) )
             constructLayers( smk.layers, 0, null, function ( ly, cfg ) {
                 // console.log( 'layer', ly.index, ly.id );
