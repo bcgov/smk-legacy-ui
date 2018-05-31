@@ -320,7 +320,8 @@ include.module( 'tool-directions', [ 'tool', 'widgets', 'tool-directions.panel-d
                 }
             },
             updated: function () {
-                self.updatePopup()
+                if ( this.site )
+                    self.updatePopup()
             }
         } )
 
