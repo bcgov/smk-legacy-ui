@@ -17,7 +17,7 @@
         Enter search keywords.
     </div>
 
-    <div class="smk-search-result"
+    <div class="smk-search-result smk-item"
         v-if="!isEmpty()"
         v-for="result in results"
         v-on:mouseenter="$$emit( 'hover', { result: result } )"
@@ -42,5 +42,8 @@
                 </div>
             </div>
         </div>
+
+        <i class="smk-highlight material-icons smk-command smk-icon"
+        >speaker_notes</i>
     </div>
 </side-panel>
