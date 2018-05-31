@@ -64,3 +64,15 @@
 .smk-tool.smk-search-tool input:focus {
     outline: 0;
 }
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - */
+
+.smk-search-popup .smk-address {
+    margin-bottom: 10px;
+}
+
+.smk-search-popup .smk-commands {
+    border-top: 1px solid gray;
+    margin-top: 10px;
+    padding-top: 5px;
+}

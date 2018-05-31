@@ -118,3 +118,22 @@
     font-size: 14px;
 }
 
+
+.smk-map-frame .smk-address {
+}
+
+.smk-map-frame .smk-address .smk-street {
+    font-size: 15px;
+}
+
+.smk-map-frame .smk-address .smk-locality {
+    font-size: 12px;
+}
+
+.smk-map-frame .smk-address .smk-precision-locality .smk-locality {
+    font-size: 15px;
+}
+
+.smk-map-frame .smk-address .smk-locality-type {
+    font-size: 10px;
+}
