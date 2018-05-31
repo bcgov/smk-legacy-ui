@@ -27,6 +27,14 @@
     pointer-events: none;
 }
 
+.smk-map-frame .smk-overlay .smk-status {
+    position: absolute;
+    right: 0;
+    bottom: 10px;
+
+    display: flex;
+    flex-direction: column-reverse;
+}
 
 .smk-map-frame .smk-command {
     cursor: pointer;

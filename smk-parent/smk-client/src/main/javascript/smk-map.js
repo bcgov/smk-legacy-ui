@@ -371,6 +371,13 @@ include.module( 'smk-map', [ 'jquery', 'util' ], function () {
         return $( html ).appendTo( this.$overlay ).get( 0 )
     }
 
+    SmkMap.prototype.addToStatus = function ( html ) {
+        if ( !this.$status )
+            this.$status = this.addToOverlay( '<div class="smk-status">' )
+
+        return $( html ).appendTo( this.$status ).get( 0 )
+    }
+
     SmkMap.prototype.getToolbar = function () {
         var self = this
 

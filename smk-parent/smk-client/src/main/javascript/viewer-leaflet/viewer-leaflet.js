@@ -78,6 +78,13 @@ include.module( 'viewer-leaflet', [ 'viewer', 'leaflet', 'layer-leaflet', 'leafl
                 screen: ev.containerPoint,
             } )
         } )
+
+        self.map.on( 'mousemove', function ( ev ) {
+            self.changedLocation( {
+                map:    { latitude: ev.latlng.lat, longitude: ev.latlng.lng },
+                screen: ev.containerPoint,
+            } )
+        } )
     }
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //

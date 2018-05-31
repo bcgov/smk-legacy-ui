@@ -23,7 +23,7 @@ include.module( 'tool-scale', [ 'tool', 'tool-scale.scale-html' ], function ( in
         }
 
         this.vm = new Vue( {
-            el: smk.addToOverlay( inc[ 'tool-scale.scale-html' ] ),
+            el: smk.addToStatus( inc[ 'tool-scale.scale-html' ] ),
             data: this.model,
         } )
 

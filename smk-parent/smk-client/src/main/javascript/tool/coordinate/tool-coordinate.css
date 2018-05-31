@@ -1,0 +1,23 @@
+.smk-coordinate {
+    border: 0;
+    color: #000;
+    font-weight: bold;
+    font-size: 12px;
+    text-shadow: 1px 0 0 #fff, 0 -1px 0 #fff, 0 1px 0 #fff, -1px 0 0 #fff;
+    text-align: right;
+    background-color: transparent;
+    cursor: default;
+
+    margin-top: 5px;
+}
+
+.smk-coordinate .smk-ordinate label {
+    display: inline-block;
+    font-size: 10px;
+    margin-left: 10px;
+}
+
+.smk-coordinate .smk-ordinate div {
+    font-size: 14px;
+}
+

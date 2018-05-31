@@ -8,6 +8,7 @@ include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', '
         'startedIdentify',
         'finishedIdentify',
         'pickedLocation',
+        'changedLocation',
         'changedPopup'
     ] )
 
