@@ -129,6 +129,13 @@ include.module( 'viewer-esri3d', [ 'viewer', 'esri3d', 'types-esri3d', 'layer-es
             } )
         } )
 
+        this.view.on( 'pointer-move', function ( ev ) {
+            self.changedLocation( {
+                map:    self.view.toMap( ev ),
+                screen: { x: ev.x, y: ev.y }
+            } )
+        } )
+
         E.core.watchUtils.watch( this.view.popup, "visible", function() {
             self.changedPopup()
         } )
