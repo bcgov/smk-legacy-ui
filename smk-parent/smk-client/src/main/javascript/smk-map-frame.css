@@ -98,3 +98,23 @@
     background-color: #d2d9e6;
     /* border: 1px solid #d2d9e6; */
 }
+
+
+.smk-map-frame .smk-coordinate {
+    color: black;
+    font-size: 12px;
+    background-color: transparent;
+    cursor: default;
+}
+
+.smk-map-frame .smk-coordinate .smk-ordinate label {
+    display: inline-block;
+    font-size: 10px;
+    margin-right: 10px;
+    text-align: left;
+}
+
+.smk-map-frame .smk-coordinate .smk-ordinate div {
+    font-size: 14px;
+}
+

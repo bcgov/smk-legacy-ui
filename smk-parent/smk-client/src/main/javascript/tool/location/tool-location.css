@@ -10,16 +10,6 @@
     font-size: 10px;
 }
 
-.smk-location-popup .smk-ordinate label {
-    display: inline-block;
-    font-size: 10px;
-    margin-right: 10px;
-}
-
-.smk-location-popup .smk-ordinate div {
-    font-size: 14px;
-}
-
 .smk-location-popup .smk-commands {
     border-top: 1px solid gray;
     margin-top: 10px;
