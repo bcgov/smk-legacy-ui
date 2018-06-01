@@ -810,6 +810,14 @@
 										<input type="checkbox" id="directions" onclick="setToolActivation('directions')"/>
 										<label class="black-text" for="directions">Directions</label>
 									</p>
+									<p>
+										<input type="checkbox" id="searchPanel" onclick="setToolActivation('search')"/>
+										<label class="black-text" for="searchPanel">Search</label>
+									</p>
+									<p>
+										<input type="checkbox" id="location" onclick="setToolActivation('location')"/>
+										<label class="black-text" for="location">Location</label>
+									</p>
 									<p><h5 style="border-bottom: 2px solid #fcba19;">Map Information</h5></p>
 									<p>
 										<input type="checkbox" id="coordinates" onclick="setToolActivation('coordinate')"/>
@@ -858,8 +866,12 @@
 										<label class="black-text" for="selectionPanel">Selection Panel</label>
 									</p>
 									<p>
-										<input type="checkbox" id="searchPanel" onclick="setToolActivation('search')"/>
-										<label class="black-text" for="searchPanel">Search Panel</label>
+										<input type="checkbox" id="dropdown" onclick="setToolActivation('dropdown')"/>
+										<label class="black-text" for="dropdown">Query Dropdown Panel</label>
+									</p>
+									<p>
+										<input type="checkbox" id="menu" onclick="setToolActivation('menu')"/>
+										<label class="black-text" for="menu">Hamburger Menu</label>
 									</p>
 								</div>
 								<div class="col s9">
@@ -1179,6 +1191,12 @@
 					<div class="col s8 input-field">
 						<input id="queryDescription" type="text">
 						<label for="queryDescription">Description</label>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col s12">
+						<input type="checkbox" id="queryOnDropdown" />
+						<label class="black-text" for="queryOnDropdown">Add to Dropdown</label>
 					</div>
 				</div>
 				<div class="row">

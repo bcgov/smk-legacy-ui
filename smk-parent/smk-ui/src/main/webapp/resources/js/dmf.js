@@ -53,7 +53,8 @@ var data = {
 	    },
 	    tools: [
 			{ "type": "menu" },
-			{ "type": "dropdown" }
+			{ "type": "dropdown" },
+			{ "type": "location" }
 	    ],
 	    layers: [],
 	    _id: null,
@@ -617,7 +618,10 @@ function setupMapConfigToolsUI()
 			}
 		}
     	else if(tool.type == "search") $("#searchPanel").prop('checked', tool.enabled);
+    	else if(tool.type == "location") $("#location").prop('checked', tool.enabled);
     	else if(tool.type == "directions") $("#directions").prop('checked', tool.enabled);
+    	else if(tool.type == "dropdown") $("#dropdown").prop('checked', tool.enabled);
+    	else if(tool.type == "menu") $("#menu").prop('checked', tool.enabled);
 	});
 
     // clear out any layers
@@ -657,6 +661,18 @@ function finishToolEdits()
 			tool.style.strokeColor = $("#selectStyleStrokeColor").val();
 			tool.style.fillColor = $("#selectStyleFillColor").val();
 		}
+		/*else if(tool.type == "dropdown" && tool.enabled == false)
+		{
+			// move any queries from the dropdown to the bar
+			for(var i = 0; i < data.tools.length; i++)
+			{
+				var tool = data.tools[i];
+				if(tool.type == "query" && tool.position == "dropdown")
+				{
+					//tool.position = "toolbar"; // or just remove it entirely
+				}
+			}
+		}*/
 	});
 }
 
@@ -740,6 +756,10 @@ function addNewMapConfig()
 			      "type": "about",
 			      "enabled": true,
 			      "content": ""
+			    },
+			    {
+			      "type": "location",
+				  "enabled": true,
 			    },
 			    {
 			      "type": "baseMaps",
@@ -843,6 +863,9 @@ function saveMapConfig()
 	finishLayerEdits(selectedLayerNode != null);
 
 	finishToolEdits();
+	
+	// check if the dropdown tool is disabled, but we have queries that use dropdown
+	// if we do, change the queries location from "dropdown"
 	
 	var requestType = "put";
 	var requestUrl = "MapConfigurations/" + data.lmfId;
@@ -1125,7 +1148,8 @@ function previewMapConfig(mapConfigId)
 	{
 		if(mapConfig.lmfId == mapConfigId)
 		{
-			window.open("viewer.html?type=edit&id=" + mapConfig.lmfId);
+			//window.open("viewer.html?type=edit&id=" + mapConfig.lmfId);
+			window.open("viewer.html?config=../smks-api/MapConfigurations/" + mapConfig.lmfId + "/");
 		}
 	});
 }
@@ -1136,7 +1160,8 @@ function previewPublishedMapConfig(mapConfigId)
 	{
 		if(mapConfig.lmfId == mapConfigId)
 		{
-			window.open("viewer.html?type=published&id=" + mapConfig.lmfId);
+			//window.open("viewer.html?type=published&id=" + mapConfig.lmfId);
+			window.open("viewer.html?config=../smks-api/MapConfigurations/Published/" + mapConfig.lmfId + "/");
 		}
 	});
 }
@@ -1612,6 +1637,15 @@ function editQuery(id)
 			$("#queryName").val(query.title);
 			$("#queryDescription").val(query.description);
 			$("#queryAndOrToggle").prop('checked', query.predicate.operator == "or" ? true : false);
+
+			for(var i = 0; i < data.tools.length; i++)
+			{
+				if(data.tools[i].type == "query" && data.tools[i].instance == selectedLayerNode.data.id + "--" + selectedQuery.id)
+				{
+					$("#queryOnDropdown").prop('checked', data.tools[i].position == "dropdown" ? true : false);
+					break;
+				}
+			}
 			
 			// build argument chain
 	
@@ -1810,11 +1844,22 @@ function saveQuery()
 		{
 			type: "query", 
 			instance: selectedLayerNode.data.id + "--" + selectedQuery.id,
-			position: "dropdown", 
+			position: $("#queryOnDropdown").is(":checked") ? "dropdown" : "toolbar", 
 			icon: "search"
 		};
 		
 		data.tools.push(tool);
+	}
+	else
+	{
+		for(var i = 0; i < data.tools.length; i++)
+		{
+			if(data.tools[i].type == "query" && data.tools[i].instance == selectedLayerNode.data.id + "--" + selectedQuery.id)
+			{
+				data.tools[i].position = $("#queryOnDropdown").is(":checked") ? "dropdown" : "toolbar";
+				break;
+			}
+		}
 	}
 	
 	newQuery = false;

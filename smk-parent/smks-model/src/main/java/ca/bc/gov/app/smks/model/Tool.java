@@ -15,6 +15,7 @@ import ca.bc.gov.app.smks.model.tool.Directions;
 import ca.bc.gov.app.smks.model.tool.Dropdown;
 import ca.bc.gov.app.smks.model.tool.Identify;
 import ca.bc.gov.app.smks.model.tool.Layers;
+import ca.bc.gov.app.smks.model.tool.Location;
 import ca.bc.gov.app.smks.model.tool.Markup;
 import ca.bc.gov.app.smks.model.tool.Measure;
 import ca.bc.gov.app.smks.model.tool.Menu;
@@ -52,7 +53,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
     @Type( name = "search",			value = Search.class ),
     @Type( name = "dropdown",		value = Dropdown.class ),
     @Type( name = "menu",			value = Menu.class ),
-    @Type( name = "query",			value = Query.class )
+    @Type( name = "query",			value = Query.class ),
+    @Type( name = "location",       value = Location.class)
 } )
 @JsonInclude(Include.NON_DEFAULT)
 public class Tool implements Cloneable
@@ -76,6 +78,7 @@ public class Tool implements Cloneable
         layers( Layers.class ),
         identify( Identify.class ),
         select( Select.class ),
+        location( Location.class ),
         search( Search.class );
 
         private final Class<?> CLASS;

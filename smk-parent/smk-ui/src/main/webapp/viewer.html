@@ -1,60 +1,17 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Simple Map Kit</title>
-        <!-- STATIC -->
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-        <script src="https://cdn.rawgit.com/harvesthq/chosen/gh-pages/chosen.jquery.min.js"></script>
-        <link href="https://cdn.rawgit.com/harvesthq/chosen/gh-pages/chosen.min.css" rel="stylesheet"/>
-        <!-- DYNAMIC LOADED -->
-    </head>
-    <body >
-        <div id="smk-map-frame"></div>
-        <script>
-        	(window.onpopstate = function () 
-        	{
-            	var match = "";
-                var pl = /\+/g;  // Regex for replacing addition symbol with a space
-                var search = /([^&=]+)=?([^&]*)/g;
-                var decode = function (s) { return decodeURIComponent(s.replace(pl, " ")); };
-                var query  = window.location.search.substring(1);
+        <title>Standalone - smk</title>
 
-            	var urlParams = {};
-            	
-                while (match = search.exec(query))
-                    urlParams[decode(match[1])] = decode(match[2]);
-                
-                // get the query string ID and version, pass a call to the api.
-                
-                if(urlParams.hasOwnProperty("id") && urlParams.hasOwnProperty("type"))
-                {
-                	var service = "../smks-api/MapConfigurations/";
-	                
-	                if(urlParams.type == "published")
-                	{
-	                	service = service + "Published/";
-                	}
-	                
-	                service = service + urlParams.id + "/";
-	                
-	                if(urlParams.hasOwnProperty("version"))
-                	{
-                        service = service + "?version=" + urlParams.version;
-	                }
-	                
-	                var script = document.createElement( "script" )
-	                script.setAttribute( "src", "../smk-client/smk-bootstrap.js" )
-	                script.setAttribute( "smk-disconnected", false )
-	                script.setAttribute( "smk-standalone", true )
-	                script.setAttribute( "smk-config", service )
-	                
-	                document.getElementsByTagName( 'head' )[ 0 ].appendChild( script );
-                }
-                else
-               	{
-                	alert("Specify a type (edit or published) and a config ID!");
-               	}
-        	})();
-        </script>
-    </body>
+        <!-- SMK BOOTSTRAP - - - - - - - -->
+        <script src="../smk-client/smk-bootstrap.js"
+            smk-disconnected
+            smk-standalone
+            smk-container-id="smk-map-frame"
+            smk-config="?"
+        ></script>
+        <!-- - - - - - - - - - - - - - - -->
+    </head>
+
+    <body id="smk-map-frame"></body>
 </html>
