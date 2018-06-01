@@ -1194,9 +1194,17 @@
 					</div>
 				</div>
 				<div class="row">
-					<div class="col s12">
+					<div class="col s5">
 						<input type="checkbox" id="queryOnDropdown" />
-						<label class="black-text" for="queryOnDropdown">Add to Dropdown</label>
+						<label class="black-text" for="queryOnDropdown">Add to Dropdown (if tool is available)</label>
+					</div>
+					<div class="col s4 input-field">
+						<i id="iconDemo" class="material-icons prefix black-text">search</i>
+						<input id="queryIcon" type="text" onchange="updateQueryIconPrefix();">
+						<label for="queryIcon">Query Icon ID</label>
+					</div>
+					<div class="col s3 input-field">
+						<a href="https://material.io/tools/icons/?style=sharp" target="_blank">Material Icon IDs</a>
 					</div>
 				</div>
 				<div class="row">
@@ -1238,6 +1246,9 @@
 	    </div>
 	    <div class="row">
 			<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="addNewChoice();" style="width: 220px;"><i class="material-icons left">add</i>Add Choice</a>
+		</div>
+		<div class="row">
+			<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="loadDropdownChoiceFromLayer();" style="width: 220px;"><i class="material-icons left">redo</i>Load Choices</a>
 		</div>
       </div>
       <div class="modal-footer">

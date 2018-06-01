@@ -1598,6 +1598,7 @@ function addNewQuery()
 	
 	$("#queryTable").hide();
 	$("#queryEditor").show();
+	$("#queryIcon").val("search");
 	
 	// we should make sure that the config includes the menu and dropdown tools
 	var menuExists = false;
@@ -1637,12 +1638,13 @@ function editQuery(id)
 			$("#queryName").val(query.title);
 			$("#queryDescription").val(query.description);
 			$("#queryAndOrToggle").prop('checked', query.predicate.operator == "or" ? true : false);
-
+			
 			for(var i = 0; i < data.tools.length; i++)
 			{
 				if(data.tools[i].type == "query" && data.tools[i].instance == selectedLayerNode.data.id + "--" + selectedQuery.id)
 				{
 					$("#queryOnDropdown").prop('checked', data.tools[i].position == "dropdown" ? true : false);
+					$("#queryIcon").val(data.tools[i].icon);
 					break;
 				}
 			}
@@ -1845,7 +1847,7 @@ function saveQuery()
 			type: "query", 
 			instance: selectedLayerNode.data.id + "--" + selectedQuery.id,
 			position: $("#queryOnDropdown").is(":checked") ? "dropdown" : "toolbar", 
-			icon: "search"
+			icon: $("#queryIcon").val()
 		};
 		
 		data.tools.push(tool);
@@ -1857,6 +1859,7 @@ function saveQuery()
 			if(data.tools[i].type == "query" && data.tools[i].instance == selectedLayerNode.data.id + "--" + selectedQuery.id)
 			{
 				data.tools[i].position = $("#queryOnDropdown").is(":checked") ? "dropdown" : "toolbar";
+				data.tools[i].icon = $("#queryIcon").val();
 				break;
 			}
 		}
@@ -1884,6 +1887,71 @@ function saveQuery()
 	}
 	
 	$("#queryTable").show();
+}
+
+function updateQueryIconPrefix()
+{
+	var txt = $("#iconDemo").text();
+	var val = $("#queryIcon").val();
+	$("#iconDemo").text($("#queryIcon").val());
+}
+
+function loadDropdownChoiceFromLayer()
+{
+	var layer = selectedLayerNode.data;
+	if(layer.type == "vector")
+	{
+		// fetch json from service, parse all attributes
+		alert("Not yet implemented");
+	}
+	else if(layer.type == "esri-dynamic")
+	{
+		// run an ArcGIS query on the layer, no geom return, just the selected attribute
+		alert("Not yet implemented");
+	}
+	else if(layer.type == "wms")
+	{
+		// wfs query to get all layer data.
+		var attribute = $("#" + currentDropdownId + "_queryAttributes").val();
+		var url = layer.serviceUrl + "?service=WFS&request=GetFeature&typeNames=" + layer.layerName + "&propertyName=" + attribute + "&outputformat=application%2Fjson";
+		
+		// fire a request to the wfs URL. take all the results and create choices out of them
+		$.ajax
+		({
+			url: url,
+	        type: 'get',
+	        dataType: 'json',
+	        contentType:'application/json',
+	        crossDomain: true,
+	        withCredentials: true,
+	        success: function (resultData)
+	        {
+	        	var processedVals = [];
+	        	
+	        	for(var i = 0; i < resultData.features.length; i++)
+        		{
+	        		var feature = resultData.features[i];
+	        		var value = feature.properties[attribute];
+	        		
+	        		if(!processedVals.includes(value))
+	        		{
+	        			processedVals.push(value);
+	        			
+		        		choiceId++;
+		        		choicesIds.push(choiceId);
+	
+		        		$("#dropdownOptionsPanel").append('<div id="' + choiceId + '_choice" class="row"><div class="col s5 input-field"><input id="' + choiceId + '_dropdownValue" type="text"><label for="' + choiceId + '_dropdownValue">Value</label></div><div class="col s5 input-field"><input id="' + choiceId + '_dropdownTitle" type="text"><label for="' + choiceId + '_dropdownTitle">Description Text</label></div><div class="col s2"><a class="btn-floating btn-large waves-effect waves-light nrpp-blue-dark" onclick="removeChoice(' + choiceId + ');"><i class="material-icons left">delete_forever</i></a></div></div>');
+		        		
+		        		$("#" + choiceId + "_dropdownValue").val(feature.properties[attribute]);
+		        		$("#" + choiceId + "_dropdownTitle").val(feature.properties[attribute]);
+        			}
+        		}
+	        	
+	        	Materialize.updateTextFields();
+	        }
+		});
+		
+	}
 }
 
 var dropdownOptions = [];
@@ -2652,6 +2720,7 @@ $(document).ready(function()
 	    }
 	});
 	$('#layerPopupTemplateModal').modal({ dismissible: false });
+
 });
 
 var fileContents;
