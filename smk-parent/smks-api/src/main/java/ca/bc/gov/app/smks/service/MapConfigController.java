@@ -349,7 +349,7 @@ public class MapConfigController
 
 				    if(type.equals("image") && id.equals("surroundImage"))
 				    {
-				        resource.getSurround().setImageSrc("surroundImage");
+				        resource.getSurround().setImageSrc("@surroundImage");
 				    }
 
 				    // if this is a geojson blob, make sure we have verified the properties set
