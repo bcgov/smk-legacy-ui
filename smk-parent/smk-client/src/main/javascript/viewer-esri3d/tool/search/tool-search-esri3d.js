@@ -81,6 +81,12 @@ include.module( 'tool-search-esri3d', [ 'esri3d', 'types-esri3d', 'util-esri3d',
             }
         } )
 
+        smk.on( this.id, {
+            'zoom': function () {
+                smk.$viewer.view.goTo( self.searchLayer.graphics )
+            }
+        } )
+
         this.showPopup = function ( feature, loc ) {
             self.popupModel.feature = feature
 

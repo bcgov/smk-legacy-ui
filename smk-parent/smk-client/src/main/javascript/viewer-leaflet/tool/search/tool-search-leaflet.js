@@ -50,7 +50,7 @@ include.module( 'tool-search-leaflet', [ 'leaflet', 'tool-search' ], function ( 
 
         var vw = smk.$viewer
 
-        searchMarkers = L.layerGroup( { pane: 'markerPane' } )
+        searchMarkers = L.featureGroup( { pane: 'markerPane' } )
 
         this.changedActive( function () {
             if ( self.active ) {
@@ -59,6 +59,15 @@ include.module( 'tool-search-leaflet', [ 'leaflet', 'tool-search' ], function ( 
             else {
                 vw.searched.pick( null )
                 vw.map.removeLayer( searchMarkers )
+            }
+        } )
+
+        smk.on( this.id, {
+            'zoom': function () {
+                smk.$viewer.map.fitBounds( searchMarkers.getBounds().pad( 0.25 ), {
+                    paddingTopLeft: L.point( 340, 40 ),
+                    paddingBottomRight: L.point( 40, 40 )
+                } )
             }
         } )
 
