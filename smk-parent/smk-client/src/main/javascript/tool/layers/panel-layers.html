@@ -19,16 +19,14 @@
             v-model="legend"
             v-on:change="!busy && $$emit( 'config', getConfigState() )"
         >Legend</label>
-
-        <!-- <i class="smk-all-collapse material-icons"
-            v-on:click="$$emit( 'set-expanded', { ids: allLayerIds(), expanded: false } )"
-        >arrow_drop_up</i>
-
-        <i class="smk-all-expand material-icons"
-            v-on:click="$$emit( 'set-expanded', { ids: allLayerIds(), expanded: true } )"
-        >arrow_drop_down</i> -->
     </template>
 
+    <template slot="placeholder"
+        v-if="!layers || layers.length == 0"
+    >
+        No layers are configured
+    </template>
+    
     <div class="smk-layer smk-item"
         v-for="layer in layers"
         v-bind:class="{
@@ -47,11 +45,6 @@
 
             <span v-bind:class="[ layer.class ]">{{ layer.title }}</span>
         </div>
-
-        <!-- <i class="smk-layer-expand material-icons smk-command"
-            v-if="layer.hasLegend"
-            v-on:click="$$emit( 'set-expanded', { ids: [ layer.id ], expanded: !layer.expanded } )"
-        >{{ layer.expanded ? 'arrow_drop_up' : 'arrow_drop_down' }}</i> -->
 
         <div class="smk-layer-info" v-if="legend && layer.hasLegend">
             <div class="smk-legend">

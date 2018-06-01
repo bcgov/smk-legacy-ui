@@ -1,6 +1,6 @@
-== {GET} MapConfiguration/{id} - Retrieve the latest versions of a LMF Map Configurations (non-published only)
+== {GET} MapConfiguration/{id} - Retrieve the latest versions of a SMK Map Configurations (non-published only)
 
-Executing a GET at the MapConfiguration endpoint with the LMF id will return the related Map Configuration document
+Executing a GET at the MapConfiguration endpoint with the SMK id will return the related Map Configuration document
 
 NOTE: The document returned will be the latest version, not the published version. To get the published version, you must call the /Published/ endpoints
 NOTE: It is possible to fetch previous version from this endpoint by including a query parameter of 'version' with the desired version number. This is not the preferred method of getting the current published configuration.

@@ -16,6 +16,9 @@ RUN curl -jksSL -o /tmp/apache-tomcat.tar.gz http://archive.apache.org/dist/tomc
     tar -C /opt -xf /tmp/apache-tomcat.tar && \
     ln -s /opt/apache-tomcat-${TOMCAT_VERSION} ${TOMCAT_HOME}
 
+ADD jvmMemSettings.sh /jvmMemSettings.sh
+ENTRYPOINT ["/jvmMemSettings.sh"]
+
 WORKDIR /tmp
 
 #Copy SMK api

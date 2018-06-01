@@ -1,40 +1,32 @@
 
-.smk-search-panel .smk-placeholder {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: lightgray;
-    font-style: italic;
-    font-size: 20px;
-    padding:5px 10px;
-    text-align: center;
-}
-
-.smk-search-result {
-    position: relative;
-    border: 1px solid transparent;
-    border-radius: 5px;
-    padding: 5px;
+.smk-search-panel .smk-search-result {
+    font-size: 12px;
     cursor: pointer;
+    padding: 5px;
+
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
 }
 
-.smk-search-result:hover {
-    border: 1px solid black;
-}
-
-.smk-search-result h2 {
-    display: inline-block;
-    width: 200px;
-    font-size: 13px;
-}
-
-.smk-search-result.smk-highlighted h2 {
+.smk-search-panel .smk-search-result.smk-highlighted {
     font-weight: bold;
+}
+
+.smk-search-panel .smk-search-result .smk-highlight {
+    opacity: 0.0;
+    margin: -5px;
+}
+
+.smk-search-panel .smk-search-result:hover .smk-highlight {
+    opacity: 0.3;
+
+
+}
+
+.smk-search-panel .smk-search-result.smk-highlighted .smk-highlight {
+    opacity: 1.0;
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -63,4 +55,16 @@
 
 .smk-tool.smk-search-tool input:focus {
     outline: 0;
+}
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - */
+
+.smk-search-popup .smk-address {
+    margin-bottom: 10px;
+}
+
+.smk-search-popup .smk-commands {
+    border-top: 1px solid gray;
+    margin-top: 10px;
+    padding-top: 5px;
 }

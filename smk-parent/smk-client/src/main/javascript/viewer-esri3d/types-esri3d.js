@@ -8,7 +8,8 @@ include.module( 'types-esri3d', [ 'esri3d' ], function () {
             // base
             'esri/Map',
             'esri/views/SceneView',
-            'esri/views/ui/DefaultUI',
+            // 'esri/views/ui/DefaultUI',
+            'esri/views/ui/3d/DefaultUI3D',
             'esri/views/ui/UI',
             'esri/core/watchUtils',
 
@@ -16,12 +17,14 @@ include.module( 'types-esri3d', [ 'esri3d' ], function () {
             'esri/widgets/NavigationToggle',
             'esri/widgets/Compass',
             'esri/widgets/Zoom',
-            'esri/widgets/Expand',
-            'esri/widgets/BasemapGallery',
-            'esri/widgets/Legend',
-            'esri/widgets/Home',
-            'esri/widgets/LayerList',
-            'esri/widgets/Search',
+            // 'esri/widgets/Expand',
+            // 'esri/widgets/BasemapGallery',
+            // 'esri/widgets/Legend',
+            // 'esri/widgets/Home',
+            // 'esri/widgets/LayerList',
+            // 'esri/widgets/Search',
+            "esri/widgets/DirectLineMeasurement3D",
+            "esri/widgets/AreaMeasurement3D",
 
             // layers
             'esri/layers/MapImageLayer',
@@ -31,9 +34,9 @@ include.module( 'types-esri3d', [ 'esri3d' ], function () {
             'esri/layers/GraphicsLayer',
 
             // rendering
-            'esri/renderers/SimpleRenderer',
-            'esri/renderers/UniqueValueRenderer',
-            'esri/renderers/ClassBreaksRenderer',
+            // 'esri/renderers/SimpleRenderer',
+            // 'esri/renderers/UniqueValueRenderer',
+            // 'esri/renderers/ClassBreaksRenderer',
 
             // symbols
             'esri/Graphic',

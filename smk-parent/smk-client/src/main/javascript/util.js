@@ -284,6 +284,12 @@ include.module( 'util', null, function ( inc ) {
                     // unitNumberSuffix
                 }
             } )
+        },
+
+        wrapFunction: function ( obj, fName, outer ) {
+            return obj[ fName ] = ( function ( inner ) {
+                return outer.call( null, inner )
+            } )( obj[ fName ] )
         }
 
     } )

@@ -1,4 +1,23 @@
-== Retrieve generated API documents
+== {POST} MapConfiguration/{config_id}/Attachments/ - Create a new Attachment for a Map Configuration
+
+Executing a POST at the MapConfiguration/{config_id}/Attachments endpoint with a formdata multipart file containing the desired attachment binary will create a new attachment document for this configuration.
+
+Additional request parameters are: 
+
+Attachment ID {id='my-attachment'}
+Attachment Type {type='kml|kmz|shape|vector|image'}
+
+If the type is excluded, the SMK service will attempt to determine the attachment type. If the attachment type is:
+
+application/vnd.google-earth.kml+xml - SMK will attempt to convert KML to geojson
+application/vnd.google-earth.kmz - SMK will attempt to unzip the KMZ, and convert contained KML to geojson
+application/zip - SMK will attempt to unzip the zip file, and convert contained shapefile to geojson
+
+All other types will be stored directly as standard attachments with no conversion.
+
+If you are uploading an attachment to use as a custom marker image, you must ensure your markerUrl in the layer configuration contains the matching attachment ID.
+
+NOTE: Supplying KML, KMZ, or Shapefile attachments will trigger an automatic conversion of the suppllied attachment to GeoJSON. The source attachment will not be preserved.
 
 Example of curl command:
 

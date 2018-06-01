@@ -1,6 +1,6 @@
 == {GET} LayerLibrary - Retrieve All MPCM ArcGIS Catalog Listings
 
-Executing a GET at the LayerConfig endpoint will query the MPCM ArcGIS Layer Catalog service and create a listing of all available layers that can be used by LMF. The resulting snippets are incomplete and meant for listing only.
+Executing a GET at the LayerConfig endpoint will query the MPCM ArcGIS Layer Catalog service and create a listing of all available layers that can be used by SMK. The resulting snippets are incomplete and meant for listing only.
 
 CAUTION: The MPCM Layer Catalog contains public and private records. If you lack access to a private layer, it may display in this list but any further queries will fail.
 
@@ -27,7 +27,7 @@ MPCMInfoLayer fields:
 
 |`id`
 |`String`
-|The layer ID used by LMF
+|The layer ID used by SMK
 
 |`mpcmId`
 |`String`

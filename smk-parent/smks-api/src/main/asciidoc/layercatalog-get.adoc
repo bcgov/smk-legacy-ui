@@ -33,7 +33,7 @@ DynamicServiceLayer fields:
 
 |`id`
 |`String`
-|The layers ID used in LMF
+|The layers ID used in SMK
 
 |`label`
 |`String`
@@ -41,7 +41,7 @@ DynamicServiceLayer fields:
 
 |`isVisible`
 |`Boolean`
-|Indicates if the layer will be visible in LMF by default
+|Indicates if the layer will be visible in SMK by default
 
 |`attribution`
 |`String`

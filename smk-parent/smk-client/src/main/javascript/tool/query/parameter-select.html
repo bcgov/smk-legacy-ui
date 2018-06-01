@@ -3,7 +3,7 @@
         {{ title }}
         <select
             v-model="selected"
-            v-on:input="$emit( 'input', { value: $event.target.value } )"
+            v-on:change="$emit( 'input', { value: $event.target.value } )"
         >
             <option disabled value="">Select {{ title }}</option>
 

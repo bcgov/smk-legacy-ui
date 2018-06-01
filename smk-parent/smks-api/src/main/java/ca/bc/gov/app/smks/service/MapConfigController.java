@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
-import java.util.function.Consumer;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
@@ -555,7 +554,7 @@ public class MapConfigController
 					couchDAO.deleteAttachment(resource, attachment_id);
 
 					// fetch the updated resource, so we're not out of date
-					resource = couchDAO.getResourceByDocId(config_id);
+					resource = couchDAO.getMapConfiguration(config_id);
 
 					Attachment attachment = new Attachment(attachment_id, Base64.encodeBase64String(request.getBytes()), request.getContentType());
 					resource.addInlineAttachment(attachment);

@@ -53,7 +53,8 @@ var data = {
 	    },
 	    tools: [
 			{ "type": "menu" },
-			{ "type": "dropdown" }
+			{ "type": "dropdown" },
+			{ "type": "location" }
 	    ],
 	    layers: [],
 	    _id: null,
@@ -617,7 +618,10 @@ function setupMapConfigToolsUI()
 			}
 		}
     	else if(tool.type == "search") $("#searchPanel").prop('checked', tool.enabled);
+    	else if(tool.type == "location") $("#location").prop('checked', tool.enabled);
     	else if(tool.type == "directions") $("#directions").prop('checked', tool.enabled);
+    	else if(tool.type == "dropdown") $("#dropdown").prop('checked', tool.enabled);
+    	else if(tool.type == "menu") $("#menu").prop('checked', tool.enabled);
 	});
 
     // clear out any layers
@@ -657,6 +661,18 @@ function finishToolEdits()
 			tool.style.strokeColor = $("#selectStyleStrokeColor").val();
 			tool.style.fillColor = $("#selectStyleFillColor").val();
 		}
+		/*else if(tool.type == "dropdown" && tool.enabled == false)
+		{
+			// move any queries from the dropdown to the bar
+			for(var i = 0; i < data.tools.length; i++)
+			{
+				var tool = data.tools[i];
+				if(tool.type == "query" && tool.position == "dropdown")
+				{
+					//tool.position = "toolbar"; // or just remove it entirely
+				}
+			}
+		}*/
 	});
 }
 
@@ -740,6 +756,10 @@ function addNewMapConfig()
 			      "type": "about",
 			      "enabled": true,
 			      "content": ""
+			    },
+			    {
+			      "type": "location",
+				  "enabled": true,
 			    },
 			    {
 			      "type": "baseMaps",
@@ -843,6 +863,9 @@ function saveMapConfig()
 	finishLayerEdits(selectedLayerNode != null);
 
 	finishToolEdits();
+	
+	// check if the dropdown tool is disabled, but we have queries that use dropdown
+	// if we do, change the queries location from "dropdown"
 	
 	var requestType = "put";
 	var requestUrl = "MapConfigurations/" + data.lmfId;
@@ -1125,7 +1148,8 @@ function previewMapConfig(mapConfigId)
 	{
 		if(mapConfig.lmfId == mapConfigId)
 		{
-			window.open("viewer.html?type=edit&id=" + mapConfig.lmfId);
+			//window.open("viewer.html?type=edit&id=" + mapConfig.lmfId);
+			window.open("viewer.html?config=../smks-api/MapConfigurations/" + mapConfig.lmfId + "/");
 		}
 	});
 }
@@ -1136,7 +1160,8 @@ function previewPublishedMapConfig(mapConfigId)
 	{
 		if(mapConfig.lmfId == mapConfigId)
 		{
-			window.open("viewer.html?type=published&id=" + mapConfig.lmfId);
+			//window.open("viewer.html?type=published&id=" + mapConfig.lmfId);
+			window.open("viewer.html?config=../smks-api/MapConfigurations/Published/" + mapConfig.lmfId + "/");
 		}
 	});
 }
@@ -1573,6 +1598,7 @@ function addNewQuery()
 	
 	$("#queryTable").hide();
 	$("#queryEditor").show();
+	$("#queryIcon").val("search");
 	
 	// we should make sure that the config includes the menu and dropdown tools
 	var menuExists = false;
@@ -1612,6 +1638,16 @@ function editQuery(id)
 			$("#queryName").val(query.title);
 			$("#queryDescription").val(query.description);
 			$("#queryAndOrToggle").prop('checked', query.predicate.operator == "or" ? true : false);
+			
+			for(var i = 0; i < data.tools.length; i++)
+			{
+				if(data.tools[i].type == "query" && data.tools[i].instance == selectedLayerNode.data.id + "--" + selectedQuery.id)
+				{
+					$("#queryOnDropdown").prop('checked', data.tools[i].position == "dropdown" ? true : false);
+					$("#queryIcon").val(data.tools[i].icon);
+					break;
+				}
+			}
 			
 			// build argument chain
 	
@@ -1810,11 +1846,23 @@ function saveQuery()
 		{
 			type: "query", 
 			instance: selectedLayerNode.data.id + "--" + selectedQuery.id,
-			position: "dropdown", 
-			icon: "search"
+			position: $("#queryOnDropdown").is(":checked") ? "dropdown" : "toolbar", 
+			icon: $("#queryIcon").val()
 		};
 		
 		data.tools.push(tool);
+	}
+	else
+	{
+		for(var i = 0; i < data.tools.length; i++)
+		{
+			if(data.tools[i].type == "query" && data.tools[i].instance == selectedLayerNode.data.id + "--" + selectedQuery.id)
+			{
+				data.tools[i].position = $("#queryOnDropdown").is(":checked") ? "dropdown" : "toolbar";
+				data.tools[i].icon = $("#queryIcon").val();
+				break;
+			}
+		}
 	}
 	
 	newQuery = false;
@@ -1839,6 +1887,71 @@ function saveQuery()
 	}
 	
 	$("#queryTable").show();
+}
+
+function updateQueryIconPrefix()
+{
+	var txt = $("#iconDemo").text();
+	var val = $("#queryIcon").val();
+	$("#iconDemo").text($("#queryIcon").val());
+}
+
+function loadDropdownChoiceFromLayer()
+{
+	var layer = selectedLayerNode.data;
+	if(layer.type == "vector")
+	{
+		// fetch json from service, parse all attributes
+		alert("Not yet implemented");
+	}
+	else if(layer.type == "esri-dynamic")
+	{
+		// run an ArcGIS query on the layer, no geom return, just the selected attribute
+		alert("Not yet implemented");
+	}
+	else if(layer.type == "wms")
+	{
+		// wfs query to get all layer data.
+		var attribute = $("#" + currentDropdownId + "_queryAttributes").val();
+		var url = layer.serviceUrl + "?service=WFS&request=GetFeature&typeNames=" + layer.layerName + "&propertyName=" + attribute + "&outputformat=application%2Fjson";
+		
+		// fire a request to the wfs URL. take all the results and create choices out of them
+		$.ajax
+		({
+			url: url,
+	        type: 'get',
+	        dataType: 'json',
+	        contentType:'application/json',
+	        crossDomain: true,
+	        withCredentials: true,
+	        success: function (resultData)
+	        {
+	        	var processedVals = [];
+	        	
+	        	for(var i = 0; i < resultData.features.length; i++)
+        		{
+	        		var feature = resultData.features[i];
+	        		var value = feature.properties[attribute];
+	        		
+	        		if(!processedVals.includes(value))
+	        		{
+	        			processedVals.push(value);
+	        			
+		        		choiceId++;
+		        		choicesIds.push(choiceId);
+	
+		        		$("#dropdownOptionsPanel").append('<div id="' + choiceId + '_choice" class="row"><div class="col s5 input-field"><input id="' + choiceId + '_dropdownValue" type="text"><label for="' + choiceId + '_dropdownValue">Value</label></div><div class="col s5 input-field"><input id="' + choiceId + '_dropdownTitle" type="text"><label for="' + choiceId + '_dropdownTitle">Description Text</label></div><div class="col s2"><a class="btn-floating btn-large waves-effect waves-light nrpp-blue-dark" onclick="removeChoice(' + choiceId + ');"><i class="material-icons left">delete_forever</i></a></div></div>');
+		        		
+		        		$("#" + choiceId + "_dropdownValue").val(feature.properties[attribute]);
+		        		$("#" + choiceId + "_dropdownTitle").val(feature.properties[attribute]);
+        			}
+        		}
+	        	
+	        	Materialize.updateTextFields();
+	        }
+		});
+		
+	}
 }
 
 var dropdownOptions = [];
@@ -2607,6 +2720,7 @@ $(document).ready(function()
 	    }
 	});
 	$('#layerPopupTemplateModal').modal({ dismissible: false });
+
 });
 
 var fileContents;

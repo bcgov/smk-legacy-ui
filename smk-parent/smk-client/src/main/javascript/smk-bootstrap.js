@@ -1,8 +1,11 @@
 ( function () {
 
-    installPolyfills()
+    var bootstrapScriptEl = document.currentScript
 
-    setupGlobalSMK()
+    var util = {}
+    installPolyfills( util )
+
+    setupGlobalSMK( util )
 
     console.time( 'smk-bootstrap' )
     console.groupCollapsed( 'SMK bootstrap' )
@@ -13,27 +16,26 @@
         .then( loadInclude )
         .then( initializeSmkMap )
         .catch( SMK.ON_FAILURE )
-        .finally( function () {
-            console.groupEnd()
-            console.timeEnd( 'smk-bootstrap' )
-        } )
+
+    util.promiseFinally( SMK.BOOT, function () {
+        console.groupEnd()
+        console.timeEnd( 'smk-bootstrap' )
+    } )
 
 // = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
     function parseScriptElement() {
-        var script = document.currentScript
-
         var smkAttr = {
             'container-id': attrString( 'smk-map-frame' ),
             'config':       attrList( '?smk-' ),
             'standalone':   attrBoolean( false, true ),
             'disconnected': attrBoolean( false, true ),
-            'base-url':     attrString( ( new URL( script.src.replace( 'smk-bootstrap.js', '' ), document.location ) ).toString() ),
+            'base-url':     attrString( ( new URL( bootstrapScriptEl.src.replace( 'smk-bootstrap.js', '' ), document.location ) ).toString() ),
             'service-url':  attrString( '../smks-api' ),
         }
 
         Object.keys( smkAttr ).forEach( function ( k ) {
-            smkAttr[ k ] = smkAttr[ k ]( 'smk-' + k, script )
+            smkAttr[ k ] = smkAttr[ k ]( 'smk-' + k, bootstrapScriptEl )
         } )
 
         console.log( 'SMK attributes', JSON.parse( JSON.stringify( smkAttr ) ) )
@@ -465,6 +467,9 @@
                 return include( 'vue' )
             } )
             .then( function () {
+                return include( 'vue-config' )
+            } )
+            .then( function () {
                 if ( window.turf ) {
                     include.tag( 'turf' ).include = Promise.resolve( window.turf )
                     return
@@ -482,7 +487,7 @@
 
 // = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
-    function installPolyfills() {
+    function installPolyfills( util ) {
         window.dojoConfig = {
             has: {
                 "esri-promise-compatibility": 1
@@ -530,18 +535,39 @@
             if ( document.__defineGetter__ )
                 document.__defineGetter__( 'currentScript', actualScript )
         } )()
+
+
+        if ( Promise.prototype.finally )
+            util.promiseFinally = function ( promise, onFinally ) {
+                return promise.finally( onFinally )
+            }
+        else
+            util.promiseFinally = function ( promise, onFinally ) {
+                var onThen = function ( arg ) {
+                    onFinally()
+                    return arg
+                }
+
+                var onFail = function ( arg ) {
+                    onFinally()
+                    return Promise.reject( arg )
+                }
+
+                return promise.then( onThen, onFail )
+            }
+
     }
 
 // = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
-    function setupGlobalSMK() {
+    function setupGlobalSMK( util ) {
         // if ( !window.SMK ) window.SMK = {}
 
         return window.SMK = Object.assign( {
             MAP: {},
             VIEWER: {},
             TYPE: {},
-            UTIL: {},
+            UTIL: util,
 
             CONFIG: {
                 surround: {

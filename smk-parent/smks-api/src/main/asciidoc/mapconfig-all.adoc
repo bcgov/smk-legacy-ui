@@ -1,6 +1,6 @@
-== {GET} MapConfiguration - Retrieve the latest versions of all LMF Map Configurations (non-published only)
+== {GET} MapConfiguration - Retrieve the latest versions of all SMK Map Configurations (non-published only)
 
-Executing a GET at the MapConfiguration endpoint will return a listing of all non published LMF Map Configurations
+Executing a GET at the MapConfiguration endpoint will return a listing of all non published SMK Map Configurations
 
 Example of curl command:
 
@@ -21,3 +21,22 @@ include::{snippets}/mapconfig-all/response-body.adoc[]
 Response fields:
 
 include::{snippets}/mapconfig-all/response-fields.adoc[]
+
+Resulting fields:
+
+|===
+|Path|Type|Description
+
+|`id`
+|`String`
+|The ID of the attachment
+
+|`content-type`
+|`String`
+|The content-type of the attachment
+
+|`content-length`
+|`String`
+|The size of the attachment in bytes
+
+|===

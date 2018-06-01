@@ -38,32 +38,4 @@
     font-weight: bold;
 }
 
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-.smk-directions-popup .smk-address {
-    margin-bottom: 10px;
-}
-
-.smk-directions-popup .smk-street {
-    font-size: 15px;
-}
-
-.smk-directions-popup .smk-locality-type {
-    font-size: 10px;
-}
-
-.smk-directions-popup .smk-ordinate label {
-    display: inline-block;
-    font-size: 10px;
-    margin-right: 10px;
-}
-
-.smk-directions-popup .smk-ordinate div {
-    font-size: 14px;
-}
-
-.smk-directions-popup .smk-commands {
-    border-top: 1px solid gray;
-    margin-top: 10px;
-    padding-top: 5px;
-}

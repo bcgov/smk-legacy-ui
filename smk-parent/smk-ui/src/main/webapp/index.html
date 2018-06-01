@@ -810,6 +810,14 @@
 										<input type="checkbox" id="directions" onclick="setToolActivation('directions')"/>
 										<label class="black-text" for="directions">Directions</label>
 									</p>
+									<p>
+										<input type="checkbox" id="searchPanel" onclick="setToolActivation('search')"/>
+										<label class="black-text" for="searchPanel">Search</label>
+									</p>
+									<p>
+										<input type="checkbox" id="location" onclick="setToolActivation('location')"/>
+										<label class="black-text" for="location">Location</label>
+									</p>
 									<p><h5 style="border-bottom: 2px solid #fcba19;">Map Information</h5></p>
 									<p>
 										<input type="checkbox" id="coordinates" onclick="setToolActivation('coordinate')"/>
@@ -858,8 +866,12 @@
 										<label class="black-text" for="selectionPanel">Selection Panel</label>
 									</p>
 									<p>
-										<input type="checkbox" id="searchPanel" onclick="setToolActivation('search')"/>
-										<label class="black-text" for="searchPanel">Search Panel</label>
+										<input type="checkbox" id="dropdown" onclick="setToolActivation('dropdown')"/>
+										<label class="black-text" for="dropdown">Query Dropdown Panel</label>
+									</p>
+									<p>
+										<input type="checkbox" id="menu" onclick="setToolActivation('menu')"/>
+										<label class="black-text" for="menu">Hamburger Menu</label>
 									</p>
 								</div>
 								<div class="col s9">
@@ -1182,6 +1194,20 @@
 					</div>
 				</div>
 				<div class="row">
+					<div class="col s5">
+						<input type="checkbox" id="queryOnDropdown" />
+						<label class="black-text" for="queryOnDropdown">Add to Dropdown (if tool is available)</label>
+					</div>
+					<div class="col s4 input-field">
+						<i id="iconDemo" class="material-icons prefix black-text">search</i>
+						<input id="queryIcon" type="text" onchange="updateQueryIconPrefix();">
+						<label for="queryIcon">Query Icon ID</label>
+					</div>
+					<div class="col s3 input-field">
+						<a href="https://material.io/tools/icons/?style=sharp" target="_blank">Material Icon IDs</a>
+					</div>
+				</div>
+				<div class="row">
 					<!-- And/Or toggle  -->
 					<p>Select "And" to query all arguments together. Select "Or" if each argument is a separate query</p>
 					<div class="switch">
@@ -1220,6 +1246,9 @@
 	    </div>
 	    <div class="row">
 			<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="addNewChoice();" style="width: 220px;"><i class="material-icons left">add</i>Add Choice</a>
+		</div>
+		<div class="row">
+			<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="loadDropdownChoiceFromLayer();" style="width: 220px;"><i class="material-icons left">redo</i>Load Choices</a>
 		</div>
       </div>
       <div class="modal-footer">
