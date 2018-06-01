@@ -81,7 +81,7 @@
 }
 
 .smk-sidepanel .smk-placeholder:empty {
-    padding: 0;
+    display: none;
 }
 
 .smk-sidepanel .smk-panel h1 {
