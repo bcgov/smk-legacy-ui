@@ -204,8 +204,14 @@ include.module( 'tool-search', [ 'tool', 'widgets', 'tool-search.widget-search-h
                                 } )
                         } )
                 },
+            },
+            updated: function () {
+                if ( this.feature )
+                    self.updatePopup()
             }
         } )
+
+        this.updatePopup = function () {}
     } )
 
     return SearchTool

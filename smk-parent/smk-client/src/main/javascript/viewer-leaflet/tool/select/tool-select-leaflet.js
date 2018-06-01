@@ -1,4 +1,4 @@
-include.module( 'tool-select-leaflet', [ 'leaflet', 'tool-select' ], function ( inc ) {
+include.module( 'tool-select-leaflet', [ 'leaflet', 'tool-select', 'feature-list-leaflet' ], function ( inc ) {
 
     SMK.TYPE.SelectTool.prototype.styleFeature = function () {
         var self = this
@@ -13,6 +13,8 @@ include.module( 'tool-select-leaflet', [ 'leaflet', 'tool-select' ], function ( 
             }, self.style )
         }
     }
+
+    SMK.TYPE.SelectTool.prototype.afterInitialize.push( inc[ 'feature-list-leaflet' ] )
 
     SMK.TYPE.SelectTool.prototype.afterInitialize.push( function ( smk ) {
         var self = this

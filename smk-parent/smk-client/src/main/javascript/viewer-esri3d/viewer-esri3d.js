@@ -41,7 +41,7 @@ include.module( 'viewer-esri3d', [ 'viewer', 'esri3d', 'types-esri3d', 'layer-es
         this.view = new E.views.SceneView( {
             container: el,
             map: this.map,
-            ui: new E.views.ui.DefaultUI( {
+            ui: new E.views.ui[ '3d' ].DefaultUI3D( {
                 components: [ "attribution" ],
                 padding: {
                     top: 5,
@@ -129,10 +129,27 @@ include.module( 'viewer-esri3d', [ 'viewer', 'esri3d', 'types-esri3d', 'layer-es
             } )
         } )
 
+        this.view.on( 'pointer-move', function ( ev ) {
+            self.changedLocation( {
+                map:    self.view.toMap( ev ),
+                screen: { x: ev.x, y: ev.y }
+            } )
+        } )
+
         E.core.watchUtils.watch( this.view.popup, "visible", function() {
             self.changedPopup()
         } )
 
+    }
+
+    ViewerEsri3d.prototype.screenToGroundDistance = function ( pt1, pt2 ) {
+        var ll1 = this.screenToMap( pt1 )
+        if ( !ll1 ) return
+
+        var ll2 = this.screenToMap( pt2 )
+        if ( !ll2 ) return
+
+        return turf.distance( ll1, ll2 ) * 1000
     }
 
     ViewerEsri3d.prototype.getView = function () {
@@ -140,16 +157,51 @@ include.module( 'viewer-esri3d', [ 'viewer', 'esri3d', 'types-esri3d', 'layer-es
 
         var ex = E.geometry.support.webMercatorUtils.webMercatorToGeographic( this.view.extent )
 
+        var w = this.view.width,
+            h = this.view.height
+
+        var tl = this.screenToGroundDistance( [ 0, 0 ], [ 100, 0 ] )
+        var tr = this.screenToGroundDistance( [ w, 0 ], [ w - 100, 0 ] )
+        var bl = this.screenToGroundDistance( [ 0, h ], [ 100, h ] )
+        var br = this.screenToGroundDistance( [ w, h ], [ w - 100, h ] )
+        var c = this.screenToGroundDistance( [ w / 2 - 50, h / 2 ], [ w / 2 + 50, h / 2 ] )
+        // console.log( tl, tr )
+        // console.log( '       ' + c )
+        // console.log( bl, br )
+
+        var mapDist
+        if ( tl && tr && bl && br && c ) {
+            var t = Math.max( tr, tl ) / Math.min( tr, tl ) * 100 - 100
+            var b = Math.max( br, bl ) / Math.min( br, bl ) * 100 - 100
+            var l = Math.max( tl, bl ) / Math.min( tl, bl ) * 100 - 100
+            var r = Math.max( tr, br ) / Math.min( tr, br ) * 100 - 100
+            var tlc = Math.max( tl, c ) / Math.min( tl, c ) * 100 - 100
+            var trc = Math.max( tr, c ) / Math.min( tr, c ) * 100 - 100
+            var blc = Math.max( bl, c ) / Math.min( bl, c ) * 100 - 100
+            var brc = Math.max( br, c ) / Math.min( br, c ) * 100 - 100
+
+            var fudge = Math.pow( 2000 / Math.min( 2000, c ), 1.1 )
+            var maxChange = Math.max( t, b, l, r, tlc, trc, blc, brc ) / fudge
+            // console.log( c, maxChange, fudge )
+
+            if ( maxChange < 6 )
+                mapDist = c
+        }
+
+        if ( mapDist )
+            var scale = mapDist / this.screenpixelsToMeters,
+                metersPerPixel = mapDist / 100
+
         return {
             center: this.view.center,
             zoom: this.view.zoom,
             extent: [ ex.xmin, ex.ymin, ex.xmax, ex.ymax ],
             screen: {
-                width:  this.view.width,
-                height: this.view.height
-            }
-            // scale: mapDist / this.screenpixelsToMeters,
-            // metersPerPixel: mapDist / 100,
+                width:  w,
+                height: h
+            },
+            scale: scale,
+            metersPerPixel: metersPerPixel
         }
     }
 
@@ -159,6 +211,7 @@ include.module( 'viewer-esri3d', [ 'viewer', 'esri3d', 'types-esri3d', 'layer-es
         else
             var ll = this.view.toMap( screen )
 
+        if ( !ll ) return
         return [ ll.longitude, ll.latitude ]
     }
 

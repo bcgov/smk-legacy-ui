@@ -116,7 +116,7 @@ include.module( 'tool-directions-leaflet', [ 'leaflet', 'tool-directions' ], fun
                     }
 
                     return L.marker( [ w.latitude, w.longitude ], {
-                            title: w.fullAddress,
+                            // title: w.fullAddress,
                             icon: icon
                         } )
                         .bindPopup( function () {

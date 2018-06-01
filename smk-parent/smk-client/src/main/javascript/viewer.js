@@ -8,6 +8,7 @@ include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', '
         'startedIdentify',
         'finishedIdentify',
         'pickedLocation',
+        'changedLocation',
         'changedPopup'
     ] )
 
@@ -130,6 +131,8 @@ include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', '
         this.deadViewerLayer = {}
         this.pickHandlers = []
         this.query = {}
+
+        this.screenpixelsToMeters = self.pixelsToMillimeters( 100 ) / 1000
 
         if ( Array.isArray( smk.layers ) )
             constructLayers( smk.layers, 0, null, function ( ly, cfg ) {

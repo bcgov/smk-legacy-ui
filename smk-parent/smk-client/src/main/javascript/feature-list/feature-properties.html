@@ -4,7 +4,9 @@
         <h2>{{ feature.title }}</h2>
     </div>
 
-    <div class="smk-attributes">
+    <div class="smk-attributes"
+        v-if="feature.properties && Object.keys( feature.properties ) > 0"
+    >
         <div class="smk-attribute"
             v-for="(val, attr) in feature.properties"
         >

@@ -82,9 +82,9 @@ include.module( 'tool-directions-esri3d', [ 'esri3d', 'types-esri3d', 'util-esri
                 self.directionsLayer.visible = true
             }
             else {
-                reset()
                 smk.$viewer.view.padding = { left: 0 }
                 self.directionsLayer.visible = false
+                smk.$viewer.view.popup.close()
             }
         } )
 
@@ -179,10 +179,6 @@ include.module( 'tool-directions-esri3d', [ 'esri3d', 'types-esri3d', 'util-esri
 
             smk.$viewer.view.popup.close()
         }
-
-        self.directionHighlightLayer = new E.layers.GraphicsLayer()
-        smk.$viewer.map.add( self.directionHighlightLayer )
-
 
         smk.on( this.id, {
             'hover-direction': function ( ev ) {

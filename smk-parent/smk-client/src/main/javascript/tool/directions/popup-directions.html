@@ -1,4 +1,4 @@
-<div class="smk-directions-popup">
+<div class="smk-directions-popup" v-if="site">
     <div class="smk-message">
         <span v-if="site.current">[CURRENT]</span>
         <span v-if="site.first">Start here:</span>
@@ -12,7 +12,7 @@
             <span class="smk-distance" >for {{ site.distance }}</span>
             <span class="smk-time">({{ site.time }})</span>
         </div>
-    </div>    
+    </div>
 
     <div class="smk-address" v-if="site.fullAddress">
         <div class="smk-street">

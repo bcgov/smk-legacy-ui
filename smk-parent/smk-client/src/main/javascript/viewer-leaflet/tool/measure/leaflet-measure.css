@@ -51,6 +51,7 @@
     background: #fff;
     border-radius: 4px;
     box-shadow: none;
+    /* display: none;  */
 }
 
 .leaflet-control-measure .leaflet-control-measure-toggle, .leaflet-control-measure .leaflet-control-measure-toggle:hover {

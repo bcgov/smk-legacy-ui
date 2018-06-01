@@ -22,22 +22,24 @@ include.module( 'smk-map', [ 'jquery', 'util' ], function () {
         $( this.$container )
             .addClass( 'smk-hidden' )
 
-        return SMK.UTIL.resolved()
-            .then( loadConfigs )
-            .then( mergeConfigs )
-            .then( resolveConfig )
-            .then( initMapFrame )
-            .then( loadSurround )
-            // .then( loadViewer )
-            .then( loadTools )
-            .then( loadViewer )
-            .then( initViewer )
-            .then( initTools )
-            .then( initSurround )
-            .then( showMap )
-            .finally( function () {
+        return SMK.UTIL.promiseFinally(
+            SMK.UTIL.resolved()
+                .then( loadConfigs )
+                .then( mergeConfigs )
+                .then( resolveConfig )
+                .then( initMapFrame )
+                .then( loadSurround )
+                .then( checkTools )
+                .then( loadViewer )
+                .then( loadTools )
+                .then( initViewer )
+                .then( initTools )
+                .then( initSurround )
+                .then( showMap ),
+            function () {
                 console.groupEnd()
-            } )
+            }
+        )
 
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -249,10 +251,20 @@ include.module( 'smk-map', [ 'jquery', 'util' ], function () {
             return include( 'surround' )
         }
 
-        function initSurround() {
-            if ( !self.$option.standalone ) return
+        function checkTools() {
+            if ( !self.tools ) return
+            var enabledTools = self.tools.filter( function ( t ) { return t.enabled !== false } )
+            if ( enabledTools.length == 0 ) return
 
-            self.$surround = new SMK.TYPE.Surround( self )
+            return SMK.UTIL.waitAll( enabledTools.map( function ( t ) {
+                return include( 'check-' + t.type )
+                    .then( function ( inc ) {
+                        console.log( 'checked tool "' + t.type + '"' )
+                    } )
+                    .catch( function ( e ) {
+                        console.debug( 'unable to check tool "' + t.type + '"', e )
+                    } )
+            } ) )
         }
 
         function loadViewer() {
@@ -264,26 +276,14 @@ include.module( 'smk-map', [ 'jquery', 'util' ], function () {
                 } )
         }
 
-        function initViewer() {
-            if ( !( self.viewer.type in SMK.TYPE.Viewer ) )
-                throw new Error( 'viewer type "' + self.viewer.type + '" not defined' )
-
-            self.$viewer = new SMK.TYPE.Viewer[ self.viewer.type ]()
-            return SMK.UTIL.resolved()
-                .then( function () {
-                    return self.$viewer.initialize( self )
-                } )
-                .then( function () {
-                    return self.$viewer.initializeLayers( self )
-                } )
-        }
-
         function loadTools() {
             self.$tool = {}
 
-            if ( !self.tools || self.tools.length == 0 ) return
+            if ( !self.tools ) return
+            var enabledTools = self.tools.filter( function ( t ) { return t.enabled !== false } )
+            if ( enabledTools.length == 0 ) return
 
-            return SMK.UTIL.waitAll( self.tools.filter( function ( t ) { return t.enabled !== false } ).map( function ( t ) {
+            return SMK.UTIL.waitAll( enabledTools.map( function ( t ) {
                 var tag = 'tool-' + t.type
                 return include( tag )
                     .then( function ( inc ) {
@@ -306,6 +306,20 @@ include.module( 'smk-map', [ 'jquery', 'util' ], function () {
             } ) )
         }
 
+        function initViewer() {
+            if ( !( self.viewer.type in SMK.TYPE.Viewer ) )
+                throw new Error( 'viewer type "' + self.viewer.type + '" not defined' )
+
+            self.$viewer = new SMK.TYPE.Viewer[ self.viewer.type ]()
+            return SMK.UTIL.resolved()
+                .then( function () {
+                    return self.$viewer.initialize( self )
+                } )
+                .then( function () {
+                    return self.$viewer.initializeLayers( self )
+                } )
+        }
+
         function initTools() {
             var ts = Object.keys( self.$tool )
                 .sort( function ( a, b ) { return self.$tool[ a ].order - self.$tool[ b ].order } )
@@ -322,6 +336,12 @@ include.module( 'smk-map', [ 'jquery', 'util' ], function () {
                         console.log( 'tool "' + t + '" initialized' )
                     } )
             } ) )
+        }
+
+        function initSurround() {
+            if ( !self.$option.standalone ) return
+
+            self.$surround = new SMK.TYPE.Surround( self )
         }
 
         function showMap() {
@@ -349,6 +369,13 @@ include.module( 'smk-map', [ 'jquery', 'util' ], function () {
             this.$overlay = this.addToContainer( '<div class="smk-overlay">' )
 
         return $( html ).appendTo( this.$overlay ).get( 0 )
+    }
+
+    SmkMap.prototype.addToStatus = function ( html ) {
+        if ( !this.$status )
+            this.$status = this.addToOverlay( '<div class="smk-status">' )
+
+        return $( html ).appendTo( this.$status ).get( 0 )
     }
 
     SmkMap.prototype.getToolbar = function () {

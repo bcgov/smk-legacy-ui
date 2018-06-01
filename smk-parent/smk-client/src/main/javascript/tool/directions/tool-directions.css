@@ -99,11 +99,21 @@
 
 .smk-directions-panel .smk-body .smk-directions {
     position: relative;
-    flex: 1 0;
+    /* flex: 1 0; */
     overflow-x: hidden;
-    overflow-y: scroll;
+    overflow-y: auto;
     height: 100%;
     margin-top: 5px;
+}
+
+.smk-directions-popup .smk-address {
+    margin-bottom: 10px;
+}
+
+.smk-directions-popup .smk-commands {
+    border-top: 1px solid gray;
+    margin-top: 10px;
+    padding-top: 5px;
 }
 
 .smk-direction {

@@ -190,7 +190,7 @@ include.module( 'tool-query', [ 'feature-list', 'widgets', 'tool-query.panel-que
                     param[ p.prop.id ] = $.extend( {}, p.prop )
                 } )
 
-                return SMK.UTIL.resolved()
+                return SMK.UTIL.promiseFinally( SMK.UTIL.resolved()
                     .then( function () {
                         return self.query.queryLayer( param, self.config, smk.$viewer )
                     } )
@@ -209,8 +209,7 @@ include.module( 'tool-query', [ 'feature-list', 'widgets', 'tool-query.panel-que
                     .catch( function ( err ) {
                         console.warn( err )
                         self.setMessage( 'Query returned no results', 'warning' )
-                    } )
-                    .finally( function () {
+                    } ), function () {
                         self.busy = false
                     } )
 

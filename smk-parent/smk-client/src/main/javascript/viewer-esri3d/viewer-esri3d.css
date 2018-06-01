@@ -1,3 +1,7 @@
+.smk-viewer .esri-ui .esri-popup  {
+    transform: translateY( -30px );
+}
+
 .smk-viewer .esri-popup__main-container {
     width: 400px;
     border-radius: 5px;
