@@ -467,6 +467,9 @@
                 return include( 'vue' )
             } )
             .then( function () {
+                return include( 'vue-config' )
+            } )
+            .then( function () {
                 if ( window.turf ) {
                     include.tag( 'turf' ).include = Promise.resolve( window.turf )
                     return

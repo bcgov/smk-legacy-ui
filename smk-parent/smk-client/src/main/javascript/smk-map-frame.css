@@ -27,6 +27,14 @@
     pointer-events: none;
 }
 
+.smk-map-frame .smk-overlay .smk-status {
+    position: absolute;
+    right: 0;
+    bottom: 10px;
+
+    display: flex;
+    flex-direction: column-reverse;
+}
 
 .smk-map-frame .smk-command {
     cursor: pointer;
@@ -89,4 +97,43 @@
 .smk-map-frame .smk-item:hover {
     background-color: #d2d9e6;
     /* border: 1px solid #d2d9e6; */
+}
+
+
+.smk-map-frame .smk-coordinate {
+    color: black;
+    font-size: 12px;
+    background-color: transparent;
+    cursor: default;
+}
+
+.smk-map-frame .smk-coordinate .smk-ordinate label {
+    display: inline-block;
+    font-size: 10px;
+    margin-right: 10px;
+    text-align: left;
+}
+
+.smk-map-frame .smk-coordinate .smk-ordinate div {
+    font-size: 14px;
+}
+
+
+.smk-map-frame .smk-address {
+}
+
+.smk-map-frame .smk-address .smk-street {
+    font-size: 15px;
+}
+
+.smk-map-frame .smk-address .smk-locality {
+    font-size: 12px;
+}
+
+.smk-map-frame .smk-address .smk-precision-locality .smk-locality {
+    font-size: 15px;
+}
+
+.smk-map-frame .smk-address .smk-locality-type {
+    font-size: 10px;
 }
