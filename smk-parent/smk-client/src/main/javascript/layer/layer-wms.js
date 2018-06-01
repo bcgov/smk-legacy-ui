@@ -33,7 +33,7 @@ include.module( 'layer.layer-wms-js', [ 'layer.layer-js' ], function () {
                     .on( 'load', function () {
                         res( [ { url: url } ] )
                     } )
-                    .error( function ( ev ) {
+                    .on( 'error', function ( ev ) {
                         rej( new Error( 'Unable to load: ' + url ) )
                     } )
                     .attr( 'src', url )
