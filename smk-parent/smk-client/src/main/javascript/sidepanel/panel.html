@@ -1,11 +1,17 @@
 <div>
     <div class="smk-header">
         <slot name="header"></slot>
+
         <div class="smk-commands">
             <slot name="commands"></slot>
         </div>
     </div>
+
     <div class="smk-body">
+        <div class="smk-placeholder">
+            <slot name="placeholder"></slot>
+        </div>
+
         <slot></slot>
-    </div >
+    </div>
 </div>

@@ -9,6 +9,11 @@
             v-bind:class="{ 'smk-disabled': isEmpty() }"
             v-on:click="$$emit( 'clear' )"
         >Clear results</span>
+
+        <span class="smk-command"
+            v-bind:class="{ 'smk-disabled': isEmpty() }"
+            v-on:click="$$emit( 'zoom' )"
+        >Zoom to results</span>
     </template>
 
     <div class="smk-placeholder"
