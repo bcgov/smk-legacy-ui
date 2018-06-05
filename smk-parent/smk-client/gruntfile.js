@@ -68,7 +68,7 @@ module.exports = function( grunt ) {
             'test': {
                 expand: true,
                 cwd: 'src/main/test',
-                src: [ '**', '!**/*html' ],
+                src: [ '**', '!**/*html' ], //, '!attachments/**' ],
                 dest: '<%= buildPath %>/test'
             },
 
@@ -89,7 +89,11 @@ module.exports = function( grunt ) {
             },
 
             'build': {
-                src: [ '<%= buildPath %>/**' ]
+                src: [ '<%= buildPath %>/**', '!<%= buildPath %>', '!<%= buildPath %>/test/**' ]
+            },
+
+            'test': {
+                src: [ '<%= buildPath %>/test/**' ]
             }
         },
 
@@ -119,23 +123,24 @@ module.exports = function( grunt ) {
                     key:    grunt.file.read( 'node_modules/grunt-contrib-connect/tasks/certs/server.key' ),
                     cert:   grunt.file.read( 'node_modules/grunt-contrib-connect/tasks/certs/server.crt' )
                 },
+                livereloadOnError: false,
                 spawn: false
                 // interrupt: true,
             },
 
             src: {
                 files: [ '<%= srcPath %>/**' ],
-                tasks: [ 'build' ],
+                tasks: [ 'build' ]
             },
 
             test: {
                 files: [ 'src/main/test/**' ],
-                tasks: [ 'filelist:configs:filelist', 'copy:test-html', 'copy:test', 'copy:deploy' ],
+                tasks: [ 'build-test' ]
             },
 
             tags: {
                 files: [ 'smk-tags.js', 'lib/**' ],
-                tasks: [ 'gen-tags', 'copy:include', 'copy:deploy' ]
+                tasks: [ 'gen-tags', 'copy:include' ]
             }
         }
 
@@ -188,6 +193,7 @@ module.exports = function( grunt ) {
 
         grunt.task.run(
             'build',
+            'build-test',
             'connect',
             'watch'
         )
@@ -227,10 +233,13 @@ module.exports = function( grunt ) {
         'gen-tags',
         'copy:src',
         'copy:include',
+    ] )
+
+    grunt.registerTask( 'build-test', [
+        'clean:test',
         'filelist:configs:filelist',
         'copy:test-html',
         'copy:test',
-        'copy:deploy'
     ] )
 
     grunt.registerTask( 'default', 'use:https' )
