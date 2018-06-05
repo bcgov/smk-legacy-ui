@@ -136,4 +136,13 @@ include.module( 'vue-config', [ 'vue' ], function ( inc ) {
         "150kilometers":    150000
     }
 
+    // Vue.mixin( {
+    //     methods: {
+    //         debug: function ( m, v ) {
+    //             console.log( m, v )
+    //             return v
+    //         }
+    //     }
+    // } )
+
 } )
