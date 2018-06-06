@@ -8,7 +8,7 @@
             v-if="!useFallback || !isEmpty"
         >
             <option disabled value="" v-if="isEmpty">No choices available</option>
-            <option disabled value="" v-if="!isEmpty">Select {{ title }}</option>
+            <option disabled value="" v-if="!isEmpty">Please choose</option>
 
             <option
                 v-for="option in choices"
