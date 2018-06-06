@@ -9,6 +9,81 @@ include.module( 'query.query-wms-js', [ 'query.query-js' ], function () {
     SMK.TYPE.Query[ 'wms' ] = WmsQuery
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
+    WmsQuery.prototype.fetchUniqueValues = function ( attribute, viewer ) {
+        var p = SMK.UTIL.resolved();
+
+        var layerConfig = viewer.layerId[ this.layerId ].config
+            typeName    = layerConfig.layerName,
+            serviceUrl  = layerConfig.serviceUrl
+
+        return SMK.UTIL.asyncReduce( function ( accum, done ) {
+            return fetchSomeUniqueValues( accum, serviceUrl, typeName, attribute )
+                .then( function ( values ) {
+                    if ( !values || values.length == 0 ) return done()
+                    return accum.concat( values )
+                } )
+        }, [] )
+    }
+
+    function fetchSomeUniqueValues( excludes, serviceUrl, typeName, attribute ) {
+        var notNullExcludes = excludes.filter( function ( v ) { return v != null } )
+        var filter = '(1=1)'
+
+        if ( excludes.length != notNullExcludes.length )
+            filter = '( ' + attribute + ' IS NOT NULL )'
+
+        if ( notNullExcludes.length > 0 )
+            filter += ' AND ' + attribute + ' NOT IN ( ' + notNullExcludes.map( function ( x ) { return "'" + x + "'" } ).join( ', ') + ' )'
+
+        var data = {
+            service:      "WFS",
+            version:      '1.1.0',
+            request:      "GetFeature",
+            srsName:      'EPSG:4326',
+            typename:     typeName,
+            outputformat: "application/json",
+            cql_filter:   filter,
+            propertyName: attribute,
+            maxFeatures:  10
+        }
+
+        return SMK.UTIL.makePromise( function ( res, rej ) {
+            $.ajax( {
+                url:        serviceUrl,
+                method:     'GET',
+                data:       data,
+                dataType:   'json',
+                // contentType:    'application/json',
+                // crossDomain:    true,
+                // withCredentials: true,
+            } ).then( res, rej )
+        } )
+        .then( function ( data ) {
+            // console.log( data )
+
+            if ( !data ) return []
+            if ( !data.features || data.features.length == 0 ) return []
+
+            var value = {}
+            var hasNull = false
+            data.features.forEach( function ( f, i ) {
+                if ( f.properties[ attribute ] == null )
+                    hasNull = true
+                else
+                    value[ f.properties[ attribute ] ] = true
+            } )
+
+            return Object.keys( value ).concat( hasNull ? [ null ] : [] )
+        } )
+        .catch( function ( e ) {
+            if ( e.responseText )
+                throw new Error( 'Request failed: ' + e.responseText )
+            throw e
+        } )
+
+    }
+    // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+    //
     WmsQuery.prototype.queryLayer = function ( param, config, viewer ) {
         var self = this
 

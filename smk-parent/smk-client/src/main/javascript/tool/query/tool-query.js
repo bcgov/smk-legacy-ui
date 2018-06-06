@@ -3,6 +3,9 @@ include.module( 'tool-query', [ 'feature-list', 'widgets', 'tool-query.panel-que
     Vue.component( 'parameter-constant', {
         template: inc[ 'tool-query.parameter-constant-html' ],
         props: [ 'id', 'title', 'value', 'type' ],
+        mounted: function () {
+            this.$emit( 'mounted' )
+        }
     } )
 
     Vue.component( 'parameter-input', {
@@ -17,12 +20,15 @@ include.module( 'tool-query', [ 'feature-list', 'widgets', 'tool-query.panel-que
             value: function ( val ) {
                 this.input = val
             }
+        },
+        mounted: function () {
+            this.$emit( 'mounted' )
         }
     } )
 
     Vue.component( 'parameter-select', {
         template: inc[ 'tool-query.parameter-select-html' ],
-        props: [ 'id', 'title', 'choices', 'value', 'type' ],
+        props: [ 'id', 'title', 'choices', 'value', 'type', 'useFallback' ],
         data: function () {
             // console.log( 'data', this.value )
             return {
@@ -33,6 +39,14 @@ include.module( 'tool-query', [ 'feature-list', 'widgets', 'tool-query.panel-que
             value: function ( val ) {
                 // console.log( 'watch', val )
                 this.selected = val || ''
+            }
+        },
+        mounted: function () {
+            this.$emit( 'mounted' )
+        },
+        computed: {
+            isEmpty: function () {
+                return !this.choices || this.choices.length == 0
             }
         }
     } )
@@ -133,7 +147,7 @@ include.module( 'tool-query', [ 'feature-list', 'widgets', 'tool-query.panel-que
 
         this.title = this.query.title
         this.description = this.query.description
-        this.parameters = this.query.getParameters()
+        this.parameters = this.query.getParameters( smk.$viewer )
 
         if ( !smk.$viewer.layerId[ this.query.layerId ].config.geometryAttribute )
             this.config.within = null
@@ -161,6 +175,11 @@ include.module( 'tool-query', [ 'feature-list', 'widgets', 'tool-query.panel-que
 
             'parameter-input': function ( ev ) {
                 self.parameters[ ev.index ].prop.value = ev.value
+            },
+
+            'parameter-mounted': function ( ev ) {
+                // console.log( 'parameter-mounted', ev.index )
+                self.parameters[ ev.index ].mounted()
             },
 
             // 'active', function ( ev ) {

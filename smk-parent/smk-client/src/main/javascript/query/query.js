@@ -13,41 +13,98 @@ include.module( 'query.query-js', [ 'jquery', 'util', 'event' ], function () {
         Object.assign( this, config )
         this.layerId = layerId
         this.id = this.layerId + '--' + this.id
-        // var loading = false
-        // Object.defineProperty( this, 'loading', {
-        //     get: function () { return loading },
-        //     set: function ( v ) {
-        //         if ( !!v == loading ) return
-        //         // console.log( self.config.id, v )
-        //         loading = !!v
-        //         if ( v )
-        //             self.startedLoading()
-        //         else
-        //             self.finishedLoading()
-        //     }
-        // } )
     }
 
     $.extend( Query.prototype, QueryEvent.prototype )
 
+    Query.prototype.maxUniqueValues = 100
+
     SMK.TYPE.Query = Query
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
-    Query.prototype.getParameters = function () {
+    Query.prototype.getParameters = function ( viewer ) {
         var self = this;
 
         return this.parameters.map( function ( p ) {
-            return {
-                id: self.id + '--' + p.id,
-                component: 'parameter-' + p.type,
-                prop: $.extend( true, { value: null }, p ),
-                initial: p.value
-            }
+            return new QueryParameter[ p.type ]( self, p, viewer )
         } )
     }
 
-
     Query.prototype.queryLayer = function ( arg ) {
         console.log( 'not implemented', arg )
+    }
+
+    Query.prototype.fetchUniqueValues = function ( attribute, viewer ) {
+        console.log( 'not implemented', attribute )
+    }
+    // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+    //
+    function QueryParameter( query, config ) {
+        this.id = query.id + '--' + config.id
+        this.layerId = query.layerId
+        this.component = 'parameter-' + config.type
+        this.prop = $.extend( true, {
+            value: null,
+        }, config ),
+        this.initial = config.value
+    }
+
+    QueryParameter.prototype.mounted = function () {}
+    // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+    //
+    QueryParameter[ 'constant' ] = function () {
+        QueryParameter.prototype.constructor.apply( this, arguments )
+    }
+
+    Object.assign( QueryParameter[ 'constant' ].prototype, QueryParameter.prototype )
+    // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+    //
+    QueryParameter[ 'input' ] = function () {
+        QueryParameter.prototype.constructor.apply( this, arguments )
+    }
+
+    Object.assign( QueryParameter[ 'input' ].prototype, QueryParameter.prototype )
+    // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+    //
+    QueryParameter[ 'select' ] = function () {
+        QueryParameter.prototype.constructor.apply( this, arguments )
+    }
+
+    Object.assign( QueryParameter[ 'select' ].prototype, QueryParameter.prototype )
+    // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+    //
+    QueryParameter[ 'select-unique' ] = function ( query, config, viewer ) {
+        var self = this
+
+        config.type = 'select'
+
+        var uniqueAttribute = config.uniqueAttribute
+        delete config.uniqueAttribute
+
+        QueryParameter.prototype.constructor.call( this, query, config )
+
+        this.mounted = function () {
+            if ( self.fetchUnique ) return
+            self.fetchUnique = query.fetchUniqueValues( uniqueAttribute, viewer )
+                .then( function ( values ) {
+                    Vue.set( self.prop, 'choices', values
+                        .map( function ( v ) { return { title: makeTitle( v ), value: v } } )
+                        .sort( function ( a, b ) { return a.title > b.title ? 1 : -1 } )
+                    )
+                } )
+                .catch( function ( e ) {
+                    console.warn( e )
+                    self.prop.useFallback = true
+                } )
+        }
+    }
+
+    Object.assign( QueryParameter[ 'select-unique' ].prototype, QueryParameter.prototype )
+    // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+    //
+    function makeTitle( value ) {
+        if ( value == null ) return '(Null)'
+        return value
+        // return value.replace( /_/, ' ' ).split( /\s+/ ).map( function ( w ) { var ww = w.toLowerCase(); ww[ 0 ] = ww[ 0 ].toUpperCase(); return ww } ).join( ' ' )
     }
 } )

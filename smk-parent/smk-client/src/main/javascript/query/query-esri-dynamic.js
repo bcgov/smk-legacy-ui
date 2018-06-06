@@ -9,6 +9,10 @@ include.module( 'query.query-esri-dynamic-js', [ 'query.query-js' ], function ()
     SMK.TYPE.Query[ 'esri-dynamic' ] = EsriDynamicQuery
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
+    EsriDynamicQuery.prototype.fetchUniqueValues = function ( attribute ) {
+        console.log( 'not implemented', attribute )
+    }
+
     EsriDynamicQuery.prototype.queryLayer = function ( param, config, viewer ) {
         var self = this
 

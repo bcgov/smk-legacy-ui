@@ -9,6 +9,10 @@ include.module( 'query.query-vector-js', [ 'query.query-js' ], function () {
     SMK.TYPE.Query[ 'vector' ] = VectorQuery
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
+    VectorQuery.prototype.fetchUniqueValues = function ( attribute ) {
+        console.log( 'not implemented', attribute )
+    }
+
     VectorQuery.prototype.queryLayer = function ( param, config, viewer ) {
         var self = this
 

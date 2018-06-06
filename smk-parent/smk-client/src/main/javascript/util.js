@@ -290,6 +290,21 @@ include.module( 'util', null, function ( inc ) {
             return obj[ fName ] = ( function ( inner ) {
                 return outer.call( null, inner )
             } )( obj[ fName ] )
+        },
+
+        asyncReduce: function ( cb, accum ) {
+            var self = this
+
+            return this.resolved()
+                .then( function () { return accum } )
+                .then( function ( arg ) {
+                    var done
+                    return cb( arg, function () { done = true } )
+                        .then( function ( res ) {
+                            if ( done ) return arg
+                            return self.asyncReduce( cb, res )
+                        } )
+                } )
         }
 
     } )
