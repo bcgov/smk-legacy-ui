@@ -21,7 +21,8 @@ include.module( 'query.query-vector-js', [ 'query.query-js' ], function () {
 
         return SMK.UTIL.resolved( Object.keys( value ).concat( hasNull ? [ null ] : [] ) )
     }
-
+    // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+    //
     VectorQuery.prototype.queryLayer = function ( param, config, viewer ) {
         var self = this
 
@@ -80,7 +81,7 @@ include.module( 'query.query-vector-js', [ 'query.query-js' ], function () {
         },
 
         'or': function ( args, param ) {
-            if ( args.length == 0 ) throw new Error( 'AND needs at least 1 argument' )
+            if ( args.length == 0 ) throw new Error( 'OR needs at least 1 argument' )
 
             var tests = args.map( function ( a ) {
                 return makeTestOperator( a, param )
@@ -180,106 +181,17 @@ include.module( 'query.query-vector-js', [ 'query.query-js' ], function () {
     var testOperand = {
         'attribute': function ( arg, param, quote ) {
             return function ( properties ) {
+                if ( !( arg.name in properties ) ) throw new Error( '"' + arg.name + '" is not a valid attribute' )
                 return properties[ arg.name ]
             }
         },
 
         'parameter': function ( arg, param, quote ) {
             return function ( properties ) {
+                if ( !( arg.id in param ) ) throw new Error( '"' + arg.id + '" is not a valid parameter' )
                 return param[ arg.id ].value
             }
         }
     }
-
-    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-    function makeWhereClause( predicate, param ) {
-        return handleWhereOperator( predicate, param )
-    }
-
-    function handleWhereOperator( predicate, param ) {
-        if ( !( predicate.operator in whereOperator ) )
-            throw new Error( 'unknown operator: ' + JSON.stringify( predicate ) )
-
-        return whereOperator[ predicate.operator ]( predicate.arguments, param )
-    }
-
-    var whereOperator = {
-        'and': function ( args, param ) {
-            if ( args.length == 0 ) throw new Error( 'AND needs at least 1 argument' )
-
-            return args.map( function ( a ) { return '( ' + handleWhereOperator( a, param ) + ' )' } ).join( ' AND ' )
-        },
-
-        'or': function ( args, param ) {
-            if ( args.length == 0 ) throw new Error( 'OR needs at least 1 argument' )
-
-            return args.map( function ( a ) { return '( ' + handleWhereOperator( a, param ) + ' )' } ).join( ' OR ' )
-        },
-
-        'equals': function ( args, param ) {
-            if ( args.length != 2 ) throw new Error( 'EQUALS needs exactly 2 arguments' )
-
-            return handleWhereOperand( args[ 0 ], param ) + ' = ' + handleWhereOperand( args[ 1 ], param )
-        },
-
-        'less-than': function ( args, param ) {
-            if ( args.length != 2 ) throw new Error( 'LESS-THAN needs exactly 2 arguments' )
-
-            return handleWhereOperand( args[ 0 ], param ) + ' < ' + handleWhereOperand( args[ 1 ], param )
-        },
-
-        'greater-than': function ( args, param ) {
-            if ( args.length != 2 ) throw new Error( 'GREATER-THAN needs exactly 2 arguments' )
-
-            return handleWhereOperand( args[ 0 ], param ) + ' > ' + handleWhereOperand( args[ 1 ], param )
-        },
-
-        'contains': function ( args, param ) {
-            if ( args.length != 2 ) throw new Error( 'CONTAINS needs exactly 2 arguments' )
-
-            return handleWhereOperand( args[ 0 ], param ) + ' LIKE \'%' + handleWhereOperand( args[ 1 ], param, false ) + '%\''
-        },
-
-        'starts-with': function ( args, param ) {
-            if ( args.length != 2 ) throw new Error( 'STARTS-WITH needs exactly 2 arguments' )
-
-            return handleWhereOperand( args[ 0 ], param ) + ' LIKE \'' + handleWhereOperand( args[ 1 ], param, false ) + '%\''
-        },
-
-        'ends-with': function ( args, param ) {
-            if ( args.length != 2 ) throw new Error( 'ENDS-WITH needs exactly 2 arguments' )
-
-            return handleWhereOperand( args[ 0 ], param ) + ' LIKE \'%' + handleWhereOperand( args[ 1 ], param, false ) + '\''
-        },
-
-        'not': function ( args, param ) {
-            if ( args.length != 1 ) throw new Error( 'NOT needs exactly 1 argument' )
-
-            return 'NOT ' + handleWhereOperator( args[ 0 ], param )
-        }
-    }
-
-    function handleWhereOperand( predicate, param, quote ) {
-        if ( !( predicate.operand in whereOperand ) )
-            throw new Error( 'unknown operand: ' + JSON.stringify( predicate ) )
-
-        return whereOperand[ predicate.operand ]( predicate, param, quote )
-    }
-
-    var whereOperand = {
-        'attribute': function ( arg, param, quote ) {
-            if ( quote === false  )
-                return '\' || ' + arg.name + ' || \''
-
-            return arg.name
-        },
-
-        'parameter': function ( arg, param, quote ) {
-            return ( quote === false ? '' : '\'' ) + escapeWhereParameter( param[ arg.id ].value ) + ( quote === false ? '' : '\'' )
-        }
-    }
-
-    function escapeWhereParameter( p ) { return p }
 
 } )
