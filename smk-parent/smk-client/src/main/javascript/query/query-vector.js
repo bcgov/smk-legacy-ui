@@ -9,8 +9,17 @@ include.module( 'query.query-vector-js', [ 'query.query-js' ], function () {
     SMK.TYPE.Query[ 'vector' ] = VectorQuery
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
-    VectorQuery.prototype.fetchUniqueValues = function ( attribute ) {
-        console.log( 'not implemented', attribute )
+    VectorQuery.prototype.fetchUniqueValues = function ( attribute, viewer ) {
+        var value = {}
+        var hasNull = false
+        viewer.visibleLayer[ this.layerId ].eachLayer( function ( ly ) {
+            if ( ly.feature.properties[ attribute ] == null )
+                hasNull = true
+            else
+                value[ ly.feature.properties[ attribute ] ] = true
+        } )
+
+        return SMK.UTIL.resolved( Object.keys( value ).concat( hasNull ? [ null ] : [] ) )
     }
 
     VectorQuery.prototype.queryLayer = function ( param, config, viewer ) {
