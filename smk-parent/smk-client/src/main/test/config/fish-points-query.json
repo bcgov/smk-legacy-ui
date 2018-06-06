@@ -210,6 +210,20 @@
                     "description": "Find features by Species",
                     "parameters": [
                         {
+                            "id": "param2",
+                            "type": "select-unique",
+                            "title": "Species code",
+                            "value": null,
+                            "uniqueAttribute": "SPECIES_CODE"
+                        },
+                        {
+                            "id": "param3",
+                            "type": "select-unique",
+                            "title": "Species name",
+                            "value": null,
+                            "uniqueAttribute": "SPECIES_NAME"
+                        },
+                        {
                             "id": "param1",
                             "type": "select",
                             "title": "Species",

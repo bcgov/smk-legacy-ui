@@ -299,9 +299,9 @@ include.module( 'util', null, function ( inc ) {
                 .then( function () { return accum } )
                 .then( function ( arg ) {
                     var done
-                    return cb( arg, function () { done = true } )
+                    return cb( arg, function ( res ) { done = true; return res } )
                         .then( function ( res ) {
-                            if ( done ) return arg
+                            if ( done ) return res
                             return self.asyncReduce( cb, res )
                         } )
                 } )

@@ -10,7 +10,7 @@ include.module( 'query.query-wms-js', [ 'query.query-js' ], function () {
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
     WmsQuery.prototype.fetchUniqueValues = function ( attribute, viewer ) {
-        var p = SMK.UTIL.resolved();
+        var self = this
 
         var layerConfig = viewer.layerId[ this.layerId ].config
             typeName    = layerConfig.layerName,
@@ -19,8 +19,10 @@ include.module( 'query.query-wms-js', [ 'query.query-js' ], function () {
         return SMK.UTIL.asyncReduce( function ( accum, done ) {
             return fetchSomeUniqueValues( accum, serviceUrl, typeName, attribute )
                 .then( function ( values ) {
-                    if ( !values || values.length == 0 ) return done()
-                    return accum.concat( values )
+                    if ( !values || values.length == 0 ) return done( accum )
+                    var a = accum.concat( values )
+                    if ( a.length >= self.maxUniqueValues ) done()
+                    return a
                 } )
         }, [] )
     }

@@ -9,10 +9,84 @@ include.module( 'query.query-esri-dynamic-js', [ 'query.query-js' ], function ()
     SMK.TYPE.Query[ 'esri-dynamic' ] = EsriDynamicQuery
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
-    EsriDynamicQuery.prototype.fetchUniqueValues = function ( attribute ) {
-        console.log( 'not implemented', attribute )
+    EsriDynamicQuery.prototype.fetchUniqueValues = function ( attribute, viewer ) {
+        var self = this
+
+        var layerConfig = viewer.layerId[ this.layerId ].config
+            dynamicLayer= JSON.parse( layerConfig.dynamicLayers[ 0 ] ),
+            serviceUrl  = layerConfig.serviceUrl + '/dynamicLayer/query'
+
+        delete dynamicLayer.drawingInfo
+
+        return SMK.UTIL.asyncReduce( function ( accum, done ) {
+            return fetchSomeUniqueValues( accum, serviceUrl, dynamicLayer, attribute )
+                .then( function ( values ) {
+                    if ( !values || values.length == 0 ) return done( accum )
+                    var a = accum.concat( values )
+                    if ( a.length >= self.maxUniqueValues ) done()
+                    return a
+                } )
+        }, [] )
     }
 
+    function fetchSomeUniqueValues( excludes, serviceUrl, dynamicLayer, attribute ) {
+        var notNullExcludes = excludes.filter( function ( v ) { return v != null } )
+        var filter = '(1=1)'
+
+        if ( excludes.length != notNullExcludes.length )
+            filter = '( ' + attribute + ' IS NOT NULL )'
+
+        if ( notNullExcludes.length > 0 )
+            filter += ' AND ' + attribute + ' NOT IN ( ' + notNullExcludes.map( function ( x ) { return "'" + x + "'" } ).join( ', ') + ' )'
+
+        var data = {
+            f:                  'geojson',
+            layer:              JSON.stringify( dynamicLayer ).replace( /^"|"$/g, '' ),
+            where:              filter,
+            outFields:          attribute,
+            inSR:               4326,
+            outSR:              4326,
+            returnGeometry:     false,
+            returnZ:            false,
+            returnM:            false,
+            returnIdsOnly:      false,
+            returnCountOnly:    false,
+            returnDistinctValues:true,
+            // resultRecordCount:  10,
+        }
+
+        return SMK.UTIL.makePromise( function ( res, rej ) {
+            $.ajax( {
+                url:        serviceUrl,
+                method:     'POST',
+                data:       data,
+                dataType:   'json',
+                // contentType:    'application/json',
+                // crossDomain:    true,
+                // withCredentials: true,
+            } ).then( res, rej )
+        } )
+        .then( function ( data ) {
+            console.log( data )
+
+            if ( !data ) return
+            if ( !data.features || data.features.length == 0 ) return
+
+            var value = {}
+            var hasNull = false
+            data.features.forEach( function ( f, i ) {
+                if ( f.properties[ attribute ] == null )
+                    hasNull = true
+                else
+                    value[ f.properties[ attribute ] ] = true
+            } )
+
+            return Object.keys( value ).concat( hasNull ? [ null ] : [] )
+        } )
+
+    }
+    // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+    //
     EsriDynamicQuery.prototype.queryLayer = function ( param, config, viewer ) {
         var self = this
 
