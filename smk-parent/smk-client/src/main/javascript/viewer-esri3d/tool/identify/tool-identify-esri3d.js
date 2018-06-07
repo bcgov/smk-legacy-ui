@@ -41,6 +41,7 @@ include.module( 'tool-identify-esri3d', [ 'esri3d', 'types-esri3d', 'util-esri3d
                 .then( function ( hit ) {
                     if ( hit.results.length == 0 ) return
                     if ( !hit.results[ 0 ].graphic ) return
+                    if ( !hit.results[ 0 ].graphic.attributes.$identifyMarker ) return
 
                     smk.$viewer.identified.pick( self.firstId )
                     return true
@@ -53,6 +54,9 @@ include.module( 'tool-identify-esri3d', [ 'esri3d', 'types-esri3d', 'util-esri3d
 
             self.clickLocation = new E.Graphic( {
                 geometry: { type: 'point', latitude: ev.location.latitude, longitude: ev.location.longitude },
+                attributes: {
+                    $identifyMarker: 0
+                },
                 symbol: {
                     type: 'point-3d',
                     symbolLayers: [
@@ -117,6 +121,7 @@ include.module( 'tool-identify-esri3d', [ 'esri3d', 'types-esri3d', 'util-esri3d
                     }
                 ]
             }
+            self.clickLocation.attributes.$identifyMarker = stat.featureCount
 
             self.identifyLayer.add( self.clickLocation )
         } )

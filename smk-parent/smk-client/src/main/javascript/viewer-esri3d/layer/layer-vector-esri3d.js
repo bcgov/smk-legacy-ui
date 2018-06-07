@@ -12,6 +12,64 @@ include.module( 'layer-esri3d.layer-vector-esri3d-js', [ 'layer.layer-vector-js'
     SMK.TYPE.Layer[ 'vector' ][ 'esri3d' ] = VectorEsri3dLayer
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
+    VectorEsri3dLayer.prototype.getFeaturesInArea = function ( area, view, option ) {
+        var self = this
+
+        if ( !option.layer ) return
+
+        var features = []
+
+        option.layer.graphics.forEach( function ( gr ) {
+            var gm = gr.attributes._geojsonGeometry
+
+            var ft = {
+                type: 'Feature',
+                properties: Object.assign( {}, gr.attributes ),
+                geometry: gm
+            }
+            delete ft.properties._geojsonGeometry
+
+            switch ( gm.type ) {
+            case 'Polygon':
+                if ( turf.intersect( ft, area ) )
+                    features.push( ft )
+                break
+
+            case 'MultiPolygon':
+                var intersect = gm.coordinates.reduce( function ( accum, poly ) {
+                    return accum || !!turf.intersect( turf.polygon( poly ), area )
+                }, false )
+                if ( intersect ) features.push( ft )
+                break
+
+            case 'LineString':
+                if ( turf.booleanCrosses( area, ft ) ) features.push( ft )
+                break
+
+            case 'MultiLineString':
+                var close = turf.segmentReduce( ft, function ( accum, segment ) {
+                    return accum || turf.booleanCrosses( area, segment )
+                }, false )
+                if ( close ) features.push( ft )
+                break
+
+            case 'Point':
+            case 'MultiPoint':
+                var close = turf.coordReduce( ft, function ( accum, coord ) {
+                    return accum || turf.booleanPointInPolygon( coord, area )
+                }, false )
+                if ( close ) features.push( ft )
+                break
+
+            default:
+                console.warn( 'skip', gm.type )
+            }
+        } )
+
+        return features
+    }
+    // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+    //
     SMK.TYPE.Layer[ 'vector' ][ 'esri3d' ].create = function ( layers, zIndex ) {
         var self = this;
 
@@ -32,30 +90,6 @@ include.module( 'layer-esri3d.layer-vector-esri3d-js', [ 'layer.layer-vector-js'
                 graphics: SMK.UTIL.geoJsonToEsriGeometry( geojson, function ( t ) { return symbol[ t ] } )
             } )
         } )
-    }
-    // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-    //
-    function getVectorFeaturesAtPoint( arg, esri3dLayer ) {
-        var self = this
-
-        if ( !esri3dLayer ) return
-
-        var fs = []
-        esri3dLayer.eachLayer( function ( sly ) {
-            var geoj = sly.toGeoJSON()
-            var inp = turf.booleanPointInPolygon( [ arg.point.lng, arg.point.lat ] , geoj )
-            // console.log( geoj, inp )
-            if ( inp ) fs.push( geoj )
-        } )
-
-        fs.forEach( function ( f, i ) {
-            if ( self.config.titleAttribute )
-                f.title = r.attributes[ self.config.titleAttribute ]
-            else
-                f.title = 'Feature #' + ( i + 1 )
-        } )
-
-        return fs
     }
 
 } )

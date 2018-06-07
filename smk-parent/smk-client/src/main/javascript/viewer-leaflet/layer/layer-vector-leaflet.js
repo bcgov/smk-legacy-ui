@@ -34,6 +34,7 @@ include.module( 'layer-leaflet.layer-vector-leaflet-js', [ 'layer.layer-vector-j
 
             case 'LineString':
                 if ( turf.booleanCrosses( area, ft ) ) features.push( ft )
+                break
 
             case 'MultiLineString':
                 var close = turf.segmentReduce( ft, function ( accum, segment ) {

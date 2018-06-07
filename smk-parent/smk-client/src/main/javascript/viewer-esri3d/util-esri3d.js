@@ -56,7 +56,7 @@ include.module( 'util-esri3d', [ 'types-esri3d' ], function ( inc ) {
                     var geoms = geoJsonHandler[ obj.geometry.type ]( obj.geometry )
                     return geoms.map( function ( g ) {
                         return {
-                            attributes: obj.properties,
+                            attributes: Object.assign( { _geojsonGeometry: obj.geometry }, obj.properties ),
                             geometry:   g,
                             symbol:     symbol( g.type, obj.properties )
                         }
