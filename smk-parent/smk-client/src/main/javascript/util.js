@@ -305,6 +305,17 @@ include.module( 'util', null, function ( inc ) {
                             return self.asyncReduce( cb, res )
                         } )
                 } )
+        },
+
+        projection: function ( key ) {
+            var keys = [].slice.call( arguments )
+
+            return function ( obj ) {
+                return keys.reduce( function ( accum, k ) {
+                    if ( k in obj ) accum[ k ] = obj[ k ]
+                    return accum
+                }, {} )
+            }
         }
 
     } )

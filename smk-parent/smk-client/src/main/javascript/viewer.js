@@ -118,6 +118,7 @@ include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', '
         this.type = smk.viewer.type
         this.disconnected = smk.$option.disconnected
         this.serviceUrl = smk.$option[ 'service-url' ]
+        this.identifyTool = function () { return smk.$tool[ 'identify' ] }
 
         this.identified = new SMK.TYPE.FeatureSet()
         this.selected = new SMK.TYPE.FeatureSet()
@@ -391,20 +392,18 @@ include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', '
         throw new Error( 'not implemented' )
     }
 
-    Viewer.prototype.identifyFeatures = function ( location, option ) {
+    Viewer.prototype.identifyFeatures = function ( location ) {
         var self = this
 
-        option = Object.assign( {
+        var identifyOptions = SMK.UTIL.projection( 'tolerance' )
+
+        var baseOption = Object.assign( {
             tolerance: 5
-        }, option )
+        }, identifyOptions( this.identifyTool() ) )
 
         var view = this.getView()
 
-        var searchArea = turf.polygon( [ SMK.UTIL.circlePoints( location.screen, option.tolerance, 12 ).map( function ( p ) { return self.screenToMap( p ) } ) ] )
-
-        // var searchArea = turf.circle( [ location.map.longitude, location.map.latitude ], option.tolerance * view.metersPerPixelAtY( location.screen.y ) / 1000 )
-
-        this.startedIdentify( { area: searchArea, location: location.map } )
+        this.startedIdentify( { location: location.map } )
 
         this.identified.clear()
 
@@ -416,7 +415,9 @@ include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', '
             if ( ly.config.isQueryable === false ) return
             if ( !ly.inScaleRange( view ) ) return
 
-            option.layer = self.visibleLayer[ id ]
+            var option = Object.assign( {}, baseOption, identifyOptions( ly.config ), { layer: self.visibleLayer[ id ] } )
+
+            var searchArea = turf.polygon( [ SMK.UTIL.circlePoints( location.screen, baseOption.tolerance, 12 ).map( function ( p ) { return self.screenToMap( p ) } ) ] )
 
             var p = ly.getFeaturesInArea( searchArea, view, option )
             // var p = ly.getFeaturesAtPoint( location, view, option )
