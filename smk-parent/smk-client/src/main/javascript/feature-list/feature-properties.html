@@ -11,7 +11,7 @@
             v-for="(val, attr) in feature.properties"
         >
             <span class="smk-title" v-html="insertWordBreaks( attr )"></span>
-            <span class="smk-value">{{ val }}</span>
+            <span class="smk-value" v-html="formatValue( val )"></span>
         </div>
     </div>
 </div>

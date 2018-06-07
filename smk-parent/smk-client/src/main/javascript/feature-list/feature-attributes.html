@@ -12,7 +12,7 @@
             v-if="attr.visible !== false"
         >
             <span class="smk-title" v-html="insertWordBreaks( attr.title )"></span>
-            <span class="smk-value">{{ feature.properties[ attr.name ] }}</span>
+            <span class="smk-value" v-html="formatValue( feature.properties[ attr.name ] )"></span>
         </div>
     </div>
 </div>
