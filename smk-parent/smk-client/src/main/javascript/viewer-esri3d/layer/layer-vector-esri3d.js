@@ -85,7 +85,7 @@ include.module( 'layer-esri3d.layer-vector-esri3d-js', [ 'layer.layer-vector-js'
             } )
         } )
         .then( function ( geojson ) {
-            var symbol = SMK.UTIL.smkStyleToEsriSymbol( layers[ 0 ].config.style )
+            var symbol = SMK.UTIL.smkStyleToEsriSymbol( layers[ 0 ].config.style, self )
             return new E.layers.GraphicsLayer( {
                 graphics: SMK.UTIL.geoJsonToEsriGeometry( geojson, function ( t ) { return symbol[ t ] } )
             } )

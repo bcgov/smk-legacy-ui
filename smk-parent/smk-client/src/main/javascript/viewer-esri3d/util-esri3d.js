@@ -40,14 +40,6 @@ include.module( 'util-esri3d', [ 'types-esri3d' ], function ( inc ) {
                 FeatureCollection:  function ( obj, symbol ) {
                     return obj.features.map( function ( f ) {
                         return geoJsonHandler[ f.type ]( f, symbol )
-                        // var geoms = geoJsonHandler[ f.geometry.type ]( f.geometry, symbol )
-                        // return geoms.map( function ( g ) {
-                        //     return {
-                        //         attributes: f.properties,
-                        //         geometry:   g,
-                        //         symbol:     symbol[ g.type ]
-                        //     }
-                        // } )
                     } )
                     .reduce( function( acc, val ) { return acc.concat( val ) }, [] )
                 },
@@ -75,12 +67,7 @@ include.module( 'util-esri3d', [ 'types-esri3d' ], function ( inc ) {
         } )(),
 
 
-                    // self.highlight[ f.id ] = new E.Graphic( SMK.UTIL.geoJsonToEsriGeometry( f,
-                        // SMK.UTIL.smkStyleToEsriSymbol( self.styleFeature()() )
-                    // )[ 0 ] )
-
-
-        smkStyleToEsriSymbol: function ( styleConfig ) {
+        smkStyleToEsriSymbol: function ( styleConfig, viewer ) {
             var line = {
                 type: 'line-3d',
                 symbolLayers: [ {
@@ -92,22 +79,39 @@ include.module( 'util-esri3d', [ 'types-esri3d' ], function ( inc ) {
                 } ]
             }
 
-            var point = {
-                type: 'point-3d',
-                symbolLayers: [ {
-                    type: 'icon',
-                    size: styleConfig.strokeWidth * 2,
-                    resource: {
-                        primitive: 'circle'
-                    },
-                    material: {
-                        color: color( styleConfig.fillColor, styleConfig.fillOpacity ),
-                    },
-                    outline: {
-                        size: styleConfig.strokeWidth / 2,
-                        color: color( styleConfig.strokeColor, styleConfig.strokeOpacity ),
-                    }
-                } ]
+            if ( styleConfig.markerUrl ) {
+                var point = {
+                    type: 'point-3d',
+                    symbolLayers: [
+                        {
+                            type:       'icon',
+                            size:       Math.max.apply( Math, styleConfig.markerSize ) + 'px',
+                            anchor:     'bottom',
+                            resource: {
+                                href: viewer.resolveAttachmentUrl( styleConfig.markerUrl, null, 'png' )
+                            }
+                        }
+                    ]
+                }
+            }
+            else {
+                var point = {
+                    type: 'point-3d',
+                    symbolLayers: [ {
+                        type: 'icon',
+                        size: styleConfig.strokeWidth * 2,
+                        resource: {
+                            primitive: 'circle'
+                        },
+                        material: {
+                            color: color( styleConfig.fillColor, styleConfig.fillOpacity ),
+                        },
+                        outline: {
+                            size: styleConfig.strokeWidth / 2,
+                            color: color( styleConfig.strokeColor, styleConfig.strokeOpacity ),
+                        }
+                    } ]
+                }
             }
 
             var fill = {

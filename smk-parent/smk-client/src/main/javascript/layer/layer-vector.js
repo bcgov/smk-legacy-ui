@@ -9,23 +9,46 @@ include.module( 'layer.layer-vector-js', [ 'layer.layer-js' ], function () {
     SMK.TYPE.Layer[ 'vector' ] = VectorLayer
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
-    VectorLayer.prototype.getLegends = function createLegendChip( width, height ) {
+    VectorLayer.prototype.getLegends = function ( viewer, width, height ) {
+        var self = this
+
         if ( width == null ) width = 20
         if ( height == null ) height = 20
 
-        var cv = $( '<canvas width="' + width + '" height="' + height + '">' ).get( 0 )
+        var cv = $( '<canvas width="' + width * 3 + '" height="' + height + '">' ).get( 0 )
         var ctx = cv.getContext( '2d' )
 
         ctx.fillStyle = this.config.style.fillColor
         ctx.fillRect( 0, 0, width, height )
 
-        ctx.lineWidth = this.config.style.strokeWidth
+        ctx.lineWidth = 4
         ctx.strokeStyle = this.config.style.strokeColor
-        ctx.strokeRect( 0, 0, width, height )
+        ctx.strokeRect( 2, 2, width - 4 , height - 4 )
 
-        return SMK.UTIL.resolved( [ {
-            url: cv.toDataURL( 'image/png' ),
-        } ] )
+        var p = SMK.UTIL.resolved()
+
+        if ( this.config.style.markerUrl ) {
+            p = p.then( function () {
+                return SMK.UTIL.makePromise( function ( res, rej ) {
+                    var img = $( '<img>' )
+                        .on( 'load', function () {
+                            var r = img.width / img.height
+                            if ( r > 1 ) r = 1 / r
+                            ctx.drawImage( img, width + 5, 0, height * r, height )
+                            res()
+                        } )
+                        .on( 'error', res )
+                        .attr( 'src', viewer.resolveAttachmentUrl( self.config.style.markerUrl, null, 'png' ) )
+                        .get( 0 )
+                } )
+            } )
+        }
+
+        return p.then( function () {
+            return [ {
+                url: cv.toDataURL( 'image/png' ),
+            } ]
+        } )
     }
 
     VectorLayer.prototype.initialize = function () {

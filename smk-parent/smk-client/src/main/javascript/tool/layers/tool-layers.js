@@ -110,7 +110,7 @@ include.module( 'tool-layers', [ 'tool', 'widgets', 'tool-layers.panel-layers-ht
                         var ly = layerModel[ id ]
                         if ( ly.legends == null ) {
                             ly.legends = 'waiting'
-                            smk.$viewer.layerId[ id ].getLegends()
+                            smk.$viewer.layerId[ id ].getLegends( smk.$viewer )
                                 .then( function ( ls ) {
                                     ly.legends = ls
                                 }, function () {
