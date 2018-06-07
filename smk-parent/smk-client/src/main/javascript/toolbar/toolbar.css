@@ -28,6 +28,7 @@
     border: 1px solid transparent;
     padding: 0;
     margin: 1px;
+    cursor: default;
 }
 
 .smk-tool:hover {
