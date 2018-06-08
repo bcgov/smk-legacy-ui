@@ -1,13 +1,5 @@
 include.module( 'tool-search-leaflet', [ 'leaflet', 'tool-search' ], function ( inc ) {
 
-    // var precisionSize = { // meters
-    //     INTERSECTION:   100,
-    //     STREET:         1000,
-    //     BLOCK:          200,
-    //     CIVIC_NUMBER:   50,
-    //     _OTHER_:        10000
-    // }
-
     var precisionZoom = {
         INTERSECTION:   15,
         STREET:         13,
@@ -16,7 +8,7 @@ include.module( 'tool-search-leaflet', [ 'leaflet', 'tool-search' ], function ( 
         _OTHER_:        12
     }
 
-    var base = include.option( 'baseUrl' ) + '/tool/search'
+    var base = include.option( 'baseUrl' ) + '/smk/tool/search'
 
     var yellowMarker = new L.Icon( {
         iconUrl:        base + '/marker-icon-yellow.png',

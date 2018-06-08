@@ -1,6 +1,6 @@
 include.module( 'tool-directions-leaflet', [ 'leaflet', 'tool-directions' ], function ( inc ) {
 
-    var base = include.option( 'baseUrl' ) + '/tool/directions'
+    var base = include.option( 'baseUrl' ) + '/smk/tool/directions'
 
     var redIcon = new L.Icon( {
         iconUrl:        base + '/marker-icon-red.png',

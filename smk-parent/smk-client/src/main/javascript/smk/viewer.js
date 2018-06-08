@@ -119,6 +119,9 @@ include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', '
         this.disconnected = smk.$option.disconnected
         this.serviceUrl = smk.$option[ 'service-url' ]
         this.identifyTool = function () { return smk.$tool[ 'identify' ] }
+        this.resolveUrl = function ( url ) {
+            return ( new URL( url, smk.$option[ 'base-url' ] ) ).toString()
+        }
 
         this.identified = new SMK.TYPE.FeatureSet()
         this.selected = new SMK.TYPE.FeatureSet()
@@ -494,7 +497,7 @@ include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', '
             throw new Error( 'attachment without URL or Id' )
 
         if ( this.disconnected )
-            return 'attachments/' + id + ( type ? '.' + type : '' )
+            return this.resolveUrl( 'attachments/' + id + ( type ? '.' + type : '' ) )
         else
             return this.serviceUrl + '/MapConfigurations/' + this.lmfId + '/Attachments/' + id
     }
