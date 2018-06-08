@@ -17,6 +17,7 @@ RUN curl -jksSL -o /tmp/apache-tomcat.tar.gz http://archive.apache.org/dist/tomc
     ln -s /opt/apache-tomcat-${TOMCAT_VERSION} ${TOMCAT_HOME}
 
 ADD jvmMemSettings.sh /jvmMemSettings.sh
+RUN chmod +x /jvmMemSettings.sh
 ENTRYPOINT ["/jvmMemSettings.sh"]
 
 WORKDIR /tmp
