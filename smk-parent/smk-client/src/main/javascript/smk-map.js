@@ -28,13 +28,13 @@ include.module( 'smk-map', [ 'jquery', 'util' ], function () {
                 .then( mergeConfigs )
                 .then( resolveConfig )
                 .then( initMapFrame )
-                .then( loadSurround )
+                // .then( loadSurround )
                 .then( checkTools )
                 .then( loadViewer )
                 .then( loadTools )
                 .then( initViewer )
                 .then( initTools )
-                .then( initSurround )
+                // .then( initSurround )
                 .then( showMap ),
             function () {
                 console.groupEnd()
@@ -245,11 +245,11 @@ include.module( 'smk-map', [ 'jquery', 'util' ], function () {
                 .addClass( 'smk-viewer-' + self.viewer.type )
         }
 
-        function loadSurround() {
-            if ( !self.$option.standalone ) return
+        // function loadSurround() {
+        //     if ( !self.$option.standalone ) return
 
-            return include( 'surround' )
-        }
+        //     return include( 'surround' )
+        // }
 
         function checkTools() {
             if ( !self.tools ) return
@@ -338,11 +338,11 @@ include.module( 'smk-map', [ 'jquery', 'util' ], function () {
             } ) )
         }
 
-        function initSurround() {
-            if ( !self.$option.standalone ) return
+        // function initSurround() {
+        //     if ( !self.$option.standalone ) return
 
-            self.$surround = new SMK.TYPE.Surround( self )
-        }
+        //     self.$surround = new SMK.TYPE.Surround( self )
+        // }
 
         function showMap() {
             $( self.$container )

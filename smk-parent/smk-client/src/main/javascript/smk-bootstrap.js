@@ -28,7 +28,7 @@
         var smkAttr = {
             'container-id': attrString( 'smk-map-frame' ),
             'config':       attrList( '?smk-' ),
-            'standalone':   attrBoolean( false, true ),
+            // 'standalone':   attrBoolean( false, true ),
             'disconnected': attrBoolean( false, true ),
             'base-url':     attrString( ( new URL( bootstrapScriptEl.src.replace( 'smk-bootstrap.js', '' ), document.location ) ).toString() ),
             'service-url':  attrString( '../smks-api' ),
@@ -570,10 +570,10 @@
             UTIL: util,
 
             CONFIG: {
-                surround: {
-                    type: "default",
-                    title: 'Simple Map Kit'
-                },
+                // surround: {
+                //     type: "default",
+                //     title: 'Simple Map Kit'
+                // },
                 viewer: {
                     type: "leaflet",
                     location: {
