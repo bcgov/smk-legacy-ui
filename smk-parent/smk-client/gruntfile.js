@@ -48,34 +48,70 @@ module.exports = function( grunt ) {
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
         copy: {
-            'src': {
+            'smk': {
                 expand: true,
                 cwd: '<%= srcPath %>',
-                src: [ '**' ],
-                dest: '<%= buildPath %>'
-            },
-
-            'test-html': {
-                expand: true,
-                cwd: 'src/main/test',
-                src: [ '*html' ],
-                dest: '<%= buildPath %>/test',
+                src: [ 'smk.js' ],
+                dest: '<%= buildPath %>',
                 options: {
                     process: '<%= processTemplate %>',
                 },
             },
 
+            'lib': {
+                files: [
+                    {
+                        expand: true,
+                        cwd: '<%= srcPath %>/smk',
+                        src: [ '**' ],
+                        dest: '<%= buildPath %>/smk'
+                    },
+                    {
+                        expand: true,
+                        cwd: '<%= srcPath %>/lib',
+                        src: [ '**' ],
+                        dest: '<%= buildPath %>/lib'
+                    },
+                    {
+                        expand: true,
+                        src: 'lib/include.js',
+                        dest: '<%= buildPath %>'
+                    }
+                ]
+            },
+
+            // 'test-html': {
+            //     expand: true,
+            //     cwd: 'src/main/test',
+            //     src: [ '*html' ],
+            //     dest: '<%= buildPath %>/test',
+            //     options: {
+            //         process: '<%= processTemplate %>',
+            //     },
+            // },
+
             'test': {
                 expand: true,
                 cwd: 'src/main/test',
-                src: [ '**', '!**/*html' ], //, '!attachments/**' ],
+                src: [ '**' ], //[, '!**/*html' ], //, '!attachments/**' ],
                 dest: '<%= buildPath %>/test'
             },
 
-            'include': {
+            'sample': {
                 expand: true,
-                src: 'lib/include.js',
-                dest: '<%= buildPath %>'
+                cwd: '<%= srcPath %>/sample',
+                src: [ '**' ], //[, '!**/*html' ], //, '!attachments/**' ],
+                dest: '<%= buildPath %>/sample'
+            },
+
+            'index': {
+                expand: true,
+                cwd: '<%= srcPath %>',
+                src: [ 'index.html' ],
+                dest: '<%= buildPath %>',
+                options: {
+                    process: '<%= processTemplate %>',
+                },
             },
 
             'deploy': {}
@@ -86,6 +122,10 @@ module.exports = function( grunt ) {
         clean: {
             options: {
                 force: true
+            },
+
+            all: {
+                src: [ '<%= buildPath %>/**' ]
             },
 
             'build': {
@@ -99,19 +139,19 @@ module.exports = function( grunt ) {
 
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-        filelist: {
-            configs: {
-                files: [
-                    {
-                        cwd: 'src/main/test/config',
-                        src: [
-                            '*json',
-                        ],
-                        dest: '<%= buildPath %>/test/configs.json'
-                    }
-                ]
-            },
-        },
+        // filelist: {
+        //     configs: {
+        //         files: [
+        //             {
+        //                 cwd: 'src/main/test/config',
+        //                 src: [
+        //                     '*json',
+        //                 ],
+        //                 dest: '<%= buildPath %>/test/configs.json'
+        //             }
+        //         ]
+        //     },
+        // },
 
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -140,7 +180,7 @@ module.exports = function( grunt ) {
 
             tags: {
                 files: [ 'smk-tags.js', 'lib/**' ],
-                tasks: [ 'gen-tags', 'copy:include' ]
+                tasks: [ 'gen-tags', 'build' ]
             }
         }
 
@@ -152,9 +192,17 @@ module.exports = function( grunt ) {
             delete require.cache[ key ]
 
         var tags = require( './smk-tags' )
-        var out = grunt.template.process( '<%= buildPath %>/smk-tags.json' )
-        grunt.file.write( out, JSON.stringify( tags.gen(), null, '  ' ) )
-        grunt.log.writeln( 'Wrote tags to ' + out )
+        var tagData = tags.gen()
+        // var out = grunt.template.process( '<%= buildPath %>/smk-tags.json' )
+
+        var includes = []
+        Object.keys( tagData ).sort().forEach( function ( t ) {
+            includes.push( 'include.tag( "' + t + '", ' + JSON.stringify( tagData[ t ], null, '    ' ) + ' )' )
+        } )
+
+        grunt.config( 'includes', includes.join( '\n' ) )
+        // grunt.file.write( out, JSON.stringify( , null, '  ' ) )
+        grunt.log.writeln( 'Output ' + includes.length + ' tags' )
     } )
 
     grunt.registerTask( 'deploy', 'set deploy dir', function ( dir ) {
@@ -192,6 +240,7 @@ module.exports = function( grunt ) {
         grunt.log.writeln( 'Server host: ' + grunt.config( 'serverHost' ) )
 
         grunt.task.run(
+            'clean:all',
             'build',
             'build-test',
             'connect',
@@ -231,17 +280,21 @@ module.exports = function( grunt ) {
     grunt.registerTask( 'build', [
         'clean:build',
         'gen-tags',
-        'copy:src',
-        'copy:include',
+        'copy:smk',
+        'copy:lib',
+        'copy:sample',
+        'copy:index',
     ] )
 
     grunt.registerTask( 'build-test', [
         'clean:test',
-        'filelist:configs:filelist',
-        'copy:test-html',
+        // 'filelist:configs:filelist',
+        // 'copy:test-html',
         'copy:test',
     ] )
 
-    grunt.registerTask( 'default', 'use:https' )
+    grunt.registerTask( 'default', [
+        'use:https',
+    ] )
 
 }

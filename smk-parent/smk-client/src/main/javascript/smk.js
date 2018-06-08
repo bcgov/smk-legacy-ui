@@ -14,6 +14,7 @@
         .then( parseScriptElement )
         .then( resolveConfig )
         .then( loadInclude )
+        .then( defineTags )
         .then( initializeSmkMap )
         .catch( SMK.ON_FAILURE )
 
@@ -28,9 +29,8 @@
         var smkAttr = {
             'container-id': attrString( 'smk-map-frame' ),
             'config':       attrList( '?smk-' ),
-            // 'standalone':   attrBoolean( false, true ),
             'disconnected': attrBoolean( false, true ),
-            'base-url':     attrString( ( new URL( bootstrapScriptEl.src.replace( 'smk-bootstrap.js', '' ), document.location ) ).toString() ),
+            'base-url':     attrString( ( new URL( bootstrapScriptEl.src.replace( 'smk.js', '' ), document.location ) ).toString() ),
             'service-url':  attrString( '../smks-api' ),
         }
 
@@ -430,7 +430,8 @@
                 rej( new Error( 'failed to load script from ' + el.src ) )
             } )
 
-            el.setAttribute( 'src', attr[ 'base-url' ] + '/lib/include.js' )
+
+            el.setAttribute( 'src', ( new URL( 'lib/include.js', attr[ 'base-url' ] ) ).toString() )
 
             document.getElementsByTagName( 'head' )[ 0 ].appendChild( el )
         } )
@@ -439,17 +440,7 @@
 // = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
     function initializeSmkMap( attr ) {
-        try {
-            include.tag( 'smk-tags' )
-        }
-        catch ( e ) {
-            include.tag( 'smk-tags', { loader: 'tags', url: 'smk-tags.json' } )
-        }
-
-        return include( 'smk-tags' )
-            .then( function ( inc ) {
-                console.log( 'tags', inc[ 'smk-tags' ] )
-            } )
+         return Promise.resolve()
             .then( function () {
                 if ( window.jQuery ) {
                     include.tag( 'jquery' ).include = Promise.resolve( window.jQuery )
@@ -561,8 +552,6 @@
 // = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
     function setupGlobalSMK( util ) {
-        // if ( !window.SMK ) window.SMK = {}
-
         return window.SMK = Object.assign( {
             MAP: {},
             VIEWER: {},
@@ -570,10 +559,6 @@
             UTIL: util,
 
             CONFIG: {
-                // surround: {
-                //     type: "default",
-                //     title: 'Simple Map Kit'
-                // },
                 viewer: {
                     type: "leaflet",
                     location: {
@@ -635,6 +620,15 @@
             }
 
         }, window.SMK )
+    }
+
+// = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+
+    function defineTags( attr ) {
+//===================================== vv GENERATED CODE vv =====================================
+<%= includes %>
+//===================================== ^^ GENERATED CODE ^^ =====================================
+        return attr
     }
 
 } )();
