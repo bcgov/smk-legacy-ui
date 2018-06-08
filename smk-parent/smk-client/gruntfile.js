@@ -93,15 +93,15 @@ module.exports = function( grunt ) {
             'test': {
                 expand: true,
                 cwd: 'src/main/test',
-                src: [ '**' ], //[, '!**/*html' ], //, '!attachments/**' ],
-                dest: '<%= buildPath %>/test'
+                src: [ 'attachments/**', 'config/**' ],
+                dest: '<%= buildPath %>'
             },
 
-            'sample': {
+            'samples': {
                 expand: true,
-                cwd: '<%= srcPath %>/sample',
-                src: [ '**' ], //[, '!**/*html' ], //, '!attachments/**' ],
-                dest: '<%= buildPath %>/sample'
+                cwd: '<%= srcPath %>/samples',
+                src: [ '**' ],
+                dest: '<%= buildPath %>/samples'
             },
 
             'index': {
@@ -129,11 +129,11 @@ module.exports = function( grunt ) {
             },
 
             'build': {
-                src: [ '<%= buildPath %>/**', '!<%= buildPath %>', '!<%= buildPath %>/test/**' ]
+                src: [ '<%= buildPath %>/**', '!<%= buildPath %>', '!<%= buildPath %>/attachments/**', '!<%= buildPath %>/config/**' ]
             },
 
             'test': {
-                src: [ '<%= buildPath %>/test/**' ]
+                src: [ '<%= buildPath %>/attachments/**', '<%= buildPath %>/config/**' ]
             }
         },
 
@@ -282,7 +282,7 @@ module.exports = function( grunt ) {
         'gen-tags',
         'copy:smk',
         'copy:lib',
-        'copy:sample',
+        'copy:samples',
         'copy:index',
     ] )
 
@@ -295,6 +295,11 @@ module.exports = function( grunt ) {
 
     grunt.registerTask( 'default', [
         'use:https',
+    ] )
+
+    grunt.registerTask( 'maven', [
+        'clean:all',
+        'build',
     ] )
 
 }
