@@ -28,6 +28,7 @@
     function parseScriptElement() {
         var smkAttr = {
             'container-id': attrString( 'smk-map-frame' ),
+            'title-id':     attrString( 'head title' ),
             'config':       attrList( '?smk-' ),
             'disconnected': attrBoolean( false, true ),
             'base-url':     attrString( ( new URL( bootstrapScriptEl.src.replace( 'smk.js', '' ), document.location ) ).toString() ),
@@ -559,6 +560,7 @@
             UTIL: util,
 
             CONFIG: {
+                name: 'SMK Default map',
                 viewer: {
                     type: "leaflet",
                     location: {
@@ -588,6 +590,7 @@
             },
 
             BOOT: Promise.resolve(),
+            TAGS_DEFINED: false,
             ON_FAILURE: function ( e ) {
                 if ( e.parseSource )
                     e.message += ',\n  while parsing ' + e.parseSource
@@ -625,9 +628,11 @@
 // = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
     function defineTags( attr ) {
+        if ( SMK.TAGS_DEFINED ) return attr
 //===================================== vv GENERATED CODE vv =====================================
 <%= includes %>
 //===================================== ^^ GENERATED CODE ^^ =====================================
+        SMK.TAGS_DEFINED = true
         return attr
     }
 
