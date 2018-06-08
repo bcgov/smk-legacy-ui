@@ -53,8 +53,7 @@ var data = {
 	    },
 	    tools: [
 			{ "type": "menu" },
-			{ "type": "dropdown" },
-			{ "type": "location" }
+			{ "type": "dropdown" }
 	    ],
 	    layers: [],
 	    _id: null,

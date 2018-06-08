@@ -10,7 +10,8 @@ public class MapViewer implements Cloneable
 	//private Double[] initialExtent = {-139.1782, 47.6039, -110.3533, 60.5939};
 	private ViewerLocation location;
 	private String baseMap;
-
+	private String activeTool;
+	
 	public MapViewer() {
 	}
 
@@ -18,6 +19,8 @@ public class MapViewer implements Cloneable
 		this.setType(mapViewer.getType());
 		//this.setInitialExtent(mapViewer.getInitialExtent().clone());
 		this.setBaseMap(mapViewer.getBaseMap());
+		this.setActiveTool(mapViewer.getActiveTool());
+		this.setLocation(mapViewer.getLocation());
 	}
 
 	public String getType() { return type; }
@@ -37,6 +40,16 @@ public class MapViewer implements Cloneable
 	public void setLocation(ViewerLocation location)
 	{
 	    this.location = location;
+	}
+	
+	public String getActiveTool()
+	{
+	    return this.activeTool;
+	}
+	
+	public void setActiveTool(String activeTool)
+	{
+	    this.activeTool = activeTool;
 	}
 	
 	public String getBaseMap() { return baseMap; }
