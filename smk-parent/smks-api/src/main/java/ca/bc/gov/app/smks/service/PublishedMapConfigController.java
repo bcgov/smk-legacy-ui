@@ -362,7 +362,7 @@ public class PublishedMapConfigController
 				    
 				    // create config json
 				    ObjectMapper mapper = new ObjectMapper();
-				    File mapConfigTempFile = new File(tempLocationPath + "map_config.json");
+				    File mapConfigTempFile = new File(tempLocationPath + "map-config.json");
 				    mapConfigTempFile.createNewFile();
 				    mapper.writeValue(mapConfigTempFile, resource);
 				    String configString = mapper.writeValueAsString(resource);
@@ -428,6 +428,7 @@ public class PublishedMapConfigController
 				    if(smkConfigDocumentNames.length() > 0 && smkConfigDocumentNames.endsWith(",")) smkConfigDocumentNames = smkConfigDocumentNames.substring(0, smkConfigDocumentNames.length() - 1);
 				    
 				    // create index.html with refs to config and attachments, and insert
+				    /*
 				    File indexHtml = new File(tempLocationPath + "index.html");
 				    indexHtml.createNewFile();
 				    
@@ -441,7 +442,7 @@ public class PublishedMapConfigController
 
 				    out.close();
 				    out = null;
-				    
+				    */
 				    // done creating temp zip,
 				    
 				    File exportableZip = zipFile.getFile();
@@ -462,7 +463,7 @@ public class PublishedMapConfigController
 			        exportStream.close();
 				    exportStream = null;
 				    zipFile = null;
-				    indexHtml.delete();
+				    //indexHtml.delete();
 				    exportTemplateZip.delete();
 				    mapConfigTempFile.delete();
 				    exportableZip.delete();
