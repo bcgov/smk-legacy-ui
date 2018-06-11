@@ -3,6 +3,7 @@
         {
             "type": "esri-dynamic",
             "id": "746",
+            "tolerance": 20,
             "title": "All Fish points",
             "isVisible": true,
             "attribution": "Copyright 2018 DataBC, Government of British Columbia",

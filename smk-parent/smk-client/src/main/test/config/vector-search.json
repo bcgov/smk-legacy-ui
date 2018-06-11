@@ -374,6 +374,12 @@
                     "description": "Find features by Parcel Area Derivation",
                     "parameters": [
                         {
+                            "id": "param2",
+                            "type": "select-unique",
+                            "title": "Parcel Area Derivation 1",
+                            "uniqueAttribute": "PARCEL_AREA_DERIVATION"
+                        },
+                        {
                             "id": "param1",
                             "type": "select",
                             "title": "Parcel Area Derivation",

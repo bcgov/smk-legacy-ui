@@ -7,18 +7,19 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import ca.bc.gov.app.smks.model.LayerStyle;
 import ca.bc.gov.app.smks.model.Tool;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 @JsonInclude(Include.NON_NULL)
 public class Identify extends Tool
 {
 	private LayerStyle style;
 	private Double styleOpacity;
-	
+	private Integer tolerance;
 	public Identify() {}
 
-	protected Identify( Identify about ) {
-		super( about );
+	protected Identify( Identify identify ) {
+		super( identify );
+		this.tolerance = identify.getTolerance();
+		this.styleOpacity = identify.getStyleOpacity();
+		this.style = identify.getStyle();
 	}
 
 	public String getType() {
@@ -32,7 +33,7 @@ public class Identify extends Tool
 	public Identify clone()
 	{
 		Identify clone = new Identify( this );
-
+		
 		return clone;
 	}
 
@@ -55,5 +56,15 @@ public class Identify extends Tool
 	public void setStyleOpacity(Double styleOpacity)
 	{
 		this.styleOpacity = styleOpacity;
+	}
+	
+	public Integer getTolerance()
+	{
+	    return this.tolerance;
+	}
+	
+	public void setTolerance(Integer tolerance)
+	{
+	    this.tolerance = tolerance;
 	}
 }
