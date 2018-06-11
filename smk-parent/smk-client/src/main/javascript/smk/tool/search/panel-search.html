@@ -1,6 +1,6 @@
 <side-panel class="smk-search-panel" v-bind:class="{ 'smk-busy': busy }">
     <template slot="header">
-        <h1>Search</h1>
+        <h1>Search for Location</h1>
         <div class="smk-spinner"></div>
     </template>
 
@@ -19,7 +19,7 @@
     <div class="smk-placeholder"
         v-if="isEmpty()"
     >
-        Enter search keywords.
+        Enter name of location.
     </div>
 
     <div class="smk-search-result smk-item"
