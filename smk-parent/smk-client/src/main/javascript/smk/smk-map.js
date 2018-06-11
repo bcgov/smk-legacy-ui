@@ -35,7 +35,13 @@ include.module( 'smk-map', [ 'jquery', 'util' ], function () {
                 .then( loadTools )
                 .then( initViewer )
                 .then( initTools )
-                .then( showMap ),
+                .then( showMap )
+                .catch( function ( e ) {
+                    $( self.$container )
+                        .removeClass( 'smk-map-frame smk-hidden' )
+
+                    return Promise.reject( e )
+                } ),
             function () {
                 console.groupEnd()
             }
@@ -50,7 +56,12 @@ include.module( 'smk-map', [ 'jquery', 'util' ], function () {
 
                 var id = c.url.toLowerCase().replace( /[^a-z0-9]+/g, '-' ).replace( /^[-]|[-]$/g, '' )
                 var tag = 'config-' + id
-                include.tag( tag, { loader: 'template', url: c.url } )
+                try {
+                    include.tag( tag, { loader: 'template', url: c.url } )
+                }
+                catch ( e ) {
+                    console.warn( e )
+                }
 
                 return include( tag )
                     .then( function ( inc ) {
@@ -60,7 +71,8 @@ include.module( 'smk-map', [ 'jquery', 'util' ], function () {
                             return obj
                         }
                         catch ( e ) {
-                            console.warn( c.$sources[ 0 ], inc[ tag ] )
+                            console.warn( c.$sources[ 0 ] )
+                            console.warn( inc[ tag ] )
                             e.parseSource = c.$sources[ 0 ]
                             throw e
                         }

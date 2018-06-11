@@ -51,7 +51,7 @@ module.exports = function( grunt ) {
             'smk': {
                 expand: true,
                 cwd: '<%= srcPath %>',
-                src: [ 'smk.js' ],
+                src: [ 'smk.js', 'index.html', 'map-config.json' ],
                 dest: '<%= buildPath %>',
                 options: {
                     process: '<%= processTemplate %>',
@@ -102,16 +102,6 @@ module.exports = function( grunt ) {
                 cwd: '<%= srcPath %>/samples',
                 src: [ '**' ],
                 dest: '<%= buildPath %>/samples'
-            },
-
-            'index': {
-                expand: true,
-                cwd: '<%= srcPath %>',
-                src: [ 'index.html' ],
-                dest: '<%= buildPath %>',
-                options: {
-                    process: '<%= processTemplate %>',
-                },
             },
 
             'deploy': {}
@@ -283,7 +273,6 @@ module.exports = function( grunt ) {
         'copy:smk',
         'copy:lib',
         'copy:samples',
-        'copy:index',
     ] )
 
     grunt.registerTask( 'build-test', [
