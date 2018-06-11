@@ -90,7 +90,7 @@
                             <goal>grunt</goal>
                         </goals>
                         <configuration>
-                            <arguments>build</arguments>
+                            <arguments>maven</arguments>
                         </configuration>
                     </execution>
                 </executions>

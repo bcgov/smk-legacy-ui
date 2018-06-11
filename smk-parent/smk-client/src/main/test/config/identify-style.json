@@ -2,6 +2,7 @@
     "tools": [
         {
             "type": "identify",
+            "tolerance": 10,
             "style": {
                 "color":       "red",
                 "weight":      3,
