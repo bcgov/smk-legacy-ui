@@ -6,6 +6,19 @@
     visibility: hidden;
 }
 
+.smk-map-frame.smk-hidden::after {
+    content: ' ';
+    visibility: visible;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url( 'spinner.gif' );
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
 .smk-map-frame .smk-viewer {
     position: absolute;
     top: 0;
@@ -140,6 +153,8 @@
 }
 
 /* style resets */
+
+/* https://gist.github.com/retyui/b71c6cfca2d265c8c3c108fa39c7c88a */
 
 .smk-map-frame select {
     background: #fff;

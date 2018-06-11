@@ -11,16 +11,18 @@ include.module( 'smk-map', [ 'jquery', 'util' ], function () {
     SmkMap.prototype.initialize = function () {
         var self = this;
 
-        console.groupCollapsed( 'SMK initialize #' + this.$option[ 'container-id' ] )
+        console.groupCollapsed( 'SMK initialize ' + this.$option[ 'id' ] )
 
         console.log( 'options:', JSON.parse( JSON.stringify( this.$option ) ) )
 
-        this.$container = document.getElementById( this.$option[ 'container-id' ] )
-        if ( !this.$container )
-            throw new Error( 'Unable to find container #' + this.$option[ 'container-id' ] )
+        var container = $( this.$option[ 'container-sel' ] )
+        if ( container.length != 1 )
+            throw new Error( 'smk-container-sel "' + this.$option[ 'container-sel' ] + '" doesn\'t match a unique element' )
+
+        this.$container = container.get( 0 )
 
         $( this.$container )
-            .addClass( 'smk-hidden' )
+            .addClass( 'smk-map-frame smk-hidden' )
 
         return SMK.UTIL.promiseFinally(
             SMK.UTIL.resolved()
@@ -239,11 +241,10 @@ include.module( 'smk-map', [ 'jquery', 'util' ], function () {
 
         function initMapFrame() {
             $( self.$container )
-                .addClass( 'smk-map-frame' )
                 .addClass( 'smk-viewer-' + self.viewer.type )
 
-            if ( self.$option[ 'title-id' ] )
-                $( self.$option[ 'title-id' ] ).text( self.name )
+            if ( self.$option[ 'title-sel' ] )
+                $( self.$option[ 'title-sel' ] ).text( self.name )
         }
 
         function checkTools() {

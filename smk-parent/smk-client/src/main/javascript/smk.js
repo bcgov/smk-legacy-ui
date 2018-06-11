@@ -1,17 +1,19 @@
 ( function () {
 
-    var bootstrapScriptEl = document.currentScript
-
     var util = {}
     installPolyfills( util )
-
     setupGlobalSMK( util )
 
-    console.time( 'smk-bootstrap' )
-    console.groupCollapsed( 'SMK bootstrap' )
+    var bootstrapScriptEl = document.currentScript
 
+    var timer
     SMK.BOOT = SMK.BOOT
         .then( parseScriptElement )
+        .then( function ( attr ) {
+            timer = 'SMK initialize ' + attr.id
+            console.time( timer )
+            return attr
+        } )
         .then( resolveConfig )
         .then( loadInclude )
         .then( defineTags )
@@ -19,16 +21,16 @@
         .catch( SMK.ON_FAILURE )
 
     util.promiseFinally( SMK.BOOT, function () {
-        console.groupEnd()
-        console.timeEnd( 'smk-bootstrap' )
+        console.timeEnd( timer )
     } )
 
 // = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
     function parseScriptElement() {
         var smkAttr = {
-            'container-id': attrString( 'smk-map-frame' ),
-            'title-id':     attrString( 'head title' ),
+            'id':           attrString( '1' ),
+            'container-sel':attrString( '#smk-map-frame' ),
+            'title-sel':    attrString( 'head title' ),
             'config':       attrList( '?smk-' ),
             'disconnected': attrBoolean( false, true ),
             'base-url':     attrString( ( new URL( bootstrapScriptEl.src.replace( 'smk.js', '' ), document.location ) ).toString() ),
@@ -471,7 +473,10 @@
             } )
             .then( function () {
                 return include( 'smk-map' ).then( function ( inc ) {
-                    var map = SMK.MAP[ attr[ 'container-id' ] ] = new SMK.TYPE.SmkMap( attr )
+                    if ( attr[ 'id' ] in SMK.MAP )
+                        throw new Error( 'An SMK map with smk-id "' + attr[ 'id' ] + '" already exists' )
+
+                    var map = SMK.MAP[ attr[ 'id' ] ] = new SMK.TYPE.SmkMap( attr )
                     return map.initialize()
                 } )
             } )
