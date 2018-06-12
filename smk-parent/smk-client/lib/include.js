@@ -204,7 +204,8 @@
         if ( !Array.isArray( tags ) )
             tags = [].slice.call( arguments )
 
-        return loader.group( { tags: tags } )
+        // return loader.group( { tags: tags } )
+        return loader.sequence( { tags: tags } )
     }
 
     var extLoader = {
