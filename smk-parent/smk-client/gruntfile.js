@@ -245,7 +245,6 @@ module.exports = function( grunt ) {
         grunt.log.writeln( 'Server host: ' + grunt.config( 'serverHost' ) )
 
         grunt.task.run(
-            'mavenEffectivePom',
             'clean:all',
             'build',
             'build-test',
@@ -284,6 +283,7 @@ module.exports = function( grunt ) {
     } )
 
     grunt.registerTask( 'build', [
+        'mavenEffectivePom',
         'gitinfo',
         'clean:build',
         'gen-tags',
