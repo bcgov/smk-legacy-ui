@@ -138,7 +138,7 @@ include.module( 'util', null, function ( inc ) {
         reproject: function ( geojson, crs ) {
             var self = this
 
-            return include( 'proj4' ).then( function ( inc ) {
+            return include( 'projections' ).then( function ( inc ) {
                 var proj = proj4( self.extractCRS( crs ) )
 
                 return self.traverse.GeoJSON( geojson, {

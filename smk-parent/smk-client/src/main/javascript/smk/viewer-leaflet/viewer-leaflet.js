@@ -1,4 +1,4 @@
-include.module( 'viewer-leaflet', [ 'viewer', 'leaflet', 'layer-leaflet', 'leaflet-extensions', 'feature-list-leaflet' ], function () {
+include.module( 'viewer-leaflet', [ 'viewer', 'leaflet', 'layer-leaflet', 'feature-list-leaflet' ], function () {
 
     function ViewerLeaflet() {
         SMK.TYPE.Viewer.prototype.constructor.apply( this, arguments )

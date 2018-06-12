@@ -1,4 +1,4 @@
-include.module( 'tool-select-leaflet', [ 'leaflet', 'tool-select', 'feature-list-leaflet' ], function ( inc ) {
+include.module( 'tool-select-leaflet', [ 'leaflet', 'tool-select', 'feature-list-leaflet', 'turf' ], function ( inc ) {
 
     SMK.TYPE.SelectTool.prototype.styleFeature = function () {
         var self = this

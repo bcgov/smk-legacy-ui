@@ -1,4 +1,4 @@
-include.module( 'layer.layer-esri-dynamic-js', [ 'layer.layer-js' ], function () {
+include.module( 'layer.layer-esri-dynamic-js', [ 'layer.layer-js', 'terraformer' ], function () {
 
     function EsriDynamicLayer() {
         SMK.TYPE.Layer.prototype.constructor.apply( this, arguments )

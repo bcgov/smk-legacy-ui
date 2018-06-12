@@ -1,4 +1,4 @@
-include.module( 'feature-list-clustering-leaflet', [ 'leaflet', 'feature-list-leaflet' ], function ( inc ) {
+include.module( 'feature-list-clustering-leaflet', [ 'leaflet', 'feature-list-leaflet', 'turf' ], function ( inc ) {
 
     return function ( smk ) {
         var self = this

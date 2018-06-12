@@ -1,4 +1,4 @@
-include.module( 'viewer-esri3d', [ 'viewer', 'esri3d', 'types-esri3d', 'layer-esri3d' ], function () {
+include.module( 'viewer-esri3d', [ 'viewer', 'esri3d', 'types-esri3d', 'layer-esri3d', 'turf' ], function () {
 
     var E = SMK.TYPE.Esri3d
 

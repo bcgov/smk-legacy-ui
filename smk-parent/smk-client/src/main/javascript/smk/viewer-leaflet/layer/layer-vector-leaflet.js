@@ -1,4 +1,4 @@
-include.module( 'layer-leaflet.layer-vector-leaflet-js', [ 'layer.layer-vector-js' ], function () {
+include.module( 'layer-leaflet.layer-vector-leaflet-js', [ 'layer.layer-vector-js', 'turf' ], function () {
 
     function VectorLeafletLayer() {
         SMK.TYPE.Layer[ 'vector' ].prototype.constructor.apply( this, arguments )
