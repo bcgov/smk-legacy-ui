@@ -625,6 +625,14 @@
                 '.replace( /\s+/g, ' ' ).replace( '{}', e || '' )
 
                 document.querySelector( 'body' ).appendChild( message )
+            },
+
+            BUILD: {
+                commit:     '<%= gitinfo.local.branch.current.SHA %>',
+                branch:     '<%= gitinfo.local.branch.current.name %>',
+                lastCommit: '<%= gitinfo.local.branch.current.lastCommitTime %>'.replace( /^"|"$/g, '' ),
+                origin:     '<%= gitinfo.remote.origin.url %>',
+                pomVersion: '<%= pom.project.parent.version %>',
             }
 
         }, window.SMK )

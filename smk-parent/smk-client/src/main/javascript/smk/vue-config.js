@@ -11,6 +11,16 @@ include.module( 'vue-config', [ 'vue' ], function ( inc ) {
         return i.toLocaleString() + ( decimalPlaces && decimalPlaces > 0 ? f.toFixed( decimalPlaces ).substr( 1 ) : '' )
     }
 
+    Vue.filter( 'formatDate', function ( date ) {
+        return formatDate( date )
+    } )
+
+    function formatDate( date ) {
+        var d = new Date( date )
+
+        return d.toLocaleString()
+    }
+
     Vue.filter( 'dimensionalNumber', function ( value, dim, unit, decimalPlaces ) {
         if ( dim == 1 )
             switch ( unit ) {

@@ -106,6 +106,9 @@ exports.gen = function () {
     t.group( 'tool-select' )
         .dir( 'smk/tool/select/**/*', { cwd: baseDir } )
 
+    t.group( 'tool-version' )
+        .dir( 'smk/tool/version/**/*', { cwd: baseDir } )
+
     t.group( 'tool-zoom' )
         .dir( 'smk/tool/zoom/**/*', { cwd: baseDir } )
 
