@@ -4,6 +4,9 @@ var glob = require('glob')
 
 var ts =  function () {}
 
+var globOption = { nodir: true }
+exports.globOption = globOption
+
 exports.TagSet = ts
 
 ts.prototype._add = function ( tag, loader, url, option ) {
@@ -77,7 +80,7 @@ var extTemplate = {
 tl.prototype.dir = function ( pattern, option ) {
     var self = this
 
-    var files = glob.sync( pattern, Object.assign( { nodir: true }, option ) )
+    var files = glob.sync( pattern, Object.assign( globOption, option ) )
     files.forEach( function ( f ) {
         var ext = path.extname( f ).substr( 1 )
         var loader = extTemplate[ ext ]
