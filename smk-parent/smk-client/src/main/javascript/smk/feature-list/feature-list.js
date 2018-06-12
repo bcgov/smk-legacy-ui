@@ -26,7 +26,7 @@ include.module( 'feature-list', [ 'tool', 'widgets',
                 return str.replace( /[^a-z0-9 ]+/ig, function ( m ) { return '<wbr>' + m } )
             },
             formatValue: function ( val ) {
-                if ( /^https?[:][/]{2}[^/]/.test( val.trim() ) ) {
+                if ( /^https?[:][/]{2}[^/]/.test( ( '' + val ).trim() ) ) {
                     return '<a href="'+ val + '" target="_blank">' + val + '</a>'
                 }
 
