@@ -91,7 +91,6 @@ include.module( 'smk-map', [ 'jquery', 'util' ], function () {
 
                 console.log( 'merging', JSON.parse( JSON.stringify( c ) ) )
 
-                mergeSurround( config, c )
                 mergeViewer( config, c )
                 mergeTools( config, c )
                 mergeLayers( config, c )
@@ -107,24 +106,6 @@ include.module( 'smk-map', [ 'jquery', 'util' ], function () {
             Object.assign( self, config )
 
             // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-            function mergeSurround( base, merge ) {
-                if ( !merge.surround ) return
-
-                if ( base.surround ) {
-                    if ( base.surround.subtitles && merge.surround.subtitles ) {
-                        base.surround.subtitles = base.surround.subtitles.concat( merge.surround.subtitles )
-                        delete merge.surround.subtitles
-                    }
-
-                    Object.assign( base.surround, merge.surround )
-                }
-                else {
-                    base.surround = merge.surround
-                }
-
-                delete merge.surround
-            }
 
             function mergeViewer( base, merge ) {
                 if ( !merge.viewer ) return
