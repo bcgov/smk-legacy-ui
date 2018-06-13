@@ -1,5 +1,16 @@
 include.module( 'tool-location-leaflet', [ 'leaflet', 'tool-location' ], function ( inc ) {
 
+    var base = include.option( 'baseUrl' ) + '/smk/tool/location'
+
+    var blueIcon = new L.Icon( {
+        iconUrl:        base + '/marker-icon-blue.png',
+        shadowUrl:      base + '/marker-shadow.png',
+        iconSize:       [ 25, 41 ],
+        iconAnchor:     [ 12, 41 ],
+        popupAnchor:    [ 1, -34 ],
+        shadowSize:     [ 41, 41 ]
+    } )
+
     SMK.TYPE.LocationTool.prototype.afterInitialize.push( function ( smk ) {
         var self = this
 
@@ -9,7 +20,7 @@ include.module( 'tool-location-leaflet', [ 'leaflet', 'tool-location' ], functio
         } )
         .setContent( function () { return self.vm.$el } )
 
-        this.locationMarker = L.marker()
+        this.locationMarker = L.marker( null, { icon: blueIcon } )
             .bindPopup( this.popup )
 
         self.changedVisible( function () {
