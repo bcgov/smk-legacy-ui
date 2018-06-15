@@ -23,7 +23,7 @@ exports.gen = function () {
         .script( 'lib/terraformer/terraformer-arcgis-parser-1.0.5.js' )
         // .script( 'lib/terraformer/terraformer-wkt-parser-1.1.2.js' )
 
-    t.style( 'material-icons', 'https://fonts.googleapis.com/icon?family=Material+Icons' )
+    t.style( 'material-icons', 'https://fonts.googleapis.com/icon?family=Material+Icons', { external: true } )
 
     // ==================================================================================
     // smk base
@@ -206,8 +206,8 @@ exports.gen = function () {
 
     t.sequence( 'esri3d' )
         .tag( 'leaflet' )
-        .style( 'https://js.arcgis.com/4.7/esri/css/main.css' )
-        .script( 'https://js.arcgis.com/4.7/' )
+        .style( 'https://js.arcgis.com/4.7/esri/css/main.css', { external: true } )
+        .script( 'https://js.arcgis.com/4.7/', { external: true } )
         // .script( 'lib/toGeoJSON.js' )
         // .script( 'https://unpkg.com/terraformer@1.0.7' )
         // .script( 'https://unpkg.com/terraformer-arcgis-parser@1.0.5' )

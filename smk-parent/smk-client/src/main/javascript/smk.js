@@ -15,8 +15,6 @@
             return attr
         } )
         .then( resolveConfig )
-        .then( loadInclude )
-        .then( defineTags )
         .then( initializeSmkMap )
         .catch( SMK.ON_FAILURE )
 
@@ -417,33 +415,20 @@
 
 // = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
-    function loadInclude( attr ) {
-        return new Promise( function ( res, rej ) {
-            if ( window.include ) return res( attr )
-
-            var el = document.createElement( 'script' )
-
-            el.addEventListener( 'load', function( ev ) {
-                include.option( { baseUrl: attr[ 'base-url' ] } )
-
-                res( attr )
-            } )
-
-            el.addEventListener( 'error', function( ev ) {
-                rej( new Error( 'failed to load script from ' + el.src ) )
-            } )
-
-
-            el.setAttribute( 'src', ( new URL( 'lib/include.js', attr[ 'base-url' ] ) ).toString() )
-
-            document.getElementsByTagName( 'head' )[ 0 ].appendChild( el )
-        } )
-    }
-
-// = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
-
     function initializeSmkMap( attr ) {
-         return Promise.resolve()
+        include.option( { baseUrl: attr[ 'base-url' ] } )
+
+        return new Promise( function ( res, rej ) {
+            document.addEventListener( "DOMContentLoaded", function( ev ) {
+                clearTimeout( id )
+                res()
+            } )
+
+            var id = setTimeout( function () {
+                console.error( 'timeout waiting for document ready' )
+                rej()
+            }, 2000 )
+        } )
             .then( function () {
                 if ( window.jQuery ) {
                     include.tag( 'jquery' ).include = Promise.resolve( window.jQuery )
@@ -636,17 +621,6 @@
             }
 
         }, window.SMK )
-    }
-
-// = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
-
-    function defineTags( attr ) {
-        if ( SMK.TAGS_DEFINED ) return attr
-//===================================== vv GENERATED CODE vv =====================================
-<%= includes %>
-//===================================== ^^ GENERATED CODE ^^ =====================================
-        SMK.TAGS_DEFINED = true
-        return attr
     }
 
 } )();
