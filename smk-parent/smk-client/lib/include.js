@@ -1,5 +1,5 @@
 "use strict";
-( function () {
+if ( !window.include ) { ( function () {
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -91,32 +91,35 @@
         var self = this
 
         return new Promise( function ( res, rej ) {
-            var style = document.createElement( 'link' )
-
-            style.setAttribute( 'rel', 'stylesheet' )
-
-            if ( inc.integrity ) {
-                style.setAttribute( 'integrity', inc.integrity )
-                style.setAttribute( 'crossorigin', '' )
-            }
-
-            style.addEventListener( 'load', function( ev ) {
-                res( style )
-            } )
-
-            style.addEventListener( 'error', function( ev ) {
-                rej( new Error( 'failed to load stylesheet from ' + style.src ) )
-            } )
-
             if ( inc.load ) {
+                var style = document.createElement( 'style' )
                 style.textContent = inc.load
-                // res( style )
-            }
-            else if ( inc.url ) {
-                style.setAttribute( 'href', self.$resolveUrl( inc.url ) )
+                res( style )
             }
             else {
-                rej( new Error( 'Can\'t load style' ) )
+                var style = document.createElement( 'link' )
+
+                style.setAttribute( 'rel', 'stylesheet' )
+
+                if ( inc.integrity ) {
+                    style.setAttribute( 'integrity', inc.integrity )
+                    style.setAttribute( 'crossorigin', '' )
+                }
+
+                style.addEventListener( 'load', function( ev ) {
+                    res( style )
+                } )
+
+                style.addEventListener( 'error', function( ev ) {
+                    rej( new Error( 'failed to load stylesheet from ' + style.src ) )
+                } )
+
+                if ( inc.url ) {
+                    style.setAttribute( 'href', self.$resolveUrl( inc.url ) )
+                }
+                else {
+                    rej( new Error( 'Can\'t load style' ) )
+                }
             }
 
             document.getElementsByTagName( 'head' )[ 0 ].appendChild( style );
@@ -261,12 +264,6 @@
                         return inc.module
                     } )
                     .then( res, rej )
-                    // .then( function ( r ) {
-                    //     res( r )
-                    // } )
-                    // .catch( function ( e ) {
-                    //     rej( e )
-                    // } )
 
                 setTimeout( function () {
                     rej( new Error( 'timeout' ) )
@@ -405,5 +402,5 @@
     window.include.hash = hash
     window.include.option = option
 
-} )()
+} )() }
 
