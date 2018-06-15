@@ -12,6 +12,7 @@ module.exports = function( grunt ) {
     grunt.registerTask( 'build-smk', [
         'gen-tags',
         'make-tag-files',
+        'write-tag-head-foot',
         'concat:smk',
     ] )
 

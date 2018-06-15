@@ -73,6 +73,13 @@ module.exports = function( grunt ) {
                 },
             },
 
+            'images': {
+                expand: true,
+                cwd: '<%= srcPath %>/smk',
+                src: [ '**/*.{gif,png,jpg,jpeg}' ],
+                dest: '<%= buildPath %>/images'
+            },
+
             'test': {
                 expand: true,
                 cwd: 'src/main/test',
@@ -260,13 +267,13 @@ module.exports = function( grunt ) {
 
 
     grunt.registerTask( 'build', [
-        'build-info',
         'clean:build',
+        'build-info',
         'build-lib',
-        'write-tag-head-foot',
+        'build-images',
         'build-smk',
         'build-samples',
-        'copy:root',
+        'build-root',
         'clean:temp',
     ] )
 
@@ -286,6 +293,10 @@ module.exports = function( grunt ) {
         grunt.fail.fatal( 'Build mode isn\'t set' )
     } )
 
+    grunt.registerTask( 'build-images', [
+        'copy:images',
+    ] )
+
     grunt.registerTask( 'build-samples', [
         'copy:samples',
     ] )
@@ -297,6 +308,9 @@ module.exports = function( grunt ) {
         'copy:test',
     ] )
 
+    grunt.registerTask( 'build-root', [
+        'copy:root',
+    ] )
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
     grunt.registerTask( 'default', [
