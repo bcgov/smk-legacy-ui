@@ -2701,7 +2701,7 @@ $(document).ready(function()
 
 	//init the file upload components
 	document.getElementById('vectorFileUpload').addEventListener('change', readFile, false);
-	document.getElementById('headerImageFileUpload').addEventListener('change', readHeaderFile, false);
+	//document.getElementById('headerImageFileUpload').addEventListener('change', readHeaderFile, false);
 	document.getElementById('replaceVectorFileUpload').addEventListener('change', readFile, false);
 	document.getElementById('customMarkerFileUploadUpdate').addEventListener('change', readMarkerFile, false);
 	document.getElementById('customMarkerFileUploadNew').addEventListener('change', readMarkerFile, false);
@@ -2725,16 +2725,16 @@ $(document).ready(function()
 var fileContents;
 var unsavedAttachments = [];
 
-function readHeaderFile(e)
-{
-	readFile(e);
-	
-	unsavedAttachments.push(
-	{
-		type: "header_upload",
-		contents: fileContents
-	});
-}
+//function readHeaderFile(e)
+//{
+//	readFile(e);
+//	
+//	unsavedAttachments.push(
+//	{
+//		type: "header_upload",
+//		contents: fileContents
+//	});
+//}
 
 function readMarkerFile(e)
 {
