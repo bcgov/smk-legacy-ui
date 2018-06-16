@@ -298,7 +298,7 @@ include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', '
             if ( !self.isLayerVisible( id )  ) return
             if ( self.layerId[ id ].isContainer ) return
 
-            ly = self.layerId[ id ]
+            var ly = self.layerId[ id ]
             if ( !merged ) {
                 merged = [ ly ]
                 return
@@ -322,7 +322,7 @@ include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', '
 
             delete pending[ cid ]
             if ( self.visibleLayer[ cid ] ) {
-                self.positionViewerLayer( ly, maxZOrder - i )
+                self.positionViewerLayer( self.visibleLayer[ cid ], maxZOrder - i )
                 return
             }
 

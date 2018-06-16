@@ -76,7 +76,7 @@ include.module( 'tool-directions-leaflet', [ 'leaflet', 'tool-directions' ], fun
 
             smk.$viewer.map.addLayer( self.routeLayer )
 
-            bounds = self.routeLayer.getBounds()
+            var bounds = self.routeLayer.getBounds()
 
             smk.$viewer.map.fitBounds( bounds.pad( 0.25 ), {
                 paddingTopLeft: L.point( 340, 40 ),

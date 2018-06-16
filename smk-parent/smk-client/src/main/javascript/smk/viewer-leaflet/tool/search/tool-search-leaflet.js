@@ -42,7 +42,7 @@ include.module( 'tool-search-leaflet', [ 'leaflet', 'tool-search' ], function ( 
 
         var vw = smk.$viewer
 
-        searchMarkers = L.featureGroup( { pane: 'markerPane' } )
+        var searchMarkers = L.featureGroup( { pane: 'markerPane' } )
 
         this.changedActive( function () {
             if ( self.active ) {

@@ -45,6 +45,8 @@ include.module( 'smk-map', [ 'jquery', 'util' ], function () {
                 .then( initTools )
                 .then( showMap )
                 .catch( function ( e ) {
+                    console.error( e )
+
                     $( self.$container )
                         .removeClass( 'smk-hidden' )
 
