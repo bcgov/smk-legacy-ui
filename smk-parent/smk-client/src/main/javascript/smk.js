@@ -419,6 +419,9 @@
         include.option( { baseUrl: attr[ 'base-url' ] } )
 
         return new Promise( function ( res, rej ) {
+            if ( document.readyState != "loading" ) 
+                return res()
+            
             document.addEventListener( "DOMContentLoaded", function( ev ) {
                 clearTimeout( id )
                 res()
@@ -427,7 +430,7 @@
             var id = setTimeout( function () {
                 console.error( 'timeout waiting for document ready' )
                 rej()
-            }, 2000 )
+            }, 20000 )
         } )
             .then( function () {
                 if ( window.jQuery ) {
@@ -582,6 +585,8 @@
             BOOT: Promise.resolve(),
             TAGS_DEFINED: false,
             ON_FAILURE: function ( e ) {
+                if ( !e ) return 
+
                 if ( e.parseSource )
                     e.message += ',\n  while parsing ' + e.parseSource
 
