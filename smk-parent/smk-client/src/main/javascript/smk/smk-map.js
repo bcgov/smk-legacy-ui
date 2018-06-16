@@ -23,6 +23,14 @@ include.module( 'smk-map', [ 'jquery', 'util' ], function () {
 
         $( this.$container )
             .addClass( 'smk-map-frame smk-hidden' )
+        
+        var spinner = $( '<img class="smk-toplevel smk-spinner">' )
+            .attr( 'src', include.option( 'baseUrl' ) + '/images/spinner.gif' )
+            .appendTo( this.$container )
+
+        var status = $( '<div class="smk-toplevel smk-status">' )
+            .text( 'Reticulating splines...' )
+            .appendTo( this.$container )
 
         return SMK.UTIL.promiseFinally(
             SMK.UTIL.resolved()
@@ -38,9 +46,15 @@ include.module( 'smk-map', [ 'jquery', 'util' ], function () {
                 .then( showMap )
                 .catch( function ( e ) {
                     $( self.$container )
-                        .removeClass( 'smk-map-frame smk-hidden' )
+                        .removeClass( 'smk-hidden' )
 
-                    return Promise.reject( e )
+                    status.html( 
+                        '<h3>SMK initialization failed</h3><br>' + 
+                        e + ( e.parseSource ? ',<br>while parsing ' + e.parseSource : '' ) 
+                    )
+                    spinner.remove()
+
+                    return Promise.reject()
                 } ),
             function () {
                 console.groupEnd()
@@ -65,17 +79,14 @@ include.module( 'smk-map', [ 'jquery', 'util' ], function () {
 
                 return include( tag )
                     .then( function ( inc ) {
-                        try {
-                            var obj = JSON.parse( inc[ tag ] )
-                            obj.$sources = c.$sources
-                            return obj
-                        }
-                        catch ( e ) {
-                            console.warn( c.$sources[ 0 ] )
-                            console.warn( inc[ tag ] )
-                            e.parseSource = c.$sources[ 0 ]
-                            throw e
-                        }
+                        var obj = JSON.parse( inc[ tag ] )
+                        obj.$sources = c.$sources
+                        return obj
+                    } )
+                    .catch( function ( e ) {
+                        console.warn( c.$sources[ 0 ] )
+                        e.parseSource = c.$sources[ 0 ]
+                        throw e
                     } )
             } ) )
         }
@@ -328,9 +339,11 @@ include.module( 'smk-map', [ 'jquery', 'util' ], function () {
         }
 
         function showMap() {
+            status.remove()
+            spinner.remove()
             $( self.$container )
-                .removeClass( 'smk-hidden' )
                 .hide()
+                .removeClass( 'smk-hidden' )
                 .fadeIn( 1000 )
 
             if ( self.viewer.activeTool in self.$tool )

@@ -155,4 +155,25 @@ include.module( 'vue-config', [ 'vue' ], function ( inc ) {
     //     }
     // } )
 
+    Vue.component( 'spinner', {
+        template: '\
+<img class="smk-spinner"\
+    v-if="busy"\
+    v-bind:src="imageUrl"\
+    v-bind:style="{ width: size + \'px\', height: size + \'px\' }"\
+>',
+        props: { 
+            size: {
+                type: Number,
+                default: 24
+            },
+            busy: Boolean 
+        },
+        data: function () {
+            return {
+                imageUrl: include.option( 'baseUrl' ) + '/images/spinner.gif'
+            }
+        }
+    } )
+
 } )
