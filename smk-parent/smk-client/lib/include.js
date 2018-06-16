@@ -140,6 +140,7 @@ if ( !window.include ) { ( function () {
                 var url = self.$resolveUrl( inc.url )
 
                 req.addEventListener( 'load', function () {
+                    if ( this.status != 200 ) rej( new Error( 'status ' + this.status + ' trying to load template from ' + url ) )
                     res( inc.data = this.responseText )
                 } )
 
