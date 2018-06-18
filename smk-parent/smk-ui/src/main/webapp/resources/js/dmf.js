@@ -148,10 +148,10 @@ function parseKmlLayerStyle(fileText)
 		
 		if(markerUrl != null)
 		{
-			$("#kmlMarkerSizeX").val(markerSize);
-			$("#kmlMarkerSizeY").val(markerSize);
-			$("#kmlMarkerOffsetX").val(markerOffsetX);
-			$("#kmlMarkerOffsetY").val(markerOffsetY);
+			$("#kmlMarkerSizeX").val(parseInt(markerSize));
+			$("#kmlMarkerSizeY").val(parseInt(markerSize));
+			$("#kmlMarkerOffsetX").val(parseInt(markerOffsetX));
+			$("#kmlMarkerOffsetY").val(parseInt(markerOffsetY));
 		}
 	}
 	else // edit panel
@@ -166,10 +166,10 @@ function parseKmlLayerStyle(fileText)
 		
 		if(markerUrl != null)
 		{
-			$("#vectorMarkerSizeX").val(markerSize);
-			$("#vectorMarkerSizeY").val(markerSize);
-			$("#vectorMarkerOffsetX").val(markerOffsetX);
-			$("#vectorMarkerOffsetY").val(markerOffsetY);
+			$("#vectorMarkerSizeX").val(parseInt(markerSize));
+			$("#vectorMarkerSizeY").val(parseInt(markerSize));
+			$("#vectorMarkerOffsetX").val(parseInt(markerOffsetX));
+			$("#vectorMarkerOffsetY").val(parseInt(markerOffsetY));
 		}
 	}
 	
@@ -498,7 +498,8 @@ function editMapConfig(mapConfigId)
 		        },
 		        error: function (status)
     	        {
-    	            Materialize.toast('Map config loading failed. Please refresh and try again.', 4000);
+    	            Materialize.toast('Map config loading failed. Please refresh and try again. Error: ' + status.responseText, 4000);
+    	            console.log('Map config loading failed. Please refresh and try again. Error: ' + status.responseText);
     	        }
 			});
 		}
@@ -889,6 +890,7 @@ function saveMapConfig()
         withCredentials: true,
         success: function (result)
         {
+        	data.lmfId = result.lmfId;
         	Materialize.toast('Successfully saved application ' + data.lmfId + '. Checking for attachment uploads...', 4000);
 
         	// now we need to complete any attachments before moving on.
@@ -914,7 +916,8 @@ function saveMapConfig()
         },
         error: function (status)
         {
-            Materialize.toast('Error saving application ' + data.lmfId, 4000);
+            Materialize.toast('Error saving application ' + data.lmfId + '. Error: ' + status.responseText, 4000);
+            console.log('Error saving application ' + data.lmfId + '. Error: ' + status.responseText);
             if(data._rev == null) data._id = null;
         }
 	});
@@ -986,7 +989,8 @@ function handleAttachmentUpload(lmfId, attchId, attchType, documentData)
         processData: false,
         error: function (status)
         {
-            Materialize.toast('Error uploading attachment ' + attchId, 4000);
+            Materialize.toast('Error uploading attachment ' + attchId + '. Error: ' + status.responseText, 4000);
+            console.log('Error uploading attachment ' + attchId + '. Error: ' + status.responseText);
         }
 	}));
 }
@@ -1041,6 +1045,7 @@ function unPublishMapConfig(mapConfigId)
                 error: function (status)
                 {
                 	Materialize.toast('Error un-publishing ' + mapConfigId, 4000);
+                	console.log('Error un-publishing ' + mapConfigId + '. Error: ' + status.responseText);
                 }
 			});
 		}
@@ -1072,6 +1077,7 @@ function publishMapConfig(mapConfigId)
                 error: function (status)
                 {
                 	Materialize.toast('Error publishing ' + mapConfigId, 4000);
+                	console.log('Error publishing ' + mapConfigId + '. Error: ' + status.responseText);
                 	$("#loadingBar").hide();
                 	$("#appsTablePanel").show();
                 }
@@ -1125,6 +1131,7 @@ function deleteMapConfig(mapConfigId)
                     error: function (status)
                     {
                     	Materialize.toast('Could not delete ' + mapConfigId + '. Ensure this map is not published before deleting', 4000);
+                    	console.log('Error un-publishing ' + mapConfigId + '. Error: ' + status.responseText);
                     }
     			});
 			}
@@ -1215,7 +1222,8 @@ function downloadSelectedVector()
         },
         error: function (status)
         {
-            Materialize.toast('Error loading JSON. Please try again later', 4000);
+            Materialize.toast('Error loading JSON. Please try again later. Error: ' + status.responseText, 4000);
+            console.log('Error loading JSON. Error: ' + status.responseText);
         }
 	});
 }
@@ -2409,7 +2417,8 @@ function loadCatalogLayers()
         error: function (status)
         {
             // error handler
-            Materialize.toast('Error loading DataBC Layer catalog. Please try again later', 4000);
+            Materialize.toast('Error loading DataBC Layer catalog. Please try again later. Error: ' + status.responseText, 4000);
+            console.log('Error loading DataBC Layer catalog. Error: ' + status.responseText);
         }
 	});
 }
@@ -2482,7 +2491,8 @@ function loadWmsLayers()
         error: function (status)
         {
             // error handler
-            Materialize.toast('Error loading GetCapabilities from ' + wmsUrl + '. Please try again later', 4000);
+            Materialize.toast('Error loading GetCapabilities from ' + wmsUrl + '. Please try again later. Error: ' + status.responseText, 4000);
+            console.log('Error loading GetCapabilities from ' + wmsUrl + '. Error: ' + status.responseText);
             $("#wmsPanelLoading").hide();
             $("#wmsRefreshButton").show();
         	$("#wmsPanel").show();
@@ -2541,7 +2551,8 @@ function loadConfigs()
 	                    error: function (status)
 	                    {
 	                        // error handler
-	                        Materialize.toast('Error loading application ' + appConfigStub.id, 4000);
+	                        Materialize.toast('Error loading application ' + appConfigStub.id + 'Error: ' + status.responseText, 4000);
+	                        console.log('Error loading application ' + appConfigStub.id + '. Error: ' + status.responseText);
 	                    }
 	    			});
         		}
@@ -2554,7 +2565,8 @@ function loadConfigs()
         error: function (status)
         {
             // error handler
-            Materialize.toast('Error loading applications. Please try again later', 4000);
+            Materialize.toast('Error loading applications. Please try again later. Error: ' + status.responseText, 4000);
+            console.log('Error loading applications. Error: ' + status.responseText);
         }
 	});
 
@@ -2586,14 +2598,16 @@ function loadConfigs()
                     },
                     error: function (status)
                     {
-                        Materialize.toast('Error loading published application ' + appConfigStub.id, 4000);
+                        Materialize.toast('Error loading published application ' + appConfigStub.id + 'Error: ' + status.responseText, 4000);
+                        console.log('Error loading published applications. Error: ' + status.responseText);
                     }
     			});
         	});
         },
         error: function (status)
         {
-            Materialize.toast('Error loading published applications. Please try again later', 4000);
+            Materialize.toast('Error loading published applications. Please try again later. Error: ' + status.responseText, 4000);
+            console.log('Error loading published applications. Error: ' + status.responseText);
         }
 	});
 }
@@ -2701,7 +2715,7 @@ $(document).ready(function()
 
 	//init the file upload components
 	document.getElementById('vectorFileUpload').addEventListener('change', readFile, false);
-	document.getElementById('headerImageFileUpload').addEventListener('change', readHeaderFile, false);
+	//document.getElementById('headerImageFileUpload').addEventListener('change', readHeaderFile, false);
 	document.getElementById('replaceVectorFileUpload').addEventListener('change', readFile, false);
 	document.getElementById('customMarkerFileUploadUpdate').addEventListener('change', readMarkerFile, false);
 	document.getElementById('customMarkerFileUploadNew').addEventListener('change', readMarkerFile, false);
@@ -2725,16 +2739,16 @@ $(document).ready(function()
 var fileContents;
 var unsavedAttachments = [];
 
-function readHeaderFile(e)
-{
-	readFile(e);
+//function readHeaderFile(e)
+//{
+//	readFile(e);
 	
-	unsavedAttachments.push(
-	{
-		type: "header_upload",
-		contents: fileContents
-	});
-}
+//	unsavedAttachments.push(
+//	{
+//		type: "header_upload",
+//		contents: fileContents
+//	});
+//}
 
 function readMarkerFile(e)
 {
