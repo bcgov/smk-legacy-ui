@@ -3,6 +3,7 @@ module.exports = function( grunt ) {
     grunt.config( 'mode', 'dev' )
 
     grunt.registerTask( 'build-lib', [
+        'jshint:lib',
         'copy:lib',
     ] )
 
@@ -11,6 +12,7 @@ module.exports = function( grunt ) {
         'write-tags',
         'write-tag-head-foot',
         'concat:smk',
+        'jshint:smk',
     ] )
 
     grunt.registerTask( 'write-tags', function () {
@@ -64,8 +66,37 @@ module.exports = function( grunt ) {
                 ],
                 dest: '<%= buildPath %>/smk.js'
             }
-        }
+        },
 
+        jshint: {
+            options: {
+                bitwise: true,
+                // latedef: true,
+                strict: 'implied',
+                undef: true,
+                // unused: true,
+                asi: true,
+                plusplus: true,
+                
+
+                // curly: true,
+                // eqeqeq: true,
+                eqnull: true,
+                sub: true,
+                browser: true,
+                globals: {
+                    $: true,
+                    Vue: true,
+                    include: true,
+                    console: true,
+                    SMK: true,
+                    turf: true,
+                    Terraformer: true
+                },
+            },            
+            lib: [ '<%= srcPath %>/smk/**/*js', '!<%= srcPath %>/smk/**/lib/**' ],
+            smk: [ '<%= buildPath %>/smk.js' ],
+        }
     } )
 
 }

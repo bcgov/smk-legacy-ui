@@ -9,6 +9,13 @@ include.module( 'feature-set', [ 'jquery', 'util', 'event', 'turf' ], function (
         'clearedFeatures'
     ] )
 
+    function featureId( feature, keyAttribute, nonce ) {
+        if ( keyAttribute in feature.properties )
+            return include.hash( [ feature.properties[ keyAttribute ], nonce ] )
+
+        return include.hash( [ feature.properties, nonce ] )
+    }
+
     function FeatureSet() {
         FeatureSetEvent.prototype.constructor.call( this )
 
@@ -190,13 +197,6 @@ include.module( 'feature-set', [ 'jquery', 'util', 'event', 'turf' ], function (
                 }, {} ) ).length )
             }
         }
-    }
-
-    function featureId( feature, keyAttribute, nonce ) {
-        if ( keyAttribute in feature.properties )
-            return include.hash( [ feature.properties[ keyAttribute ], nonce ] )
-
-        return include.hash( [ feature.properties, nonce ] )
     }
 
 } )
