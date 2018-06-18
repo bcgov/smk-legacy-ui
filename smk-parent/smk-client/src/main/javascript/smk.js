@@ -66,6 +66,8 @@
         }
 
         function attrBoolean( missingKey, missingValue ) {
+            /* jshint evil: true */
+
             return function( key, el ) {
                 var val = attrString( missingKey, missingValue )( key, el )
                 return !!eval( val )
@@ -490,7 +492,7 @@
             // return script object based off of src
             var getScriptFromURL = function( url ) {
                 // console.log( url )
-                for ( var i = 0; i < scripts.length; i++ )
+                for ( var i = 0; i < scripts.length; i += 1 )
                     if ( scripts[ i ].src == url ) {
                         // console.log( scripts[ i ] )
                         return scripts[ i ]
@@ -498,15 +500,15 @@
             }
 
             var actualScript = document.actualScript = function() {
-                // if (document._currentScript)
-                //     return document._currentScript
+                /* jshint -W030 */ // Expected an assignment or function call and instead saw an expression.
+                /* jshint -W117 */ // omgwtf is not defined
 
                 var stack
                 try {
                     omgwtf
                 } catch( e ) {
                     stack = e.stack
-                };
+                }
 
                 if ( !stack ) return
 
@@ -547,7 +549,7 @@
 // = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
     function setupGlobalSMK( util ) {
-        return window.SMK = Object.assign( {
+        return ( window.SMK = Object.assign( {
             MAP: {},
             VIEWER: {},
             TYPE: {},
@@ -626,7 +628,7 @@
                 pomVersion: '<%= pom.project.parent.version %>',
             }
 
-        }, window.SMK )
+        }, window.SMK ) )
     }
 
 } )();

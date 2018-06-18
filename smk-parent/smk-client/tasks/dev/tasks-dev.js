@@ -78,6 +78,7 @@ module.exports = function( grunt ) {
         jshint: {
             options: {
                 reporter: jshintStylish,
+                // reporter: 'checkstyle',
 
                 // unused: true,
                 // latedef: true,
