@@ -269,7 +269,7 @@ if ( !window.include ) { ( function () {
                 setTimeout( function () {
                     rej( new Error( 'timeout' ) )
                 }, OPTION.timeout )
-            } ) )
+            } )
             .then( function ( res ) {
                 console.debug( 'included ' + inc.loader + ' "' + tag + '"', inc.url || inc.tags )
                 return res
@@ -279,7 +279,7 @@ if ( !window.include ) { ( function () {
                 console.warn(e)
 
                 throw e
-            } )
+            } ) )
     }
 
     function module( tag, incs, mod ) {
@@ -301,7 +301,7 @@ if ( !window.include ) { ( function () {
         else
             deps = Promise.resolve()
 
-        return ( inc.module = deps )
+        return ( inc.module = deps
             .then( function ( res ) {
                 if ( typeof mod == 'function' )
                     return mod.call( inc, res )
@@ -312,7 +312,7 @@ if ( !window.include ) { ( function () {
                 console.debug( 'module "' + tag + '"' )
                 inc.exported = exp
                 return exp
-            } )
+            } ) )
     }
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

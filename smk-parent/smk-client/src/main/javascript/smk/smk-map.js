@@ -382,10 +382,10 @@ include.module( 'smk-map', [ 'jquery', 'util' ], function () {
 
         if ( this.$toolbar ) return this.$toolbar
 
-        return ( this.$toolbar = include( 'toolbar' ) )
+        return ( this.$toolbar = include( 'toolbar' )
             .then( function ( inc ) {
                 return new SMK.TYPE.Toolbar( self )
-            } )
+            } ) )
     }
 
     SmkMap.prototype.getSidepanel = function () {
@@ -393,10 +393,10 @@ include.module( 'smk-map', [ 'jquery', 'util' ], function () {
 
         if ( this.$sidepanel ) return this.$sidepanel
 
-    return ( this.$sidepanel = include( 'sidepanel' ) )
+    return ( this.$sidepanel = include( 'sidepanel' )
             .then( function ( inc ) {
                 return new SMK.TYPE.Sidepanel( self )
-            } )
+            } ) )
     }
 
     SmkMap.prototype.emit = function ( toolId, event, arg ) {

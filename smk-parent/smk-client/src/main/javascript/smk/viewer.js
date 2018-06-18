@@ -370,7 +370,7 @@ include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', '
         if ( !SMK.TYPE.Layer[ type ][ self.type ].create )
             return SMK.UTIL.rejected( new Error( 'can\'t create viewer layer of type "' + type + '"' ) )
 
-        return ( this.layerIdPromise[ id ] = SMK.UTIL.resolved() )
+        return ( this.layerIdPromise[ id ] = SMK.UTIL.resolved()
             .then( function () {
                 try {
                     return SMK.TYPE.Layer[ type ][ self.type ].create.call( self, layers, zIndex )
@@ -382,7 +382,7 @@ include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', '
             } )
             .then( function ( ly ) {
                 return self.afterCreateViewerLayer( id, type, layers, ly )
-            } )
+            } ) )
     }
 
     Viewer.prototype.afterCreateViewerLayer = function ( id, type, layers, viewerLayer ) {
@@ -540,7 +540,7 @@ include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', '
                 enableHighAccuracy: true,
             } )
             setTimeout( function () { rej( new Error( 'timeout' ) ) }, option.timeout )
-        } ) )
+        } )
         .then( function ( pos ) {
             self.currentLocationTimestamp = ( new Date() ).getTime()
             window.localStorage.setItem( option.cacheKey, JSON.stringify( { latitude: pos.coords.latitude, longitude: pos.coords.longitude } ) )
@@ -563,7 +563,7 @@ include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', '
                     site.current = true
                     return site
                 } )
-        } )
+        } ) )
     }
 
 } )
