@@ -35,8 +35,8 @@ include.module( 'vue-config', [ 'vue' ], function ( inc ) {
                 case 'acres':           return formatNumber( value / metersPerUnit[ 'mi' ], decimalPlaces ) + ' mi'
                 case 'hectares':        return formatNumber( value, decimalPlaces ) + ' m'
 
-                case 'metric':
-                case 'meters':
+                case 'metric': /* jshint -W086 */ // no break before default
+                case 'meters': /* jshint -W086 */
                 default:                return formatNumber( value, decimalPlaces ) + ' m'
             }
 
@@ -53,8 +53,8 @@ include.module( 'vue-config', [ 'vue' ], function ( inc ) {
                 case 'acres':           return formatNumber( value / metersPerUnit[ 'GunterChain' ] / metersPerUnit[ 'Furlong' ], decimalPlaces ) + ' acres'
                 case 'hectares':        return formatNumber( value / 100 / 100, decimalPlaces ) + ' ha'
 
-                case 'metric':
-                case 'meters':
+                case 'metric': /* jshint -W086 */
+                case 'meters': /* jshint -W086 */
                 default:                return formatNumber( value, decimalPlaces ) + ' m²'
             }
 
@@ -162,12 +162,12 @@ include.module( 'vue-config', [ 'vue' ], function ( inc ) {
     v-bind:src="imageUrl"\
     v-bind:style="{ width: size + \'px\', height: size + \'px\' }"\
 >',
-        props: { 
+        props: {
             size: {
                 type: Number,
                 default: 24
             },
-            busy: Boolean 
+            busy: Boolean
         },
         data: function () {
             return {

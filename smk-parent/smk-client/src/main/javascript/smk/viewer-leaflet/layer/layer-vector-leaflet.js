@@ -37,18 +37,18 @@ include.module( 'layer-leaflet.layer-vector-leaflet-js', [ 'layer.layer-vector-j
                 break
 
             case 'MultiLineString':
-                var close = turf.segmentReduce( ft, function ( accum, segment ) {
+                var close1 = turf.segmentReduce( ft, function ( accum, segment ) {
                     return accum || turf.booleanCrosses( area, segment )
                 }, false )
-                if ( close ) features.push( ft )
+                if ( close1 ) features.push( ft )
                 break
 
             case 'Point':
             case 'MultiPoint':
-                var close = turf.coordReduce( ft, function ( accum, coord ) {
+                var close2 = turf.coordReduce( ft, function ( accum, coord ) {
                     return accum || turf.booleanPointInPolygon( coord, area )
                 }, false )
-                if ( close ) features.push( ft )
+                if ( close2 ) features.push( ft )
                 break
 
             default:
@@ -79,18 +79,18 @@ include.module( 'layer-leaflet.layer-vector-leaflet-js', [ 'layer.layer-vector-j
 
             case 'LineString':
             case 'MultiLineString':
-                var close = turf.segmentReduce( ft, function ( accum, segment ) {
+                var close1 = turf.segmentReduce( ft, function ( accum, segment ) {
                     return accum || turf.pointToLineDistance( test, segment ) < toleranceKm
                 }, false )
-                if ( close ) features.push( ft )
+                if ( close1 ) features.push( ft )
                 break
 
             case 'Point':
             case 'MultiPoint':
-                var close = turf.coordReduce( ft, function ( accum, coord ) {
+                var close2 = turf.coordReduce( ft, function ( accum, coord ) {
                     return accum || turf.distance( coord, test ) < toleranceKm
                 }, false )
-                if ( close ) features.push( ft )
+                if ( close2 ) features.push( ft )
                 break
 
             default:
@@ -110,7 +110,7 @@ include.module( 'layer-leaflet.layer-vector-leaflet-js', [ 'layer.layer-vector-j
 
         var layer = new L.geoJson( null, {
             pointToLayer: function ( geojson, latlng ) {
-                return markerForStyle.call( self, latlng, layers[ 0 ].config.style )
+                return markerForStyle( self, latlng, layers[ 0 ].config.style )
             },
             onEachFeature: function ( feature, layer ) {
                 if ( layer.setStyle )
@@ -194,11 +194,11 @@ include.module( 'layer-leaflet.layer-vector-leaflet-js', [ 'layer.layer-vector-j
             }
     }
 
-    function markerForStyle( latlng, styleConfig ) {
+    function markerForStyle( viewer, latlng, styleConfig ) {
         if ( styleConfig.markerUrl ) {
             return L.marker( latlng, {
                 icon: styleConfig.marker || ( styleConfig.marker = L.icon( {
-                    iconUrl: this.resolveAttachmentUrl( styleConfig.markerUrl, null, 'png' ),
+                    iconUrl: viewer.resolveAttachmentUrl( styleConfig.markerUrl, null, 'png' ),
                     iconSize: styleConfig.markerSize,
                     iconAnchor: styleConfig.markerOffset,
                 } ) ),

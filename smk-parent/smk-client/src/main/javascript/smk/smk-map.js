@@ -23,7 +23,7 @@ include.module( 'smk-map', [ 'jquery', 'util' ], function () {
 
         $( this.$container )
             .addClass( 'smk-map-frame smk-hidden' )
-        
+
         var spinner = $( '<img class="smk-toplevel smk-spinner">' )
             .attr( 'src', include.option( 'baseUrl' ) + '/images/spinner.gif' )
             .appendTo( this.$container )
@@ -50,9 +50,9 @@ include.module( 'smk-map', [ 'jquery', 'util' ], function () {
                     $( self.$container )
                         .removeClass( 'smk-hidden' )
 
-                    status.html( 
-                        '<h3>SMK initialization failed</h3><br>' + 
-                        e + ( e.parseSource ? ',<br>while parsing ' + e.parseSource : '' ) 
+                    status.html(
+                        '<h3>SMK initialization failed</h3><br>' +
+                        e + ( e.parseSource ? ',<br>while parsing ' + e.parseSource : '' )
                     )
                     spinner.remove()
 
@@ -238,7 +238,7 @@ include.module( 'smk-map', [ 'jquery', 'util' ], function () {
                     } ).then( res, rej )
                 } )
                 .then( function ( data ) {
-                    debugger
+                    // debugger
                 } )
                 // console.log( ly )
 
@@ -381,7 +381,7 @@ include.module( 'smk-map', [ 'jquery', 'util' ], function () {
 
         if ( this.$toolbar ) return this.$toolbar
 
-        return this.$toolbar = include( 'toolbar' )
+        return ( this.$toolbar = include( 'toolbar' ) )
             .then( function ( inc ) {
                 return new SMK.TYPE.Toolbar( self )
             } )
@@ -392,7 +392,7 @@ include.module( 'smk-map', [ 'jquery', 'util' ], function () {
 
         if ( this.$sidepanel ) return this.$sidepanel
 
-        return this.$sidepanel = include( 'sidepanel' )
+    return ( this.$sidepanel = include( 'sidepanel' ) )
             .then( function ( inc ) {
                 return new SMK.TYPE.Sidepanel( self )
             } )

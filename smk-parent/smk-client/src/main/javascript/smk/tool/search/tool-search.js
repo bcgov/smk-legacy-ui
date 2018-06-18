@@ -16,12 +16,12 @@ include.module( 'tool-search', [ 'tool', 'widgets', 'tool-search.widget-search-h
 
         return SMK.UTIL.resolved()
             .then( function () {
-                return request = $.ajax( {
+                return ( request = $.ajax( {
                     timeout:    10 * 1000,
                     dataType:   'jsonp',
                     url:        'https://apps.gov.bc.ca/pub/geocoder/addresses.geojsonp',
                     data:       query,
-                } )
+                } ) )
             } )
             .then( function ( data ) {
                 return $.map( data.features, function ( feature ) {

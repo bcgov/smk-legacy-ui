@@ -13,8 +13,8 @@ include.module( 'query.query-esri-dynamic-js', [ 'query.query-js' ], function ()
         var self = this
 
         var layerConfig = viewer.layerId[ this.layerId ].config
-            dynamicLayer= JSON.parse( layerConfig.dynamicLayers[ 0 ] ),
-            serviceUrl  = layerConfig.serviceUrl + '/dynamicLayer/query'
+        var dynamicLayer= JSON.parse( layerConfig.dynamicLayers[ 0 ] )
+        var serviceUrl  = layerConfig.serviceUrl + '/dynamicLayer/query'
 
         delete dynamicLayer.drawingInfo
 

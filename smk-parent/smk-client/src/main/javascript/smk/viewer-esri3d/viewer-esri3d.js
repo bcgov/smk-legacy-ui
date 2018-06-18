@@ -188,9 +188,10 @@ include.module( 'viewer-esri3d', [ 'viewer', 'esri3d', 'types-esri3d', 'layer-es
                 mapDist = c
         }
 
+        var scale, metersPerPixel
         if ( mapDist )
-            var scale = mapDist / this.screenpixelsToMeters,
-                metersPerPixel = mapDist / 100
+            scale = mapDist / this.screenpixelsToMeters
+            metersPerPixel = mapDist / 100
 
         return {
             center: this.view.center,
@@ -206,10 +207,11 @@ include.module( 'viewer-esri3d', [ 'viewer', 'esri3d', 'types-esri3d', 'layer-es
     }
 
     ViewerEsri3d.prototype.screenToMap = function ( screen ) {
+        var ll
         if ( Array.isArray( screen ) )
-            var ll = this.view.toMap( { x: screen[ 0 ], y: screen[ 1 ] } )
+            ll = this.view.toMap( { x: screen[ 0 ], y: screen[ 1 ] } )
         else
-            var ll = this.view.toMap( screen )
+            ll = this.view.toMap( screen )
 
         if ( !ll ) return
         return [ ll.longitude, ll.latitude ]

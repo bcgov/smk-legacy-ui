@@ -67,7 +67,7 @@ include.module( 'types-esri3d', [ 'esri3d' ], function () {
                 var parts = o.replace( 'esri/', '' ).split( '/' )
                 var container = SMK.TYPE.Esri3d
 
-                for( var j = 0; j < parts.length - 1; j++ ) {
+                for( var j = 0; j < parts.length - 1; j += 1 ) {
                     if ( !( parts[ j ] in container ) )
                         container[ parts[ j ] ] = {}
                     container = container[ parts[ j ] ]

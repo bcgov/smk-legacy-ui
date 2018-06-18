@@ -47,18 +47,18 @@ include.module( 'layer-esri3d.layer-vector-esri3d-js', [ 'layer.layer-vector-js'
                 break
 
             case 'MultiLineString':
-                var close = turf.segmentReduce( ft, function ( accum, segment ) {
+                var close1 = turf.segmentReduce( ft, function ( accum, segment ) {
                     return accum || turf.booleanCrosses( area, segment )
                 }, false )
-                if ( close ) features.push( ft )
+                if ( close1 ) features.push( ft )
                 break
 
             case 'Point':
             case 'MultiPoint':
-                var close = turf.coordReduce( ft, function ( accum, coord ) {
+                var close2 = turf.coordReduce( ft, function ( accum, coord ) {
                     return accum || turf.booleanPointInPolygon( coord, area )
                 }, false )
-                if ( close ) features.push( ft )
+                if ( close2 ) features.push( ft )
                 break
 
             default:

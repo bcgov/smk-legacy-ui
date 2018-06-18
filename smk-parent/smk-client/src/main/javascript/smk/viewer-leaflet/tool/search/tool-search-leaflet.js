@@ -102,14 +102,14 @@ include.module( 'tool-search-leaflet', [ 'leaflet', 'tool-search' ], function ( 
 
         vw.searched.pickedFeature( function ( ev ) {
             if ( ev.was ) {
-                var ly = ev.was.highlightLayer
-                if ( ly.isPopupOpen() && !ev.popupclose ) ly.closePopup()
-                brightHighlight( ly, vw.searched.isHighlighted( ev.was.id ), false )
+                var ly1 = ev.was.highlightLayer
+                if ( ly1.isPopupOpen() && !ev.popupclose ) ly1.closePopup()
+                brightHighlight( ly1, vw.searched.isHighlighted( ev.was.id ), false )
             }
 
             if ( ev.feature ) {
-                var ly = ev.feature.highlightLayer
-                if ( !ly.isPopupOpen() ) ly.openPopup()
+                var ly2 = ev.feature.highlightLayer
+                if ( !ly2.isPopupOpen() ) ly2.openPopup()
                 brightHighlight( ev.feature.highlightLayer, true, true )
             }
         } )
