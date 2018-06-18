@@ -1,4 +1,5 @@
 include.module( 'tool-version', [ 'tool', 'widgets', 'tool-version.panel-version-html' ], function ( inc ) {
+    "use strict";
 
     Vue.component( 'version-widget', {
         extends: inc.widgets.toolButton,

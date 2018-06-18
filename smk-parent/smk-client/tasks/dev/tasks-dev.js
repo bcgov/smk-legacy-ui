@@ -84,7 +84,7 @@ module.exports = function( grunt ) {
                 // curly: true,
                 // eqeqeq: true,
                 bitwise: true,
-                strict: 'implied',
+                strict: true,
                 undef: true,
                 asi: true,
                 plusplus: true,

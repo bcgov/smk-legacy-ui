@@ -1,4 +1,5 @@
 include.module( 'query.query-esri-dynamic-js', [ 'query.query-js' ], function () {
+    "use strict";
 
     function EsriDynamicQuery() {
         SMK.TYPE.Query.prototype.constructor.apply( this, arguments )

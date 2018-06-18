@@ -1,4 +1,5 @@
 ( function () {
+    "use strict";
 
     var util = {}
     installPolyfills( util )
@@ -419,9 +420,9 @@
         include.option( { baseUrl: attr[ 'base-url' ] } )
 
         return new Promise( function ( res, rej ) {
-            if ( document.readyState != "loading" ) 
+            if ( document.readyState != "loading" )
                 return res()
-            
+
             document.addEventListener( "DOMContentLoaded", function( ev ) {
                 clearTimeout( id )
                 res()
@@ -585,7 +586,7 @@
             BOOT: Promise.resolve(),
             TAGS_DEFINED: false,
             ON_FAILURE: function ( e ) {
-                if ( !e ) return 
+                if ( !e ) return
 
                 if ( e.parseSource )
                     e.message += ',\n  while parsing ' + e.parseSource

@@ -1,4 +1,5 @@
 include.module( 'tool-location-leaflet', [ 'leaflet', 'tool-location' ], function ( inc ) {
+    "use strict";
 
     var base = include.option( 'baseUrl' ) + '/images/tool/location'
 

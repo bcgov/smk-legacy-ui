@@ -1,4 +1,5 @@
 include.module( 'types-esri3d', [ 'esri3d' ], function () {
+    "use strict";
 
     return new Promise( function ( res ) {
         var objs = [

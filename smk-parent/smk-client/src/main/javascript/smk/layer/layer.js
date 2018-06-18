@@ -1,4 +1,5 @@
 include.module( 'layer.layer-js', [ 'jquery', 'util', 'event' ], function () {
+    "use strict";
 
     var LayerEvent = SMK.TYPE.Event.define( [
         'startedLoading',

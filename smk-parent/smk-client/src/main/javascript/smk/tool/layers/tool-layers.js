@@ -1,4 +1,5 @@
 include.module( 'tool-layers', [ 'tool', 'widgets', 'tool-layers.panel-layers-html' ], function ( inc ) {
+    "use strict";
 
     Vue.component( 'layers-widget', {
         extends: inc.widgets.toolButton,

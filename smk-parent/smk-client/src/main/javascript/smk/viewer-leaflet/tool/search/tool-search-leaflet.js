@@ -1,4 +1,5 @@
 include.module( 'tool-search-leaflet', [ 'leaflet', 'tool-search' ], function ( inc ) {
+    "use strict";
 
     var precisionZoom = {
         INTERSECTION:   15,

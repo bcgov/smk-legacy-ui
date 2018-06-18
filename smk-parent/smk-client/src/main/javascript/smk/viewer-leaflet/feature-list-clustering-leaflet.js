@@ -1,4 +1,5 @@
 include.module( 'feature-list-clustering-leaflet', [ 'leaflet', 'feature-list-leaflet', 'turf' ], function ( inc ) {
+    "use strict";
 
     return function ( smk ) {
         var self = this

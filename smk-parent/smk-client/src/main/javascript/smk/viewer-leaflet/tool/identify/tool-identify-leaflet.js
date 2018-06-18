@@ -1,4 +1,5 @@
 include.module( 'tool-identify-leaflet', [ 'leaflet', 'tool-identify', 'feature-list-clustering-leaflet' ], function ( inc ) {
+    "use strict";
 
     SMK.TYPE.IdentifyTool.prototype.styleFeature = function () {
         var self = this

@@ -1,4 +1,5 @@
 include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', 'query', 'turf' ], function () {
+    "use strict";
 
     var ViewerEvent = SMK.TYPE.Event.define( [
         'changedView',

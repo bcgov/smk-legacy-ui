@@ -1,4 +1,5 @@
 include.module( 'util-esri3d', [ 'types-esri3d', 'terraformer' ], function ( inc ) {
+    "use strict";
 
     Object.assign( window.SMK.UTIL, {
         geoJsonToEsriGeometry: ( function () {

@@ -1,4 +1,5 @@
 include.module( 'event', [ 'vue', 'util' ], function () {
+    "use strict";
 
     function Event ( events ) {
         this.dispatcher = new Vue()

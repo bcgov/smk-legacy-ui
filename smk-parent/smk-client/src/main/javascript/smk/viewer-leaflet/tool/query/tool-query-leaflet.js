@@ -1,4 +1,5 @@
 include.module( 'tool-query-leaflet', [ 'leaflet', 'tool-query', 'feature-list-clustering-leaflet' ], function ( inc ) {
+    "use strict";
 
     SMK.TYPE.QueryTool.prototype.styleFeature = function () {
         var self = this

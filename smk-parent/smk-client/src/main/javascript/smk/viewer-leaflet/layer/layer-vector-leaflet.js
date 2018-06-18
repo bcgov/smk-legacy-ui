@@ -1,4 +1,5 @@
 include.module( 'layer-leaflet.layer-vector-leaflet-js', [ 'layer.layer-vector-js', 'turf' ], function () {
+    "use strict";
 
     function VectorLeafletLayer() {
         SMK.TYPE.Layer[ 'vector' ].prototype.constructor.apply( this, arguments )

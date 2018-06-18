@@ -5,6 +5,7 @@ include.module( 'feature-list', [ 'tool', 'widgets',
     'feature-list.feature-properties-html',
     'feature-list.feature-description-html'
 ], function ( inc ) {
+    "use strict";
 
     Vue.component( 'feature-list-panel', {
         extends: inc.widgets.toolPanel,

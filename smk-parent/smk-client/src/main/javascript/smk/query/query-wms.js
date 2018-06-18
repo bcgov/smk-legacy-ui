@@ -1,4 +1,5 @@
 include.module( 'query.query-wms-js', [ 'query.query-js' ], function () {
+    "use strict";
 
     function WmsQuery() {
         SMK.TYPE.Query.prototype.constructor.apply( this, arguments )

@@ -1,4 +1,5 @@
 include.module( 'tool-search-esri3d', [ 'esri3d', 'types-esri3d', 'util-esri3d', 'tool-search' ], function ( inc ) {
+    "use strict";
 
     var precisionZoom = {
         INTERSECTION:   15,

@@ -1,4 +1,5 @@
 include.module( 'vue-config', [ 'vue' ], function ( inc ) {
+    "use strict";
 
     Vue.filter( 'formatNumber', function ( value, decimalPlaces ) {
         return formatNumber( value, decimalPlaces )

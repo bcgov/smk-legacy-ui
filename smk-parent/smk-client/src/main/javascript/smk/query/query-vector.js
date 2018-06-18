@@ -1,4 +1,5 @@
 include.module( 'query.query-vector-js', [ 'query.query-js' ], function () {
+    "use strict";
 
     function VectorQuery() {
         SMK.TYPE.Query.prototype.constructor.apply( this, arguments )

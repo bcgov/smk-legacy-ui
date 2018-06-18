@@ -279,7 +279,7 @@ module.exports = function( grunt ) {
 
     grunt.registerTask( 'write-tag-head-foot', function () {
         var fn = grunt.template.process( '<%= buildPath %>/smk-tags-head.js' )
-        grunt.file.write( fn, 'if ( !window.include.SMK ) { ( function () {\n' )
+        grunt.file.write( fn, 'if ( !window.include.SMK ) { ( function () {\n"use strict";\n' )
 
         var fn = grunt.template.process( '<%= buildPath %>/smk-tags-foot.js' )
         grunt.file.write( fn, '\nwindow.include.SMK = true\n} )() }\n' )

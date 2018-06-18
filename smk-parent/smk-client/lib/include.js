@@ -1,5 +1,5 @@
-"use strict";
 if ( !window.include ) { ( function () {
+    "use strict";
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 

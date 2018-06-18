@@ -1,4 +1,5 @@
 include.module( 'util', null, function ( inc ) {
+    "use strict";
 
     Object.assign( window.SMK.UTIL, {
         makePromise: function( withFn ) {

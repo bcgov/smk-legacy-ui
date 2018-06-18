@@ -1,4 +1,5 @@
 include.module( 'feature-set', [ 'jquery', 'util', 'event', 'turf' ], function () {
+    "use strict";
 
     var FeatureSetEvent = SMK.TYPE.Event.define( [
         'addedFeatures',

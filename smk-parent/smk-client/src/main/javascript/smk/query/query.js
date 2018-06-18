@@ -1,4 +1,5 @@
 include.module( 'query.query-js', [ 'jquery', 'util', 'event' ], function () {
+    "use strict";
 
     var QueryEvent = SMK.TYPE.Event.define( [
         // 'startedLoading',

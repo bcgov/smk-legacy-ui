@@ -1,4 +1,5 @@
 include.module( 'smk-map', [ 'jquery', 'util' ], function () {
+    "use strict";
 
     function SmkMap( option ) {
         this.$option = option

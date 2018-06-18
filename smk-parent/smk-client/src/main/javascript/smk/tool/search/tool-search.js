@@ -1,4 +1,5 @@
 include.module( 'tool-search', [ 'tool', 'widgets', 'tool-search.widget-search-html', 'tool-search.panel-search-html', 'tool-search.popup-search-html' ], function ( inc ) {
+    "use strict";
 
     var request
 

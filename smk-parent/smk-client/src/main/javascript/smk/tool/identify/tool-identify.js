@@ -1,4 +1,5 @@
 include.module( 'tool-identify', [ 'feature-list', 'widgets', 'tool-identify.panel-identify-html' ], function ( inc ) {
+    "use strict";
 
     Vue.component( 'identify-widget', {
         extends: inc.widgets.toolButton,

@@ -1,4 +1,5 @@
 include.module( 'tool-measure-esri3d', [ 'tool-measure', 'esri3d', 'types-esri3d', 'util-esri3d' ], function () {
+    "use strict";
 
     var E = SMK.TYPE.Esri3d
 
