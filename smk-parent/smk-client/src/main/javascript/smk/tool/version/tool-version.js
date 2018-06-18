@@ -35,7 +35,7 @@ include.module( 'tool-version', [ 'tool', 'widgets', 'tool-version.panel-version
     VersionTool.prototype.afterInitialize.push( function ( smk ) {
         var self = this
 
-        this.config = SMK.UTIL.projection( 'lmfId', 'lmfRevision', 'createdBy' )( smk )
+        this.config = SMK.UTIL.projection( 'lmfId', 'lmfRevision', 'createdBy', '_rev', 'published' )( smk )
 
         smk.on( this.id, {
             'activate': function () {
