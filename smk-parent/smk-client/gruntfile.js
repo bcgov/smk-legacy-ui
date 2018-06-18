@@ -4,6 +4,13 @@ module.exports = function( grunt ) {
 
     require( 'load-grunt-tasks' )( grunt )
 
+    var jshintStylish = require( 'jshint-stylish' )
+    jshintStylish.reporter = ( function ( inner ) {
+        return function ( result, config ) {
+            return inner( result, config, { verbose: true } )
+        }
+    } )( jshintStylish.reporter )
+
     grunt.initConfig( {
         package: grunt.file.readJSON( 'package.json' ),
 
@@ -119,6 +126,48 @@ module.exports = function( grunt ) {
             temp: {
                 src: [ '<%= buildPath %>/smk-tags-*.js' ]
             }
+        },
+
+        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+        jshint: {
+            options: {
+                reporter: jshintStylish,
+                // reporter: 'checkstyle',
+
+                // unused: true,
+                // latedef: true,
+                // curly: true,
+                // eqeqeq: true,
+                bitwise: true,
+                strict: true,
+                undef: true,
+                asi: true,
+                plusplus: true,
+                eqnull: true,
+                multistr: true,
+                sub: true,
+                browser: true,
+                devel: true,
+
+                '-W018': true, // confusing use of !
+
+                globals: {
+                    SMK: true,
+                    $: true,
+                    Vue: true,
+                    console: true,
+                    Promise: true,
+                    include: true,
+                    require: true,
+                    turf: true,
+                    Terraformer: true,
+                    proj4: true,
+                    L: true,
+                },
+            },
+            lib: [ '<%= srcPath %>/smk/**/*js', '!<%= srcPath %>/smk/**/lib/**', '!<%= srcPath %>/smk/**/*.min.js' ],
+            smk: [ '<%= buildPath %>/smk.js' ],
         },
 
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

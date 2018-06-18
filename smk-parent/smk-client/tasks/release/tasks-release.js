@@ -5,6 +5,7 @@ module.exports = function( grunt ) {
     grunt.config( 'mode', 'release' )
 
     grunt.registerTask( 'build-lib', [
+        'jshint:lib',
         'copy:minified-lib',
         'uglify:lib'
     ] )

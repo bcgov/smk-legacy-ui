@@ -1,12 +1,5 @@
 module.exports = function( grunt ) {
 
-    var jshintStylish = require( 'jshint-stylish' )
-    jshintStylish.reporter = ( function ( inner ) {
-        return function ( result, config ) {
-            return inner( result, config, { verbose: true } )
-        }
-    } )( jshintStylish.reporter )
-
     grunt.config( 'mode', 'dev' )
 
     grunt.registerTask( 'build-lib', [
@@ -75,45 +68,6 @@ module.exports = function( grunt ) {
             }
         },
 
-        jshint: {
-            options: {
-                reporter: jshintStylish,
-                // reporter: 'checkstyle',
-
-                // unused: true,
-                // latedef: true,
-                // curly: true,
-                // eqeqeq: true,
-                bitwise: true,
-                strict: true,
-                undef: true,
-                asi: true,
-                plusplus: true,
-                eqnull: true,
-                multistr: true,
-                sub: true,
-                browser: true,
-                devel: true,
-
-                '-W018': true, // confusing use of !
-
-                globals: {
-                    $: true,
-                    Vue: true,
-                    include: true,
-                    require: true,
-                    console: true,
-                    SMK: true,
-                    turf: true,
-                    Terraformer: true,
-                    proj4: true,
-                    L: true,
-                    Promise: true,
-                },
-            },
-            lib: [ '<%= srcPath %>/smk/**/*js', '!<%= srcPath %>/smk/**/lib/**', '!<%= srcPath %>/smk/**/*.min.js' ],
-            smk: [ '<%= buildPath %>/smk.js' ],
-        }
     } )
 
 }
