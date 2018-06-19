@@ -893,7 +893,7 @@ function saveMapConfig()
         withCredentials: true,
         success: function (result)
         {
-        	data.lmfId = result.lmfId;
+        	if(result.hasOwnProperty("lmfId")) data.lmfId = result.lmfId;
         	Materialize.toast('Successfully saved application ' + data.lmfId + '. Checking for attachment uploads...', 4000);
 
         	// now we need to complete any attachments before moving on.
