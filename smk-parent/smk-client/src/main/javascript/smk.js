@@ -31,9 +31,8 @@
             'container-sel':attrString( '#smk-map-frame' ),
             'title-sel':    attrString( 'head title' ),
             'config':       attrList( '?smk-' ),
-            'disconnected': attrBoolean( false, true ),
             'base-url':     attrString( ( new URL( bootstrapScriptEl.src.replace( 'smk.js', '' ), document.location ) ).toString() ),
-            'service-url':  attrString( '../smks-api' ),
+            'service-url':  attrString( null, null ),
         }
 
         Object.keys( smkAttr ).forEach( function ( k ) {
