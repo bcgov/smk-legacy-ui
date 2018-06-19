@@ -73,7 +73,7 @@ module.exports = function( grunt ) {
             'root': {
                 expand: true,
                 cwd: '<%= srcPath %>',
-                src: [ 'index.html', 'map-config.json' ],
+                src: [ 'index.html', 'map-config.json', 'readme.md' ],
                 dest: '<%= buildPath %>',
                 options: {
                     process: '<%= processTemplate %>',
@@ -168,6 +168,16 @@ module.exports = function( grunt ) {
             },
             lib: [ '<%= srcPath %>/smk/**/*js', '!<%= srcPath %>/smk/**/lib/**', '!<%= srcPath %>/smk/**/*.min.js' ],
             smk: [ '<%= buildPath %>/smk.js' ],
+        },
+
+        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+        zip: {
+            dev: {
+                expand: true,
+                dest: '<%= buildPath %>/smk-<%= pom.project.parent.version %>-development.zip',
+                src: [ './**/*', '!./build/**', '!./etc/**', '!./node*/**', '!./target/**' ]
+            }
         },
 
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -360,6 +370,10 @@ module.exports = function( grunt ) {
     grunt.registerTask( 'build-root', [
         'copy:root',
     ] )
+
+    grunt.registerTask( 'build-dev-kit', [
+        'zip:dev',
+    ] )
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
     grunt.registerTask( 'default', [
@@ -371,6 +385,7 @@ module.exports = function( grunt ) {
         'mode:release',
         'clean:all',
         'build',
+        'build-dev-kit'
     ] )
 
 }
