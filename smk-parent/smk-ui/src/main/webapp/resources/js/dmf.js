@@ -995,6 +995,7 @@ function handleAttachmentUpload(lmfId, attchId, attchType, documentData)
         {
             Materialize.toast('Error uploading attachment ' + attchId + '. Error: ' + status.responseText, 10000);
             console.log('Error uploading attachment ' + attchId + '. Error: ' + status.responseText);
+            closeEditPanel();
         }
 	}));
 }
