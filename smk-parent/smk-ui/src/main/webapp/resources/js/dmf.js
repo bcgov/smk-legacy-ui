@@ -499,7 +499,7 @@ function editMapConfig(mapConfigId)
 		        },
 		        error: function (status)
     	        {
-    	            Materialize.toast('Map config loading failed. Please refresh and try again. Error: ' + status.responseText, 4000);
+    	            Materialize.toast('Map config loading failed. Please refresh and try again. Error: ' + status.responseText, 10000);
     	            console.log('Map config loading failed. Please refresh and try again. Error: ' + status.responseText);
     	        }
 			});
@@ -919,9 +919,10 @@ function saveMapConfig()
         },
         error: function (status)
         {
-            Materialize.toast('Error saving application ' + data.lmfId + '. Error: ' + status.responseText, 4000);
+            Materialize.toast('Error saving application ' + data.lmfId + '. Error: ' + status.responseText, 10000);
             console.log('Error saving application ' + data.lmfId + '. Error: ' + status.responseText);
             if(data._rev == null) data._id = null;
+            closeEditPanel();
         }
 	});
 }
@@ -992,7 +993,7 @@ function handleAttachmentUpload(lmfId, attchId, attchType, documentData)
         processData: false,
         error: function (status)
         {
-            Materialize.toast('Error uploading attachment ' + attchId + '. Error: ' + status.responseText, 4000);
+            Materialize.toast('Error uploading attachment ' + attchId + '. Error: ' + status.responseText, 10000);
             console.log('Error uploading attachment ' + attchId + '. Error: ' + status.responseText);
         }
 	}));
@@ -1047,7 +1048,7 @@ function unPublishMapConfig(mapConfigId)
                 },
                 error: function (status)
                 {
-                	Materialize.toast('Error un-publishing ' + mapConfigId, 4000);
+                	Materialize.toast('Error un-publishing ' + mapConfigId, 10000);
                 	console.log('Error un-publishing ' + mapConfigId + '. Error: ' + status.responseText);
                 }
 			});
@@ -1079,7 +1080,7 @@ function publishMapConfig(mapConfigId)
                 },
                 error: function (status)
                 {
-                	Materialize.toast('Error publishing ' + mapConfigId, 4000);
+                	Materialize.toast('Error publishing ' + mapConfigId, 10000);
                 	console.log('Error publishing ' + mapConfigId + '. Error: ' + status.responseText);
                 	$("#loadingBar").hide();
                 	$("#appsTablePanel").show();
@@ -1133,7 +1134,7 @@ function deleteMapConfig(mapConfigId)
                     },
                     error: function (status)
                     {
-                    	Materialize.toast('Could not delete ' + mapConfigId + '. Ensure this map is not published before deleting', 4000);
+                    	Materialize.toast('Could not delete ' + mapConfigId + '. Ensure this map is not published before deleting', 10000);
                     	console.log('Error un-publishing ' + mapConfigId + '. Error: ' + status.responseText);
                     }
     			});
@@ -1225,7 +1226,7 @@ function downloadSelectedVector()
         },
         error: function (status)
         {
-            Materialize.toast('Error loading JSON. Please try again later. Error: ' + status.responseText, 4000);
+            Materialize.toast('Error loading JSON. Please try again later. Error: ' + status.responseText, 10000);
             console.log('Error loading JSON. Error: ' + status.responseText);
         }
 	});
@@ -2452,7 +2453,7 @@ function loadCatalogLayers()
         error: function (status)
         {
             // error handler
-            Materialize.toast('Error loading DataBC Layer catalog. Please try again later. Error: ' + status.responseText, 4000);
+            Materialize.toast('Error loading DataBC Layer catalog. Please try again later. Error: ' + status.responseText, 10000);
             console.log('Error loading DataBC Layer catalog. Error: ' + status.responseText);
         }
 	});
@@ -2526,7 +2527,7 @@ function loadWmsLayers()
         error: function (status)
         {
             // error handler
-            Materialize.toast('Error loading GetCapabilities from ' + wmsUrl + '. Please try again later. Error: ' + status.responseText, 4000);
+            Materialize.toast('Error loading GetCapabilities from ' + wmsUrl + '. Please try again later. Error: ' + status.responseText, 10000);
             console.log('Error loading GetCapabilities from ' + wmsUrl + '. Error: ' + status.responseText);
             $("#wmsPanelLoading").hide();
             $("#wmsRefreshButton").show();
@@ -2586,7 +2587,7 @@ function loadConfigs()
 	                    error: function (status)
 	                    {
 	                        // error handler
-	                        Materialize.toast('Error loading application ' + appConfigStub.id + 'Error: ' + status.responseText, 4000);
+	                        Materialize.toast('Error loading application ' + appConfigStub.id + 'Error: ' + status.responseText, 10000);
 	                        console.log('Error loading application ' + appConfigStub.id + '. Error: ' + status.responseText);
 	                    }
 	    			});
@@ -2600,7 +2601,7 @@ function loadConfigs()
         error: function (status)
         {
             // error handler
-            Materialize.toast('Error loading applications. Please try again later. Error: ' + status.responseText, 4000);
+            Materialize.toast('Error loading applications. Please try again later. Error: ' + status.responseText, 10000);
             console.log('Error loading applications. Error: ' + status.responseText);
         }
 	});
@@ -2633,7 +2634,7 @@ function loadConfigs()
                     },
                     error: function (status)
                     {
-                        Materialize.toast('Error loading published application ' + appConfigStub.id + 'Error: ' + status.responseText, 4000);
+                        Materialize.toast('Error loading published application ' + appConfigStub.id + 'Error: ' + status.responseText, 10000);
                         console.log('Error loading published applications. Error: ' + status.responseText);
                     }
     			});
@@ -2641,7 +2642,7 @@ function loadConfigs()
         },
         error: function (status)
         {
-            Materialize.toast('Error loading published applications. Please try again later. Error: ' + status.responseText, 4000);
+            Materialize.toast('Error loading published applications. Please try again later. Error: ' + status.responseText, 10000);
             console.log('Error loading published applications. Error: ' + status.responseText);
         }
 	});
