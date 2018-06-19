@@ -2777,7 +2777,7 @@ var unsavedAttachments = [];
 //function readHeaderFile(e)
 //{
 //	readFile(e);
-	
+//
 //	unsavedAttachments.push(
 //	{
 //		type: "header_upload",
