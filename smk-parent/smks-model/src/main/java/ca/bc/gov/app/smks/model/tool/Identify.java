@@ -12,7 +12,7 @@ public class Identify extends Tool
 {
 	private LayerStyle style;
 	private Double styleOpacity;
-	private Integer tolerance;
+	private Integer tolerance = 5;
 	public Identify() {}
 
 	protected Identify( Identify identify ) {

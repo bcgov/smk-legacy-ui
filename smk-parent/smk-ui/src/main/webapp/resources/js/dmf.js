@@ -285,6 +285,7 @@ function setToolActivation(toolType)
     			$("#identifyStyleStrokeColor").val(tool.style.strokeColor);
     			$("#identifyStyleFillColor").val(tool.style.fillColor);
     			$("#identifyPanelVisible").prop('checked', tool.showPanel);
+    			$("#identifyClickRadius").val(tool.tolerance);
     		}
 	    	else if(tool.type == "identify" && tool.enabled == false) $("#identifyOptions").hide();
 	    	else if(tool.type == "select" && tool.enabled == true)
@@ -615,6 +616,7 @@ function setupMapConfigToolsUI()
     			$("#identifyStyleStrokeColor").val(tool.style.strokeColor);
     			$("#identifyStyleFillColor").val(tool.style.fillColor);
     			$("#identifyPanelVisible").prop('checked', tool.showPanel);
+    			$("#identifyClickRadius").val(tool.tolerance);
 			}
 		}
     	else if(tool.type == "search") $("#searchPanel").prop('checked', tool.enabled);
@@ -649,6 +651,7 @@ function finishToolEdits()
 			tool.style.strokeStyle = $("#identifyStyleStrokeStyle").val();
 			tool.style.strokeColor = $("#identifyStyleStrokeColor").val();
 			tool.style.fillColor = $("#identifyStyleFillColor").val();
+			tool.tolerance = $("#identifyClickRadius").val();
 			tool.showPanel = $("#identifyStyleFillColor").is(":checked");
 		}
 		else if(tool.type == "select") 
@@ -1228,6 +1231,11 @@ function downloadSelectedVector()
 	});
 }
 
+function setTitleAttribute(val)
+{
+	selectedLayerNode.data.titleAttribute = val; 
+}
+
 function finishLayerEdits(save)
 {
 	if(save)
@@ -1407,9 +1415,18 @@ function editSelectedLayer()
 				
 				node.data.attributes.forEach(function (attribute)
 				{
-					$("#attributePanel").append('<div class="row"><div class="col s4"><p><input type="checkbox" id="' + attribute.id + '_visible" /><label class="black-text" for="' + attribute.id + '_visible">Visible</label></p></div><div class="col s8 input-field"><input id="' + attribute.id + '_label" type="text"><label for="' + attribute.id + '_label">' + attribute.name + '</label></div></div>');
+					$("#attributePanel").append('<div class="row"><div class="col s2"><p><input type="checkbox" id="' + attribute.id + '_visible" /><label class="black-text" for="' + attribute.id + '_visible">Visible</label></p></div><div class="col s2"><p><input name="titleGroup" type="radio" id="' + attribute.id + '_title" onclick="setTitleAttribute(\'' + attribute.id + '\')" /><label for="' + attribute.id + '_title"></label></p></div><div class="col s8 input-field"><input id="' + attribute.id + '_label" type="text"><label for="' + attribute.id + '_label">' + attribute.name + '</label></div></div>');
 					$("#" + attribute.id + "_visible").prop('checked', attribute.visible);
 					$("#" + attribute.id + "_label").val(attribute.title);
+					
+					if(node.data.hasOwnProperty("titleAttribute") && node.data.titleAttribute == attribute.id)
+					{
+						$("#" + attribute.id + "_title").prop('checked', true);
+					}
+					else
+					{
+						$("#" + attribute.id + "_title").prop('checked', false);
+					}
 				});
 				
 				if(node.data.queries == null) node.data.queries = [];
@@ -1450,9 +1467,18 @@ function editSelectedLayer()
 				
 				node.data.attributes.forEach(function (attribute)
 				{
-					$("#attributePanel").append('<div class="row"><div class="col s4"><p><input type="checkbox" id="' + attribute.id + '_visible" /><label class="black-text" for="' + attribute.id + '_visible">Visible</label></p></div><div class="col s8 input-field"><input id="' + attribute.id + '_label" type="text"><label for="' + attribute.id + '_label">' + attribute.name + '</label></div></div>');
+					$("#attributePanel").append('<div class="row"><div class="col s2"><p><input type="checkbox" id="' + attribute.id + '_visible" /><label class="black-text" for="' + attribute.id + '_visible">Visible</label></p></div><div class="col s2"><p><input name="titleGroup" type="radio" id="' + attribute.id + '_title" /><label for="' + attribute.id + '_title" onclick="setTitleAttribute(\'' + attribute.id + '\')"></label></p></div><div class="col s8 input-field"><input id="' + attribute.id + '_label" type="text"><label for="' + attribute.id + '_label">' + attribute.name + '</label></div></div>');
 					$("#" + attribute.id + "_visible").prop('checked', attribute.visible);
 					$("#" + attribute.id + "_label").val(attribute.title);
+					
+					if(node.data.hasOwnProperty("titleAttribute") && node.data.titleAttribute == attribute.id)
+					{
+						$("#" + attribute.id + "_title").prop('checked', true);
+					}
+					else
+					{
+						$("#" + attribute.id + "_title").prop('checked', false);
+					}
 				}); 
 				
 				if(node.data.queries == null) node.data.queries = [];
@@ -1485,9 +1511,18 @@ function editSelectedLayer()
 
 			    node.data.attributes.forEach(function (attribute)
 				{
-					$("#attributePanel").append('<div class="row"><div class="col s4"><p><input type="checkbox" id="' + attribute.id + '_visible" /><label class="black-text" for="' + attribute.id + '_visible">Visible</label></p></div><div class="col s8 input-field"><input id="' + attribute.id + '_label" type="text"><label for="' + attribute.id + '_label">' + attribute.name + '</label></div></div>');
+					$("#attributePanel").append('<div class="row"><div class="col s2"><p><input type="checkbox" id="' + attribute.id + '_visible" /><label class="black-text" for="' + attribute.id + '_visible">Visible</label></p></div><div class="col s2"><p><input name="titleGroup" type="radio" id="' + attribute.id + '_title" /><label for="' + attribute.id + '_title" onclick="setTitleAttribute(\'' + attribute.id + '\')"></label></p></div><div class="col s8 input-field"><input id="' + attribute.id + '_label" type="text"><label for="' + attribute.id + '_label">' + attribute.name + '</label></div></div>');
 					$("#" + attribute.id + "_visible").prop('checked', attribute.visible);
 					$("#" + attribute.id + "_label").val(attribute.title);
+					
+					if(node.data.hasOwnProperty("titleAttribute") && node.data.titleAttribute == attribute.id)
+					{
+						$("#" + attribute.id + "_title").prop('checked', true);
+					}
+					else
+					{
+						$("#" + attribute.id + "_title").prop('checked', false);
+					}
 				}); 
 			    
 			    if(node.data.queries == null) node.data.queries = [];
