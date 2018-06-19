@@ -1,4 +1,5 @@
 include.module( 'tool-markup-leaflet', [ 'leaflet', 'tool-markup' ], function () {
+    "use strict";
 
     SMK.TYPE.MarkupTool.prototype.afterInitialize.push( function ( smk ) {
         smk.$viewer.map.pm.addControls( {

@@ -1,4 +1,5 @@
 ( function () {
+    "use strict";
 
     var util = {}
     installPolyfills( util )
@@ -15,8 +16,6 @@
             return attr
         } )
         .then( resolveConfig )
-        .then( loadInclude )
-        .then( defineTags )
         .then( initializeSmkMap )
         .catch( SMK.ON_FAILURE )
 
@@ -32,9 +31,8 @@
             'container-sel':attrString( '#smk-map-frame' ),
             'title-sel':    attrString( 'head title' ),
             'config':       attrList( '?smk-' ),
-            'disconnected': attrBoolean( false, true ),
             'base-url':     attrString( ( new URL( bootstrapScriptEl.src.replace( 'smk.js', '' ), document.location ) ).toString() ),
-            'service-url':  attrString( '../smks-api' ),
+            'service-url':  attrString( null, null ),
         }
 
         Object.keys( smkAttr ).forEach( function ( k ) {
@@ -67,6 +65,8 @@
         }
 
         function attrBoolean( missingKey, missingValue ) {
+            /* jshint evil: true */
+
             return function( key, el ) {
                 var val = attrString( missingKey, missingValue )( key, el )
                 return !!eval( val )
@@ -417,33 +417,23 @@
 
 // = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
-    function loadInclude( attr ) {
-        return new Promise( function ( res, rej ) {
-            if ( window.include ) return res( attr )
-
-            var el = document.createElement( 'script' )
-
-            el.addEventListener( 'load', function( ev ) {
-                include.option( { baseUrl: attr[ 'base-url' ] } )
-
-                res( attr )
-            } )
-
-            el.addEventListener( 'error', function( ev ) {
-                rej( new Error( 'failed to load script from ' + el.src ) )
-            } )
-
-
-            el.setAttribute( 'src', ( new URL( 'lib/include.js', attr[ 'base-url' ] ) ).toString() )
-
-            document.getElementsByTagName( 'head' )[ 0 ].appendChild( el )
-        } )
-    }
-
-// = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
-
     function initializeSmkMap( attr ) {
-         return Promise.resolve()
+        include.option( { baseUrl: attr[ 'base-url' ] } )
+
+        return new Promise( function ( res, rej ) {
+            if ( document.readyState != "loading" )
+                return res()
+
+            document.addEventListener( "DOMContentLoaded", function( ev ) {
+                clearTimeout( id )
+                res()
+            } )
+
+            var id = setTimeout( function () {
+                console.error( 'timeout waiting for document ready' )
+                rej()
+            }, 20000 )
+        } )
             .then( function () {
                 if ( window.jQuery ) {
                     include.tag( 'jquery' ).include = Promise.resolve( window.jQuery )
@@ -501,7 +491,7 @@
             // return script object based off of src
             var getScriptFromURL = function( url ) {
                 // console.log( url )
-                for ( var i = 0; i < scripts.length; i++ )
+                for ( var i = 0; i < scripts.length; i += 1 )
                     if ( scripts[ i ].src == url ) {
                         // console.log( scripts[ i ] )
                         return scripts[ i ]
@@ -509,15 +499,15 @@
             }
 
             var actualScript = document.actualScript = function() {
-                // if (document._currentScript)
-                //     return document._currentScript
+                /* jshint -W030 */ // Expected an assignment or function call and instead saw an expression.
+                /* jshint -W117 */ // omgwtf is not defined
 
                 var stack
                 try {
                     omgwtf
                 } catch( e ) {
                     stack = e.stack
-                };
+                }
 
                 if ( !stack ) return
 
@@ -558,7 +548,7 @@
 // = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
     function setupGlobalSMK( util ) {
-        return window.SMK = Object.assign( {
+        return ( window.SMK = Object.assign( {
             MAP: {},
             VIEWER: {},
             TYPE: {},
@@ -597,6 +587,8 @@
             BOOT: Promise.resolve(),
             TAGS_DEFINED: false,
             ON_FAILURE: function ( e ) {
+                if ( !e ) return
+
                 if ( e.parseSource )
                     e.message += ',\n  while parsing ' + e.parseSource
 
@@ -635,18 +627,7 @@
                 pomVersion: '<%= pom.project.parent.version %>',
             }
 
-        }, window.SMK )
-    }
-
-// = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
-
-    function defineTags( attr ) {
-        if ( SMK.TAGS_DEFINED ) return attr
-//===================================== vv GENERATED CODE vv =====================================
-<%= includes %>
-//===================================== ^^ GENERATED CODE ^^ =====================================
-        SMK.TAGS_DEFINED = true
-        return attr
+        }, window.SMK ) )
     }
 
 } )();

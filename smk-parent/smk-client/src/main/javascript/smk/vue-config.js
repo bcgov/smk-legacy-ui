@@ -1,4 +1,5 @@
 include.module( 'vue-config', [ 'vue' ], function ( inc ) {
+    "use strict";
 
     Vue.filter( 'formatNumber', function ( value, decimalPlaces ) {
         return formatNumber( value, decimalPlaces )
@@ -35,8 +36,8 @@ include.module( 'vue-config', [ 'vue' ], function ( inc ) {
                 case 'acres':           return formatNumber( value / metersPerUnit[ 'mi' ], decimalPlaces ) + ' mi'
                 case 'hectares':        return formatNumber( value, decimalPlaces ) + ' m'
 
-                case 'metric':
-                case 'meters':
+                case 'metric': /* jshint -W086 */ // no break before default
+                case 'meters': /* jshint -W086 */
                 default:                return formatNumber( value, decimalPlaces ) + ' m'
             }
 
@@ -53,8 +54,8 @@ include.module( 'vue-config', [ 'vue' ], function ( inc ) {
                 case 'acres':           return formatNumber( value / metersPerUnit[ 'GunterChain' ] / metersPerUnit[ 'Furlong' ], decimalPlaces ) + ' acres'
                 case 'hectares':        return formatNumber( value / 100 / 100, decimalPlaces ) + ' ha'
 
-                case 'metric':
-                case 'meters':
+                case 'metric': /* jshint -W086 */
+                case 'meters': /* jshint -W086 */
                 default:                return formatNumber( value, decimalPlaces ) + ' m²'
             }
 
@@ -154,5 +155,26 @@ include.module( 'vue-config', [ 'vue' ], function ( inc ) {
     //         }
     //     }
     // } )
+
+    Vue.component( 'spinner', {
+        template: '\
+<img class="smk-spinner"\
+    v-if="busy"\
+    v-bind:src="imageUrl"\
+    v-bind:style="{ width: size + \'px\', height: size + \'px\' }"\
+>',
+        props: {
+            size: {
+                type: Number,
+                default: 24
+            },
+            busy: Boolean
+        },
+        data: function () {
+            return {
+                imageUrl: include.option( 'baseUrl' ) + '/images/spinner.gif'
+            }
+        }
+    } )
 
 } )

@@ -1,4 +1,5 @@
 include.module( 'tool-search-leaflet', [ 'leaflet', 'tool-search' ], function ( inc ) {
+    "use strict";
 
     var precisionZoom = {
         INTERSECTION:   15,
@@ -8,7 +9,7 @@ include.module( 'tool-search-leaflet', [ 'leaflet', 'tool-search' ], function ( 
         _OTHER_:        12
     }
 
-    var base = include.option( 'baseUrl' ) + '/smk/tool/search'
+    var base = include.option( 'baseUrl' ) + '/images/tool/search'
 
     var yellowMarker = new L.Icon( {
         iconUrl:        base + '/marker-icon-yellow.png',
@@ -42,7 +43,7 @@ include.module( 'tool-search-leaflet', [ 'leaflet', 'tool-search' ], function ( 
 
         var vw = smk.$viewer
 
-        searchMarkers = L.featureGroup( { pane: 'markerPane' } )
+        var searchMarkers = L.featureGroup( { pane: 'markerPane' } )
 
         this.changedActive( function () {
             if ( self.active ) {
@@ -102,14 +103,14 @@ include.module( 'tool-search-leaflet', [ 'leaflet', 'tool-search' ], function ( 
 
         vw.searched.pickedFeature( function ( ev ) {
             if ( ev.was ) {
-                var ly = ev.was.highlightLayer
-                if ( ly.isPopupOpen() && !ev.popupclose ) ly.closePopup()
-                brightHighlight( ly, vw.searched.isHighlighted( ev.was.id ), false )
+                var ly1 = ev.was.highlightLayer
+                if ( ly1.isPopupOpen() && !ev.popupclose ) ly1.closePopup()
+                brightHighlight( ly1, vw.searched.isHighlighted( ev.was.id ), false )
             }
 
             if ( ev.feature ) {
-                var ly = ev.feature.highlightLayer
-                if ( !ly.isPopupOpen() ) ly.openPopup()
+                var ly2 = ev.feature.highlightLayer
+                if ( !ly2.isPopupOpen() ) ly2.openPopup()
                 brightHighlight( ev.feature.highlightLayer, true, true )
             }
         } )

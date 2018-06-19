@@ -1,4 +1,5 @@
 include.module( 'layer-esri3d.layer-wms-esri3d-js', [ 'layer.layer-wms-js', 'types-esri3d' ], function () {
+    "use strict";
 
     function WmsEsri3dLayer() {
         SMK.TYPE.Layer[ 'wms' ].prototype.constructor.apply( this, arguments )

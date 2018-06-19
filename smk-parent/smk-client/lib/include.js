@@ -1,5 +1,5 @@
-"use strict";
-( function () {
+if ( !window.include ) { ( function () {
+    "use strict";
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -91,32 +91,36 @@
         var self = this
 
         return new Promise( function ( res, rej ) {
-            var style = document.createElement( 'link' )
-
-            style.setAttribute( 'rel', 'stylesheet' )
-
-            if ( inc.integrity ) {
-                style.setAttribute( 'integrity', inc.integrity )
-                style.setAttribute( 'crossorigin', '' )
-            }
-
-            style.addEventListener( 'load', function( ev ) {
-                res( style )
-            } )
-
-            style.addEventListener( 'error', function( ev ) {
-                rej( new Error( 'failed to load stylesheet from ' + style.src ) )
-            } )
-
+            var style
             if ( inc.load ) {
+                style = document.createElement( 'style' )
                 style.textContent = inc.load
-                // res( style )
-            }
-            else if ( inc.url ) {
-                style.setAttribute( 'href', self.$resolveUrl( inc.url ) )
+                res( style )
             }
             else {
-                rej( new Error( 'Can\'t load style' ) )
+                style = document.createElement( 'link' )
+
+                style.setAttribute( 'rel', 'stylesheet' )
+
+                if ( inc.integrity ) {
+                    style.setAttribute( 'integrity', inc.integrity )
+                    style.setAttribute( 'crossorigin', '' )
+                }
+
+                style.addEventListener( 'load', function( ev ) {
+                    res( style )
+                } )
+
+                style.addEventListener( 'error', function( ev ) {
+                    rej( new Error( 'failed to load stylesheet from ' + style.src ) )
+                } )
+
+                if ( inc.url ) {
+                    style.setAttribute( 'href', self.$resolveUrl( inc.url ) )
+                }
+                else {
+                    rej( new Error( 'Can\'t load style' ) )
+                }
             }
 
             document.getElementsByTagName( 'head' )[ 0 ].appendChild( style );
@@ -137,6 +141,7 @@
                 var url = self.$resolveUrl( inc.url )
 
                 req.addEventListener( 'load', function () {
+                    if ( this.status != 200 ) rej( new Error( 'status ' + this.status + ' trying to load template from ' + url ) )
                     res( inc.data = this.responseText )
                 } )
 
@@ -250,8 +255,7 @@
 
         if ( !loader[ inc.loader ] ) throw new Error( 'tag "' + tag + '" has unknown loader "' + inc.loader + '"' )
 
-        return inc.include =
-            ( new Promise( function ( res, rej ) {
+        return ( inc.include = new Promise( function ( res, rej ) {
                 loader[ inc.loader ].call( loader, inc, tag )
                     .then( function ( r ) {
                         inc.loaded = r
@@ -261,17 +265,11 @@
                         return inc.module
                     } )
                     .then( res, rej )
-                    // .then( function ( r ) {
-                    //     res( r )
-                    // } )
-                    // .catch( function ( e ) {
-                    //     rej( e )
-                    // } )
 
                 setTimeout( function () {
                     rej( new Error( 'timeout' ) )
                 }, OPTION.timeout )
-            } ) )
+            } )
             .then( function ( res ) {
                 console.debug( 'included ' + inc.loader + ' "' + tag + '"', inc.url || inc.tags )
                 return res
@@ -281,16 +279,17 @@
                 console.warn(e)
 
                 throw e
-            } )
+            } ) )
     }
 
     function module( tag, incs, mod ) {
+        var inc
         try {
-            var inc = includeTag( tag )
+            inc = includeTag( tag )
         }
         catch ( e ) {
             console.warn( 'tag "' + tag + '" for module not defined, creating' )
-            var inc = includeTag( tag, {} )
+            inc = includeTag( tag, {} )
         }
 
         if ( inc.module )
@@ -302,7 +301,7 @@
         else
             deps = Promise.resolve()
 
-        return inc.module = deps
+        return ( inc.module = deps
             .then( function ( res ) {
                 if ( typeof mod == 'function' )
                     return mod.call( inc, res )
@@ -313,7 +312,7 @@
                 console.debug( 'module "' + tag + '"' )
                 inc.exported = exp
                 return exp
-            } )
+            } ) )
     }
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -348,6 +347,8 @@
     }
 
     function hash( val ) {
+        /* jshint bitwise: false */
+
         var h = 0x811c9dc5;
 
         walk( val );
@@ -364,8 +365,8 @@
             case 'array':
                 addBits( typeCode[ t ] );
 
-                for ( var j in val )
-                    walk( val[ j ] )
+                for ( var j1 in val )
+                    walk( val[ j1 ] )
 
                 return;
 
@@ -373,8 +374,8 @@
                 addBits( typeCode[ t ] );
 
                 var keys = Object.keys( val ).sort();
-                for ( var j in keys ) {
-                    var key = keys[ j ];
+                for ( var j2 in keys ) {
+                    var key = keys[ j2 ];
                     addBits( key );
                     walk( val[ key ] );
                 }
@@ -390,7 +391,7 @@
         }
 
         function addBits( str ) {
-            for ( var i = 0, l = str.length; i < l; i++ ) {
+            for ( var i = 0, l = str.length; i < l; i += 1 ) {
                 h ^= str.charCodeAt(i);
                 h += (h << 1) + (h << 4) + (h << 7) + (h << 8) + (h << 24);
             }
@@ -405,5 +406,5 @@
     window.include.hash = hash
     window.include.option = option
 
-} )()
+} )() }
 

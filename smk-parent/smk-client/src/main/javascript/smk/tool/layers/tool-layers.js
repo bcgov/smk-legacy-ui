@@ -1,4 +1,5 @@
 include.module( 'tool-layers', [ 'tool', 'widgets', 'tool-layers.panel-layers-html' ], function ( inc ) {
+    "use strict";
 
     Vue.component( 'layers-widget', {
         extends: inc.widgets.toolButton,
@@ -156,7 +157,7 @@ include.module( 'tool-layers', [ 'tool', 'widgets', 'tool-layers.panel-layers-ht
         this.layers = smk.$viewer.layerIds.map( function ( id, i ) {
             var ly = smk.$viewer.layerId[ id ]
 
-            return layerModel[ id ] = {
+            return ( layerModel[ id ] = {
                 id:             id,
                 title:          ly.config.title,
                 visible:        smk.$viewer.isLayerVisible( id ),
@@ -167,7 +168,7 @@ include.module( 'tool-layers', [ 'tool', 'widgets', 'tool-layers.panel-layers-ht
                 isContainer:    ly.isContainer,
                 hasLegend:      !ly.config.useHeatmap && !ly.isContainer,
                 class:          ly.parentId && 'smk-sub-layer'
-            }
+            } )
         } )
 
         smk.$viewer.startedLoading( function ( ev ) {

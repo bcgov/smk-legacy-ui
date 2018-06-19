@@ -1,4 +1,5 @@
 include.module( 'query.query-js', [ 'jquery', 'util', 'event' ], function () {
+    "use strict";
 
     var QueryEvent = SMK.TYPE.Event.define( [
         // 'startedLoading',
@@ -45,7 +46,7 @@ include.module( 'query.query-js', [ 'jquery', 'util', 'event' ], function () {
         this.component = 'parameter-' + config.type
         this.prop = $.extend( true, {
             value: null,
-        }, config ),
+        }, config )
         this.initial = config.value
     }
 

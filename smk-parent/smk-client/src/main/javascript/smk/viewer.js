@@ -1,4 +1,5 @@
 include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', 'query', 'turf' ], function () {
+    "use strict";
 
     var ViewerEvent = SMK.TYPE.Event.define( [
         'changedView',
@@ -102,7 +103,7 @@ include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', '
     Viewer.prototype.getZoomBracketForScale = function ( scale ) {
         if ( scale > this.zoomScale[ 1 ] ) return [ 0, 1 ]
         if ( scale < this.zoomScale[ 19 ] ) return [ 19, 20 ]
-        for ( var z = 2; z < 20; z++ )
+        for ( var z = 2; z < 20; z += 1 )
             if ( scale > this.zoomScale[ z ] ) return [ z - 1, z ]
     }
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
@@ -116,7 +117,6 @@ include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', '
 
         this.lmfId = smk.lmfId
         this.type = smk.viewer.type
-        this.disconnected = smk.$option.disconnected
         this.serviceUrl = smk.$option[ 'service-url' ]
         this.identifyTool = function () { return smk.$tool[ 'identify' ] }
         this.resolveUrl = function ( url ) {
@@ -199,6 +199,7 @@ include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', '
         function constructLayer( layerConfig, index, parentId, cb ) {
             var id = ( parentId ? parentId + '==' : '' ) + layerConfig.id
 
+            var ly
             try {
                 if ( !( layerConfig.type in SMK.TYPE.Layer ) )
                     throw new Error( 'layer type "' + layerConfig.type + '" not defined' )
@@ -206,7 +207,7 @@ include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', '
                 if ( !( smk.viewer.type in SMK.TYPE.Layer[ layerConfig.type ] ) )
                     throw new Error( 'layer type "' + layerConfig.type + '" not defined for viewer "' + smk.viewer.type + '"' )
 
-                var ly = new SMK.TYPE.Layer[ layerConfig.type ][ smk.viewer.type ]( layerConfig )
+                ly = new SMK.TYPE.Layer[ layerConfig.type ][ smk.viewer.type ]( layerConfig )
                 ly.initialize( id, index, parentId )
             }
             catch ( e ) {
@@ -298,7 +299,7 @@ include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', '
             if ( !self.isLayerVisible( id )  ) return
             if ( self.layerId[ id ].isContainer ) return
 
-            ly = self.layerId[ id ]
+            var ly = self.layerId[ id ]
             if ( !merged ) {
                 merged = [ ly ]
                 return
@@ -322,7 +323,7 @@ include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', '
 
             delete pending[ cid ]
             if ( self.visibleLayer[ cid ] ) {
-                self.positionViewerLayer( ly, maxZOrder - i )
+                self.positionViewerLayer( self.visibleLayer[ cid ], maxZOrder - i )
                 return
             }
 
@@ -368,7 +369,7 @@ include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', '
         if ( !SMK.TYPE.Layer[ type ][ self.type ].create )
             return SMK.UTIL.rejected( new Error( 'can\'t create viewer layer of type "' + type + '"' ) )
 
-        return this.layerIdPromise[ id ] = SMK.UTIL.resolved()
+        return ( this.layerIdPromise[ id ] = SMK.UTIL.resolved()
             .then( function () {
                 try {
                     return SMK.TYPE.Layer[ type ][ self.type ].create.call( self, layers, zIndex )
@@ -380,7 +381,7 @@ include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', '
             } )
             .then( function ( ly ) {
                 return self.afterCreateViewerLayer( id, type, layers, ly )
-            } )
+            } ) )
     }
 
     Viewer.prototype.afterCreateViewerLayer = function ( id, type, layers, viewerLayer ) {
@@ -496,7 +497,7 @@ include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', '
         if ( !id )
             throw new Error( 'attachment without URL or Id' )
 
-        if ( this.disconnected )
+        if ( !this.serviceUrl )
             return this.resolveUrl( 'attachments/' + id + ( type ? '.' + type : '' ) )
         else
             return this.serviceUrl + '/MapConfigurations/' + this.lmfId + '/Attachments/' + id
@@ -532,7 +533,7 @@ include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', '
             return this.currentLocationPromise
 
         this.currentLocationTimestamp = null
-        return this.currentLocationPromise = SMK.UTIL.makePromise( function ( res, rej ) {
+        return ( this.currentLocationPromise = SMK.UTIL.makePromise( function ( res, rej ) {
             navigator.geolocation.getCurrentPosition( res, rej, {
                 timeout:            option.timeout,
                 enableHighAccuracy: true,
@@ -561,7 +562,7 @@ include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', '
                     site.current = true
                     return site
                 } )
-        } )
+        } ) )
     }
 
 } )

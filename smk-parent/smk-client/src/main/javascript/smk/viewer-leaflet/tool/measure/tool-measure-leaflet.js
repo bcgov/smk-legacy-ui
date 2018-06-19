@@ -1,4 +1,5 @@
 include.module( 'tool-measure-leaflet', [ 'leaflet', 'tool-measure', 'turf' ], function () {
+    "use strict";
 
     SMK.TYPE.MeasureTool.prototype.afterInitialize.push( function ( smk ) {
         var self = this

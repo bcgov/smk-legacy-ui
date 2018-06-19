@@ -1,4 +1,5 @@
 include.module( 'tool-about', [ 'tool', 'widgets', 'tool-about.panel-about-html' ], function ( inc ) {
+    "use strict";
 
     Vue.component( 'about-widget', {
         extends: inc.widgets.toolButton,

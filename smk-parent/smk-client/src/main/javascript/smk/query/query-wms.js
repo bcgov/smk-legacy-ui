@@ -1,4 +1,5 @@
 include.module( 'query.query-wms-js', [ 'query.query-js' ], function () {
+    "use strict";
 
     function WmsQuery() {
         SMK.TYPE.Query.prototype.constructor.apply( this, arguments )
@@ -13,8 +14,8 @@ include.module( 'query.query-wms-js', [ 'query.query-js' ], function () {
         var self = this
 
         var layerConfig = viewer.layerId[ this.layerId ].config
-            typeName    = layerConfig.layerName,
-            serviceUrl  = layerConfig.serviceUrl
+        var typeName    = layerConfig.layerName
+        var serviceUrl  = layerConfig.serviceUrl
 
         return SMK.UTIL.asyncReduce( function ( accum, done ) {
             return fetchSomeUniqueValues( accum, serviceUrl, typeName, attribute )

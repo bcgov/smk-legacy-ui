@@ -1,4 +1,5 @@
 include.module( 'tool-identify-esri3d', [ 'esri3d', 'types-esri3d', 'util-esri3d', 'tool-identify', 'feature-list-esri3d' ], function ( inc ) {
+    "use strict";
 
     var E = SMK.TYPE.Esri3d
 
@@ -72,7 +73,7 @@ include.module( 'tool-identify-esri3d', [ 'esri3d', 'types-esri3d', 'util-esri3d
                             },
                             outline: {
                                 size: 1,
-                                color: [ 0, 0, 0, .2 ]
+                                color: [ 0, 0, 0, 0.2 ]
                             }
                         }
                     ]
@@ -102,7 +103,7 @@ include.module( 'tool-identify-esri3d', [ 'esri3d', 'types-esri3d', 'util-esri3d
                         size:       '30px',
                         anchor:     'center',
                         material: {
-                            color: [ 0, 0, 0, .2 ]
+                            color: [ 0, 0, 0, 0.2 ]
                         },
                         resource: {
                             primitive: 'circle'

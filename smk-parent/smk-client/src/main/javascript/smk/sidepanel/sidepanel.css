@@ -99,19 +99,7 @@
 }
 
 .smk-sidepanel .smk-panel .smk-spinner {
-    display:    none;
     position:   absolute;
     top:        2px;
     right:      1px;
-    width:                  24px;
-    height:                 24px;
-    background-image:       url( 'spinner.gif' );
-    background-repeat:      no-repeat;
-    background-position:    center center;
-    background-size:        24px 24px;
 }
-
-.smk-sidepanel .smk-panel.smk-busy .smk-spinner {
-    display: block;
-}
-

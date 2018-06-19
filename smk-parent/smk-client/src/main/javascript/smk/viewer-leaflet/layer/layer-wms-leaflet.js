@@ -1,4 +1,5 @@
 include.module( 'layer-leaflet.layer-wms-leaflet-js', [ 'layer.layer-wms-js' ], function () {
+    "use strict";
 
     function WmsLeafletLayer() {
         SMK.TYPE.Layer[ 'wms' ].prototype.constructor.apply( this, arguments )

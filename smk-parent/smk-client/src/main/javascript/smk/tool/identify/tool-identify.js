@@ -1,4 +1,5 @@
 include.module( 'tool-identify', [ 'feature-list', 'widgets', 'tool-identify.panel-identify-html' ], function ( inc ) {
+    "use strict";
 
     Vue.component( 'identify-widget', {
         extends: inc.widgets.toolButton,
@@ -99,7 +100,7 @@ include.module( 'tool-identify', [ 'feature-list', 'widgets', 'tool-identify.pan
         } )
 
         var onChangedViewStart = SMK.UTIL.makeDelayedCall( function () {
-            picked = smk.$viewer.identified.getPicked()
+            var picked = smk.$viewer.identified.getPicked()
             if ( !picked ) return
 
             // console.log( 'onChangedViewStart' )

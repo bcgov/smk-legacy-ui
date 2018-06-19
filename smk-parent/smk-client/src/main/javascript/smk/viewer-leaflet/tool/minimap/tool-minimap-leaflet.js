@@ -1,4 +1,5 @@
 include.module( 'tool-minimap-leaflet', [ 'leaflet', 'tool-minimap' ], function () {
+    "use strict";
 
     SMK.TYPE.MinimapTool.prototype.afterInitialize.push( function ( smk ) {
         smk.addToStatus( $( '<div class="smk-spacer">' ).height( 170 ).get( 0 ) )

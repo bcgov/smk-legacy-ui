@@ -1,4 +1,5 @@
 include.module( 'util-esri3d', [ 'types-esri3d', 'terraformer' ], function ( inc ) {
+    "use strict";
 
     Object.assign( window.SMK.UTIL, {
         geoJsonToEsriGeometry: ( function () {
@@ -79,8 +80,9 @@ include.module( 'util-esri3d', [ 'types-esri3d', 'terraformer' ], function ( inc
                 } ]
             }
 
+            var point
             if ( styleConfig.markerUrl ) {
-                var point = {
+                point = {
                     type: 'point-3d',
                     symbolLayers: [
                         {
@@ -95,7 +97,7 @@ include.module( 'util-esri3d', [ 'types-esri3d', 'terraformer' ], function ( inc
                 }
             }
             else {
-                var point = {
+                point = {
                     type: 'point-3d',
                     symbolLayers: [ {
                         type: 'icon',
@@ -132,9 +134,9 @@ include.module( 'util-esri3d', [ 'types-esri3d', 'terraformer' ], function ( inc
             }
 
             function color( c, a ) {
-                var c = new SMK.TYPE.Esri3d.Color( c )
-                c.a = a
-                return c
+                var ec = new SMK.TYPE.Esri3d.Color( c )
+                ec.a = a
+                return ec
             }
         }
 

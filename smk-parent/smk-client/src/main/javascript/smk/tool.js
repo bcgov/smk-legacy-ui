@@ -1,4 +1,5 @@
 include.module( 'tool', [ 'jquery', 'event' ], function () {
+    "use strict";
 
     var ToolEvent = SMK.TYPE.Event.define( [
         'changedVisible',

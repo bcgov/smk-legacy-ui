@@ -1,4 +1,5 @@
 include.module( 'layer-leaflet.layer-esri-dynamic-leaflet-js', [ 'layer.layer-esri-dynamic-js' ], function () {
+    "use strict";
 
     function EsriDynamicLeafletLayer() {
         SMK.TYPE.Layer[ 'esri-dynamic' ].prototype.constructor.apply( this, arguments )

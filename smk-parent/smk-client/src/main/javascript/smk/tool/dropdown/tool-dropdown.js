@@ -1,4 +1,5 @@
 include.module( 'tool-dropdown', [ 'tool', 'widgets', 'tool-dropdown.panel-dropdown-html' ], function ( inc ) {
+    "use strict";
 
     Vue.component( 'dropdown-widget', {
         extends: inc.widgets.toolButton,
