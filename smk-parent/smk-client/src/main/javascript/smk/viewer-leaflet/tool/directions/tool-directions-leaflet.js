@@ -1,6 +1,7 @@
 include.module( 'tool-directions-leaflet', [ 'leaflet', 'tool-directions' ], function ( inc ) {
+    "use strict";
 
-    var base = include.option( 'baseUrl' ) + '/smk/tool/directions'
+    var base = include.option( 'baseUrl' ) + '/images/tool/directions'
 
     var redIcon = new L.Icon( {
         iconUrl:        base + '/marker-icon-red.png',
@@ -76,7 +77,7 @@ include.module( 'tool-directions-leaflet', [ 'leaflet', 'tool-directions' ], fun
 
             smk.$viewer.map.addLayer( self.routeLayer )
 
-            bounds = self.routeLayer.getBounds()
+            var bounds = self.routeLayer.getBounds()
 
             smk.$viewer.map.fitBounds( bounds.pad( 0.25 ), {
                 paddingTopLeft: L.point( 340, 40 ),

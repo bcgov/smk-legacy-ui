@@ -1,4 +1,5 @@
 include.module( 'tool-zoom', [ 'tool' ], function () {
+    "use strict";
 
     function ZoomTool( option ) {
         SMK.TYPE.Tool.prototype.constructor.call( this, $.extend( {

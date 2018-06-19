@@ -1,8 +1,9 @@
 include.module( 'tool-location-esri3d', [ 'esri3d', 'types-esri3d', 'tool-location' ], function ( inc ) {
+    "use strict";
 
     var E = SMK.TYPE.Esri3d
 
-    var base = include.option( 'baseUrl' ) + '/smk/tool/location'
+    var base = include.option( 'baseUrl' ) + '/images/tool/location'
 
     var blueMarkerSymbol = {
         type: 'point-3d',

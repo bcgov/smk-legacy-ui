@@ -1,4 +1,5 @@
 include.module( 'tool-select', [ 'feature-list', 'widgets', 'tool-select.panel-select-html' ], function ( inc ) {
+    "use strict";
 
     Vue.component( 'select-widget', {
         extends: inc.widgets.toolButton,

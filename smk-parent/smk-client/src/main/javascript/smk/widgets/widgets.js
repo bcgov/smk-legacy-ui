@@ -1,4 +1,5 @@
 include.module( 'widgets', [ 'vue', 'widgets.tool-button-html' ], function ( inc ) {
+    "use strict";
 
     var emit = {
         methods: {

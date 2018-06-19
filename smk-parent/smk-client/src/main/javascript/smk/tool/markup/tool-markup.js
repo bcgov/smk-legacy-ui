@@ -1,4 +1,5 @@
 include.module( 'tool-markup', [ 'tool' ], function () {
+    "use strict";
 
     function MarkupTool( option ) {
         SMK.TYPE.Tool.prototype.constructor.call( this, $.extend( {

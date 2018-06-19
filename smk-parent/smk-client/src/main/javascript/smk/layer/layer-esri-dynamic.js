@@ -1,4 +1,5 @@
-include.module( 'layer.layer-esri-dynamic-js', [ 'layer.layer-js' ], function () {
+include.module( 'layer.layer-esri-dynamic-js', [ 'layer.layer-js', 'terraformer' ], function () {
+    "use strict";
 
     function EsriDynamicLayer() {
         SMK.TYPE.Layer.prototype.constructor.apply( this, arguments )
@@ -51,15 +52,14 @@ include.module( 'layer.layer-esri-dynamic-js', [ 'layer.layer-js' ], function ()
             f:              'json',
             dynamicLayers:  dynamicLayers,
             sr:             4326,
-            tolerance:      1,
+            tolerance:      0,
             mapExtent:      view.extent.join( ',' ),
             imageDisplay:   [ view.screen.width, view.screen.height, 96 ].join( ',' ),
             returnGeometry: true,
             returnZ:        false,
             returnM:        false,
             geometryType:   'esriGeometryPolygon',
-            geometry:       JSON.stringify( esriFeature.geometry ),
-            tolerance:      0
+            geometry:       JSON.stringify( esriFeature.geometry )
         }
 
         return SMK.UTIL.makePromise( function ( res, rej ) {

@@ -1,4 +1,5 @@
 include.module( 'tool-minimap', [ 'tool' ], function () {
+    "use strict";
 
     function MinimapTool( option ) {
         SMK.TYPE.Tool.prototype.constructor.call( this, $.extend( {

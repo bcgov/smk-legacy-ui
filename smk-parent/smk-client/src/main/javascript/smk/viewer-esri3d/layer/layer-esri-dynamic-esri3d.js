@@ -1,4 +1,5 @@
 include.module( 'layer-esri3d.layer-esri-dynamic-esri3d-js', [ 'layer.layer-esri-dynamic-js', 'types-esri3d' ], function () {
+    "use strict";
 
     var E = SMK.TYPE.Esri3d
 

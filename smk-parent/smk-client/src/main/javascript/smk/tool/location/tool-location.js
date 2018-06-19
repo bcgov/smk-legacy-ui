@@ -1,4 +1,5 @@
 include.module( 'tool-location', [ 'tool', 'widgets', 'tool-location.popup-location-html' ], function ( inc ) {
+    "use strict";
 
     function LocationTool( option ) {
         this.makePropWidget( 'site', {} )

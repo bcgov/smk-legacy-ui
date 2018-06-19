@@ -1,4 +1,5 @@
 include.module( 'tool-measure', [ 'tool', 'widgets', 'tool-measure.panel-measure-html' ], function ( inc ) {
+    "use strict";
 
     Vue.component( 'measure-widget', {
         extends: inc.widgets.toolButton,
