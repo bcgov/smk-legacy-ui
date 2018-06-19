@@ -1,4 +1,5 @@
 include.module( 'smk-map', [ 'jquery', 'util' ], function () {
+    "use strict";
 
     function SmkMap( option ) {
         this.$option = option
@@ -24,6 +25,14 @@ include.module( 'smk-map', [ 'jquery', 'util' ], function () {
         $( this.$container )
             .addClass( 'smk-map-frame smk-hidden' )
 
+        var spinner = $( '<img class="smk-toplevel smk-spinner">' )
+            .attr( 'src', include.option( 'baseUrl' ) + '/images/spinner.gif' )
+            .appendTo( this.$container )
+
+        var status = $( '<div class="smk-toplevel smk-status">' )
+            .text( 'Reticulating splines...' )
+            .appendTo( this.$container )
+
         return SMK.UTIL.promiseFinally(
             SMK.UTIL.resolved()
                 .then( loadConfigs )
@@ -37,10 +46,18 @@ include.module( 'smk-map', [ 'jquery', 'util' ], function () {
                 .then( initTools )
                 .then( showMap )
                 .catch( function ( e ) {
-                    $( self.$container )
-                        .removeClass( 'smk-map-frame smk-hidden' )
+                    console.error( e )
 
-                    return Promise.reject( e )
+                    $( self.$container )
+                        .removeClass( 'smk-hidden' )
+
+                    status.html(
+                        '<h3>SMK initialization failed</h3><br>' +
+                        e + ( e.parseSource ? ',<br>while parsing ' + e.parseSource : '' )
+                    )
+                    spinner.remove()
+
+                    return Promise.reject()
                 } ),
             function () {
                 console.groupEnd()
@@ -65,17 +82,14 @@ include.module( 'smk-map', [ 'jquery', 'util' ], function () {
 
                 return include( tag )
                     .then( function ( inc ) {
-                        try {
-                            var obj = JSON.parse( inc[ tag ] )
-                            obj.$sources = c.$sources
-                            return obj
-                        }
-                        catch ( e ) {
-                            console.warn( c.$sources[ 0 ] )
-                            console.warn( inc[ tag ] )
-                            e.parseSource = c.$sources[ 0 ]
-                            throw e
-                        }
+                        var obj = JSON.parse( inc[ tag ] )
+                        obj.$sources = c.$sources
+                        return obj
+                    } )
+                    .catch( function ( e ) {
+                        console.warn( c.$sources[ 0 ] )
+                        e.parseSource = c.$sources[ 0 ]
+                        throw e
                     } )
             } ) )
         }
@@ -91,7 +105,6 @@ include.module( 'smk-map', [ 'jquery', 'util' ], function () {
 
                 console.log( 'merging', JSON.parse( JSON.stringify( c ) ) )
 
-                mergeSurround( config, c )
                 mergeViewer( config, c )
                 mergeTools( config, c )
                 mergeLayers( config, c )
@@ -107,24 +120,6 @@ include.module( 'smk-map', [ 'jquery', 'util' ], function () {
             Object.assign( self, config )
 
             // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-            function mergeSurround( base, merge ) {
-                if ( !merge.surround ) return
-
-                if ( base.surround ) {
-                    if ( base.surround.subtitles && merge.surround.subtitles ) {
-                        base.surround.subtitles = base.surround.subtitles.concat( merge.surround.subtitles )
-                        delete merge.surround.subtitles
-                    }
-
-                    Object.assign( base.surround, merge.surround )
-                }
-                else {
-                    base.surround = merge.surround
-                }
-
-                delete merge.surround
-            }
 
             function mergeViewer( base, merge ) {
                 if ( !merge.viewer ) return
@@ -244,7 +239,7 @@ include.module( 'smk-map', [ 'jquery', 'util' ], function () {
                     } ).then( res, rej )
                 } )
                 .then( function ( data ) {
-                    debugger
+                    // debugger
                 } )
                 // console.log( ly )
 
@@ -347,9 +342,11 @@ include.module( 'smk-map', [ 'jquery', 'util' ], function () {
         }
 
         function showMap() {
+            status.remove()
+            spinner.remove()
             $( self.$container )
-                .removeClass( 'smk-hidden' )
                 .hide()
+                .removeClass( 'smk-hidden' )
                 .fadeIn( 1000 )
 
             if ( self.viewer.activeTool in self.$tool )
@@ -385,10 +382,10 @@ include.module( 'smk-map', [ 'jquery', 'util' ], function () {
 
         if ( this.$toolbar ) return this.$toolbar
 
-        return this.$toolbar = include( 'toolbar' )
+        return ( this.$toolbar = include( 'toolbar' )
             .then( function ( inc ) {
                 return new SMK.TYPE.Toolbar( self )
-            } )
+            } ) )
     }
 
     SmkMap.prototype.getSidepanel = function () {
@@ -396,10 +393,10 @@ include.module( 'smk-map', [ 'jquery', 'util' ], function () {
 
         if ( this.$sidepanel ) return this.$sidepanel
 
-        return this.$sidepanel = include( 'sidepanel' )
+    return ( this.$sidepanel = include( 'sidepanel' )
             .then( function ( inc ) {
                 return new SMK.TYPE.Sidepanel( self )
-            } )
+            } ) )
     }
 
     SmkMap.prototype.emit = function ( toolId, event, arg ) {

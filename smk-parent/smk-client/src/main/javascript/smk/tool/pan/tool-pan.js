@@ -1,4 +1,5 @@
 include.module( 'tool-pan', [ 'tool' ], function () {
+    "use strict";
 
     function PanTool( option ) {
         SMK.TYPE.Tool.prototype.constructor.call( this, $.extend( {

@@ -1,4 +1,5 @@
 include.module( 'tool-zoom-leaflet', [ 'tool-zoom', 'leaflet' ], function () {
+    "use strict";
 
     SMK.TYPE.ZoomTool.prototype.afterInitialize.push( function ( smk ) {
         if ( this.mouseWheel !== false ) {

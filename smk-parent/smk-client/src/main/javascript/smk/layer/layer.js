@@ -1,4 +1,5 @@
 include.module( 'layer.layer-js', [ 'jquery', 'util', 'event' ], function () {
+    "use strict";
 
     var LayerEvent = SMK.TYPE.Event.define( [
         'startedLoading',
@@ -51,7 +52,7 @@ include.module( 'layer.layer-js', [ 'jquery', 'util', 'event' ], function () {
 
             this.config.attributes.forEach( function ( at ) {
                 if ( at.name in self.attribute )
-                    log.warn( 'attribute ' + at.name + ' is duplicated in ' + ly.id )
+                    console.warn( 'attribute ' + at.name + ' is duplicated in ' + self.id )
 
                 self.attribute[ at.name ] = at
 

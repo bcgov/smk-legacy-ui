@@ -148,10 +148,10 @@ function parseKmlLayerStyle(fileText)
 		
 		if(markerUrl != null)
 		{
-			$("#kmlMarkerSizeX").val(markerSize);
-			$("#kmlMarkerSizeY").val(markerSize);
-			$("#kmlMarkerOffsetX").val(markerOffsetX);
-			$("#kmlMarkerOffsetY").val(markerOffsetY);
+			$("#kmlMarkerSizeX").val(parseInt(markerSize));
+			$("#kmlMarkerSizeY").val(parseInt(markerSize));
+			$("#kmlMarkerOffsetX").val(parseInt(markerOffsetX));
+			$("#kmlMarkerOffsetY").val(parseInt(markerOffsetY));
 		}
 	}
 	else // edit panel
@@ -166,10 +166,10 @@ function parseKmlLayerStyle(fileText)
 		
 		if(markerUrl != null)
 		{
-			$("#vectorMarkerSizeX").val(markerSize);
-			$("#vectorMarkerSizeY").val(markerSize);
-			$("#vectorMarkerOffsetX").val(markerOffsetX);
-			$("#vectorMarkerOffsetY").val(markerOffsetY);
+			$("#vectorMarkerSizeX").val(parseInt(markerSize));
+			$("#vectorMarkerSizeY").val(parseInt(markerSize));
+			$("#vectorMarkerOffsetX").val(parseInt(markerOffsetX));
+			$("#vectorMarkerOffsetY").val(parseInt(markerOffsetY));
 		}
 	}
 	
@@ -285,6 +285,7 @@ function setToolActivation(toolType)
     			$("#identifyStyleStrokeColor").val(tool.style.strokeColor);
     			$("#identifyStyleFillColor").val(tool.style.fillColor);
     			$("#identifyPanelVisible").prop('checked', tool.showPanel);
+    			$("#identifyClickRadius").val(tool.tolerance);
     		}
 	    	else if(tool.type == "identify" && tool.enabled == false) $("#identifyOptions").hide();
 	    	else if(tool.type == "select" && tool.enabled == true)
@@ -498,7 +499,8 @@ function editMapConfig(mapConfigId)
 		        },
 		        error: function (status)
     	        {
-    	            Materialize.toast('Map config loading failed. Please refresh and try again.', 4000);
+    	            Materialize.toast('Map config loading failed. Please refresh and try again. Error: ' + status.responseText, 10000);
+    	            console.log('Map config loading failed. Please refresh and try again. Error: ' + status.responseText);
     	        }
 			});
 		}
@@ -614,6 +616,7 @@ function setupMapConfigToolsUI()
     			$("#identifyStyleStrokeColor").val(tool.style.strokeColor);
     			$("#identifyStyleFillColor").val(tool.style.fillColor);
     			$("#identifyPanelVisible").prop('checked', tool.showPanel);
+    			$("#identifyClickRadius").val(tool.tolerance);
 			}
 		}
     	else if(tool.type == "search") $("#searchPanel").prop('checked', tool.enabled);
@@ -648,7 +651,8 @@ function finishToolEdits()
 			tool.style.strokeStyle = $("#identifyStyleStrokeStyle").val();
 			tool.style.strokeColor = $("#identifyStyleStrokeColor").val();
 			tool.style.fillColor = $("#identifyStyleFillColor").val();
-			tool.showPanel = $("#identifyStyleFillColor").is(":checked");
+			tool.tolerance = $("#identifyClickRadius").val();
+			tool.showPanel = $("#identifyPanelVisible").is(":checked");
 		}
 		else if(tool.type == "select") 
 		{
@@ -889,6 +893,7 @@ function saveMapConfig()
         withCredentials: true,
         success: function (result)
         {
+        	if(result.hasOwnProperty("lmfId")) data.lmfId = result.lmfId;
         	Materialize.toast('Successfully saved application ' + data.lmfId + '. Checking for attachment uploads...', 4000);
 
         	// now we need to complete any attachments before moving on.
@@ -914,8 +919,10 @@ function saveMapConfig()
         },
         error: function (status)
         {
-            Materialize.toast('Error saving application ' + data.lmfId, 4000);
+            Materialize.toast('Error saving application ' + data.lmfId + '. Error: ' + status.responseText, 10000);
+            console.log('Error saving application ' + data.lmfId + '. Error: ' + status.responseText);
             if(data._rev == null) data._id = null;
+            closeEditPanel();
         }
 	});
 }
@@ -986,7 +993,9 @@ function handleAttachmentUpload(lmfId, attchId, attchType, documentData)
         processData: false,
         error: function (status)
         {
-            Materialize.toast('Error uploading attachment ' + attchId, 4000);
+            Materialize.toast('Error uploading attachment ' + attchId + '. Error: ' + status.responseText, 10000);
+            console.log('Error uploading attachment ' + attchId + '. Error: ' + status.responseText);
+            closeEditPanel();
         }
 	}));
 }
@@ -1040,7 +1049,8 @@ function unPublishMapConfig(mapConfigId)
                 },
                 error: function (status)
                 {
-                	Materialize.toast('Error un-publishing ' + mapConfigId, 4000);
+                	Materialize.toast('Error un-publishing ' + mapConfigId, 10000);
+                	console.log('Error un-publishing ' + mapConfigId + '. Error: ' + status.responseText);
                 }
 			});
 		}
@@ -1071,7 +1081,8 @@ function publishMapConfig(mapConfigId)
                 },
                 error: function (status)
                 {
-                	Materialize.toast('Error publishing ' + mapConfigId, 4000);
+                	Materialize.toast('Error publishing ' + mapConfigId, 10000);
+                	console.log('Error publishing ' + mapConfigId + '. Error: ' + status.responseText);
                 	$("#loadingBar").hide();
                 	$("#appsTablePanel").show();
                 }
@@ -1124,7 +1135,8 @@ function deleteMapConfig(mapConfigId)
                     },
                     error: function (status)
                     {
-                    	Materialize.toast('Could not delete ' + mapConfigId + '. Ensure this map is not published before deleting', 4000);
+                    	Materialize.toast('Could not delete ' + mapConfigId + '. Ensure this map is not published before deleting', 10000);
+                    	console.log('Error un-publishing ' + mapConfigId + '. Error: ' + status.responseText);
                     }
     			});
 			}
@@ -1215,9 +1227,15 @@ function downloadSelectedVector()
         },
         error: function (status)
         {
-            Materialize.toast('Error loading JSON. Please try again later', 4000);
+            Materialize.toast('Error loading JSON. Please try again later. Error: ' + status.responseText, 10000);
+            console.log('Error loading JSON. Error: ' + status.responseText);
         }
 	});
+}
+
+function setTitleAttribute(val)
+{
+	selectedLayerNode.data.titleAttribute = val; 
 }
 
 function finishLayerEdits(save)
@@ -1399,9 +1417,18 @@ function editSelectedLayer()
 				
 				node.data.attributes.forEach(function (attribute)
 				{
-					$("#attributePanel").append('<div class="row"><div class="col s4"><p><input type="checkbox" id="' + attribute.id + '_visible" /><label class="black-text" for="' + attribute.id + '_visible">Visible</label></p></div><div class="col s8 input-field"><input id="' + attribute.id + '_label" type="text"><label for="' + attribute.id + '_label">' + attribute.name + '</label></div></div>');
+					$("#attributePanel").append('<div class="row"><div class="col s2"><p><input type="checkbox" id="' + attribute.id + '_visible" /><label class="black-text" for="' + attribute.id + '_visible">Visible</label></p></div><div class="col s2"><p><input name="titleGroup" type="radio" id="' + attribute.id + '_title" onclick="setTitleAttribute(\'' + attribute.id + '\')" /><label for="' + attribute.id + '_title"></label></p></div><div class="col s8 input-field"><input id="' + attribute.id + '_label" type="text"><label for="' + attribute.id + '_label">' + attribute.name + '</label></div></div>');
 					$("#" + attribute.id + "_visible").prop('checked', attribute.visible);
 					$("#" + attribute.id + "_label").val(attribute.title);
+					
+					if(node.data.hasOwnProperty("titleAttribute") && node.data.titleAttribute == attribute.id)
+					{
+						$("#" + attribute.id + "_title").prop('checked', true);
+					}
+					else
+					{
+						$("#" + attribute.id + "_title").prop('checked', false);
+					}
 				});
 				
 				if(node.data.queries == null) node.data.queries = [];
@@ -1442,9 +1469,18 @@ function editSelectedLayer()
 				
 				node.data.attributes.forEach(function (attribute)
 				{
-					$("#attributePanel").append('<div class="row"><div class="col s4"><p><input type="checkbox" id="' + attribute.id + '_visible" /><label class="black-text" for="' + attribute.id + '_visible">Visible</label></p></div><div class="col s8 input-field"><input id="' + attribute.id + '_label" type="text"><label for="' + attribute.id + '_label">' + attribute.name + '</label></div></div>');
+					$("#attributePanel").append('<div class="row"><div class="col s2"><p><input type="checkbox" id="' + attribute.id + '_visible" /><label class="black-text" for="' + attribute.id + '_visible">Visible</label></p></div><div class="col s2"><p><input name="titleGroup" type="radio" id="' + attribute.id + '_title" /><label for="' + attribute.id + '_title" onclick="setTitleAttribute(\'' + attribute.id + '\')"></label></p></div><div class="col s8 input-field"><input id="' + attribute.id + '_label" type="text"><label for="' + attribute.id + '_label">' + attribute.name + '</label></div></div>');
 					$("#" + attribute.id + "_visible").prop('checked', attribute.visible);
 					$("#" + attribute.id + "_label").val(attribute.title);
+					
+					if(node.data.hasOwnProperty("titleAttribute") && node.data.titleAttribute == attribute.id)
+					{
+						$("#" + attribute.id + "_title").prop('checked', true);
+					}
+					else
+					{
+						$("#" + attribute.id + "_title").prop('checked', false);
+					}
 				}); 
 				
 				if(node.data.queries == null) node.data.queries = [];
@@ -1477,9 +1513,18 @@ function editSelectedLayer()
 
 			    node.data.attributes.forEach(function (attribute)
 				{
-					$("#attributePanel").append('<div class="row"><div class="col s4"><p><input type="checkbox" id="' + attribute.id + '_visible" /><label class="black-text" for="' + attribute.id + '_visible">Visible</label></p></div><div class="col s8 input-field"><input id="' + attribute.id + '_label" type="text"><label for="' + attribute.id + '_label">' + attribute.name + '</label></div></div>');
+					$("#attributePanel").append('<div class="row"><div class="col s2"><p><input type="checkbox" id="' + attribute.id + '_visible" /><label class="black-text" for="' + attribute.id + '_visible">Visible</label></p></div><div class="col s2"><p><input name="titleGroup" type="radio" id="' + attribute.id + '_title" /><label for="' + attribute.id + '_title" onclick="setTitleAttribute(\'' + attribute.id + '\')"></label></p></div><div class="col s8 input-field"><input id="' + attribute.id + '_label" type="text"><label for="' + attribute.id + '_label">' + attribute.name + '</label></div></div>');
 					$("#" + attribute.id + "_visible").prop('checked', attribute.visible);
 					$("#" + attribute.id + "_label").val(attribute.title);
+					
+					if(node.data.hasOwnProperty("titleAttribute") && node.data.titleAttribute == attribute.id)
+					{
+						$("#" + attribute.id + "_title").prop('checked', true);
+					}
+					else
+					{
+						$("#" + attribute.id + "_title").prop('checked', false);
+					}
 				}); 
 			    
 			    if(node.data.queries == null) node.data.queries = [];
@@ -2409,7 +2454,8 @@ function loadCatalogLayers()
         error: function (status)
         {
             // error handler
-            Materialize.toast('Error loading DataBC Layer catalog. Please try again later', 4000);
+            Materialize.toast('Error loading DataBC Layer catalog. Please try again later. Error: ' + status.responseText, 10000);
+            console.log('Error loading DataBC Layer catalog. Error: ' + status.responseText);
         }
 	});
 }
@@ -2482,7 +2528,8 @@ function loadWmsLayers()
         error: function (status)
         {
             // error handler
-            Materialize.toast('Error loading GetCapabilities from ' + wmsUrl + '. Please try again later', 4000);
+            Materialize.toast('Error loading GetCapabilities from ' + wmsUrl + '. Please try again later. Error: ' + status.responseText, 10000);
+            console.log('Error loading GetCapabilities from ' + wmsUrl + '. Error: ' + status.responseText);
             $("#wmsPanelLoading").hide();
             $("#wmsRefreshButton").show();
         	$("#wmsPanel").show();
@@ -2541,7 +2588,8 @@ function loadConfigs()
 	                    error: function (status)
 	                    {
 	                        // error handler
-	                        Materialize.toast('Error loading application ' + appConfigStub.id, 4000);
+	                        Materialize.toast('Error loading application ' + appConfigStub.id + 'Error: ' + status.responseText, 10000);
+	                        console.log('Error loading application ' + appConfigStub.id + '. Error: ' + status.responseText);
 	                    }
 	    			});
         		}
@@ -2554,7 +2602,8 @@ function loadConfigs()
         error: function (status)
         {
             // error handler
-            Materialize.toast('Error loading applications. Please try again later', 4000);
+            Materialize.toast('Error loading applications. Please try again later. Error: ' + status.responseText, 10000);
+            console.log('Error loading applications. Error: ' + status.responseText);
         }
 	});
 
@@ -2586,14 +2635,16 @@ function loadConfigs()
                     },
                     error: function (status)
                     {
-                        Materialize.toast('Error loading published application ' + appConfigStub.id, 4000);
+                        Materialize.toast('Error loading published application ' + appConfigStub.id + 'Error: ' + status.responseText, 10000);
+                        console.log('Error loading published applications. Error: ' + status.responseText);
                     }
     			});
         	});
         },
         error: function (status)
         {
-            Materialize.toast('Error loading published applications. Please try again later', 4000);
+            Materialize.toast('Error loading published applications. Please try again later. Error: ' + status.responseText, 10000);
+            console.log('Error loading published applications. Error: ' + status.responseText);
         }
 	});
 }
@@ -2728,7 +2779,7 @@ var unsavedAttachments = [];
 //function readHeaderFile(e)
 //{
 //	readFile(e);
-//	
+//
 //	unsavedAttachments.push(
 //	{
 //		type: "header_upload",

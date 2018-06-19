@@ -1,4 +1,5 @@
 include.module( 'tool-directions', [ 'tool', 'widgets', 'tool-directions.panel-directions-html', 'tool-directions.popup-directions-html', 'tool-directions.address-search-html' ], function ( inc ) {
+    "use strict";
 
     var request
 
@@ -119,17 +120,17 @@ include.module( 'tool-directions', [ 'tool', 'widgets', 'tool-directions.panel-d
                 this.$emit( 'update', this.list[ this.selectedIndex ] )
             },
 
-            handleClickOutside( ev ) {
+            handleClickOutside: function ( ev ) {
                 if ( this.$el.contains( ev.target ) ) return
 
                 this.expanded = false
                 this.selectedIndex = null
             }
         },
-        mounted() {
+        mounted: function () {
             document.addEventListener( 'click', this.handleClickOutside )
         },
-        destroyed() {
+        destroyed: function () {
             document.removeEventListener( 'click', this.handleClickOutside )
         }
     } )

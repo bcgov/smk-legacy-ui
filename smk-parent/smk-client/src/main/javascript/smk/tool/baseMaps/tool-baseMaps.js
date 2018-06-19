@@ -1,5 +1,5 @@
 include.module( 'tool-baseMaps', [ 'tool', 'widgets', 'viewer', 'leaflet', 'tool-baseMaps.panel-base-maps-html' ], function ( inc ) {
-// include.module( 'tool-baseMaps', [ 'tool', 'widgets', 'viewer', 'tool-baseMaps.panel-base-maps-html' ], function ( inc ) {
+    "use strict";
 
     Vue.component( 'baseMaps-widget', {
         extends: inc.widgets.toolButton,

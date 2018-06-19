@@ -1,4 +1,5 @@
 include.module( 'tool-menu', [ 'tool', 'widgets', 'tool-menu.panel-menu-html' ], function ( inc ) {
+    "use strict";
 
     Vue.component( 'menu-widget', {
         extends: inc.widgets.toolButton,

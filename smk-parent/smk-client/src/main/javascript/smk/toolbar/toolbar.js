@@ -1,4 +1,5 @@
 include.module( 'toolbar', [ 'vue', 'toolbar.toolbar-html' ], function ( inc ) {
+    "use strict";
 
     function Toolbar( smk ) {
         var self = this

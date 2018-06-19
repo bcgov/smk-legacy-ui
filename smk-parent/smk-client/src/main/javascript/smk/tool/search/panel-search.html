@@ -1,7 +1,7 @@
 <side-panel class="smk-search-panel" v-bind:class="{ 'smk-busy': busy }">
     <template slot="header">
         <h1>Search for Location</h1>
-        <div class="smk-spinner"></div>
+        <spinner v-bind:busy="busy"></spinner> 
     </template>
 
     <template slot="commands">

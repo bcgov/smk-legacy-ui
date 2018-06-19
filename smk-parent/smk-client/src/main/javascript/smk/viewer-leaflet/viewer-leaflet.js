@@ -1,4 +1,5 @@
-include.module( 'viewer-leaflet', [ 'viewer', 'leaflet', 'layer-leaflet', 'leaflet-extensions', 'feature-list-leaflet' ], function () {
+include.module( 'viewer-leaflet', [ 'viewer', 'leaflet', 'layer-leaflet', 'feature-list-leaflet' ], function () {
+    "use strict";
 
     function ViewerLeaflet() {
         SMK.TYPE.Viewer.prototype.constructor.apply( this, arguments )
@@ -130,10 +131,11 @@ include.module( 'viewer-leaflet', [ 'viewer', 'leaflet', 'layer-leaflet', 'leafl
     }
 
     ViewerLeaflet.prototype.screenToMap = function ( screen ) {
+        var ll
         if ( Array.isArray( screen ) )
-            var ll = this.map.containerPointToLatLng( screen )
+            ll = this.map.containerPointToLatLng( screen )
         else
-            var ll = this.map.containerPointToLatLng( [ screen.x, screen.y ] )
+            ll = this.map.containerPointToLatLng( [ screen.x, screen.y ] )
 
         return [ ll.lng, ll.lat ]
     }
@@ -160,7 +162,7 @@ include.module( 'viewer-leaflet', [ 'viewer', 'leaflet', 'layer-leaflet', 'leafl
         this.map.addLayer( this.currentBasemap[ 0 ] );
         this.currentBasemap[ 0 ].bringToBack();
 
-        for ( var i = 1; i < this.currentBasemap.length; i++ )
+        for ( var i = 1; i < this.currentBasemap.length; i += 1 )
             this.map.addLayer( this.currentBasemap[ i ] );
 
         this.changedBaseMap( { baseMap: basemapId } )

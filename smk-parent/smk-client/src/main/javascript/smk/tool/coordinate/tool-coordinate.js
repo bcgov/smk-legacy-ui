@@ -1,4 +1,5 @@
 include.module( 'tool-coordinate', [ 'tool', 'tool-coordinate.coordinate-html' ], function ( inc ) {
+    "use strict";
 
     function CoordinateTool( option ) {
         SMK.TYPE.Tool.prototype.constructor.call( this, $.extend( {

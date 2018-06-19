@@ -6,17 +6,27 @@
     visibility: hidden;
 }
 
-.smk-map-frame.smk-hidden::after {
-    content: ' ';
+.smk-map-frame .smk-toplevel.smk-spinner {
+    z-index: 99999;
     visibility: visible;
     position: absolute;
-    top: 0;
+    top: 50%;
+    left: 50%;
+    width: 64px;
+    height: 64px;
+    margin-top: -32px;
+    margin-left: -32px;
+}
+
+.smk-map-frame .smk-toplevel.smk-status {
+    z-index: 99999;
+    visibility: visible;
+    position: absolute;
     left: 0;
     right: 0;
     bottom: 0;
-    background-image: url( 'spinner.gif' );
-    background-repeat: no-repeat;
-    background-position: center;
+    text-align: center;
+    padding-bottom: 30px;
 }
 
 .smk-map-frame .smk-viewer {

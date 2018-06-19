@@ -1,4 +1,5 @@
 include.module( 'util', null, function ( inc ) {
+    "use strict";
 
     Object.assign( window.SMK.UTIL, {
         makePromise: function( withFn ) {
@@ -59,8 +60,8 @@ include.module( 'util', null, function ( inc ) {
             case 'array':
                 if ( a.length != b.length ) return false;
 
-                for ( var i = 0; i < a.length; i++ )
-                    if ( !SMK.UTIL.isDeepEqual( a[ i ], b[ i ] ) )
+                for ( var i1 = 0; i1 < a.length; i1 += 1 )
+                    if ( !SMK.UTIL.isDeepEqual( a[ i1 ], b[ i1 ] ) )
                         return false
 
                 return true;
@@ -72,8 +73,8 @@ include.module( 'util', null, function ( inc ) {
                 if ( !SMK.UTIL.isDeepEqual( ak, bk ) )
                     return false
 
-                for ( var i = 0; i < ak.length; i++ )
-                    if ( !SMK.UTIL.isDeepEqual( a[ ak[ i ] ], b[ ak[ i ] ] ) )
+                for ( var i2 = 0; i2 < ak.length; i2 += 1 )
+                    if ( !SMK.UTIL.isDeepEqual( a[ ak[ i2 ] ], b[ ak[ i2 ] ] ) )
                         return false
 
                 return true;
@@ -138,7 +139,7 @@ include.module( 'util', null, function ( inc ) {
         reproject: function ( geojson, crs ) {
             var self = this
 
-            return include( 'proj4' ).then( function ( inc ) {
+            return include( 'projections' ).then( function ( inc ) {
                 var proj = proj4( self.extractCRS( crs ) )
 
                 return self.traverse.GeoJSON( geojson, {
@@ -227,7 +228,7 @@ include.module( 'util', null, function ( inc ) {
 
         circlePoints: function ( center, radius, segmentCount ) {
             var points = []
-            for( var i = 0; i <= segmentCount; i++ )
+            for( var i = 0; i <= segmentCount; i += 1 )
                 points.push( [
                     center.x + radius * Math.cos( 2 * Math.PI * i / segmentCount ),
                     center.y + radius * Math.sin( 2 * Math.PI * i / segmentCount )
@@ -287,9 +288,9 @@ include.module( 'util', null, function ( inc ) {
         },
 
         wrapFunction: function ( obj, fName, outer ) {
-            return obj[ fName ] = ( function ( inner ) {
+            return ( obj[ fName ] = ( function ( inner ) {
                 return outer.call( null, inner )
-            } )( obj[ fName ] )
+            } )( obj[ fName ] ) )
         },
 
         asyncReduce: function ( cb, accum ) {

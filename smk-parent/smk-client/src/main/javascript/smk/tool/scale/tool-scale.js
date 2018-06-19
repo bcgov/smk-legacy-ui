@@ -1,4 +1,5 @@
 include.module( 'tool-scale', [ 'tool', 'tool-scale.scale-html' ], function ( inc ) {
+    "use strict";
 
     function ScaleTool( option ) {
         SMK.TYPE.Tool.prototype.constructor.call( this, $.extend( {

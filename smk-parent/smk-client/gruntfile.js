@@ -4,6 +4,13 @@ module.exports = function( grunt ) {
 
     require( 'load-grunt-tasks' )( grunt )
 
+    var jshintStylish = require( 'jshint-stylish' )
+    jshintStylish.reporter = ( function ( inner ) {
+        return function ( result, config ) {
+            return inner( result, config, { verbose: true } )
+        }
+    } )( jshintStylish.reporter )
+
     grunt.initConfig( {
         package: grunt.file.readJSON( 'package.json' ),
 
@@ -47,48 +54,38 @@ module.exports = function( grunt ) {
 
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+        gitinfo: {},
+
+        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+        mavenEffectivePom: {
+            main: {
+                options: {
+                    file: 'target/effective-pom.xml',
+                    varName: 'pom'
+                }
+            }
+        },
+
+        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
         copy: {
-            'smk': {
+            'root': {
                 expand: true,
                 cwd: '<%= srcPath %>',
-                src: [ 'smk.js', 'index.html', 'map-config.json' ],
+                src: [ 'index.html', 'map-config.json', 'readme.md' ],
                 dest: '<%= buildPath %>',
                 options: {
                     process: '<%= processTemplate %>',
                 },
             },
 
-            'lib': {
-                files: [
-                    {
-                        expand: true,
-                        cwd: '<%= srcPath %>/smk',
-                        src: [ '**' ],
-                        dest: '<%= buildPath %>/smk'
-                    },
-                    {
-                        expand: true,
-                        cwd: '<%= srcPath %>/lib',
-                        src: [ '**' ],
-                        dest: '<%= buildPath %>/lib'
-                    },
-                    {
-                        expand: true,
-                        src: 'lib/include.js',
-                        dest: '<%= buildPath %>'
-                    }
-                ]
+            'images': {
+                expand: true,
+                cwd: '<%= srcPath %>/smk',
+                src: [ '**/*.{gif,png,jpg,jpeg}' ],
+                dest: '<%= buildPath %>/images'
             },
-
-            // 'test-html': {
-            //     expand: true,
-            //     cwd: 'src/main/test',
-            //     src: [ '*html' ],
-            //     dest: '<%= buildPath %>/test',
-            //     options: {
-            //         process: '<%= processTemplate %>',
-            //     },
-            // },
 
             'test': {
                 expand: true,
@@ -124,6 +121,62 @@ module.exports = function( grunt ) {
 
             'test': {
                 src: [ '<%= buildPath %>/attachments/**', '<%= buildPath %>/config/**' ]
+            },
+
+            temp: {
+                src: [ '<%= buildPath %>/smk-tags-*.js' ]
+            }
+        },
+
+        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+        jshint: {
+            options: {
+                reporter: jshintStylish,
+                // reporter: 'checkstyle',
+
+                // unused: true,
+                // latedef: true,
+                // curly: true,
+                // eqeqeq: true,
+                bitwise: true,
+                strict: true,
+                undef: true,
+                asi: true,
+                plusplus: true,
+                eqnull: true,
+                multistr: true,
+                sub: true,
+                browser: true,
+                devel: true,
+
+                '-W018': true, // confusing use of !
+
+                globals: {
+                    SMK: true,
+                    $: true,
+                    Vue: true,
+                    console: true,
+                    Promise: true,
+                    include: true,
+                    require: true,
+                    turf: true,
+                    Terraformer: true,
+                    proj4: true,
+                    L: true,
+                },
+            },
+            lib: [ '<%= srcPath %>/smk/**/*js', '!<%= srcPath %>/smk/**/lib/**', '!<%= srcPath %>/smk/**/*.min.js' ],
+            smk: [ '<%= buildPath %>/smk.js' ],
+        },
+
+        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+        zip: {
+            dev: {
+                expand: true,
+                dest: '<%= buildPath %>/smk-<%= pom.project.parent.version %>-development.zip',
+                src: [ './**/*', '!./build/**', '!./etc/**', '!./node*/**', '!./target/**' ]
             }
         },
 
@@ -159,7 +212,7 @@ module.exports = function( grunt ) {
             },
 
             src: {
-                files: [ '<%= srcPath %>/**' ],
+                files: [ '<%= srcPath %>/**', 'smk-tags.js', 'lib/**' ],
                 tasks: [ 'build' ]
             },
 
@@ -167,11 +220,6 @@ module.exports = function( grunt ) {
                 files: [ 'src/main/test/**' ],
                 tasks: [ 'build-test' ]
             },
-
-            tags: {
-                files: [ 'smk-tags.js', 'lib/**' ],
-                tasks: [ 'gen-tags', 'build' ]
-            }
         }
 
     } )
@@ -182,17 +230,11 @@ module.exports = function( grunt ) {
             delete require.cache[ key ]
 
         var tags = require( './smk-tags' )
+        grunt.log.write( 'Generating tags...' )
         var tagData = tags.gen()
-        // var out = grunt.template.process( '<%= buildPath %>/smk-tags.json' )
+        grunt.log.ok()
 
-        var includes = []
-        Object.keys( tagData ).sort().forEach( function ( t ) {
-            includes.push( 'include.tag( "' + t + '", ' + JSON.stringify( tagData[ t ], null, '    ' ) + ' )' )
-        } )
-
-        grunt.config( 'includes', includes.join( '\n' ) )
-        // grunt.file.write( out, JSON.stringify( , null, '  ' ) )
-        grunt.log.writeln( 'Output ' + includes.length + ' tags' )
+        grunt.config( 'tag', JSON.parse( JSON.stringify( tagData ) ) )
     } )
 
     grunt.registerTask( 'deploy', 'set deploy dir', function ( dir ) {
@@ -211,6 +253,14 @@ module.exports = function( grunt ) {
         } )
 
         grunt.task.run( 'build', 'watch' )
+    } )
+
+    grunt.registerTask( 'mode', 'build mode', function ( mode ) {
+        grunt.loadTasks( 'tasks/' + mode )
+        if ( grunt.config( 'mode' ) )
+            grunt.log.ok( 'Loaded build mode ' + grunt.log.wordlist( [ mode ] ) )
+        else
+            grunt.fail.fatal( 'Build mode ' + mode + ' not found' )
     } )
 
     grunt.registerTask( 'use', 'connection to use', function ( protocol, host ) {
@@ -267,11 +317,46 @@ module.exports = function( grunt ) {
         }
     } )
 
+    grunt.registerTask( 'build-info', function () {
+        if ( grunt.config( 'pom' ) )
+            grunt.task.run( [ 'gitinfo' ] )
+        else
+            grunt.task.run( [ 'gitinfo', 'mavenEffectivePom' ] )
+    } )
+
+
     grunt.registerTask( 'build', [
         'clean:build',
-        'gen-tags',
-        'copy:smk',
-        'copy:lib',
+        'build-info',
+        'build-lib',
+        'build-images',
+        'build-smk',
+        'build-samples',
+        'build-root',
+        'clean:temp',
+    ] )
+
+    grunt.registerTask( 'write-tag-head-foot', function () {
+        var fn = grunt.template.process( '<%= buildPath %>/smk-tags-head.js' )
+        grunt.file.write( fn, 'if ( !window.include.SMK ) { ( function () {\n"use strict";\n' )
+
+        var fn = grunt.template.process( '<%= buildPath %>/smk-tags-foot.js' )
+        grunt.file.write( fn, '\nwindow.include.SMK = true\n} )() }\n' )
+    } )
+
+    grunt.registerTask( 'build-smk', function () {
+        grunt.fail.fatal( 'Build mode isn\'t set' )
+    } )
+
+    grunt.registerTask( 'build-lib', function () {
+        grunt.fail.fatal( 'Build mode isn\'t set' )
+    } )
+
+    grunt.registerTask( 'build-images', [
+        'copy:images',
+    ] )
+
+    grunt.registerTask( 'build-samples', [
         'copy:samples',
     ] )
 
@@ -282,13 +367,25 @@ module.exports = function( grunt ) {
         'copy:test',
     ] )
 
+    grunt.registerTask( 'build-root', [
+        'copy:root',
+    ] )
+
+    grunt.registerTask( 'build-dev-kit', [
+        'zip:dev',
+    ] )
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
     grunt.registerTask( 'default', [
+        'mode:dev',
         'use:https',
     ] )
 
     grunt.registerTask( 'maven', [
+        'mode:release',
         'clean:all',
         'build',
+        'build-dev-kit'
     ] )
 
 }

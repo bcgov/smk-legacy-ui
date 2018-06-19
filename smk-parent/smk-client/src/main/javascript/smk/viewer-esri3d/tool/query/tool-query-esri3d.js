@@ -1,4 +1,5 @@
 include.module( 'tool-query-esri3d', [ 'esri3d', 'types-esri3d', 'util-esri3d', 'tool-query', 'feature-list-esri3d' ], function ( inc ) {
+    "use strict";
 
     var E = SMK.TYPE.Esri3d
 

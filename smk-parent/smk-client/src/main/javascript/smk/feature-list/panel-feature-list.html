@@ -1,6 +1,6 @@
 <side-panel class="smk-feature-list-panel" v-bind:class="{ 'smk-busy': busy }">
     <template slot="header">
-        <div class="smk-spinner"></div>
+        <spinner v-bind:busy="busy"></spinner> 
 
         <slot name="header"></slot>
     </template>

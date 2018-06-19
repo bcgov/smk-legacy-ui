@@ -1,4 +1,5 @@
 include.module( 'feature-list-leaflet', [ 'leaflet', 'feature-list' ], function ( inc ) {
+    "use strict";
 
     return function ( smk ) {
         var self = this

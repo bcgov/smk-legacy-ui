@@ -1,4 +1,5 @@
 include.module( 'layer.layer-vector-js', [ 'layer.layer-js' ], function () {
+    "use strict";
 
     function VectorLayer() {
         SMK.TYPE.Layer.prototype.constructor.apply( this, arguments )
@@ -66,7 +67,7 @@ include.module( 'layer.layer-vector-js', [ 'layer.layer-js' ], function () {
     }
 
     VectorLayer.prototype.childLayerConfigs = function () {
-        configs = []
+        var configs = []
 
         if ( this.config.useClustering )
             configs.push( Object.assign( {}, this.config, {
