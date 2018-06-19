@@ -25,7 +25,7 @@
 
         <template v-if="config.lmfRevision">
             <dt>Map Version</dt>
-            <dd>{{ config.lmfRevision }}.{{ config._rev.substr( 0, config._rev.indexOf( '-')) - 1 }}{{ published ? ' (Published)' : '' }}</dd>
+            <dd>{{ config.lmfRevision }}.{{ config._rev.substr( 0, config._rev.indexOf( '-')) - 1 }}{{ config.published ? ' (Published)' : '' }}</dd>
         </template>
 
         <template v-if="config.createdBy">
