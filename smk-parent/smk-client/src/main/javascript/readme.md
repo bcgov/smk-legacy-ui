@@ -2,12 +2,17 @@
 ## Developer Guide
 
 [Repository](https://github.com/bcgov/smk)
+[Wiki](https://github.com/bcgov/smk/wiki)
+[Issues](https://github.com/bcgov/smk/issues)
 
 ### Development setup
 
-Unless stated otherwise, all commands below are to be run from the same directory that this readme is in.
+The file `smk-<ver>-development.zip` contains the complete development environment for SMK.
+To make any changes to the code, first unzip this file to a directory, which will be refered to below as `smk-dev`.
 
 #### Prerequisites
+
+These are the tools that need to be setup in order to do development on SMK.
 
 - Install [Node.js](https://nodejs.org/en/)
 
@@ -59,3 +64,7 @@ To get a build of the code without starting the web server:
 ```
 The code will be built into the `build` directory.
 `mode:dev` will work as well.
+
+#### Code Organization
+
+**TBD**
