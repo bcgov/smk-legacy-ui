@@ -652,7 +652,7 @@ function finishToolEdits()
 			tool.style.strokeColor = $("#identifyStyleStrokeColor").val();
 			tool.style.fillColor = $("#identifyStyleFillColor").val();
 			tool.tolerance = $("#identifyClickRadius").val();
-			tool.showPanel = $("#identifyStyleFillColor").is(":checked");
+			tool.showPanel = $("#identifyPanelVisible").is(":checked");
 		}
 		else if(tool.type == "select") 
 		{
