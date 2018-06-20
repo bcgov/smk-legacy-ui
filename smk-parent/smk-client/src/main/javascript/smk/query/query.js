@@ -38,6 +38,10 @@ include.module( 'query.query-js', [ 'jquery', 'util', 'event' ], function () {
     Query.prototype.fetchUniqueValues = function ( attribute, viewer ) {
         console.log( 'not implemented', attribute )
     }
+
+    Query.prototype.canUseWithExtent = function ( viewer ) {
+        return true
+    }
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
     function QueryParameter( query, config ) {
