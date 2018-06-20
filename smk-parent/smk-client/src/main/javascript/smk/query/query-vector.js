@@ -10,6 +10,11 @@ include.module( 'query.query-vector-js', [ 'query.query-js' ], function () {
     SMK.TYPE.Query[ 'vector' ] = VectorQuery
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
+    VectorQuery.prototype.canUseWithExtent = function ( viewer ) {
+        return false
+    }
+    // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+    //
     VectorQuery.prototype.fetchUniqueValues = function ( attribute, viewer ) {
         var value = {}
         var hasNull = false
