@@ -150,7 +150,7 @@ include.module( 'tool-query', [ 'feature-list', 'widgets', 'tool-query.panel-que
         this.description = this.query.description
         this.parameters = this.query.getParameters( smk.$viewer )
 
-        if ( !smk.$viewer.layerId[ this.query.layerId ].config.geometryAttribute )
+        if ( !this.query.canUseWithExtent( smk.$viewer ) )
             this.config.within = null
     } )
 

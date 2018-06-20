@@ -10,6 +10,11 @@ include.module( 'query.query-wms-js', [ 'query.query-js' ], function () {
     SMK.TYPE.Query[ 'wms' ] = WmsQuery
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
+    WmsQuery.prototype.canUseWithExtent = function ( viewer ) {
+        return !!viewer.layerId[ this.layerId ].config.geometryAttribute
+    }
+    // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+    //
     WmsQuery.prototype.fetchUniqueValues = function ( attribute, viewer ) {
         var self = this
 

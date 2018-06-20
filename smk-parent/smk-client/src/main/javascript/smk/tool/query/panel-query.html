@@ -22,9 +22,10 @@
     <template slot="command-row" slot-scope="list">
         <div class="smk-command-row">
             <label class="smk-command"
-                v-bind:class="{ 'smk-disabled': busy || within == null }"
+                v-bind:class="{ 'smk-disabled': busy }"
+                v-if="within != null"
             ><input type="checkbox"
-                v-bind:disabled="within == null || busy"
+                v-bind:disabled="busy"
                 v-model="within"
                 v-on:change="$$emit( 'config', getConfigState() )"
             >Within current extent</label><br/>
