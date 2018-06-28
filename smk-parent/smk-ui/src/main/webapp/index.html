@@ -311,7 +311,7 @@
 										Current extent: {{viewer.initialExtent[0]}}, {{viewer.initialExtent[1]}}, {{viewer.initialExtent[2]}}, {{viewer.initialExtent[3]}}
 									</p>-->
 								</div>
-								<div class="col s8">
+								<div class="col s8" style="height: calc(100vh - 330px);">
 									<div id="basemapViewer" style="height: 100%; width: 100%;"></div>
 								</div>
 							</div>
@@ -325,7 +325,7 @@
 			     	</div>
 				</div>
 			</div>
-			<div id="layers" class="col s12">
+			<div id="layers" class="col s12">style="height: calc(100vh - 330px);"
 				<div class="card white">
 					<div class="card-content black-text" style="height: calc(100vh - 280px); overflow: auto;">
 						<form id="layersForm" style="padding: 0px; margin: 0px;">
@@ -538,7 +538,7 @@
 						</form>
 						<form id="layersDisplayForm" style="padding: 0px; margin: 0px;">
 							<div id="layerAddPanel" class="row" style="display: block; padding: 0px; margin: 0px;">
-								<div class="col s5">
+								<div class="col s5" style="height: calc(100vh - 330px);">
 									  <ul id="layerTypeTabs" class="tabs navbar tabs-fixed-width nrpp-blue-dark">
 										<div class="indicator nrpp-yellow" style="z-index:1"></div>
 										<li class="tab col s3"><a class="active" href="#dbcCatalog" onclick="selectLayerType('dbc')">DataBC</a></li>
