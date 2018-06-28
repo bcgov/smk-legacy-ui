@@ -22,10 +22,10 @@ function defs(name) {
     if (Array.isArray(name)) {
       return name.map(function(v) {
         if (Array.isArray(v)) {
-          defs.apply(that, v);
+          return defs.apply(that, v);
         }
         else {
-          defs(v);
+          return defs(v);
         }
       });
     }

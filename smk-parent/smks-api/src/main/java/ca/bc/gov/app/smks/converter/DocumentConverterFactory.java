@@ -663,7 +663,7 @@ public class DocumentConverterFactory
 		geometryObject.put("type", "Point");
 		ArrayNode coords = geometryObject.putArray("coordinates");
 
-		addCoord(coords, new BigDecimal(targetGeometry.getX()), new BigDecimal(targetGeometry.getY()), null);
+		addCoord(coords, BigDecimal.valueOf(targetGeometry.getX()), BigDecimal.valueOf(targetGeometry.getY()), null);
 	}
 	
 	private static void addCoords(ArrayNode jsonCoords, Coordinate[] coords)
@@ -672,7 +672,7 @@ public class DocumentConverterFactory
 		{
 			ArrayNode innerCoord = jsonCoords.addArray();
 			
-			addCoord(innerCoord, new BigDecimal(coord.x), new BigDecimal(coord.y), null);
+			addCoord(innerCoord, BigDecimal.valueOf(coord.x), BigDecimal.valueOf(coord.y), null);
 		}
 	}
 	

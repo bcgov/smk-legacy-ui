@@ -445,30 +445,43 @@ public class PublishedMapConfigController
 				    */
 				    // done creating temp zip,
 				    
-				    File exportableZip = zipFile.getFile();
-			        InputStream exportStream = new FileInputStream(exportableZip);
+				    InputStream exportStream = null;
+				    File exportableZip = null;
 				    
-					//add zip to published document as an attachment file called "export"
-			        resource = couchDAO.getPublishedConfig(id);
-					Attachment newAttachment = new Attachment(EXPORT_ATTACHMENT_NAME, Base64.encodeBase64String(IOUtils.toByteArray(exportStream)), "application/octet-stream");
-				    resource.addInlineAttachment(newAttachment);
-
-				    // Commit the changes and reload the resource and the attachment, then submit the export file back to the caller
-				    couchDAO.updateResource(resource);
-				    resource = couchDAO.getPublishedConfig(id);
-				    
-				    attachment = couchDAO.getAttachment(resource, EXPORT_ATTACHMENT_NAME);
-				    
-				    // finish cleanup
-			        exportStream.close();
-				    exportStream = null;
-				    zipFile = null;
-				    //indexHtml.delete();
-				    exportTemplateZip.delete();
-				    mapConfigTempFile.delete();
-				    exportableZip.delete();
-				    tempPath.delete();
-				    tempPath = null;
+				    try
+				    {
+    				    exportableZip = zipFile.getFile();
+    			        exportStream = new FileInputStream(exportableZip);
+    				    
+    					//add zip to published document as an attachment file called "export"
+    			        resource = couchDAO.getPublishedConfig(id);
+    					Attachment newAttachment = new Attachment(EXPORT_ATTACHMENT_NAME, Base64.encodeBase64String(IOUtils.toByteArray(exportStream)), "application/octet-stream");
+    				    resource.addInlineAttachment(newAttachment);
+    
+    				    // Commit the changes and reload the resource and the attachment, then submit the export file back to the caller
+    				    couchDAO.updateResource(resource);
+    				    resource = couchDAO.getPublishedConfig(id);
+    				    
+    				    attachment = couchDAO.getAttachment(resource, EXPORT_ATTACHMENT_NAME);
+				    }
+				    catch(Exception ex)
+				    {
+				        logger.error("    ## Error building export zip file: " + e.getMessage());
+				        throw new Exception("Export not found and could not be created.", ex);
+				    }
+				    finally
+				    {
+                        // finish cleanup
+                        exportStream.close();
+                        exportStream = null;
+                        zipFile = null;
+                        //indexHtml.delete();
+                        exportTemplateZip.delete();
+                        mapConfigTempFile.delete();
+                        exportableZip.delete();
+                        tempPath.delete();
+                        tempPath = null;   
+				    }
 				}
 				
 				if(attachment != null)

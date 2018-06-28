@@ -1286,8 +1286,15 @@ function finishLayerEdits(save)
 		else // vector
 		{
 			// if user activated clustering, change vector type
-			if(selectedLayerNode.data.type == "vector" && $("#vectorClustering").is(":checked")) selectedLayerNode.data.type == "clustered";
-			if(selectedLayerNode.data.type == "clustered" && !$("#vectorClustering").is(":checked")) selectedLayerNode.data.type == "vector";
+			if(selectedLayerNode.data.type == "vector" && $("#vectorClustering").is(":checked")) 
+			{
+				selectedLayerNode.data.type == "clustered";
+			}
+			if(selectedLayerNode.data.type == "clustered" && !$("#vectorClustering").is(":checked")) 
+			{
+				selectedLayerNode.data.type == "vector";
+			}
+			
 			selectedLayerNode.data.isVisible = $("#vectorVisible").is(":checked");
 			selectedLayerNode.data.isQueryable = $("#vectorQueryable").is(":checked");
 			selectedLayerNode.data.title = $("#vectorName").val();
