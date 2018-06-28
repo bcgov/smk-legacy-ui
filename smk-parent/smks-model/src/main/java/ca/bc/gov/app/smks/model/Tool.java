@@ -92,8 +92,6 @@ public class Tool implements Cloneable
                 return (Tool)CLASS.getConstructor(null).newInstance();
             } catch (InstantiationException | IllegalAccessException | IllegalArgumentException
                     | InvocationTargetException | NoSuchMethodException | SecurityException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
                 return null;
             }
         }

@@ -1953,12 +1953,12 @@ function loadDropdownChoiceFromLayer()
 	if(layer.type == "vector")
 	{
 		// fetch json from service, parse all attributes
-		alert("Not yet implemented");
+		Materialize.toast('Not yet implemented...', 4000);
 	}
 	else if(layer.type == "esri-dynamic")
 	{
 		// run an ArcGIS query on the layer, no geom return, just the selected attribute
-		alert("Not yet implemented");
+		Materialize.toast('Not yet implemented...', 4000);
 	}
 	else if(layer.type == "wms")
 	{
@@ -2279,7 +2279,7 @@ function getCompleteCatalogItem(mpcmId)
         		}
             	else
         		{
-            		alert("This layer is flagged as secure, and cannot be added to an SMK Application at this time.");
+            		Materialize.toast('This layer appears to be secure. You cannot add secure layers at this time.', 4000);
         		}
             },
             error: function (status)

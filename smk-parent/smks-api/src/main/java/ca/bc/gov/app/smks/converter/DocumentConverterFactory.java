@@ -409,13 +409,19 @@ public class DocumentConverterFactory
 	    		fis = null;
 	    	}
 	    	// start cleaning up the junk
-	    	file.delete();
+	    	if(!file.delete())
+	    	{
+	    	    logger.error("    temp KML cleanup failed...");
+	    	}
 	    }
 
 	    // finish cleanup
-	    Files.delete(tempKmzPath.toPath());
+	    Files.delete(tempKmzPath.toPath());	    
 	    zipFile = null;
-	    kmzImportTemp.delete();
+	    if(!kmzImportTemp.delete())
+	    {
+	        logger.error("    temp KMZ zip cleanup failed...");
+	    }
 	    
 	    // push the bytes up the convertKmlDocument
 	    if(fileBytes != null) return convertKmlDocument(fileBytes);
@@ -481,7 +487,10 @@ public class DocumentConverterFactory
 	    	else 
     		{
 	    		logger.debug("    Deleted " + file.getName() + "...");
-	    		file.delete();
+	    		if(!file.delete())
+	    		{
+	                logger.error("    temp shp zip cleanup failed...");
+	            }
     		}
 	    }
 	    
@@ -605,14 +614,37 @@ public class DocumentConverterFactory
         iterator.close();
 
 	    // cleanup
-	    if(shapefile != null) shapefile.delete();
-	    if(projectionFile != null) projectionFile.delete();
-	    if(dataFile != null) dataFile.delete();
-	    if(shapeshx != null) shapeshx.delete();
+        boolean deletedFile = false;
+	    if(shapefile != null) deletedFile = shapefile.delete();
+	    if(!deletedFile)
+	    {
+            logger.error("    shape file cleanup failed...");
+        }
+	    
+	    if(projectionFile != null) deletedFile = projectionFile.delete();
+	    if(!deletedFile)
+        {
+            logger.error("    projection file cleanup failed...");
+        }
+	    
+	    if(dataFile != null) deletedFile = dataFile.delete();
+	    if(!deletedFile)
+        {
+            logger.error("    data file cleanup failed...");
+        }
+	    
+	    if(shapeshx != null) deletedFile = shapeshx.delete();
+	    if(!deletedFile)
+        {
+            logger.error("    shx file cleanup failed...");
+        }
+	    
 	    Files.delete(tempShapePath.toPath());
 	    zipFile = null;
-	    shapeImportTemp.delete();
-
+	    if(!shapeImportTemp.delete())
+	    {
+            logger.error("    temp shp import file cleanup failed...");
+        }
 	    // Now that the json object is built, convert it to bytes and send back
         byte[] result = null;
         

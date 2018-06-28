@@ -346,7 +346,10 @@ public class PublishedMapConfigController
 					tempPath.mkdirs();
 					
 					File exportTemplateZip = new File(tempLocationPath + "export.war");
-					exportTemplateZip.createNewFile();
+					if(!exportTemplateZip.createNewFile())
+					{
+					    logger.debug("    Failed to create temp export file...");
+					}
 					logger.debug("    Copying zip to temp file '" + exportTemplateZip.getName() + "'...");
 					FileOutputStream os = new FileOutputStream(exportTemplateZip);
 				    IOUtils.copy(targetStream, os);
@@ -363,7 +366,10 @@ public class PublishedMapConfigController
 				    // create config json
 				    ObjectMapper mapper = new ObjectMapper();
 				    File mapConfigTempFile = new File(tempLocationPath + "map-config.json");
-				    mapConfigTempFile.createNewFile();
+				    if(!mapConfigTempFile.createNewFile())
+				    {
+                        logger.debug("    Failed to create temp config file...");
+                    }
 				    mapper.writeValue(mapConfigTempFile, resource);
 				    String configString = mapper.writeValueAsString(resource);
 				    
@@ -398,7 +404,10 @@ public class PublishedMapConfigController
 								else postfix = "json";
 								
 								File attachmentFile = new File(tempAttchPath.getPath() + File.separator + key + "." + postfix);
-								attachmentFile.createNewFile();
+								if(!attachmentFile.createNewFile())
+								{
+			                        logger.debug("    Failed to create attachment temp file...");
+			                    }
 
 								tempFiles.add(attachmentFile);
 								
@@ -419,7 +428,10 @@ public class PublishedMapConfigController
 					    //delete temp files
 					    for(File file : tempFiles)
 					    {
-					    	file.delete();
+					    	if(!file.delete())
+					    	{
+		                        logger.debug("    Failed to delete temp file...");
+		                    }
 					    }
 					    //delete temp folder
 					    Files.delete(tempAttchPath.toPath());
@@ -476,10 +488,26 @@ public class PublishedMapConfigController
                         exportStream = null;
                         zipFile = null;
                         //indexHtml.delete();
-                        exportTemplateZip.delete();
-                        mapConfigTempFile.delete();
-                        exportableZip.delete();
-                        tempPath.delete();
+                        if(!exportTemplateZip.delete())
+                        {
+                            logger.debug("    Failed to delete export template zip file...");
+                        }
+                        
+                        if(!mapConfigTempFile.delete())
+                        {
+                            logger.debug("    Failed to delete temp map config file...");
+                        }
+                        
+                        if(!exportableZip.delete())
+                        {
+                            logger.debug("    Failed to delete export zip file...");
+                        }
+                        
+                        if(!tempPath.delete())
+                        {
+                            logger.debug("    Failed to delete temp paths...");
+                        }
+                        
                         tempPath = null;   
 				    }
 				}
