@@ -26,7 +26,6 @@
     
     <script src="resources/js/trumbowyg/plugins/allowtagsfrompaste/trumbowyg.allowtagsfrompaste.min.js"></script>
     <script src="resources/js/trumbowyg/plugins/base64/trumbowyg.base64.min.js"></script>
-    <!-- script src="resources/js/trumbowyg/plugins/cleanpaste/trumbowyg.cleanpaste.min.js"></script -->
     <script src="resources/js/trumbowyg/plugins/colors/trumbowyg.colors.min.js"></script>
     <script src="resources/js/trumbowyg/plugins/fontfamily/trumbowyg.fontfamily.min.js"></script>
     <script src="resources/js/trumbowyg/plugins/fontsize/trumbowyg.fontsize.min.js"></script>
@@ -219,7 +218,6 @@
 				<li class="tab col s3"><a href="#basemap" onclick="resetBasemapView()">Basemap</a></li>
 				<li class="tab col s3"><a href="#layers">Layers</a></li>
 				<li class="tab col s3"><a href="#tools">Tools</a></li>
-				<!-- <li class="tab col s3"><a href="#themes">Style &amp; Theme</a></li> -->
 			  </ul>
 			</div>
 			<div id="identity" class="col s12">
@@ -232,12 +230,6 @@
 	          						<label for="mashupName">Name/ID</label>
 								</div>
 							</div>
-							<!-- <div class="row" style="margin-bottom: 0px;">
-								<div class="col s12 input-field">
-									<input id="mashupTitle" type="text" class="validate active" v-model="surround.title">
-									<label for="mashupTitle">Title</label>
-								</div>
-							</div> -->
 							<div class="row" style="margin-top: 20px;">
 								<div class="col s12">
 									<p>What kind of map viewer do you want to use?</p>
@@ -306,10 +298,6 @@
 									<p>
 										Select a basemap above to set your applications default basemap. Pan and zoom the map to the right to set the applications initial extent.
 									</p>
-									<!-- <div style="height: 20px;"></div>
-									<p class="z-depth-2">
-										Current extent: {{viewer.initialExtent[0]}}, {{viewer.initialExtent[1]}}, {{viewer.initialExtent[2]}}, {{viewer.initialExtent[3]}}
-									</p>-->
 								</div>
 								<div class="col s8" style="height: calc(100vh - 330px);">
 									<div id="basemapViewer" style="height: 100%; width: 100%;"></div>
@@ -570,10 +558,6 @@
 													<input id="wmsUrlField" type="text">
 					          						<label for="wmsUrlField">WMS URL</label>
 												</div>
-												<!-- div class="col s2 input-field">
-													<input id="wmsVersionField" type="text">
-					          						<label for="wmsVersionField">Version</label>
-												</div-->
 												<div class="col s2">
 													<a id="wmsRefreshButton" class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="loadWmsLayers();" ><em class="material-icons center">cached</em></a>
 													<div id="wmsPanelLoading" class="row" style="display: none;">
@@ -632,9 +616,6 @@
 												      <option value="kml">KML</option>
 												      <option value="kmz">KMZ</option>
 												      <option value="vector">GeoJSON</option>
-												      <!-- <option value="wkt">WKT</option>-->
-												      <!-- <option value="gml">GML</option>-->
-												      <!-- <option value="csv">CSV</option>-->
 												      <option value="shape">Shapefile (zip only)</option>
 												    </select>
 												</div>
@@ -777,7 +758,6 @@
 						      			</div>
 						      			<div class="row" style="padding: 10px;">
 						      				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="editSelectedLayer();" style="width: 170px;"><em class="material-icons left">mode_edit</em>Edit</a>
-						      				<!-- a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="removeSelectedLayer();" style="width: 170px;"><em class="material-icons left">delete_forever</em>Remove</a -->
 						      			</div>
 									</div>
 								</div>
@@ -1109,37 +1089,6 @@
 			     	</div>
 				</div>
 			</div>
-<!-- 			<div id="themes" class="col s12"> -->
-<!-- 				<div class="card white"> -->
-<!-- 					<div class="card-content black-text" style="height: calc(100vh - 280px); overflow: auto;"> -->
-<!-- 						<form id="themesForm" style="padding: 0px; margin: 0px;"> -->
-<!-- 							<div class="row"> -->
-<!-- 								<h5 style="border-bottom: 2px solid #fcba19;">Header Image</h5> -->
-<!-- 							</div> -->
-<!-- 							<div class="row"> -->
-<!-- 								<p>Upload a header image to replace the default header style.</p> -->
-<!-- 								<p>Once you've selected a file, click "Keep Changes" to load the file. It will be saved to your map once you click the save button.</p> -->
-<!-- 							</div> -->
-<!-- 							<div class="row"> -->
-<!-- 								<div class="file-field input-field"> -->
-<!-- 									<div class="btn nrpp-blue-dark"> -->
-<!-- 										<span>File</span> -->
-<!-- 										<input type="file" id="headerImageFileUpload"> -->
-<!-- 									</div> -->
-<!-- 									<div class="file-path-wrapper"> -->
-<!-- 										<input class="file-path validate" type="text"> -->
-<!-- 									</div> -->
-<!-- 								</div> -->
-<!-- 							</div> -->
-<!-- 						</form> -->
-<!-- 					</div> -->
-<!-- 					<div class="card-action"> -->
-<!-- 		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="saveMapConfig();" style="width: 170px;"><em class="material-icons left">save</em>Save</a> -->
-<!-- 		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="closeEditPanel();" style="width: 170px;"><em class="material-icons left">cancel</em>Close</a> -->
-<!-- 		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="$('#editorTabs').tabs('select_tab', 'tools')" style="width: 170px; position: absolute; right: 30px;"><em class="material-icons left">keyboard_arrow_left</em>Back</a> -->
-<!-- 			     	</div> -->
-<!-- 				</div> -->
-<!-- 			</div> -->
 		  </div>
 	    </div>
 		<!-- Footer -->

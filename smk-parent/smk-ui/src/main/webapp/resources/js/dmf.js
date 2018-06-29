@@ -846,8 +846,6 @@ function addNewMapConfig()
 	 	var ne = L.latLng(data.viewer.location.extent[3], data.viewer.location.extent[2]);
 		var sw = L.latLng(data.viewer.location.extent[1], data.viewer.location.extent[0]);
 		var bounds = L.latLngBounds(ne, sw);
-		var centroid = bounds.getCenter();
-		var zoom = basemapViewerMap.getBoundsZoom(bounds, true);
 
 		//basemapViewerMap.setView(bounds.getCenter(), zoom);
 		basemapViewerMap.fitBounds(bounds);
@@ -934,7 +932,7 @@ function processAttachments(unsavedAttachments)
     {
         if (i < unsavedAttachments.length) 
         {
-        	attachment = unsavedAttachments[i];
+        	var attachment = unsavedAttachments[i];
         	
         	if(attachment.contents != null)
         	{
@@ -1013,19 +1011,19 @@ function dataURLToBlob(dataURL)
     }
     else 
     {
-        var parts = dataURL.split(BASE64_MARKER);
-        var contentType = parts[0].split(':')[1];
-        var raw = window.atob(parts[1]);
-        var rawLength = raw.length;
+        var urlParts = dataURL.split(BASE64_MARKER);
+        var thisContentType = urlParts[0].split(':')[1];
+        var rawAtoB = window.atob(urlParts[1]);
+        var rawLength = rawAtoB.length;
         
         var uInt8Array = new Uint8Array(rawLength);
         
         for (var i = 0; i < rawLength; ++i) 
         {
-            uInt8Array[i] = raw.charCodeAt(i);
+            uInt8Array[i] = rawAtoB.charCodeAt(i);
         }
         
-        return new Blob([uInt8Array], {type: contentType});
+        return new Blob([uInt8Array], {type: thisContentType});
     }
 }
 
@@ -1445,15 +1443,6 @@ function editSelectedLayer()
 			{
 				$("#layerEditDataBCPanel").show();
 	
-				var layer = L.esri.dynamicMapLayer(
-			    {
-			        url: node.data.serviceUrl,
-			        opacity: node.data.opacity,
-			        layers: [node.data.mpcmId],
-			        dynamicLayers: [JSON.parse(node.data.dynamicLayers[0])],
-			        useCors: false
-			    });
-	
 				//set fields
 				$("#dbcVisible").prop('checked', node.data.isVisible);
 				$("#dbcQueryable").prop('checked', node.data.isQueryable);
@@ -1656,21 +1645,21 @@ function addNewQuery()
 	var dropdownExists = false;
 	for(var i = 0; i < data.tools.length; i++)
 	{
-		var tool = data.tools[i];
-		if(tool.type == "menu" && menuExists == false) menuExists = true;
-		if(tool.type == "dropdown" && dropdownExists == false) dropdownExists = true;
+		var thisTool = data.tools[i];
+		if(thisTool.type == "menu" && menuExists == false) menuExists = true;
+		if(thisTool.type == "dropdown" && dropdownExists == false) dropdownExists = true;
 	}
 	
 	if(!menuExists)
 	{
-		var tool = { type: "menu" };
-		data.tools.push(tool);
+		var menuTool = { type: "menu" };
+		data.tools.push(menuTool);
 	}
 	
 	if(!dropdownExists)
 	{
-		var tool = { type: "dropdown" };
-		data.tools.push(tool);
+		var dropdownTool = { type: "dropdown" };
+		data.tools.push(dropdownTool);
 	}
 }
 
@@ -1690,12 +1679,12 @@ function editQuery(id)
 			$("#queryDescription").val(query.description);
 			$("#queryAndOrToggle").prop('checked', query.predicate.operator == "or" ? true : false);
 			
-			for(var i = 0; i < data.tools.length; i++)
+			for(var j = 0; j < data.tools.length; j++)
 			{
-				if(data.tools[i].type == "query" && data.tools[i].instance == selectedLayerNode.data.id + "--" + selectedQuery.id)
+				if(data.tools[j].type == "query" && data.tools[j].instance == selectedLayerNode.data.id + "--" + selectedQuery.id)
 				{
-					$("#queryOnDropdown").prop('checked', data.tools[i].position == "dropdown" ? true : false);
-					$("#queryIcon").val(data.tools[i].icon);
+					$("#queryOnDropdown").prop('checked', data.tools[j].position == "dropdown" ? true : false);
+					$("#queryIcon").val(data.tools[j].icon);
 					break;
 				}
 			}
@@ -1905,12 +1894,12 @@ function saveQuery()
 	}
 	else
 	{
-		for(var i = 0; i < data.tools.length; i++)
+		for(var fi = 0; fi < data.tools.length; fi++)
 		{
-			if(data.tools[i].type == "query" && data.tools[i].instance == selectedLayerNode.data.id + "--" + selectedQuery.id)
+			if(data.tools[fi].type == "query" && data.tools[fi].instance == selectedLayerNode.data.id + "--" + selectedQuery.id)
 			{
-				data.tools[i].position = $("#queryOnDropdown").is(":checked") ? "dropdown" : "toolbar";
-				data.tools[i].icon = $("#queryIcon").val();
+				data.tools[fi].position = $("#queryOnDropdown").is(":checked") ? "dropdown" : "toolbar";
+				data.tools[fi].icon = $("#queryIcon").val();
 				break;
 			}
 		}
@@ -1942,8 +1931,6 @@ function saveQuery()
 
 function updateQueryIconPrefix()
 {
-	var txt = $("#iconDemo").text();
-	var val = $("#queryIcon").val();
 	$("#iconDemo").text($("#queryIcon").val());
 }
 
@@ -2715,7 +2702,6 @@ $(document).ready(function()
 
 		// init the layer tree
 		// setup catalog layers
-	var layerTreeSource = [];
 
 	$("#layer-tree").fancytree({
 		extensions: ["filter"],
