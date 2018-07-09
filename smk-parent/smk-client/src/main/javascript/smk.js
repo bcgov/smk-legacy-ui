@@ -555,7 +555,7 @@
             UTIL: util,
 
             CONFIG: {
-                name: 'SMK Default map',
+                name: 'SMK Default Map',
                 viewer: {
                     type: "leaflet",
                     location: {
