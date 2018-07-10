@@ -170,7 +170,9 @@
             return {
                 viewer: {
                     location: {
-                        extent: args
+                        extent: args,                        
+                        center: null,
+                        zoom: null,
                     }
                 }
             }
@@ -179,12 +181,23 @@
         'center': function ( arg ) {
             var args = arg.split( ',' )
             if ( args.length < 2 || args.length > 3 ) throw new Error( '-center needs 2 or 3 arguments' )
+
+            var loc = {
+                extent: null,
+                center: [ args[ 0 ], args[ 1 ] ],
+            }
+            
+            if ( args[ 2 ] )
+                loc.zoom = args[ 2 ]
+
             return {
                 viewer: {
-                    location: {
-                        center: [ args[ 0 ], args[ 1 ] ],
-                        zoom: args[ 2 ] || SMK.CONFIG.viewer.location.zoom
-                    }
+                    location: loc 
+                    // location: {
+                    //     extent: null,
+                    //     center: [ args[ 0 ], args[ 1 ] ],
+                    //     zoom: args[ 2 ] || SMK.CONFIG.viewer.location.zoom
+                    // }
                 }
             }
         },
@@ -394,6 +407,7 @@
             return {
                 viewer: {
                     location: {
+                        extent: null,
                         center: [ args[ 0 ], args[ 1 ] ]
                     }
                 }
@@ -407,6 +421,7 @@
             return {
                 viewer: {
                     location: {
+                        extent: null,
                         zoom: args[ 0 ]
                     }
                 }

@@ -125,6 +125,11 @@ include.module( 'smk-map', [ 'jquery', 'util' ], function () {
                 if ( !merge.viewer ) return
 
                 if ( base.viewer ) {
+                    if ( base.viewer.location && merge.viewer.location ) {                        
+                        Object.assign( base.viewer.location, merge.viewer.location )
+                        delete merge.viewer.location
+                    }
+
                     Object.assign( base.viewer, merge.viewer )
                 }
                 else {
