@@ -52,6 +52,7 @@
     margin-bottom: 5px;
     padding-left: 4px;
     padding-top: 5px;
+    flex-shrink: 0;
 }
 
 .smk-sidepanel .smk-panel .smk-body {
