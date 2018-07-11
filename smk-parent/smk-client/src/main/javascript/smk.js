@@ -5,6 +5,8 @@
     installPolyfills( util )
     setupGlobalSMK( util )
 
+    var documentReadyPromise
+
     var bootstrapScriptEl = document.currentScript
 
     var timer
@@ -193,11 +195,6 @@
             return {
                 viewer: {
                     location: loc 
-                    // location: {
-                    //     extent: null,
-                    //     center: [ args[ 0 ], args[ 1 ] ],
-                    //     zoom: args[ 2 ] || SMK.CONFIG.viewer.location.zoom
-                    // }
                 }
             }
         },
@@ -435,20 +432,7 @@
     function initializeSmkMap( attr ) {
         include.option( { baseUrl: attr[ 'base-url' ] } )
 
-        return new Promise( function ( res, rej ) {
-            if ( document.readyState != "loading" )
-                return res()
-
-            document.addEventListener( "DOMContentLoaded", function( ev ) {
-                clearTimeout( id )
-                res()
-            } )
-
-            var id = setTimeout( function () {
-                console.error( 'timeout waiting for document ready' )
-                rej()
-            }, 20000 )
-        } )
+        return whenDocumentReady()
             .then( function () {
                 if ( window.jQuery ) {
                     include.tag( 'jquery' ).include = Promise.resolve( window.jQuery )
@@ -485,6 +469,27 @@
                     return map.initialize()
                 } )
             } )
+    }
+
+// = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+
+    function whenDocumentReady() {
+        if ( documentReadyPromise ) return documentReadyPromise
+
+        return ( documentReadyPromise = new Promise( function ( res, rej ) {
+            if ( document.readyState != "loading" )
+                return res()
+
+            document.addEventListener( "DOMContentLoaded", function( ev ) {
+                clearTimeout( id )
+                res()
+            } )
+
+            var id = setTimeout( function () {
+                console.error( 'timeout waiting for document ready' )
+                rej()
+            }, 20000 )
+        } ) )
     }
 
 // = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
@@ -634,7 +639,9 @@
                     </div>\
                 '.replace( /\s+/g, ' ' ).replace( '{}', e || '' )
 
-                document.querySelector( 'body' ).appendChild( message )
+                whenDocumentReady().then( function () {
+                    document.querySelector( 'body' ).appendChild( message )
+                } )
             },
 
             BUILD: {
