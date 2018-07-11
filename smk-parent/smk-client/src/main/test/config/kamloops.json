@@ -1,9 +1,9 @@
 {
-    "surround": {
-        "title": "Standalone SMK Demo App - Kamloops"
-    },
-
     "viewer": {
-        "initialExtent": [ -120.52923981333151, 50.57821309403696, -120.23672882700342, 50.776409182217485 ]
+        "location": {
+            "extent": null,
+            "center": [ -120.38298432016748, 50.677415757969214 ],
+            "zoom": 11
+        }
     }
 }
