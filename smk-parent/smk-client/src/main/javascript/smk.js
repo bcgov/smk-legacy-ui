@@ -186,7 +186,7 @@
                 extent: null,
                 center: [ args[ 0 ], args[ 1 ] ],
             }
-            
+
             if ( args[ 2 ] )
                 loc.zoom = args[ 2 ]
 
@@ -575,27 +575,30 @@
                     type: "leaflet",
                     location: {
                         extent: [ -139.1782, 47.6039, -110.3533, 60.5939 ],
-                        zoom: 5,
+                        zoom: 5
                     },
-                    baseMap: 'Topographic',
+                    baseMap: 'Topographic'
                 },
                 tools: [
-                    {
-                        type: "location",
-                        enabled: true,
-                    },
-                    {
-                        type: "search",
-                        enabled: true,
-                    },
-                    {
-                        type: "directions",
-                        enabled: true,
-                    },
-                    {
-                        type: "markup",
-                        enabled: true,
-                    }
+                    { type: 'about',        enabled: false },
+                    { type: 'baseMaps',     enabled: false },
+                    { type: 'coordinate',   enabled: false },
+                    { type: 'directions',   enabled: true },
+                    // { type: 'dropdown',     enabled: false }, -- so it won't be enabled by show-tools=all, no tools use it by default
+                    { type: 'identify',     enabled: false },
+                    { type: 'layers',       enabled: false },
+                    { type: 'location',     enabled: true },
+                    { type: 'markup',       enabled: true },
+                    { type: 'measure',      enabled: false },
+                    { type: 'menu',         enabled: false },
+                    { type: 'minimap',      enabled: false },
+                    { type: 'pan',          enabled: false },
+                    // { type: 'query',        enabled: false }, -- so it won't be enabled by show-tools=all, as it needs an instance
+                    { type: 'scale',        enabled: false },
+                    { type: 'search',       enabled: true },
+                    { type: 'select',       enabled: false },
+                    // { type: 'version',      enabled: false }, -- so it won't be enabled by show-tools=all
+                    { type: 'zoom',         enabled: false }
                 ]
             },
 
