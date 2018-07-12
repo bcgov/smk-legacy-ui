@@ -41,8 +41,8 @@ include.module( 'tool-measure', [ 'tool', 'widgets', 'tool-measure.panel-measure
         this.makePropPanel( 'statusMessage', null )
 
         SMK.TYPE.Tool.prototype.constructor.call( this, $.extend( {
-            order:          2,
-            position:       'toolbar',
+            order:          6,
+            position:       'menu',
             title:          'Measurement',
             widgetComponent:'measure-widget',
             panelComponent: 'measure-panel',
