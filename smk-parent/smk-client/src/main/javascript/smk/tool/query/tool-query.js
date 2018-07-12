@@ -60,7 +60,7 @@ include.module( 'tool-query', [ 'feature-list', 'widgets', 'tool-query.panel-que
     Vue.component( 'query-panel', {
         extends: inc.widgets.toolPanel,
         template: inc[ 'tool-query.panel-query-html' ],
-        props: [ 'busy', 'layers', 'highlightId', 'description', 'parameters', 'config', 'message', 'messageClass' ],
+        props: [ 'busy', 'layers', 'highlightId', 'description', 'parameters', 'config', 'statusMessage' ],
         data: function () {
             return Object.assign( {}, this.config )
         },
@@ -157,6 +157,8 @@ include.module( 'tool-query', [ 'feature-list', 'widgets', 'tool-query.panel-que
     QueryTool.prototype.afterInitialize.push( function ( smk ) {
         var self = this
 
+        self.setMessage( 'Configure parameters and click Search.' )
+
         self.changedActive( function () {
             if ( self.active ) {
                 switch ( self.onActivate ) {
@@ -193,7 +195,7 @@ include.module( 'tool-query', [ 'feature-list', 'widgets', 'tool-query.panel-que
 
             'reset': function ( ev ) {
                 self.featureSet.clear()
-                self.setMessage()
+                self.setMessage( 'Configure parameters and click Search.' )
 
                 self.parameters.forEach( function ( p, i ) {
                     p.prop.value = self.query.parameters[ i ].value

@@ -20,12 +20,10 @@
         >Legend</label>
     </template>
 
-    <template slot="placeholder"
-        v-if="!layers || layers.length == 0"
-    >
-        No layers are configured
+    <template slot="status" v-if="!layers || layers.length == 0">
+        <status-message message="No layers are configured" status="warning">
     </template>
-    
+
     <div class="smk-layer smk-item"
         v-for="layer in layers"
         v-bind:class="{

@@ -10,7 +10,7 @@ include.module( 'feature-list', [ 'tool', 'widgets',
     Vue.component( 'feature-list-panel', {
         extends: inc.widgets.toolPanel,
         template: inc[ 'feature-list.panel-feature-list-html' ],
-        props: [ 'busy', 'layers', 'highlightId', 'canRemove', 'canClear', 'message', 'messageClass' ],
+        props: [ 'busy', 'layers', 'highlightId', 'canRemove', 'canClear', 'statusMessage' ],
         computed: {
             isEmpty: {
                 get: function () {
@@ -56,8 +56,7 @@ include.module( 'feature-list', [ 'tool', 'widgets',
         this.makePropPanel( 'busy', false )
         this.makePropPanel( 'layers', [] )
         this.makePropPanel( 'highlightId', null )
-        this.makePropPanel( 'message', null )
-        this.makePropPanel( 'messageClass', null )
+        this.makePropPanel( 'statusMessage', null )
 
         SMK.TYPE.Tool.prototype.constructor.call( this, $.extend( {
         }, option ) )
@@ -83,7 +82,6 @@ include.module( 'feature-list', [ 'tool', 'widgets',
 
             'clear': function ( ev ) {
                 self.featureSet.clear()
-                self.setMessage()
             },
 
             'remove': function ( ev ) {
@@ -286,14 +284,16 @@ include.module( 'feature-list', [ 'tool', 'widgets',
         this.popupModel.attributeComponent = 'feature-properties'
     }
 
-    FeatureList.prototype.setMessage = function ( message, Class, delay ) {
-        this.message = message
+    FeatureList.prototype.setMessage = function ( message, status, delay ) {
+        if ( !message ) {
+            this.statusMessage = null
+            return
+        }
 
-        this.messageClass = {}
-        if ( message && !Class)
-            Class = 'summary'
-
-        this.messageClass[ 'smk-' + Class ] = true
+        this.statusMessage = {
+            message: message,
+            status: status
+        }
 
         if ( delay )
             return SMK.UTIL.makePromise( function ( res ) { setTimeout( res, delay ) } )

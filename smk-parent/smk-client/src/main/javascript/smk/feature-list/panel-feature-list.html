@@ -18,13 +18,9 @@
         </div>
     </template>
 
-    <div class="smk-message" v-bind:class="messageClass"><span v-html="message"></span></div>
-
-    <template slot="placeholder"
-        v-if="isEmpty" 
-    >
-        <slot name="placeholder"></slot>
-    </template>    
+    <template slot="status" v-if="statusMessage">
+        <status-message v-bind="statusMessage">
+    </template>
 
     <div class="smk-layer"
         v-for="layer in layers"

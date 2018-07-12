@@ -177,4 +177,18 @@ include.module( 'vue-config', [ 'vue' ], function ( inc ) {
         }
     } )
 
+    Vue.component( 'status-message', {
+        template: '<div class="smk-message" v-bind:class="\'smk-\' + status"><span v-html="message"></span></div>',
+        props: {
+            status: {
+                type: String,
+                default: 'summary'
+            },
+            message: {
+                type: String,
+                default: ''
+            }
+        }
+    } )
+
 } )
