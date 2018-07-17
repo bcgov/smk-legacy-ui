@@ -6,15 +6,15 @@
     </template>
 
     <template slot="commands">
-        <slot name="commands" v-bind:isEmpty="isEmpty"></slot>
+        <slot name="commands" v-bind:featureCount="featureCount"></slot>
 
         <div class="smk-command-row">
             <span class="smk-command" v-if="canClear"
-                v-bind:class="{ 'smk-disabled': isEmpty }"
+                v-bind:class="{ 'smk-disabled': featureCount == 0 }"
                 v-on:click="$$emit( 'clear' )"
             >Clear</span>
 
-            <slot name="command-row" v-bind:isEmpty="isEmpty"></slot>
+            <slot name="command-row" v-bind:featureCount="featureCount"></slot>
         </div>
     </template>
 

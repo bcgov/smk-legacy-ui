@@ -12,9 +12,10 @@ include.module( 'feature-list', [ 'tool', 'widgets',
         template: inc[ 'feature-list.panel-feature-list-html' ],
         props: [ 'busy', 'layers', 'highlightId', 'canRemove', 'canClear', 'statusMessage' ],
         computed: {
-            isEmpty: {
+            featureCount: {
                 get: function () {
-                    return !this.layers || this.layers.length == 0 || this.layers.every( function ( ly ) { return ly.features.length == 0 } )
+                    if ( !this.layers || this.layers.length == 0 ) return 0
+                    return this.layers.reduce( function ( accum, ly ) { return accum + ly.features.length }, 0 )
                 }
             }
         },

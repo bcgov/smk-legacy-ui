@@ -24,7 +24,25 @@
 
     <template slot="command-row" slot-scope="list">
         <div class="smk-command-row">
-            <label class="smk-command"
+            <span class="smk-command"
+                v-bind:class="{ 'smk-disabled': !isReady || busy }"
+                v-on:click="isReady && !busy && $$emit( 'execute' )"
+            >Search</span>
+
+            <span class="smk-command"
+                v-bind:class="{ 'smk-disabled': list.featureCount == 0 && !isModified || busy}"
+                v-on:click="( list.featureCount > 0 || isModified ) && !busy && $$emit( 'reset' )"
+            >Reset</span>
+
+            <span class="smk-command"
+                v-bind:class="{ 'smk-disabled': busy }"
+                v-if="list.featureCount > 1"
+                v-on:click="!busy && $$emit( 'add-all' )"
+            >Add all to selection</span>
+        </div>
+
+        <div class="smk-command-row">
+            <label class="smk-command smk-larger"
                 v-bind:class="{ 'smk-disabled': busy }"
                 v-if="within != null"
             ><input type="checkbox"
@@ -32,22 +50,6 @@
                 v-model="within"
                 v-on:change="$$emit( 'config', getConfigState() )"
             >Within current extent</label><br/>
-        </div>
-        <div class="smk-command-row">
-            <span class="smk-command"
-                v-bind:class="{ 'smk-disabled': !isReady || busy }"
-                v-on:click="isReady && !busy && $$emit( 'execute' )"
-            >Search</span>
-
-            <span class="smk-command"
-                v-bind:class="{ 'smk-disabled': list.isEmpty || busy }"
-                v-on:click="!list.isEmpty && !busy && $$emit( 'add-all' )"
-            >Add all to selection</span>
-
-            <span class="smk-command"
-                v-bind:class="{ 'smk-disabled': list.isEmpty && !isModified || busy}"
-                v-on:click="( !list.isEmpty || isModified ) && !busy && $$emit( 'reset' )"
-            >Reset</span>
         </div>
     </template>
 
