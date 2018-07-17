@@ -244,7 +244,7 @@
             }
 
             var clauses = args.slice( 2 ).map( function ( p ) {
-                var m = p.trim().match( /^(\w+)\s*(like|LIKE|=|<=?|>=?)\s*(.+?)$/ )
+                var m = p.trim().match( /^(\w+)\s*([$^]?~|=|<=?|>=?)\s*(.+?)$/ )
                 if ( !m ) throw new Error( '-query expression is invalid' )
 
                 var args = [
@@ -253,10 +253,12 @@
                 ]
 
                 switch ( m[ 2 ].toLowerCase() ) {
-                    case 'like': return { operator: 'contains', arguments: args }
-                    case '=': return { operator: 'equals', arguments: args }
-                    case '>': return { operator: 'greater-than', arguments: args }
-                    case '<': return { operator: 'less-than', arguments: args }
+                    case '~':  return { operator: 'contains', arguments: args }
+                    case '^~': return { operator: 'starts-with', arguments: args }
+                    case '$~': return { operator: 'ends-with', arguments: args }
+                    case '=':  return { operator: 'equals', arguments: args }
+                    case '>':  return { operator: 'greater-than', arguments: args }
+                    case '<':  return { operator: 'less-than', arguments: args }
                     case '>=': return { operator: 'not', arguments: [ { operator: 'less-than', arguments: args } ] }
                     case '<=': return { operator: 'not', arguments: [ { operator: 'greater-than', arguments: args } ] }
                 }
