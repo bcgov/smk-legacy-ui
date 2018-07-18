@@ -185,7 +185,6 @@
             if ( args.length < 2 || args.length > 3 ) throw new Error( '-center needs 2 or 3 arguments' )
 
             var loc = {
-                extent: null,
                 center: [ args[ 0 ], args[ 1 ] ],
             }
 
@@ -406,7 +405,6 @@
             return {
                 viewer: {
                     location: {
-                        extent: null,
                         center: [ args[ 0 ], args[ 1 ] ]
                     }
                 }
@@ -420,7 +418,6 @@
             return {
                 viewer: {
                     location: {
-                        extent: null,
                         zoom: args[ 0 ]
                     }
                 }
@@ -582,7 +579,6 @@
                     type: "leaflet",
                     location: {
                         extent: [ -139.1782, 47.6039, -110.3533, 60.5939 ],
-                        zoom: 5
                     },
                     baseMap: 'Topographic'
                 },
