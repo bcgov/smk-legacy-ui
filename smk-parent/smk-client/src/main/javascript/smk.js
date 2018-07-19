@@ -166,6 +166,16 @@
             return parseLiteralJson( arg, source ) || parseUrl( arg, source )
         },
 
+        'theme': function ( arg, source ) {
+            var args = arg.split( ',' )
+            if ( args.length != 1 ) throw new Error( '-theme needs 1 argument' )
+            return {
+                viewer: {
+                    theme: args[ 0 ]
+                }
+            }
+        },
+
         'extent': function ( arg ) {
             var args = arg.split( ',' )
             if ( args.length != 4 ) throw new Error( '-extent needs 4 arguments' )

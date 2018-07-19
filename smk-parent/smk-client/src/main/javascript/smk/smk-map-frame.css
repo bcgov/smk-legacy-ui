@@ -60,6 +60,8 @@
     align-items: flex-end;
 }
 
+/*************************************************************/
+
 .smk-map-frame .smk-command {
     cursor: pointer;
     color: blue;
@@ -123,6 +125,7 @@
     /* border: 1px solid #d2d9e6; */
 }
 
+/*************************************************************/
 
 .smk-map-frame .smk-coordinate {
     color: black;

@@ -101,6 +101,13 @@ module.exports = function( grunt ) {
                 dest: '<%= buildPath %>/samples'
             },
 
+            'themes': {
+                expand: true,
+                cwd: '<%= srcPath %>/themes',
+                src: [ '**' ],
+                dest: '<%= buildPath %>/themes'
+            },
+
             'deploy': {}
         },
 
@@ -330,6 +337,7 @@ module.exports = function( grunt ) {
         'build-info',
         'build-lib',
         'build-images',
+        'build-themes',
         'build-smk',
         'build-samples',
         'build-root',
@@ -354,6 +362,10 @@ module.exports = function( grunt ) {
 
     grunt.registerTask( 'build-images', [
         'copy:images',
+    ] )
+
+    grunt.registerTask( 'build-themes', [
+        'copy:themes',
     ] )
 
     grunt.registerTask( 'build-samples', [
