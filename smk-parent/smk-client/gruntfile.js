@@ -96,7 +96,7 @@ module.exports = function( grunt ) {
 
             'samples': {
                 expand: true,
-                cwd: '<%= srcPath %>/samples',
+                cwd: 'src/main/samples',
                 src: [ '**' ],
                 dest: '<%= buildPath %>/samples'
             },
