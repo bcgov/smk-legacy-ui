@@ -590,7 +590,10 @@
                     location: {
                         extent: [ -139.1782, 47.6039, -110.3533, 60.5939 ],
                     },
-                    baseMap: 'Topographic'
+                    baseMap: 'Topographic',
+                    clusterOption: {
+                        showCoverageOnHover: false
+                    }
                 },
                 tools: [
                     { type: 'about',        enabled: false },
