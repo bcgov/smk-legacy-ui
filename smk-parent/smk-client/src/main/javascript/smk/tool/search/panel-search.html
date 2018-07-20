@@ -16,11 +16,9 @@
         >Zoom to results</span>
     </template>
 
-    <div class="smk-placeholder"
-        v-if="isEmpty()"
-    >
-        Enter name of location.
-    </div>
+    <template slot="status" v-if="isEmpty()">
+        <status-message message="Enter name of location.">
+    </template>
 
     <div class="smk-search-result smk-item"
         v-if="!isEmpty()"

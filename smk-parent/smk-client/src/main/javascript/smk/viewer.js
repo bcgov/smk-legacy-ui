@@ -122,6 +122,7 @@ include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', '
         this.resolveUrl = function ( url ) {
             return ( new URL( url, smk.$option[ 'base-url' ] ) ).toString()
         }
+        this.clusterOption = smk.viewer.clusterOption
 
         this.identified = new SMK.TYPE.FeatureSet()
         this.selected = new SMK.TYPE.FeatureSet()

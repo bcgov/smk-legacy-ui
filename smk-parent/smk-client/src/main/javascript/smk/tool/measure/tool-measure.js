@@ -8,7 +8,7 @@ include.module( 'tool-measure', [ 'tool', 'widgets', 'tool-measure.panel-measure
     Vue.component( 'measure-panel', {
         extends: inc.widgets.toolPanel,
         template: inc[ 'tool-measure.panel-measure-html' ],
-        props: [ 'busy', 'results', 'viewer', 'placeholder' ],
+        props: [ 'busy', 'results', 'viewer', 'statusMessage' ],
         data: function () {
             return {
                 unit: 'metric'
@@ -38,11 +38,11 @@ include.module( 'tool-measure', [ 'tool', 'widgets', 'tool-measure.panel-measure
         this.makePropPanel( 'busy', false )
         this.makePropPanel( 'results', [] )
         this.makePropPanel( 'viewer', {} )
-        this.makePropPanel( 'placeholder', null )
+        this.makePropPanel( 'statusMessage', null )
 
         SMK.TYPE.Tool.prototype.constructor.call( this, $.extend( {
-            order:          2,
-            position:       'toolbar',
+            order:          6,
+            position:       'menu',
             title:          'Measurement',
             widgetComponent:'measure-widget',
             panelComponent: 'measure-panel',
@@ -66,6 +66,21 @@ include.module( 'tool-measure', [ 'tool', 'widgets', 'tool-measure.panel-measure
             },
         } )
     } )
+
+    MeasureTool.prototype.setMessage = function ( message, status, delay ) {
+        if ( !message ) {
+            this.statusMessage = null
+            return
+        }
+
+        this.statusMessage = {
+            message: message,
+            status: status
+        }
+
+        if ( delay )
+            return SMK.UTIL.makePromise( function ( res ) { setTimeout( res, delay ) } )
+    }
 
     return MeasureTool
 } )

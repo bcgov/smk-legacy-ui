@@ -170,7 +170,7 @@ module.exports = function( grunt ) {
         concat: {
             smk: {
                 options: {
-                    banner: '// SMK\n',
+                    banner: '// SMK <%= pom.project.parent.version %>\n',
                     process: function ( content, src ) {
                         if ( /smk.js$/.test( src ) )
                             return grunt.config( 'processTemplate' )( content, src )

@@ -112,7 +112,7 @@ if ( !window.include ) { ( function () {
                 } )
 
                 style.addEventListener( 'error', function( ev ) {
-                    rej( new Error( 'failed to load stylesheet from ' + style.src ) )
+                    rej( new Error( 'failed to load stylesheet from ' + style.href ) )
                 } )
 
                 if ( inc.url ) {

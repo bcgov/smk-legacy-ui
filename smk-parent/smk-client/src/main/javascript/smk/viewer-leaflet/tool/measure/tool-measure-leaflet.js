@@ -8,6 +8,8 @@ include.module( 'tool-measure-leaflet', [ 'leaflet', 'tool-measure', 'turf' ], f
 
         smk.$viewer.map.createPane( 'hiddenPane', smk.addToContainer( '<div style="display:none"></div>' ) )
 
+        self.setMessage( "Select measurement method" )
+
         this.control = L.control.measure( {
                 position: 'topright',
                 primaryLengthUnit: 'meters',
@@ -81,7 +83,10 @@ include.module( 'tool-measure-leaflet', [ 'leaflet', 'tool-measure', 'turf' ], f
         function displayResult( res ) {
             Vue.set( self.panel, 'results', [] )
 
-            if ( res.count && res.count > 2 ) {
+            if ( !res.count ) return
+
+            if ( res.count > 2 ) {
+                self.setMessage()
                 self.panel.results.push( {
                     title:  'Number of edges',
                     value:  res.count,
@@ -102,13 +107,13 @@ include.module( 'tool-measure-leaflet', [ 'leaflet', 'tool-measure', 'turf' ], f
                         dim:    1
                     } )
             }
-            else {
-                if ( res.length )
-                    self.panel.results.push( {
-                        title:  'Length',
-                        value:  res.length,
-                        dim:    1
-                    } )
+            else if ( res.count > 1 ) {
+                self.setMessage()
+                self.panel.results.push( {
+                    title:  'Length',
+                    value:  res.length,
+                    dim:    1
+                } )
             }
         }
 
@@ -126,7 +131,7 @@ include.module( 'tool-measure-leaflet', [ 'leaflet', 'tool-measure', 'turf' ], f
                 self.busy = true
                 self.control._layer.clearLayers()
                 Vue.set( self.panel, 'results', [] )
-                self.panel.placeholder = "Click on map to set first point"
+                self.setMessage( "Click on map to set first point", 'progress' )
 
                 self.minPoints = 3
                 self.maxPoints = null
@@ -138,7 +143,7 @@ include.module( 'tool-measure-leaflet', [ 'leaflet', 'tool-measure', 'turf' ], f
                 self.busy = true
                 self.control._layer.clearLayers()
                 Vue.set( self.panel, 'results', [] )
-                self.panel.placeholder = "Click on map to set starting point"
+                self.setMessage( "Click on map to set starting point", 'progress' )
 
                 self.minPoints = 2
                 self.maxPoints = 2
@@ -149,7 +154,7 @@ include.module( 'tool-measure-leaflet', [ 'leaflet', 'tool-measure', 'turf' ], f
             'cancel': function ( ev ) {
                 self.busy = false
                 Vue.set( self.panel, 'results', [] )
-                self.panel.placeholder = null
+                self.setMessage( "Select measurement method" )
 
                 self.control._finishMeasure()
             },

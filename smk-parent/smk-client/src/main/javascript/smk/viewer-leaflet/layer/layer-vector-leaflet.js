@@ -144,7 +144,7 @@ include.module( 'layer-leaflet.layer-vector-leaflet-js', [ 'layer.layer-vector-j
             .then( function ( layer ) {
                 if ( !layers[ 0 ].config.useClustering ) return layer
 
-                var cluster = L.markerClusterGroup()
+                var cluster = L.markerClusterGroup( self.clusterOption )
                 cluster.addLayers( [ layer ] )
 
                 return cluster

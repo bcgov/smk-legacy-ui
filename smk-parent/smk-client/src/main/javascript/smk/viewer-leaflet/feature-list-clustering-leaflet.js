@@ -7,7 +7,7 @@ include.module( 'feature-list-clustering-leaflet', [ 'leaflet', 'feature-list-le
         inc[ 'feature-list-leaflet' ].call( this, smk )
 
         this.marker = {}
-        this.cluster = L.markerClusterGroup( {
+        this.cluster = L.markerClusterGroup( Object.assign( {
                 singleMarkerMode: true,
                 zoomToBoundsOnClick: false,
                 spiderfyOnMaxZoom: false,
@@ -20,7 +20,7 @@ include.module( 'feature-list-clustering-leaflet', [ 'leaflet', 'feature-list-le
                         iconSize: null
                     } )
                 }
-            } )
+            }, smk.viewer.clusterOption ) )
             .on( {
                 clusterclick: function ( ev ) {
                     var featureIds = ev.layer.getAllChildMarkers().map( function ( m ) {
