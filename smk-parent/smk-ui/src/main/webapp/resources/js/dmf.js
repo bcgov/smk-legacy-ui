@@ -41,6 +41,7 @@ var data = {
 	    lmfRevision: 1,
 	    name: "",
 	    createdBy: "",
+	    version: "",
 	    published: false,
 	    surround: {
 	        type: "default",
@@ -79,7 +80,7 @@ function parseKmlLayerStyle(fileText)
 	var strokeStyle = options.dashArray != null ? options.dashArray : "1";
 	var strokeColor = options.color != null ? options.color : "#000000";
 	var fillColor = options.fillColor != null ? options.fillColor : options.color != null ? options.color : "#000000";
-	var markerSize = 1;
+	var markerSize = 20;
 	var markerUrl = null;
 	var markerOffsetX = 0;
 	var markerOffsetY = 0;
@@ -112,7 +113,6 @@ function parseKmlLayerStyle(fileText)
 					}
 					else if(styleNode.localName == "IconStyle")
 					{
-						if(styleNode.getElementsByTagName("scale").length) markerSize = styleNode.getElementsByTagName("scale")[0].innerHTML;
 						if(styleNode.getElementsByTagName("hotSpot").length) markerOffsetX = styleNode.getElementsByTagName("hotSpot")[0].getAttribute("x").innerHTML;
 						if(styleNode.getElementsByTagName("hotSpot").length) markerOffsetY = styleNode.getElementsByTagName("hotSpot")[0].getAttribute("y").innerHTML;
 						if(styleNode.getElementsByTagName("Icon").length) markerUrl = styleNode.getElementsByTagName("Icon")[0].getElementsByTagName("href")[0].innerHTML;
@@ -124,11 +124,34 @@ function parseKmlLayerStyle(fileText)
 	
 	if(markerUrl != null)
 	{
-		unsavedAttachments.push(
+		/*getBase64Image(markerUrl, function(base64)
 		{
-			type: "marker_upload",
-			layer: null,
-			contents: getBase64Image(markerUrl)
+			unsavedAttachments.push(
+			{
+				type: "marker_upload",
+				layer: null,
+				contents: base64
+			});
+		});*/
+		
+		$.ajax
+		({
+			url: serviceUrl + "LayerLibrary/ImageToBase64?url=" + markerUrl,
+	        type: "get",
+	        crossDomain: true,
+	        success: function (status)
+	        {
+	        	unsavedAttachments.push(
+    			{
+    				type: "marker_upload",
+    				layer: null,
+    				contents: JSON.parse(status).image
+    			});
+	        },
+	        error: function(status)
+	        {
+	        	
+	        }
 		});
 	}
 	
@@ -148,10 +171,18 @@ function parseKmlLayerStyle(fileText)
 		
 		if(markerUrl != null)
 		{
-			$("#kmlMarkerSizeX").val(parseInt(markerSize));
-			$("#kmlMarkerSizeY").val(parseInt(markerSize));
-			$("#kmlMarkerOffsetX").val(parseInt(markerOffsetX));
-			$("#kmlMarkerOffsetY").val(parseInt(markerOffsetY));
+			// get the image dimensions and set size/offset accordingly
+			var img = new Image();
+		    img.addEventListener("load", function()
+		    {
+		        $("#kmlMarkerSizeX").val(parseInt(this.naturalWidth));
+				$("#kmlMarkerSizeY").val(parseInt(this.naturalHeight));
+				$("#kmlMarkerOffsetX").val(parseInt(this.naturalWidth / 2));
+				$("#kmlMarkerOffsetY").val(parseInt(this.naturalHeight / 2));
+				Materialize.updateTextFields();
+		    });
+		    
+		    img.src = markerUrl;
 		}
 	}
 	else // edit panel
@@ -166,10 +197,18 @@ function parseKmlLayerStyle(fileText)
 		
 		if(markerUrl != null)
 		{
-			$("#vectorMarkerSizeX").val(parseInt(markerSize));
-			$("#vectorMarkerSizeY").val(parseInt(markerSize));
-			$("#vectorMarkerOffsetX").val(parseInt(markerOffsetX));
-			$("#vectorMarkerOffsetY").val(parseInt(markerOffsetY));
+			// get the image dimensions and set size/offset accordingly
+			var img = new Image();
+		    img.addEventListener("load", function()
+		    {
+		        $("#vectorMarkerSizeX").val(parseInt(this.naturalWidth));
+				$("#vectorMarkerSizeY").val(parseInt(this.naturalHeight));
+				$("#vectorMarkerOffsetX").val(parseInt(this.naturalWidth / 2));
+				$("#vectorMarkerOffsetY").val(parseInt(this.naturalHeight / 2));
+				Materialize.updateTextFields();
+		    });
+		    
+		    img.src = markerUrl;
 		}
 	}
 	
@@ -178,17 +217,25 @@ function parseKmlLayerStyle(fileText)
 
 function getBase64Image(imgUrl) 
 {
-    var image   = new Image();
-    var canvas = document.createElement("canvas");
-	var context = canvas.getContext("2d");
-	
+    var image = new Image();
+    //image.crossOrigin = "Anonymous";
+    
+    image.onload = function()
+    {
+        var canvas = document.createElement('canvas');
+        var ctx = canvas.getContext('2d'); 
+        canvas.height = image.height;
+        canvas.width = image.width;
+        ctx.drawImage(image, 0, 0);
+        
+        var dataURL = canvas.toDataURL("image/png");
+        callback(dataURL);
+        
+        canvas = null; 
+    };
+    
 	image.src = imgUrl;
-	context.drawImage(image, 0, 0);
-	
-	var dataURL = canvas.toDataURL("image/png");
-	return dataURL; // dataURL.replace(/^data:image\/(png|jpg);base64,/, "");
 }
-
 
 function openLayerTemplateEditor()
 {
@@ -947,12 +994,16 @@ function processAttachments(unsavedAttachments)
 	    			attchType = "image";
 	    			documentData.append('file', attachment.contents);
 	    		}
-	    		else if(attachment.type == "marker_upload") 
+	    		else if(attachment.type == "marker_upload" && attachment.layer != null) 
 	    		{
 	    			attchId = attachment.layer.id + "-marker";
 	    			attchType = "image";
 	    			documentData.append('file', dataURLToBlob(attachment.contents));
 	    		}
+	    		else if(attachment.type == "marker_upload" && attachment.layer == null) 
+    			{
+	    			Materialize.toast('Error uploading marker image attachment. Could not be associated to a valid layer ID', 5000);
+    			}
 	    		else 
 	    		{
 	    			attchId = attachment.layer.id;
@@ -1327,7 +1378,7 @@ function finishLayerEdits(save)
 				if(attch.type == "marker_upload" && attch.layer == null)
 				{
 					attch.layer = selectedLayerNode.data;
-					selectedLayerNode.data.style.markerUrl = "@" +  selectedLayerNode.data.id + "-marker";
+					selectedLayerNode.data.style.markerUrl = "@" + selectedLayerNode.data.id + "-marker";
 				}
 			});
 			
@@ -2118,14 +2169,15 @@ function uploadVectorLayer()
 		
 		// if a marker has been updloaded, set the layer
 		
-		unsavedAttachments.forEach(function(attch)
+		for(var idx = 0; idx < unsavedAttachments.length; idx++)
 		{
+			var attch = unsavedAttachments[idx];
 			if(attch.type == "marker_upload" && attch.layer == null)
 			{
 				attch.layer = layer;
 				layer.style.markerUrl = "@" +  layer.id + "-marker";
 			}
-		});
+		}
 	}
 
 	document.getElementById("layersForm").reset();
@@ -2745,7 +2797,6 @@ $(document).ready(function()
 
 	//init the file upload components
 	document.getElementById('vectorFileUpload').addEventListener('change', readFile, false);
-	//document.getElementById('headerImageFileUpload').addEventListener('change', readHeaderFile, false);
 	document.getElementById('replaceVectorFileUpload').addEventListener('change', readFile, false);
 	document.getElementById('customMarkerFileUploadUpdate').addEventListener('change', readMarkerFile, false);
 	document.getElementById('customMarkerFileUploadNew').addEventListener('change', readMarkerFile, false);
@@ -2796,6 +2847,24 @@ function readMarkerFile(e)
 		});
 		fileContents = null;
 		selectedLayerNode.data.style.markerUrl = "@" + selectedLayerNode.data.id + "-marker";
+		
+		// get the image dimensions and set size/offset accordingly
+		var img = new Image();
+	    img.addEventListener("load", function()
+	    {
+	        $("#kmlMarkerSizeX").val(parseInt(this.naturalWidth));
+			$("#kmlMarkerSizeY").val(parseInt(this.naturalHeight));
+			$("#kmlMarkerOffsetX").val(parseInt(this.naturalWidth / 2));
+			$("#kmlMarkerOffsetY").val(parseInt(this.naturalHeight / 2));
+			$("#vectorMarkerSizeX").val(parseInt(this.naturalWidth));
+			$("#vectorMarkerSizeY").val(parseInt(this.naturalHeight));
+			$("#vectorMarkerOffsetX").val(parseInt(this.naturalWidth / 2));
+			$("#vectorMarkerOffsetY").val(parseInt(this.naturalHeight / 2));
+			
+			Materialize.updateTextFields();
+	    });
+	    
+	    img.src = re.target.result;
 	};
 
 	reader.readAsDataURL(fileContents);
@@ -2813,6 +2882,11 @@ function readFile(e)
 	}
 
 	fileContents = file;
+	
+	$("#kmlName").val(file.name);
+	$("#vectorName").val(file.name);
+	
+	Materialize.updateTextFields();
 	
 	if(file.type == "application/vnd.google-earth.kml+xml")
 	{

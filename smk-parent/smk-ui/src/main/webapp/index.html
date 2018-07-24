@@ -250,9 +250,9 @@
 						</form>
 					</div>
 					<div class="card-action">
-		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="saveMapConfig();" style="width: 170px;"><em class="material-icons left">save</em>Save</a>
-		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="closeEditPanel();" style="width: 170px;"><em class="material-icons left">cancel</em>Close</a>
-		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="$('#editorTabs').tabs('select_tab', 'basemap')" style="width: 170px; position: absolute; right: 30px;"><em class="material-icons right">keyboard_arrow_right</em>Next</a>
+		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="saveMapConfig();" style="width: 170px;"><em style="position: absolute; top: 14px; left: 14px;" class="material-icons left">save</em>Save</a>
+		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="closeEditPanel();" style="width: 170px;"><em style="position: absolute; top: 14px; left: 14px;" class="material-icons left">cancel</em>Close</a>
+		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="$('#editorTabs').tabs('select_tab', 'basemap')" style="width: 170px; position: absolute; right: 30px;"><em style="position: absolute; top: 14px; right: 14px;" class="material-icons right">keyboard_arrow_right</em>Next</a>
 			     	</div>
 				</div>
 			</div>
@@ -306,10 +306,10 @@
 						</form>
 					</div>
 					<div class="card-action">
-		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="saveMapConfig();" style="width: 170px;"><em class="material-icons left">save</em>Save</a>
-		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="closeEditPanel();" style="width: 170px;"><em class="material-icons left">cancel</em>Close</a>
-		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="$('#editorTabs').tabs('select_tab', 'identity')" style="width: 170px; position: absolute; right: 204px;"><em class="material-icons left">keyboard_arrow_left</em>Back</a>
-		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="$('#editorTabs').tabs('select_tab', 'layers')" style="width: 170px; position: absolute; right: 30px;"><em class="material-icons right">keyboard_arrow_right</em>Next</a>
+		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="saveMapConfig();" style="width: 170px;"><em style="position: absolute; top: 14px; left: 14px;" class="material-icons left">save</em>Save</a>
+		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="closeEditPanel();" style="width: 170px;"><em style="position: absolute; top: 14px; left: 14px;" class="material-icons left">cancel</em>Close</a>
+		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="$('#editorTabs').tabs('select_tab', 'identity')" style="width: 170px; position: absolute; right: 204px;"><em style="position: absolute; top: 14px; left: 14px;" class="material-icons left">keyboard_arrow_left</em>Back</a>
+		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="$('#editorTabs').tabs('select_tab', 'layers')" style="width: 170px; position: absolute; right: 30px;"><em style="position: absolute; top: 14px; right: 14px;" class="material-icons right">keyboard_arrow_right</em>Next</a>
 			     	</div>
 				</div>
 			</div>
@@ -319,7 +319,7 @@
 						<form id="layersForm" style="padding: 0px; margin: 0px;">
 							<div id="editLayerPanel" class="row" style="height: 100%; display: none; padding: 0px; margin: 0px;">
 								<div style="position: absolute; bottom: 14px; right: 30px; z-index: 1000;">
-									<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="finishLayerEdits(true);" style="width: 343px; height: 56px;"><em class="material-icons left">backup</em>Done Edits</a>
+									<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="finishLayerEdits(true);" style="width: 343px; height: 56px;"><em style="position: absolute; top: 14px; left: 14px;" class="material-icons left">backup</em>Done Edits</a>
 								</div>
 								<div style="height: 100%;">
 									<div id="layerEditDataBCPanel" class="col s9" style="display: none; overflow: auto; height: 100%;">
@@ -540,7 +540,7 @@
 					          						<label for="searchDbcTree">Filter</label>
 											    </div>
 											    <div class="col s2" style="padding: 7px;">
-											    	<a id="btnResetDbcTreeSearch" class="waves-effect waves-light btn-large nrpp-blue-dark"><em class="material-icons center">cancel</em></a>
+											    	<a id="btnResetDbcTreeSearch" class="waves-effect waves-light btn-large nrpp-blue-dark"><em style="position: absolute; top: 14px; left: 14px;" class="material-icons center">cancel</em></a>
 											    </div>
 											    <div class="col s1">
 											    </div>
@@ -559,7 +559,7 @@
 					          						<label for="wmsUrlField">WMS URL</label>
 												</div>
 												<div class="col s2">
-													<a id="wmsRefreshButton" class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="loadWmsLayers();" ><em class="material-icons center">cached</em></a>
+													<a id="wmsRefreshButton" class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="loadWmsLayers();" ><em style="position: absolute; top: 14px; left: 14px;" class="material-icons center">cached</em></a>
 													<div id="wmsPanelLoading" class="row" style="display: none;">
 									    				<div class="preloader-wrapper big active">
 														    <div class="spinner-layer spinner-blue-only">
@@ -584,7 +584,7 @@
 						          						<label for="searchWmsTree">Filter</label>
 												    </div>
 												    <div class="col s2" style="padding: 7px;">
-												    	<a id="btnResetWmsTreeSearch" class="waves-effect waves-light btn-large nrpp-blue-dark"><em class="material-icons center">cancel</em></a>
+												    	<a id="btnResetWmsTreeSearch" class="waves-effect waves-light btn-large nrpp-blue-dark"><em style="position: absolute; top: 14px; left: 14px;" class="material-icons center">cancel</em></a>
 												    </div>
 												    <div class="col s1">
 											    </div>
@@ -729,10 +729,10 @@
 								<div class="col s2" style="height: calc(100vh - 330px);">
 									<div style="position: absolute; top: 50%; left: 50%; transform: translateX(-50%) translateY(-50%);">
 										<div class="row" style="padding: 0px; margin: 5px;">
-											<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="addSelectedDataLayer();"><em class="material-icons center">keyboard_arrow_right</em></a>
+											<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="addSelectedDataLayer();"><em style="position: absolute; top: 14px; left: 14px;" class="material-icons center">keyboard_arrow_right</em></a>
 										</div>
 										<div class="row" style="padding: 0px; margin: 5px;">
-											<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="removeSelectedLayer();"><em class="material-icons center">keyboard_arrow_left</em></a>
+											<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="removeSelectedLayer();"><em style="position: absolute; top: 14px; left: 14px;" class="material-icons center">keyboard_arrow_left</em></a>
 										</div>
 									</div>
 								</div>
@@ -747,7 +747,7 @@
 				          						<label for="searchLayerTree">Filter</label>
 										    </div>
 										    <div class="col s2" style="padding: 7px;">
-										    	<a id="btnResetLayerTreeSearch" class="waves-effect waves-light btn-large nrpp-blue-dark"><em class="material-icons center">cancel</em></a>
+										    	<a id="btnResetLayerTreeSearch" class="waves-effect waves-light btn-large nrpp-blue-dark"><em style="position: absolute; top: 14px; left: 14px;" class="material-icons center">cancel</em></a>
 										    </div>
 										</div>
 										<div class="row" style="margin: 0px;">
@@ -757,7 +757,7 @@
 						    				<div id="layer-tree" class="layer-container" style="height: calc(100vh - 530px);"></div>
 						      			</div>
 						      			<div class="row" style="padding: 10px;">
-						      				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="editSelectedLayer();" style="width: 170px;"><em class="material-icons left">mode_edit</em>Edit</a>
+						      				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="editSelectedLayer();" style="width: 170px;"><em style="position: absolute; top: 14px; left: 14px;" class="material-icons left">mode_edit</em>Edit</a>
 						      			</div>
 									</div>
 								</div>
@@ -765,10 +765,10 @@
 						</form>
 					</div>
 					<div class="card-action">
-		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="saveMapConfig();" style="width: 170px;"><em class="material-icons left">save</em>Save</a>
-		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="closeEditPanel();" style="width: 170px;"><em class="material-icons left">cancel</em>Close</a>
-		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="$('#editorTabs').tabs('select_tab', 'basemap')" style="width: 170px; position: absolute; right: 204px;"><em class="material-icons left">keyboard_arrow_left</em>Back</a>
-		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="$('#editorTabs').tabs('select_tab', 'tools')" style="width: 170px; position: absolute; right: 30px;"><em class="material-icons right">keyboard_arrow_right</em>Next</a>
+		  				<a id="layerSave" class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="saveMapConfig();" style="width: 170px;"><em style="position: absolute; top: 14px; left: 14px;" class="material-icons left">save</em>Save</a>
+		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="closeEditPanel();" style="width: 170px;"><em style="position: absolute; top: 14px; left: 14px;" class="material-icons left">cancel</em>Close</a>
+		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="$('#editorTabs').tabs('select_tab', 'basemap')" style="width: 170px; position: absolute; right: 204px;"><em style="position: absolute; top: 14px; left: 14px;" class="material-icons left">keyboard_arrow_left</em>Back</a>
+		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="$('#editorTabs').tabs('select_tab', 'tools')" style="width: 170px; position: absolute; right: 30px;"><em style="position: absolute; top: 14px; right: 14px;" class="material-icons right">keyboard_arrow_right</em>Next</a>
 			     	</div>
 				</div>
 			</div>
@@ -1082,10 +1082,10 @@
 						</form>
 					</div>
 					<div class="card-action">
-		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="saveMapConfig();" style="width: 170px;"><em class="material-icons left">save</em>Save</a>
-		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="closeEditPanel();" style="width: 170px;"><em class="material-icons left">cancel</em>Close</a>
-		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="$('#editorTabs').tabs('select_tab', 'layers')" style="width: 170px; position: absolute; right: 204px;"><em class="material-icons left">keyboard_arrow_left</em>Back</a>
-		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="$('#editorTabs').tabs('select_tab', 'themes')" style="width: 170px; position: absolute; right: 30px;"><em class="material-icons right">keyboard_arrow_right</em>Next</a>
+		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="saveMapConfig();" style="width: 170px;"><em style="position: absolute; top: 14px; left: 14px;" class="material-icons left">save</em>Save</a>
+		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="closeEditPanel();" style="width: 170px;"><em style="position: absolute; top: 14px; left: 14px;" class="material-icons left">cancel</em>Close</a>
+		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="$('#editorTabs').tabs('select_tab', 'layers')" style="width: 170px; position: absolute; right: 204px;"><em style="position: absolute; top: 14px; left: 14px;" class="material-icons left">keyboard_arrow_left</em>Back</a>
+		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="$('#editorTabs').tabs('select_tab', 'themes')" style="width: 170px; position: absolute; right: 30px;"><em style="position: absolute; top: 14px; right: 14px;" class="material-icons right">keyboard_arrow_right</em>Next</a>
 			     	</div>
 				</div>
 			</div>
@@ -1143,7 +1143,7 @@
 				</div>
 			</div>
 			<div class="row">
-				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="addNewQuery();" style="width: 170px;"><em class="material-icons left">save</em>Add New</a>
+				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="addNewQuery();" style="width: 170px;"><em style="position: absolute; top: 14px; left: 14px;" class="material-icons left">save</em>Add New</a>
 			</div>
 		</div>
 		<div id="queryEditor" style="display: none;">
@@ -1164,7 +1164,7 @@
 						<label class="black-text" for="queryOnDropdown">Add to Dropdown (if tool is available)</label>
 					</div>
 					<div class="col s4 input-field">
-						<em id="iconDemo" class="material-icons prefix black-text">search</em>
+						<em style="position: absolute; top: 14px; left: 14px;" id="iconDemo" class="material-icons prefix black-text">search</em>
 						<input id="queryIcon" type="text" onchange="updateQueryIconPrefix();">
 						<label for="queryIcon">Query Icon ID</label>
 					</div>
@@ -1187,10 +1187,10 @@
 				<div id="queryArguments">
 				</div>
 				<div class="row">
-					<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="addNewQueryArgument();" style="width: 220px;"><em class="material-icons left">add</em>Add Argument</a>
+					<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="addNewQueryArgument();" style="width: 220px;"><em style="position: absolute; top: 14px; left: 14px;" class="material-icons left">add</em>Add Argument</a>
 				</div>
 				<div class="row">
-					<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="saveQuery();" style="width: 220px;"><em class="material-icons left">save</em>Save Query</a>
+					<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="saveQuery();" style="width: 220px;"><em style="position: absolute; top: 14px; left: 14px;" class="material-icons left">save</em>Save Query</a>
 				</div>
 			</form>
 		</div>
@@ -1210,10 +1210,10 @@
 		<div id="dropdownOptionsPanel">
 	    </div>
 	    <div class="row">
-			<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="addNewChoice();" style="width: 220px;"><em class="material-icons left">add</em>Add Choice</a>
+			<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="addNewChoice();" style="width: 220px;"><em style="position: absolute; top: 14px; left: 14px;" class="material-icons left">add</em>Add Choice</a>
 		</div>
 		<div class="row">
-			<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="loadDropdownChoiceFromLayer();" style="width: 220px;"><em class="material-icons left">redo</em>Load Choices</a>
+			<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="loadDropdownChoiceFromLayer();" style="width: 220px;"><em style="position: absolute; top: 14px; left: 14px;" class="material-icons left">redo</em>Load Choices</a>
 		</div>
       </div>
       <div class="modal-footer">

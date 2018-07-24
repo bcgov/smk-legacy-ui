@@ -11,8 +11,11 @@ public class MapViewer implements Cloneable
 	private ViewerLocation location;
 	private String baseMap;
 	private String activeTool;
+	private boolean clusterOption;
 	
-	public MapViewer() {
+	public MapViewer() 
+	{
+	    clusterOption = false;
 	}
 
 	protected MapViewer( MapViewer mapViewer ) {
@@ -21,6 +24,7 @@ public class MapViewer implements Cloneable
 		this.setBaseMap(mapViewer.getBaseMap());
 		this.setActiveTool(mapViewer.getActiveTool());
 		this.setLocation(mapViewer.getLocation());
+		this.setClusterOption(mapViewer.getClusterOption());
 	}
 
 	public String getType() { return type; }
@@ -32,6 +36,16 @@ public class MapViewer implements Cloneable
 	//}
 	//public void setInitialExtent(Double[] initialExtent) { this.initialExtent = initialExtent; }
 
+	public boolean getClusterOption()
+	{
+	    return this.clusterOption;
+	}
+	
+	public void setClusterOption(boolean clusterOption)
+	{
+	    this.clusterOption = clusterOption;
+	}
+	
 	public ViewerLocation getLocation()
 	{
 	    return this.location;

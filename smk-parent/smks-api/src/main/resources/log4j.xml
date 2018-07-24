@@ -19,7 +19,7 @@
 		</layout>
 	</appender>
 
-	<logger name="ca.bc.gov.databc">
+	<logger name="ca.bc.gov.app.smks">
 		<level value="DEBUG" />
 	</logger>
 
