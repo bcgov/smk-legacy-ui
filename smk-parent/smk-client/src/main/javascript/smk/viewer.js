@@ -134,6 +134,8 @@ include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', '
         this.visibleLayer = {}
         this.layerIdPromise = {}
         this.deadViewerLayer = {}
+        this.layerNodes = []
+
         this.pickHandlers = []
         this.query = {}
 

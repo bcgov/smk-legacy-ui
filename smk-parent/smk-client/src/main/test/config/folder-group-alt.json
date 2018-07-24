@@ -1,0 +1,75 @@
+{
+    "tools": [
+        {
+            "type": "layers",
+            "layerNodes": [
+                { 
+                    "id": "1-multipolygon-hole",
+                    "title": "Multi-polygon Hole",
+                    "opacity": 0.3,
+                    "isVisible": true,
+                    "layerId": "1-multipolygon-hole"
+                },
+                { 
+                    "id": "folder1",
+                    "title": "folder 1",
+                    "opacity": 0.7,
+                    "isVisible": true,
+                    "isExpanded": true,
+                    "isExposed": true,
+                    "layerNodes": [                
+                        { "layerId": "1-multipolygon" },
+                        { "layerId": "3-linestrings" }
+                    ]
+                },
+                { 
+                    "id": "group1",
+                    "title": "group 1",
+                    "opacity": 0.7,
+                    "isVisible": true,
+                    "isExpanded": true,
+                    "isExposed": false,
+                    "layerNodes": [                
+                        { "layerId": "3-polygons" },
+                        { "layerId": "4-points-marker" },
+                    ]
+                },
+                { 
+                    "id": "folder2",
+                    "title": "group 1",
+                    "isVisible": false,
+                    "isExpanded": false,
+                    "isExposed": true,
+                    "layerNodes": [                
+                        { "layerId": "4-points" },
+                        { 
+                            "id": "group1",
+                            "title": "group 1",
+                            "isVisible": true,
+                            "isExpanded": true,
+                            "isExposed": false,
+                            "layerNodes": [                
+                                { "layerId": "multipoint" },
+                                { "layerId": "point-polygon" },
+                            ]
+                        },
+                        { 
+                            "id": "folder1",
+                            "title": "folder 1",
+                            "isVisible": true,
+                            "isExpanded": true,
+                            "isExposed": true,
+                            "layerNodes": [                
+                                { "layerId": "polygon-polyline-point" },
+                                { "layerId": "polyline-polygon" },
+                                { "layerId": "polyline" },
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
+
+
