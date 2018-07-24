@@ -267,6 +267,7 @@ include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', '
 
         var layerId = {}
         var ids = []
+        var folderId = {}
 
         function eachItem( list, parents ) {
             list.forEach( function ( item ) {
@@ -278,6 +279,7 @@ include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', '
                     ids.push( item.layerId )
                 }
                 else {
+                    folderId[ parents.reduceRight( function ( a, v ) { return a + v.id + '--' }, '' ) + item.id ] = item
                     eachItem( item.layerList, [ item ].concat( parents ) )
                 }
             } )
@@ -288,6 +290,7 @@ include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', '
         this.layerDisplay = ld
         this.layerDisplayId = layerId
         this.layerDisplayIds = ids
+        this.layerDisplayFolderId = folderId
     }
 
     Viewer.prototype.handlePick = function ( priority, handler ) {
@@ -316,6 +319,14 @@ include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', '
         return lds.reduce( function ( accum, ld ) {
             return accum && ld.isVisible
         }, true )
+    }
+
+    Viewer.prototype.setLayerExpand = function ( folderId, expand ) {
+        if ( !( folderId in this.layerDisplayFolderId ) )
+            throw new Error( folderId + ' not defined' )
+
+        if ( this.layerDisplayFolderId[ folderId ].isExpanded != null )
+            this.layerDisplayFolderId[ folderId ].isExpanded = expand
     }
 
     Viewer.prototype.setLayersVisible = function ( layerIds, visible ) {

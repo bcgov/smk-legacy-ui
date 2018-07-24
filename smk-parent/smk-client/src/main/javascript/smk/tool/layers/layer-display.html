@@ -1,0 +1,39 @@
+<div class="smk-folder">
+    <template
+        v-for="layer in layers"
+    >
+        <div class="smk-item">
+            <div class="smk-layer-title">
+                <i class="smk-layer-expand material-icons smk-command smk-icon"
+                    v-if="layer.isExpanded != null"
+                    v-bind:title="'Expand ' + layer.title"
+                    v-on:click="$$emit( 'set-expanded', { ids: [ ( parentId ? parentId + '--' : '' ) + layer.id ], expanded: !layer.isExpanded } )"
+                >{{ layer.isExpanded ? 'arrow_drop_down' : 'arrow_right' }}</i>
+
+                <i class="smk-layer-visibility material-icons smk-command smk-icon"
+                    v-bind:title="'Toggle visibility of ' + layer.title"
+                    v-on:click="$$emit( 'set-visible', { ids: [ layer.id ], visible: !layer.isVisible } )"
+                >{{ layer.isVisible ? 'visibility' : 'visibility_off' }}</i>
+
+                <span v-bind:class="[ layer.class ]">{{ layer.title }}</span>
+            </div>
+
+            <!-- <div class="smk-layer-info" v-if="legend && layer.hasLegend">
+                <div class="smk-legend">
+                    <span v-if="layer.legends == 'waiting'">Requesting</span>
+                    <div v-for="legend in layer.legends">
+                        <img v-bind:src="legend.url">
+                        <span>{{ legend.title }}</span>
+                    </div>
+                </div>
+            </div> -->
+        </div>
+
+        <layer-display
+            v-if="layer.layerList && layer.isExpanded"
+            v-bind:layers="layer.layerList"
+            v-bind:parentId="( parentId ? parentId + '--' : '' ) + layer.id"
+            v-bind:id="id"
+        ></layer-display>
+    </template>
+</div>
