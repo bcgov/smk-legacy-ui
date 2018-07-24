@@ -1,4 +1,4 @@
-include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', 'query', 'turf' ], function () {
+include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', 'query', 'turf', 'layer-display' ], function () {
     "use strict";
 
     var ViewerEvent = SMK.TYPE.Event.define( [
@@ -134,36 +134,86 @@ include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', '
         this.visibleLayer = {}
         this.layerIdPromise = {}
         this.deadViewerLayer = {}
-        this.layerNodes = []
+        this.layerDisplay = null
+        this.layerDisplayId = null
+        this.layerDisplayIds = null
+
 
         this.pickHandlers = []
         this.query = {}
 
         this.screenpixelsToMeters = self.pixelsToMillimeters( 100 ) / 1000
 
-        if ( Array.isArray( smk.layers ) )
-            constructLayers( smk.layers, 0, null, function ( ly, cfg ) {
-                // console.log( 'layer', ly.index, ly.id );
+        function createLayer( config ) {
+            try {
+                if ( !( config.type in SMK.TYPE.Layer ) )
+                    throw new Error( 'layer type "' + config.type + '" not defined' )
 
-                self.layerIds.push( ly.id )
-                self.layerId[ ly.id ] = ly
+                if ( !( smk.viewer.type in SMK.TYPE.Layer[ config.type ] ) )
+                    throw new Error( 'layer type "' + config.type + '" not defined for viewer "' + smk.viewer.type + '"' )
 
-                ly.startedLoading( function () {
-                    self.loading = true
-                } )
+                var ly = new SMK.TYPE.Layer[ config.type ][ smk.viewer.type ]( config )
+                ly.initialize()
 
-                ly.finishedLoading( function () {
-                    self.loading = self.anyLayersLoading()
-                } )
+                return ly
+            }
+            catch ( e ) {
+                e.message += ', when creating layer id "' + config.id + '"'
+                throw e
+            }
+        }
 
-                if ( cfg.queries )
-                    cfg.queries.forEach( function ( q ) {
-                        var query = new SMK.TYPE.Query[ cfg.type ]( ly.id, q )
+        function registerLayer( ly ) {
+            self.layerIds.push( ly.id )
+            self.layerId[ ly.id ] = ly
+
+            ly.startedLoading( function () {
+                self.loading = true
+            } )
+
+            ly.finishedLoading( function () {
+                self.loading = self.anyLayersLoading()
+            } )
+        }
+
+        if ( Array.isArray( smk.layers ) ) {
+            var ldl = smk.layers.map( function ( layerConfig, i ) {
+                var ly = createLayer( layerConfig )
+    
+                if ( layerConfig.queries )
+                    layerConfig.queries.forEach( function ( q ) {
+                        var query = new SMK.TYPE.Query[ layerConfig.type ]( ly.id, q )
 
                         self.query[ query.id ] = query
                         self.queried[ query.id ] = new SMK.TYPE.FeatureSet()
                     } )
+
+                if ( ly.hasChildren() ) {
+                    var list = ly.childLayerConfigs().map( function ( childConfig ) {
+                        var cly = createLayer( childConfig )
+                        registerLayer( cly )
+                        return { layerId: cly.id }
+                    } )
+
+                    return {
+                        id: ly.id,
+                        title: ly.config.title,
+                        isVisible: ly.config.isVisible,
+                        isExpanded: false,
+                        layerList: list
+                    }
+                }
+                else {
+                    registerLayer( ly )
+
+                    return {
+                        layerId: ly.id
+                    }
+                }
             } )
+
+            this.setLayerDisplay( ldl )
+        }
 
         this.pickedLocation( function ( ev ) {
             var chain = SMK.UTIL.resolved()
@@ -190,41 +240,6 @@ include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', '
                     console.warn( e )
                 } )
         } )
-
-        function constructLayers( layerConfigs, index, parentId, cb ) {
-            layerConfigs.forEach( function ( layerConfig, i ) {
-                index = constructLayer( layerConfig, index, parentId, cb )
-            } )
-
-            return index
-        }
-
-        function constructLayer( layerConfig, index, parentId, cb ) {
-            var id = ( parentId ? parentId + '==' : '' ) + layerConfig.id
-
-            var ly
-            try {
-                if ( !( layerConfig.type in SMK.TYPE.Layer ) )
-                    throw new Error( 'layer type "' + layerConfig.type + '" not defined' )
-
-                if ( !( smk.viewer.type in SMK.TYPE.Layer[ layerConfig.type ] ) )
-                    throw new Error( 'layer type "' + layerConfig.type + '" not defined for viewer "' + smk.viewer.type + '"' )
-
-                ly = new SMK.TYPE.Layer[ layerConfig.type ][ smk.viewer.type ]( layerConfig )
-                ly.initialize( id, index, parentId )
-            }
-            catch ( e ) {
-                e.message += ', when creating layer id "' + id + '"'
-                throw e
-            }
-
-            cb( ly, layerConfig )
-
-            if ( !ly.hasChildren() )
-                return index + 1
-
-            return constructLayers( ly.childLayerConfigs(), index + 1, ly.id, cb )
-        }
     }
 
     Viewer.prototype.initializeLayers = function ( smk ) {
@@ -232,8 +247,47 @@ include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', '
 
         if ( !smk.layers || smk.layers.length == 0 ) return SMK.UTIL.resolved()
 
-        return self.setLayersVisible( self.layerIds.filter( function ( id ) { return self.layerId[ id ].config.isVisible } ), true )
+        var ids = self.layerDisplayIds.filter( function ( id ) {
+            var v = self.isLayerVisible( id )
+            self.layerDisplayId[ id ][ 0 ].isVisible = false
+            return v
+        } )
+
+        return self.setLayersVisible( ids, true )
             .catch( function () {} )
+    }
+
+    Viewer.prototype.setLayerDisplay = function ( layerList ) {
+        var ld = SMK.TYPE.LayerDisplay.create( { 
+            id: '--root', 
+            title: '(Root)', 
+            isExpanded: true, 
+            layerList: layerList
+        }, this )
+
+        var layerId = {}
+        var ids = []
+
+        function eachItem( list, parents ) {
+            list.forEach( function ( item ) {
+                if ( item.layerId ) {
+                    if ( item.layerId in layerId ) 
+                        throw new Error( item.layerId + ' appears more than once in layer display' )
+
+                    layerId[ item.layerId ] = [ item ].concat( parents )
+                    ids.push( item.layerId )
+                }
+                else {
+                    eachItem( item.layerList, [ item ].concat( parents ) )
+                }
+            } )
+        }
+
+        eachItem( ld.layerList, [] )
+        
+        this.layerDisplay = ld
+        this.layerDisplayId = layerId
+        this.layerDisplayIds = ids
     }
 
     Viewer.prototype.handlePick = function ( priority, handler ) {
@@ -256,15 +310,12 @@ include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', '
     }
 
     Viewer.prototype.isLayerVisible = function ( layerId ) {
-        var ly = this.layerId[ layerId ]
-        if ( !ly.parentId ) return ly.visible
-        return this.layerId[ ly.parentId ].visible && ly.visible
-    }
+        if ( !( layerId in this.layerDisplayId ) ) return false
 
-    Viewer.prototype.childLayers = function ( layerId ) {
-        if ( !this.layerId[ layerId ].isContainer ) return []
-
-        return this.filterLayers( function ( ly ) { return ly.parentId == layerId } )
+        var lds = this.layerDisplayId[ layerId ]
+        return lds.reduce( function ( accum, ld ) {
+            return accum && ld.isVisible
+        }, true )
     }
 
     Viewer.prototype.setLayersVisible = function ( layerIds, visible ) {
@@ -286,21 +337,21 @@ include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', '
         layerIds.forEach( function ( id ) {
             var ly = self.layerId[ id ]
 
-            var prev = ly.visible
-            ly.visible = !!visible
+            var lds = self.layerDisplayId[ id ]
 
-            if ( visible && ly.parentId )
-                self.layerId[ ly.parentId ].visible = true
-
-            self.childLayers( id ).forEach( function ( ly ) { ly.visible = visible } )
+            if ( visible )
+                lds.forEach( function ( ld ) {
+                    ld.isVisible = true
+                } )
+            else
+                lds[ 0 ].isVisible = false
         } )
 
         var visibleLayers = []
         var merged
-        this.layerIds.forEach( function ( id, i ) {
+        this.layerDisplayIds.forEach( function ( id, i ) {
             // console.log( id,self.isLayerVisible( id ),self.layerId[ id ].isContainer,self.layerId[ id ].config );
             if ( !self.isLayerVisible( id )  ) return
-            if ( self.layerId[ id ].isContainer ) return
 
             var ly = self.layerId[ id ]
             if ( !merged ) {
