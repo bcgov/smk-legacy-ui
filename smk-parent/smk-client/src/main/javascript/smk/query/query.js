@@ -93,7 +93,7 @@ include.module( 'query.query-js', [ 'jquery', 'util', 'event' ], function () {
             self.fetchUnique = query.fetchUniqueValues( uniqueAttribute, viewer )
                 .then( function ( values ) {
                     Vue.set( self.prop, 'choices', values
-                        .map( function ( v ) { return { title: makeTitle( v ), value: v } } )
+                        .map( function ( v ) { return { value: v } } )
                         .sort( function ( a, b ) { return a.title > b.title ? 1 : -1 } )
                     )
                 } )
@@ -105,11 +105,4 @@ include.module( 'query.query-js', [ 'jquery', 'util', 'event' ], function () {
     }
 
     Object.assign( QueryParameter[ 'select-unique' ].prototype, QueryParameter.prototype )
-    // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-    //
-    function makeTitle( value ) {
-        if ( value == null ) return '(Null)'
-        return value
-        // return value.replace( /_/, ' ' ).split( /\s+/ ).map( function ( w ) { var ww = w.toLowerCase(); ww[ 0 ] = ww[ 0 ].toUpperCase(); return ww } ).join( ' ' )
-    }
 } )
