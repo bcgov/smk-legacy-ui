@@ -635,93 +635,97 @@
 					          						<label for="kmlName">Name</label>
 												</div>
 							      			</div>
-							      			<div class="row">
-							      				<div class="col s4">
-													<input type="checkbox" id="kmlIsVisible" />
-													<label class="black-text" for="kmlIsVisible">Visible</label>
-												</div>
-												<div class="col s4">
-													<input type="checkbox" id="kmlQueryable" />
-													<label class="black-text" for="kmlQueryable">Identifiable</label>
-												</div>
-												<div class="col s4"> 
-												</div>
-											</div>
-											<div class="row">
-							      				<div class="col s4">
-													<input type="checkbox" id="kmlClustering" />
-													<label class="black-text" for="kmlClustering">Display as Cluster</label>
-												</div>
-												<div class="col s4">
-													<input type="checkbox" id="kmlHeatmapping" />
-													<label class="black-text" for="kmlHeatmapping">Display as Heatmap</label>
-												</div>
-							      			</div>
-							      			<div class="row" >
-												<div class="col s4 input-field">
-													<input id="kmlOpacity" type="text">
-					          						<label for="kmlOpacity">Layer Opacity</label>
-												</div>
-												<div class="col s4 input-field">
-													<input id="kmlStrokeOpacity" type="text">
-					          						<label for="kmlStrokeOpacity">Stroke Opacity</label>
-												</div>
-												<div class="col s4 input-field">
-													<input id="kmlFillOpacity" type="text">
-					          						<label for="kmlFillOpacity">Fill Opacity</label>
-												</div>
-							      			</div>
-							      			<div class="row" >
-							      				<div class="col s4 input-field">
-													<input id="kmlStrokeWidth" type="text">
-					          						<label for="kmlStrokeWidth">Stroke Width</label>
-												</div>
-												<div class="col s4 input-field">
-													<input id="kmlStrokeStyle" type="text">
-					          						<label for="kmlStrokeStyle">Stroke Style</label>
-												</div>
-											</div>
-											<div class="row" >
-							    				<div class="col s4">
-													<label for="kmlStrokeColor" class="black-text">Stroke Color</label>
-													<input id="kmlStrokeColor" type="color">
-												</div>
-												<div class="col s4">
-							    					<label for="kmlFillColor" class="black-text">Fill Color</label>
-													<input id="kmlFillColor" type="color">
-												</div>
-							      			</div>
-							      			<div class="row">
-												<div class="file-field input-field">
-													<div class="btn nrpp-blue-dark">
-														<span>Custom Point Marker</span>
-														<input type="file" id="customMarkerFileUploadNew">
+							      			<!-- Currently hiding vector edit on create to support splitting KML files on load -->
+							      			<div style="display: none;">
+								      			<div class="row">
+								      				<div class="col s4">
+														<input type="checkbox" id="kmlIsVisible" />
+														<label class="black-text" for="kmlIsVisible">Visible</label>
 													</div>
-													<div class="file-path-wrapper">
-														<input class="file-path validate" type="text">
+													<div class="col s4">
+														<input type="checkbox" id="kmlQueryable" />
+														<label class="black-text" for="kmlQueryable">Identifiable</label>
+													</div>
+													<div class="col s4"> 
 													</div>
 												</div>
+												<div class="row">
+								      				<div class="col s4">
+														<input type="checkbox" id="kmlClustering" />
+														<label class="black-text" for="kmlClustering">Display as Cluster</label>
+													</div>
+													<div class="col s4">
+														<input type="checkbox" id="kmlHeatmapping" />
+														<label class="black-text" for="kmlHeatmapping">Display as Heatmap</label>
+													</div>
+								      			</div>
+								      			<div class="row" >
+													<div class="col s4 input-field">
+														<input id="kmlOpacity" type="text">
+						          						<label for="kmlOpacity">Layer Opacity</label>
+													</div>
+													<div class="col s4 input-field">
+														<input id="kmlStrokeOpacity" type="text">
+						          						<label for="kmlStrokeOpacity">Stroke Opacity</label>
+													</div>
+													<div class="col s4 input-field">
+														<input id="kmlFillOpacity" type="text">
+						          						<label for="kmlFillOpacity">Fill Opacity</label>
+													</div>
+								      			</div>
+								      			<div class="row" >
+								      				<div class="col s4 input-field">
+														<input id="kmlStrokeWidth" type="text">
+						          						<label for="kmlStrokeWidth">Stroke Width</label>
+													</div>
+													<div class="col s4 input-field">
+														<input id="kmlStrokeStyle" type="text">
+						          						<label for="kmlStrokeStyle">Stroke Style</label>
+													</div>
+												</div>
+												<div class="row" >
+								    				<div class="col s4">
+														<label for="kmlStrokeColor" class="black-text">Stroke Color</label>
+														<input id="kmlStrokeColor" type="color">
+													</div>
+													<div class="col s4">
+								    					<label for="kmlFillColor" class="black-text">Fill Color</label>
+														<input id="kmlFillColor" type="color">
+													</div>
+								      			</div>
+								      			<div class="row">
+													<div class="file-field input-field">
+														<div class="btn nrpp-blue-dark">
+															<span>Custom Point Marker</span>
+															<input type="file" id="customMarkerFileUploadNew">
+														</div>
+														<div class="file-path-wrapper">
+															<input class="file-path validate" type="text">
+														</div>
+													</div>
+												</div>
+												<div class="row">
+													<div class="col s6 input-field">
+														<input id="kmlMarkerSizeX" type="text">
+						          						<label for="kmlMarkerSizeX">Marker Size X</label>
+													</div>
+													<div class="col s6 input-field">
+														<input id="kmlMarkerSizeY" type="text">
+						          						<label for="kmlMarkerSizeY">Marker Size Y</label>
+													</div>
+												</div>
+												<div class="row">
+													<div class="col s6 input-field">
+														<input id="kmlMarkerOffsetX" type="text">
+						          						<label for="kmlMarkerOffsetX">Marker Offset X</label>
+													</div>
+													<div class="col s6 input-field">
+														<input id="kmlMarkerOffsetY" type="text">
+						          						<label for="kmlMarkerOffsetY">Marker Offset Y</label>
+													</div>
+												</div>
 											</div>
-											<div class="row">
-												<div class="col s6 input-field">
-													<input id="kmlMarkerSizeX" type="text">
-					          						<label for="kmlMarkerSizeX">Marker Size X</label>
-												</div>
-												<div class="col s6 input-field">
-													<input id="kmlMarkerSizeY" type="text">
-					          						<label for="kmlMarkerSizeY">Marker Size Y</label>
-												</div>
-											</div>
-											<div class="row">
-												<div class="col s6 input-field">
-													<input id="kmlMarkerOffsetX" type="text">
-					          						<label for="kmlMarkerOffsetX">Marker Offset X</label>
-												</div>
-												<div class="col s6 input-field">
-													<input id="kmlMarkerOffsetY" type="text">
-					          						<label for="kmlMarkerOffsetY">Marker Offset Y</label>
-												</div>
-											</div>
+											<!-- End of kml edit block (currently hidden as commented above) -->
 											<div style="height: 100px;"></div>
 								    	</div>
 									</ul>
@@ -1237,7 +1241,30 @@
       <div class="modal-footer">
         <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat">Close</a>
       </div>
-    </div> 
+    </div>
+    <div id="kmlUploadModal" class="modal modal-fixed-footer">
+      <div class="modal-content">
+		<div class="row">
+			<h5>KML Uploading...</h5>
+		</div>
+		<div class="row">
+			<p>You've attempted to upload a KML file that contains multiple styles. This may potentially cause multiple layers to be created. They will be automatically generated, but you can edit them after the generation is complete.</p>
+			<div class="row">
+           		<div class="col s12">
+            		<div id="kmlUploadProgressBar" class="progress">
+      		  			<div class="indeterminate"></div>
+  					</div>
+  					<div id="kmlUploadProgressComplete" style="display: none;">
+      		  			<p>Processing Complete!</p>
+  					</div>
+  				</div>
+  			</div>
+		</div>
+      </div>
+      <div class="modal-footer">
+        <a id="kmlUploadButton" style="display: none;" href="#!" class="modal-action modal-close waves-effect waves-red btn-flat">Close</a>
+      </div>
+    </div>
 	<script type="text/javascript">
 	</script>
   </body>

@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.core.JsonParser.Feature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -365,6 +366,8 @@ public class MapConfigController
 				        Vector layer = (Vector)resource.getLayerByID(id);
 				        
     				    ObjectMapper objectMapper = new ObjectMapper();
+    				    objectMapper.configure(Feature.ALLOW_UNQUOTED_CONTROL_CHARS, true);
+    				    
     				    JsonNode node = objectMapper.readValue(docBytes, JsonNode.class);
 
     				    List<String> fieldNames = new ArrayList<String>();

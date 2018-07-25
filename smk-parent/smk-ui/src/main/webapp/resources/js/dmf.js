@@ -1,9 +1,3 @@
-function openMap(type)
-{
-
-	window.location.href = "./view.xhtml?id=" + getQueryString('id') + "&view=" + type;
-}
-
 var getQueryString = function ( field, url )
 {
     var href = url ? url : window.location.href;
@@ -61,7 +55,7 @@ var data = {
 	    _rev: null
 	};
 
-function parseKmlLayerStyle(fileText)
+function parseKmlLayerStyle(fileText, fileContents)
 {
 	var layer = omnivore.kml.parse(fileText);
 	
@@ -73,146 +67,264 @@ function parseKmlLayerStyle(fileText)
 	// parsed styles from direct dom (dom.firstChild(kml).firstChild(document)
 	var styleNodes = dom.firstElementChild.firstElementChild.childNodes;
 	
-	var opacity = options.opacity != null ? options.opacity : 1.0;
-	var strokeOpacity = 1.0;
-	var fillOpacity = options.fillOpacity != null ? options.fillOpacity : 0.65;
-	var strokeWidth = options.weight != null ? options.weight : "1";
-	var strokeStyle = options.dashArray != null ? options.dashArray : "1";
-	var strokeColor = options.color != null ? options.color : "#000000";
-	var fillColor = options.fillColor != null ? options.fillColor : options.color != null ? options.color : "#000000";
-	var markerSize = 20;
-	var markerUrl = null;
-	var markerOffsetX = 0;
-	var markerOffsetY = 0;
-	
-	for(var i = 0; i < styleNodes.length; i++)
+	if(dom.getElementsByTagName("Style").length > 1)
 	{
-		var node = styleNodes[i];
-		if(node.localName == "Style")
+		$('#kmlUploadButton').hide();
+    	$('#kmlUploadProgressBar').show();
+    	$('#kmlUploadProgressComplete').hide();
+		$('#kmlUploadModal').modal('open');
+		
+		var documentData = new FormData();
+		documentData.append('file', fileContents);
+		
+		$.ajax
+		({
+			url: serviceUrl + "LayerLibrary/ProcessKML/",
+			type: "post",
+		    data: documentData,
+		    crossDomain: true,
+		    withCredentials: true,
+		    cache: false,
+		    contentType: false,
+		    processData: false,
+	        success: function (status)
+	        {
+	        	status.results.forEach(function(sourceLayer)
+    		   	{
+	        		var layer =
+	        		{
+	        			type: "vector",
+	        			id: fileContents.name.replace(/[^a-z0-9]+/gi, "-").replace(" ", "-") + "-" + sourceLayer.styleUrl.replace(/[^a-z0-9]+/gi, '-').replace(" ", "-").toLowerCase(),
+	        		    title: fileContents.name.replace(/[^a-z0-9]+/gi, "-").replace(" ", "-") + "-" + sourceLayer.styleUrl.replace(/[^a-z0-9]+/gi, '-').replace(" ", "-").toLowerCase(),
+	        		    isVisible: true,
+	        		    isQueryable: true,
+	        		    opacity: 0.65,
+	        		    attributes: [],
+	        		    useRaw: true,
+	        			useClustering: false,
+	        			useHeatmap: false,
+	        			dataUrl: null,
+	        			style: sourceLayer.style
+	        		};
+
+	        		data.layers.push(layer);
+	        		
+	        		// add to layer tree
+	        		var lyrNode =
+	        		{
+	        			title: layer.title,
+	        			folder: false,
+	        			expanded: false,
+	        			data: layer,
+	        			children: []
+	        		};
+
+	        		var tree = $('#layer-tree').fancytree('getTree');
+	        		var layerSource = tree.getRootNode().children;
+	        		layerSource.push(lyrNode);
+	        		tree.reload(layerSource);
+
+	        		// create blob from geojson
+	        		var jsonString = JSON.stringify(sourceLayer.geojson);
+    				var out = [];
+    				for (var jsIdx = 0; jsIdx < jsonString.length; jsIdx++ ) 
+    				{
+    					out[jsIdx] = jsonString.charCodeAt(jsIdx);
+    				}
+    				
+    				var unsignedData = new Uint8Array(out); 
+    				var blob = new Blob([ JSON.stringify(sourceLayer.geojson) ], {encoding:"UTF-8",type:"application/json"});
+	        		
+        			unsavedAttachments.push(
+        			{
+        				type: "vector",
+        				layer: layer,
+        				contents: blob
+        			});
+	        			
+        			// style marker
+        			if(sourceLayer.markerImage != null)
+    				{
+        				layer.style.markerUrl = "@" +  layer.id + "-marker";
+        				
+        				// set marker dimensions
+        				var img = new Image();
+        			    img.addEventListener("load", function()
+        			    {
+        			    	layer.style.markerSize[0] = parseInt(this.naturalWidth);
+        			    	layer.style.markerSize[1] = parseInt(this.naturalHeight);
+        			    	layer.style.markerOffset[0] = parseInt(this.naturalWidth / 2);
+        			    	layer.style.markerOffset[1] = parseInt(this.naturalHeight / 2);
+        			    });
+        			    
+        			    img.src = sourceLayer.markerImage;
+        			    
+	        			unsavedAttachments.push(
+	        			{
+	        				type: "marker_upload",
+	        				layer: layer,
+	        				contents: sourceLayer.markerImage
+	        			});
+    				}
+    		   	});
+	        	
+	        	document.getElementById("layersDisplayForm").reset();
+	        	$('#kmlUploadButton').show();
+	        	$('#kmlUploadProgressBar').hide();
+	        	$('#kmlUploadProgressComplete').show();
+	        	//$('#kmlUploadModal').modal('close');
+	        },
+	        error: function(status)
+	        {
+	        	Materialize.toast("There was an error attempting to read the supplied KML File: " + status.responseText, 4000);
+	        	document.getElementById("layersDisplayForm").reset();
+	        	$('#kmlUploadModal').modal('close');
+	        }
+		});
+	}
+	else
+	{
+		var opacity = options.opacity != null ? options.opacity : 1.0;
+		var strokeOpacity = 1.0;
+		var fillOpacity = options.fillOpacity != null ? options.fillOpacity : 0.65;
+		var strokeWidth = options.weight != null ? options.weight : "1";
+		var strokeStyle = options.dashArray != null ? options.dashArray : "1";
+		var strokeColor = options.color != null ? options.color : "#000000";
+		var fillColor = options.fillColor != null ? options.fillColor : options.color != null ? options.color : "#000000";
+		var markerSize = 20;
+		var markerUrl = null;
+		var markerOffsetX = 0;
+		var markerOffsetY = 0;
+		
+		for(var i = 0; i < styleNodes.length; i++)
 		{
-			for(var styleIndex = 0; styleIndex < node.childNodes.length; styleIndex++)
+			var node = styleNodes[i];
+			if(node.localName == "Style")
 			{
-				var styleNode = node.childNodes[styleIndex];
-				
-				if(styleNode.nodeName != "#text")
+				for(var styleIndex = 0; styleIndex < node.childNodes.length; styleIndex++)
 				{
-					if(styleNode.getElementsByTagName("color").length) 
-					{
-						fillColor = styleNode.getElementsByTagName("color")[0].innerHTML;
-						strokeColor = styleNode.getElementsByTagName("color")[0].innerHTML;
-					}
+					var styleNode = node.childNodes[styleIndex];
 					
-					if(styleNode.localName == "LineStyle")
+					if(styleNode.nodeName != "#text")
 					{
-						if(styleNode.getElementsByTagName("width").length) strokeWidth = styleNode.getElementsByTagName("width")[0].innerHTML;
-					}
-					else if(styleNode.localName == "PolyStyle")
-					{
-						if(styleNode.getElementsByTagName("fill").length) fillOpacity = styleNode.getElementsByTagName("fill")[0].innerHTML;
-						if(styleNode.getElementsByTagName("outline").length) strokeWidth = styleNode.getElementsByTagName("outline")[0].innerHTML;
-					}
-					else if(styleNode.localName == "IconStyle")
-					{
-						if(styleNode.getElementsByTagName("hotSpot").length) markerOffsetX = styleNode.getElementsByTagName("hotSpot")[0].getAttribute("x").innerHTML;
-						if(styleNode.getElementsByTagName("hotSpot").length) markerOffsetY = styleNode.getElementsByTagName("hotSpot")[0].getAttribute("y").innerHTML;
-						if(styleNode.getElementsByTagName("Icon").length) markerUrl = styleNode.getElementsByTagName("Icon")[0].getElementsByTagName("href")[0].innerHTML;
+						if(styleNode.getElementsByTagName("color").length) 
+						{
+							fillColor = styleNode.getElementsByTagName("color")[0].innerHTML;
+							strokeColor = styleNode.getElementsByTagName("color")[0].innerHTML;
+						}
+						
+						if(styleNode.localName == "LineStyle")
+						{
+							if(styleNode.getElementsByTagName("width").length) strokeWidth = styleNode.getElementsByTagName("width")[0].innerHTML;
+						}
+						else if(styleNode.localName == "PolyStyle")
+						{
+							if(styleNode.getElementsByTagName("fill").length) fillOpacity = styleNode.getElementsByTagName("fill")[0].innerHTML;
+							if(styleNode.getElementsByTagName("outline").length) strokeWidth = styleNode.getElementsByTagName("outline")[0].innerHTML;
+						}
+						else if(styleNode.localName == "IconStyle")
+						{
+							if(styleNode.getElementsByTagName("hotSpot").length) markerOffsetX = styleNode.getElementsByTagName("hotSpot")[0].getAttribute("x").innerHTML;
+							if(styleNode.getElementsByTagName("hotSpot").length) markerOffsetY = styleNode.getElementsByTagName("hotSpot")[0].getAttribute("y").innerHTML;
+							if(styleNode.getElementsByTagName("Icon").length) markerUrl = styleNode.getElementsByTagName("Icon")[0].getElementsByTagName("href")[0].innerHTML;
+						}
 					}
 				}
 			}
 		}
-	}
-	
-	if(markerUrl != null)
-	{
-		/*getBase64Image(markerUrl, function(base64)
+		
+		if(markerUrl != null)
 		{
-			unsavedAttachments.push(
+			/*getBase64Image(markerUrl, function(base64)
 			{
-				type: "marker_upload",
-				layer: null,
-				contents: base64
+				unsavedAttachments.push(
+				{
+					type: "marker_upload",
+					layer: null,
+					contents: base64
+				});
+			});*/
+			
+			$.ajax
+			({
+				url: serviceUrl + "LayerLibrary/ImageToBase64?url=" + markerUrl,
+		        type: "get",
+		        crossDomain: true,
+		        success: function (status)
+		        {
+		        	unsavedAttachments.push(
+	    			{
+	    				type: "marker_upload",
+	    				layer: null,
+	    				contents: JSON.parse(status).image
+	    			});
+		        },
+		        error: function(status)
+		        {
+		        	
+		        }
 			});
-		});*/
-		
-		$.ajax
-		({
-			url: serviceUrl + "LayerLibrary/ImageToBase64?url=" + markerUrl,
-	        type: "get",
-	        crossDomain: true,
-	        success: function (status)
-	        {
-	        	unsavedAttachments.push(
-    			{
-    				type: "marker_upload",
-    				layer: null,
-    				contents: JSON.parse(status).image
-    			});
-	        },
-	        error: function(status)
-	        {
-	        	
-	        }
-		});
-	}
-	
-	if(fillColor.length > 7) fillColor = "#" + fillColor.substring(0, 6);
-	if(strokeColor.length > 7) strokeColor = "#" + strokeColor.substring(0, 6);
-
-	// set the vector layer panel options
-	if(selectedLayerNode == null) // new file panel
-	{
-		$("#kmlOpacity").val(opacity);
-		$("#kmlStrokeOpacity").val(strokeOpacity);
-		$("#kmlFillOpacity").val(fillOpacity);
-		$("#kmlStrokeWidth").val(strokeWidth);
-		$("#kmlStrokeStyle").val(strokeStyle);
-		$("#kmlStrokeColor").val(strokeColor);
-		$("#kmlFillColor").val(fillColor);
-		
-		if(markerUrl != null)
-		{
-			// get the image dimensions and set size/offset accordingly
-			var img = new Image();
-		    img.addEventListener("load", function()
-		    {
-		        $("#kmlMarkerSizeX").val(parseInt(this.naturalWidth));
-				$("#kmlMarkerSizeY").val(parseInt(this.naturalHeight));
-				$("#kmlMarkerOffsetX").val(parseInt(this.naturalWidth / 2));
-				$("#kmlMarkerOffsetY").val(parseInt(this.naturalHeight / 2));
-				Materialize.updateTextFields();
-		    });
-		    
-		    img.src = markerUrl;
 		}
-	}
-	else // edit panel
-	{
-		$("#vectorOpacity").val(opacity);
-		$("#vectorStrokeOpacity").val(strokeOpacity);
-		$("#vectorFillOpacity").val(fillOpacity);
-		$("#vectorStrokeWidth").val(strokeWidth);
-		$("#vectorStrokeStyle").val(strokeStyle);
-		$("#vectorStrokeColor").val(strokeColor);
-		$("#vectorFillColor").val(fillColor);
 		
-		if(markerUrl != null)
-		{
-			// get the image dimensions and set size/offset accordingly
-			var img = new Image();
-		    img.addEventListener("load", function()
-		    {
-		        $("#vectorMarkerSizeX").val(parseInt(this.naturalWidth));
-				$("#vectorMarkerSizeY").val(parseInt(this.naturalHeight));
-				$("#vectorMarkerOffsetX").val(parseInt(this.naturalWidth / 2));
-				$("#vectorMarkerOffsetY").val(parseInt(this.naturalHeight / 2));
-				Materialize.updateTextFields();
-		    });
-		    
-		    img.src = markerUrl;
-		}
-	}
+		if(fillColor.length > 7) fillColor = "#" + fillColor.substring(0, 6);
+		if(strokeColor.length > 7) strokeColor = "#" + strokeColor.substring(0, 6);
 	
-	Materialize.updateTextFields();
+		// set the vector layer panel options
+		if(selectedLayerNode == null) // new file panel
+		{
+			$("#kmlOpacity").val(opacity);
+			$("#kmlStrokeOpacity").val(strokeOpacity);
+			$("#kmlFillOpacity").val(fillOpacity);
+			$("#kmlStrokeWidth").val(strokeWidth);
+			$("#kmlStrokeStyle").val(strokeStyle);
+			$("#kmlStrokeColor").val(strokeColor);
+			$("#kmlFillColor").val(fillColor);
+			
+			if(markerUrl != null)
+			{
+				// get the image dimensions and set size/offset accordingly
+				var img = new Image();
+			    img.addEventListener("load", function()
+			    {
+			        $("#kmlMarkerSizeX").val(parseInt(this.naturalWidth));
+					$("#kmlMarkerSizeY").val(parseInt(this.naturalHeight));
+					$("#kmlMarkerOffsetX").val(parseInt(this.naturalWidth / 2));
+					$("#kmlMarkerOffsetY").val(parseInt(this.naturalHeight / 2));
+					Materialize.updateTextFields();
+			    });
+			    
+			    img.src = markerUrl;
+			}
+		}
+		else // edit panel
+		{
+			$("#vectorOpacity").val(opacity);
+			$("#vectorStrokeOpacity").val(strokeOpacity);
+			$("#vectorFillOpacity").val(fillOpacity);
+			$("#vectorStrokeWidth").val(strokeWidth);
+			$("#vectorStrokeStyle").val(strokeStyle);
+			$("#vectorStrokeColor").val(strokeColor);
+			$("#vectorFillColor").val(fillColor);
+			
+			if(markerUrl != null)
+			{
+				// get the image dimensions and set size/offset accordingly
+				var img = new Image();
+			    img.addEventListener("load", function()
+			    {
+			        $("#vectorMarkerSizeX").val(parseInt(this.naturalWidth));
+					$("#vectorMarkerSizeY").val(parseInt(this.naturalHeight));
+					$("#vectorMarkerOffsetX").val(parseInt(this.naturalWidth / 2));
+					$("#vectorMarkerOffsetY").val(parseInt(this.naturalHeight / 2));
+					Materialize.updateTextFields();
+			    });
+			    
+			    img.src = markerUrl;
+			}
+		}
+		
+		Materialize.updateTextFields();
+	}
 }
 
 function getBase64Image(imgUrl) 
@@ -841,7 +953,7 @@ function addNewMapConfig()
 			          ],
 			          "markerOffset": [
 			            10,
-			            0
+			            10
 			          ]
 			        },
 			        "styleOpacity": 1
@@ -950,11 +1062,7 @@ function saveMapConfig()
         		$("#loadingBar").show();
         		$("#appsTablePanel").hide();
         		
-	        	processAttachments(unsavedAttachments).then(function()
-	        	{
-	        		Materialize.toast('Attachment upload complete', 4000);
-	        		closeEditPanel();
-	        	});
+	        	processAttachments(0, unsavedAttachments);
     		}
         	else
     		{
@@ -972,60 +1080,54 @@ function saveMapConfig()
 	});
 }
 
-function processAttachments(unsavedAttachments)
+function processAttachments(index, unsavedAttachments)
 {
-	var i = 0;
-    function next() 
-    {
-        if (i < unsavedAttachments.length) 
-        {
-        	var attachment = unsavedAttachments[i];
-        	
-        	if(attachment.contents != null)
-        	{
-	    		var documentData = new FormData();
-	    		
-	    		var attchId;
-	    		var attchType;
-	    		
-	    		if(attachment.type == "header_upload") 
-	    		{
-	    			attchId = "surroundImage";
-	    			attchType = "image";
-	    			documentData.append('file', attachment.contents);
-	    		}
-	    		else if(attachment.type == "marker_upload" && attachment.layer != null) 
-	    		{
-	    			attchId = attachment.layer.id + "-marker";
-	    			attchType = "image";
-	    			documentData.append('file', dataURLToBlob(attachment.contents));
-	    		}
-	    		else if(attachment.type == "marker_upload" && attachment.layer == null) 
-    			{
-	    			Materialize.toast('Error uploading marker image attachment. Could not be associated to a valid layer ID', 5000);
-    			}
-	    		else 
-	    		{
-	    			attchId = attachment.layer.id;
-	    			attchType = attachment.type;
-	    			documentData.append('file', attachment.contents);
-	    		}
-	    		
-	    		if(attchType == null) attchType = "vector";
-	    		    		
-	            return handleAttachmentUpload(data.lmfId, attchId, attchType, documentData).then(function(unsavedAttachments) 
-	            {
-	                ++i;
-	                return next();
-	            });
-        	}
-         }
-         else 
-         {
-             // all done with loop
-         }
-    }
-    return next();
+	if(index >= unsavedAttachments.length)
+	{
+		Materialize.toast('Attachment upload complete.', 4000);
+		closeEditPanel();	
+	}
+	else
+	{
+		var attachment = unsavedAttachments[index];
+		
+		if(attachment.contents != null)
+		{
+			var documentData = new FormData();
+			
+			var attchId;
+			var attchType;
+			
+			if(attachment.type == "marker_upload" && attachment.layer != null) 
+			{
+				attchId = attachment.layer.id + "-marker";
+				attchType = "image";
+				documentData.append('file', dataURLToBlob(attachment.contents));
+			}
+			else if(attachment.type == "marker_upload" && attachment.layer == null) 
+			{
+				Materialize.toast('Error uploading marker image attachment. Could not be associated to a valid layer ID', 5000);
+			}
+			else 
+			{
+				attchId = attachment.layer.id;
+				attchType = attachment.type;
+				documentData.append('file', attachment.contents);
+			}
+			
+			if(attchType == null) attchType = "vector";
+			    		
+	        handleAttachmentUpload(data.lmfId, attchId, attchType, documentData).then(function()
+			{
+	        	processAttachments(index + 1, unsavedAttachments);
+			});
+		}
+		else
+		{
+			Materialize.toast('Attachment ' + attchId + ' failed. No content delivered.', 4000);
+			processAttachments(index + 1, unsavedAttachments);
+		}
+	}
 }
 
 function handleAttachmentUpload(lmfId, attchId, attchType, documentData)
@@ -1346,7 +1448,7 @@ function finishLayerEdits(save)
 			
 			selectedLayerNode.data.isVisible = $("#vectorVisible").is(":checked");
 			selectedLayerNode.data.isQueryable = $("#vectorQueryable").is(":checked");
-			selectedLayerNode.data.title = $("#vectorName").val();
+			selectedLayerNode.data.title = $("#vectorName").val().replace('.', '-');
 			selectedLayerNode.data.dataUrl = $("#vectorUrl").val();
 			selectedLayerNode.data.opacity = $("#vectorOpacity").val();
 			selectedLayerNode.data.useRaw = !$("#vectorClustering").is(":checked");
@@ -2118,10 +2220,10 @@ function uploadVectorLayer()
 	{
 		type: "vector",
 		id: $("#kmlName").val().replace(/\s+/g, '-').toLowerCase(),
-	    title: $("#kmlName").val(),
-	    isVisible: $("#kmlIsVisible").is(":checked"),
-	    isQueryable: $("#kmlQueryable").is(":checked"),
-	    opacity: $("#kmlOpacity").val(),
+	    title: $("#kmlName").val().replace('.', '-'),
+	    isVisible: true, //$("#kmlIsVisible").is(":checked"),
+	    isQueryable: true, //$("#kmlQueryable").is(":checked"),
+	    opacity: 0.65,//$("#kmlOpacity").val(),
 	    attributes: [],
 	    useRaw: !$("#kmlClustering").is(":checked"),
 		useClustering: $("#kmlClustering").is(":checked"),
@@ -2179,7 +2281,7 @@ function uploadVectorLayer()
 			}
 		}
 	}
-
+		
 	document.getElementById("layersForm").reset();
 }
 
@@ -2805,6 +2907,7 @@ $(document).ready(function()
 	$('.modal').modal();
 	$('#attributesModal').modal({ dismissible: false });
 	$('#queriesModal').modal({ dismissible: false });
+	$('#kmlUploadModal').modal({ dismissible: false });
 	$('#queryDropdownModal').modal(
 	{
 		dismissible: false,
@@ -2819,17 +2922,6 @@ $(document).ready(function()
 
 var fileContents;
 var unsavedAttachments = [];
-
-//function readHeaderFile(e)
-//{
-//	readFile(e);
-//
-//	unsavedAttachments.push(
-//	{
-//		type: "header_upload",
-//		contents: fileContents
-//	});
-//}
 
 function readMarkerFile(e)
 {
@@ -2883,21 +2975,23 @@ function readFile(e)
 
 	fileContents = file;
 	
-	$("#kmlName").val(file.name);
-	$("#vectorName").val(file.name);
+	if(!file.type.startsWith("image/"))
+	{
+		$("#kmlName").val(file.name.replace('.', '-'));
+		$("#vectorName").val(file.name.replace('.', '-'));
+	}
 	
 	Materialize.updateTextFields();
 	
-	if(file.type == "application/vnd.google-earth.kml+xml")
+	if(fileContents.type == "application/vnd.google-earth.kml+xml")
 	{
-		// get style info via omnivore
 		var reader = new FileReader();
-
+	
 		reader.onload = function(e)
 		{
-			parseKmlLayerStyle(e.target.result);
+			parseKmlLayerStyle(e.target.result, fileContents);
 		};
-
+	
 		reader.readAsText(fileContents);
 	}
 }

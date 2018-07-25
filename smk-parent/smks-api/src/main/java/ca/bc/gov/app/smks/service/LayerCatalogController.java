@@ -9,15 +9,11 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.ektorp.AttachmentInputStream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,10 +24,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import ca.bc.gov.app.smks.converter.DocumentConverterFactory;
 import ca.bc.gov.app.smks.dao.LayerCatalogDAO;
 import ca.bc.gov.app.smks.model.Layer;
 import ca.bc.gov.app.smks.model.MPCMInfoLayer;
-import ca.bc.gov.app.smks.model.MapConfiguration;
 import ca.bc.gov.app.smks.model.WMSInfoLayer;
 
 @CrossOrigin
@@ -195,26 +193,9 @@ public class LayerCatalogController
         {
             logger.debug("    Fetching image Base64 String from " + imageUrl);
             
-            // get content type
-            URL url = new URL(imageUrl);
-            HttpURLConnection connection = (HttpURLConnection)  url.openConnection();
-            connection.setRequestMethod("HEAD");
-            connection.connect();
-            String contentType = connection.getContentType();
+            String base64 = DocumentConverterFactory.getImageBase64StringFromUrl(imageUrl);
             
-            BufferedInputStream bis = new BufferedInputStream(url.openConnection().getInputStream());
-            
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            byte[] buffer = new byte[1024];
-            int read = 0;
-            
-            while ((read = bis.read(buffer, 0, buffer.length)) != -1) 
-            {
-                baos.write(buffer, 0, read);
-            }
-            baos.flush();
-            
-            result = new ResponseEntity<String>("{ \"image\": \"data:" + contentType + ";base64," + Base64.getEncoder().encodeToString(baos.toByteArray()) + "\"}", HttpStatus.OK);
+            result = new ResponseEntity<String>("{ \"image\": \"" + base64 + "\"}", HttpStatus.OK);
         }
         catch (Exception e)
         {
@@ -224,6 +205,56 @@ public class LayerCatalogController
 
         logger.info("    Building image Base64 complete. Response: " + result.getStatusCode().name());
         logger.debug(" << getImageAsBase64()");
+        return result;
+    }
+    
+    @RequestMapping(value = "/ProcessKML", headers=("content-type=multipart/form-data"), method = RequestMethod.POST)
+    @ResponseBody
+    public ResponseEntity<?> processKML(@RequestParam("file") MultipartFile request)
+    {
+        logger.debug(" >> processKML()");
+        ResponseEntity<?> result = null;
+
+        if(!request.isEmpty())
+        {
+            try
+            {
+                logger.debug("    Processing KML/KMZ data...");
+
+                byte[] docBytes = request.getBytes();                
+                String contentType = request.getContentType();
+                ObjectNode resultingJson = null;
+                
+                if(contentType.equals("application/vnd.google-earth.kml+xml"))
+                {
+                    // get a list of layers as JSON, including image for markers and GeoJSON source data
+                    resultingJson = DocumentConverterFactory.createlayersFromKML(docBytes);
+                }
+                else if(contentType.equals("application/vnd.google-earth.kmz"))
+                {
+                    resultingJson = DocumentConverterFactory.createlayersFromKMZ(docBytes);
+                }
+
+                if(resultingJson == null)
+                {
+                    throw new Exception("Valid GEOJson could not be generated from this KML");
+                }
+                else
+                {
+                    logger.debug("    Success!");
+                    result = new ResponseEntity<ObjectNode>(resultingJson, HttpStatus.OK);
+                }
+            }
+            catch (Exception e)
+            {
+                logger.error("    ## Error creating resources from source KML: " + e.getMessage());
+                result = new ResponseEntity<String>("{ \"status\": \"ERROR\", \"message\": \"" + e.getMessage() + "\" }", HttpStatus.BAD_REQUEST);
+            }
+        }
+        else result = new ResponseEntity<String>("{ \"status\": \"ERROR\", \"message\": \"File or ID was not submitted. Please post your form with a file, and id\" }", HttpStatus.BAD_REQUEST);
+
+        logger.info("    Create layers from KML completed. Response: " + result.getStatusCode().name());
+        logger.debug(" >> processKML()");
         return result;
     }
 }
