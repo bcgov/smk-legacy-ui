@@ -8,6 +8,7 @@ RUN apk upgrade --update && apk add --update curl
 
 # Java memory settings
 ADD jvmMemSettings.sh /jvmMemSettings.sh
+RUN chmod +x /jvmMemSettings.sh
 ENTRYPOINT ["/jvmMemSettings.sh"]
 
 # Add a tomcat users config for admin access, if desired
