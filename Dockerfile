@@ -42,4 +42,6 @@ USER tomcat
 
 EXPOSE 8080
 
+WORKDIR ${TOMCAT_HOME}/bin
+
 CMD catalina.sh run
