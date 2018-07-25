@@ -88,39 +88,85 @@ function parseKmlLayerStyle(fileText, fileContents)
 	        {
 	        	status.results.forEach(function(sourceLayer)
     		   	{
-	        		var newLayer =
-	        		{
-	        			type: "vector",
-	        			id: fileContents.name.replace(/[^a-z0-9]+/gi, "-").replace(" ", "-") + "-" + sourceLayer.styleUrl.replace(/[^a-z0-9]+/gi, '-').replace(" ", "-").toLowerCase(),
-	        		    title: fileContents.name.replace(/[^a-z0-9]+/gi, "-").replace(" ", "-") + "-" + sourceLayer.styleUrl.replace(/[^a-z0-9]+/gi, '-').replace(" ", "-").toLowerCase(),
-	        		    isVisible: true,
-	        		    isQueryable: true,
-	        		    opacity: 0.65,
-	        		    attributes: [],
-	        		    useRaw: true,
-	        			useClustering: false,
-	        			useHeatmap: false,
-	        			dataUrl: null,
-	        			style: sourceLayer.style
-	        		};
-
-	        		data.layers.push(newLayer);
+	        		var generatedID = fileContents.name.replace(/[^a-z0-9]+/gi, "-").replace(" ", "-") + "-" + sourceLayer.styleUrl.replace(/[^a-z0-9]+/gi, '-').replace(" ", "-").toLowerCase();
+	        		var newLayer;
+	        		var update = false;
+	        		// if a layer exists with the same ID, this should be an update, not a new add?
+	        		for(var lyrIdx = 0; lyrIdx < data.layers.length; lyrIdx++)
+        			{
+	        			var existingLayer = data.layers[lyrIdx];
+	        			if(existingLayer.id == generatedID)
+        				{
+	        				update = true;
+	        				newLayer = existingLayer;
+	        				break;
+        				}
+        			}
 	        		
-	        		// add to layer tree
-	        		var lyrNode =
-	        		{
-	        			title: newLayer.title,
-	        			folder: false,
-	        			expanded: false,
-	        			data: newLayer,
-	        			children: []
-	        		};
+	        		if(update)
+        			{
+	        			newLayer.style = sourceLayer.style;
+	        			
+	        			$("#vectorStrokeOpacity").val(newLayer.style.strokeOpacity);
+	        			$("#vectorFillOpacity").val(newLayer.style.fillOpacity);
+	        			$("#vectorStrokeWidth").val(newLayer.style.strokeWidth);
+	        			$("#vectorStrokeStyle").val(newLayer.style.strokeStyle);
+	        			$("#vectorStrokeColor").val(newLayer.style.strokeColor);
+	        			$("#vectorFillColor").val(newLayer.style.fillColor);
+	        			
+	        			if(sourceLayer.markerImage != null)
+	        			{
+	        				// get the image dimensions and set size/offset accordingly
+	        				var img = new Image();
+	        			    img.addEventListener("load", function()
+	        			    {
+	        			        $("#vectorMarkerSizeX").val(parseInt(this.naturalWidth));
+	        					$("#vectorMarkerSizeY").val(parseInt(this.naturalHeight));
+	        					$("#vectorMarkerOffsetX").val(parseInt(this.naturalWidth / 2));
+	        					$("#vectorMarkerOffsetY").val(parseInt(this.naturalHeight / 2));
 
-	        		var tree = $('#layer-tree').fancytree('getTree');
-	        		var layerSource = tree.getRootNode().children;
-	        		layerSource.push(lyrNode);
-	        		tree.reload(layerSource);
-
+	        					Materialize.updateTextFields();
+	        			    });
+	        			    
+	        			    img.src = sourceLayer.markerImage;
+	        			}
+        			}
+	        		else
+        			{
+		        		newLayer =
+		        		{
+		        			type: "vector",
+		        			id: generatedID,
+		        		    title: generatedID,
+		        		    isVisible: true,
+		        		    isQueryable: true,
+		        		    opacity: 0.65,
+		        		    attributes: [],
+		        		    useRaw: true,
+		        			useClustering: false,
+		        			useHeatmap: false,
+		        			dataUrl: null,
+		        			style: sourceLayer.style
+		        		};
+	
+		        		data.layers.push(newLayer);
+		        		
+		        		// add to layer tree
+		        		var lyrNode =
+		        		{
+		        			title: newLayer.title,
+		        			folder: false,
+		        			expanded: false,
+		        			data: newLayer,
+		        			children: []
+		        		};
+	
+		        		var tree = $('#layer-tree').fancytree('getTree');
+		        		var layerSource = tree.getRootNode().children;
+		        		layerSource.push(lyrNode);
+		        		tree.reload(layerSource);
+        			}
+	        		
 	        		// create blob from geojson
 	        		var jsonString = JSON.stringify(sourceLayer.geojson);
     				var out = [];
@@ -1456,7 +1502,7 @@ function finishLayerEdits(save)
 			selectedLayerNode.data.style.fillOpacity = $("#vectorFillOpacity").val();
 			selectedLayerNode.data.style.markerSize = [$("#vectorMarkerSizeX").val(), $("#vectorMarkerSizeY").val()];
 			selectedLayerNode.data.style.markerOffset = [$("#vectorMarkerOffsetX").val(), $("#vectorMarkerOffsetY").val()];
-			
+			selectedLayerNode.title = $("#vectorName").val();
 			// add the attachment data to the cache for upload after save
 			// currently you cannot re-upload and must create a new layer
 			if(fileContents !== null)
@@ -2986,10 +3032,22 @@ function readFile(e)
 
 	fileContents = file;
 	
-	if(!file.type.startsWith("image/"))
+	if(!file.type.startsWith("image/") && selectedLayerNode == null)
 	{
 		$("#kmlName").val(file.name.replace('.', '-'));
 		$("#vectorName").val(file.name.replace('.', '-'));
+	}
+	
+	if(selectedLayerNode != null && fileContents.type == "application/vnd.google-earth.kml+xml")
+	{
+		var reader = new FileReader();
+	
+		reader.onload = function(e)
+		{
+			parseKmlLayerStyle(e.target.result, fileContents);
+		};
+	
+		reader.readAsText(fileContents);
 	}
 	
 	Materialize.updateTextFields();
