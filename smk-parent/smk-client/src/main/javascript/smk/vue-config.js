@@ -1,6 +1,28 @@
 include.module( 'vue-config', [ 'vue' ], function ( inc ) {
     "use strict";
 
+    Vue.filter( 'formatTitle', function ( value ) {
+        return formatTitle( value )
+    } )
+
+    function formatTitle( value ) {
+        if ( value == null ) return '(Null)'
+
+        return value
+            // surround symbols with spaces
+            .replace( /([^\w\s]+)/, ' $1 ' )
+            // surround words starting with cap with spaces 
+            .replace( /\s*[A-Z]\S*?\w(?=\W)/g, function ( m ) { return ' ' + m.trim() + ' ' } )
+            // change _ & - to space
+            .replace( /\s*[_-]\s*/g, ' ' )
+            .toLowerCase()
+            // uppercase first letter of each space-separated word
+            .replace( /^\w|\s\w/g, function ( m ) { return m.toUpperCase() } )
+            // collapse whitespace to single space
+            .replace( /\s+/g, ' ' )
+            .trim()
+    }
+
     Vue.filter( 'formatNumber', function ( value, decimalPlaces ) {
         return formatNumber( value, decimalPlaces )
     } )
@@ -173,6 +195,20 @@ include.module( 'vue-config', [ 'vue' ], function ( inc ) {
         data: function () {
             return {
                 imageUrl: include.option( 'baseUrl' ) + '/images/spinner.gif'
+            }
+        }
+    } )
+
+    Vue.component( 'status-message', {
+        template: '<div class="smk-message" v-bind:class="\'smk-\' + status"><span v-html="message"></span></div>',
+        props: {
+            status: {
+                type: String,
+                default: 'summary'
+            },
+            message: {
+                type: String,
+                default: ''
             }
         }
     } )

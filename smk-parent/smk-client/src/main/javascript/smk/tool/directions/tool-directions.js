@@ -143,7 +143,7 @@ include.module( 'tool-directions', [ 'tool', 'widgets', 'tool-directions.panel-d
     Vue.component( 'directions-panel', {
         extends: inc.widgets.toolPanel,
         template: inc[ 'tool-directions.panel-directions-html' ],
-        props: [ 'busy', 'waypoints', 'directions', 'directionHighlight', 'directionPick', 'message', 'messageClass', 'config' ],
+        props: [ 'busy', 'waypoints', 'directions', 'directionHighlight', 'directionPick', 'statusMessage', 'config' ],
         data: function () {
             return Object.assign( {}, this.config )
         },
@@ -178,8 +178,7 @@ include.module( 'tool-directions', [ 'tool', 'widgets', 'tool-directions.panel-d
         this.makePropPanel( 'directions', [] )
         this.makePropPanel( 'directionHighlight', null )
         this.makePropPanel( 'directionPick', null )
-        this.makePropPanel( 'message', null )
-        this.makePropPanel( 'messageClass', null )
+        this.makePropPanel( 'statusMessage', null )
         this.makePropPanel( 'config', {
             optimal:    false,
             roundTrip:  false,
@@ -434,14 +433,16 @@ include.module( 'tool-directions', [ 'tool', 'widgets', 'tool-directions.panel-d
         } )
     }
 
-    DirectionsTool.prototype.setMessage = function ( message, Class, delay ) {
-        this.message = message
+    DirectionsTool.prototype.setMessage = function ( message, status, delay ) {
+        if ( !message ) {
+            this.statusMessage = null
+            return
+        }
 
-        this.messageClass = {}
-        if ( message && !Class )
-            Class = 'summary'
-
-        this.messageClass[ 'smk-' + Class ] = true
+        this.statusMessage = {
+            message: message,
+            status: status
+        }
 
         if ( delay )
             return SMK.UTIL.makePromise( function ( res ) { setTimeout( res, delay ) } )

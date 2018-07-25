@@ -5,6 +5,8 @@
     installPolyfills( util )
     setupGlobalSMK( util )
 
+    var documentReadyPromise
+
     var bootstrapScriptEl = document.currentScript
 
     var timer
@@ -164,13 +166,25 @@
             return parseLiteralJson( arg, source ) || parseUrl( arg, source )
         },
 
+        'theme': function ( arg, source ) {
+            var args = arg.split( ',' )
+            if ( args.length != 1 ) throw new Error( '-theme needs 1 argument' )
+            return {
+                viewer: {
+                    theme: args[ 0 ]
+                }
+            }
+        },
+
         'extent': function ( arg ) {
             var args = arg.split( ',' )
             if ( args.length != 4 ) throw new Error( '-extent needs 4 arguments' )
             return {
                 viewer: {
                     location: {
-                        extent: args
+                        extent: args,                        
+                        center: null,
+                        zoom: null,
                     }
                 }
             }
@@ -179,12 +193,17 @@
         'center': function ( arg ) {
             var args = arg.split( ',' )
             if ( args.length < 2 || args.length > 3 ) throw new Error( '-center needs 2 or 3 arguments' )
+
+            var loc = {
+                center: [ args[ 0 ], args[ 1 ] ],
+            }
+
+            if ( args[ 2 ] )
+                loc.zoom = args[ 2 ]
+
             return {
                 viewer: {
-                    location: {
-                        center: [ args[ 0 ], args[ 1 ] ],
-                        zoom: args[ 2 ] || SMK.CONFIG.viewer.location.zoom
-                    }
+                    location: loc 
                 }
             }
         },
@@ -234,7 +253,7 @@
             }
 
             var clauses = args.slice( 2 ).map( function ( p ) {
-                var m = p.trim().match( /^(\w+)\s*(like|LIKE|=|<=?|>=?)\s*(.+?)$/ )
+                var m = p.trim().match( /^(\w+)\s*([$^]?~|=|<=?|>=?)\s*(.+?)$/ )
                 if ( !m ) throw new Error( '-query expression is invalid' )
 
                 var args = [
@@ -243,10 +262,12 @@
                 ]
 
                 switch ( m[ 2 ].toLowerCase() ) {
-                    case 'like': return { operator: 'contains', arguments: args }
-                    case '=': return { operator: 'equals', arguments: args }
-                    case '>': return { operator: 'greater-than', arguments: args }
-                    case '<': return { operator: 'less-than', arguments: args }
+                    case '~':  return { operator: 'contains', arguments: args }
+                    case '^~': return { operator: 'starts-with', arguments: args }
+                    case '$~': return { operator: 'ends-with', arguments: args }
+                    case '=':  return { operator: 'equals', arguments: args }
+                    case '>':  return { operator: 'greater-than', arguments: args }
+                    case '<':  return { operator: 'less-than', arguments: args }
                     case '>=': return { operator: 'not', arguments: [ { operator: 'less-than', arguments: args } ] }
                     case '<=': return { operator: 'not', arguments: [ { operator: 'greater-than', arguments: args } ] }
                 }
@@ -420,20 +441,7 @@
     function initializeSmkMap( attr ) {
         include.option( { baseUrl: attr[ 'base-url' ] } )
 
-        return new Promise( function ( res, rej ) {
-            if ( document.readyState != "loading" )
-                return res()
-
-            document.addEventListener( "DOMContentLoaded", function( ev ) {
-                clearTimeout( id )
-                res()
-            } )
-
-            var id = setTimeout( function () {
-                console.error( 'timeout waiting for document ready' )
-                rej()
-            }, 20000 )
-        } )
+        return whenDocumentReady()
             .then( function () {
                 if ( window.jQuery ) {
                     include.tag( 'jquery' ).include = Promise.resolve( window.jQuery )
@@ -470,6 +478,27 @@
                     return map.initialize()
                 } )
             } )
+    }
+
+// = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+
+    function whenDocumentReady() {
+        if ( documentReadyPromise ) return documentReadyPromise
+
+        return ( documentReadyPromise = new Promise( function ( res, rej ) {
+            if ( document.readyState != "loading" )
+                return res()
+
+            document.addEventListener( "DOMContentLoaded", function( ev ) {
+                clearTimeout( id )
+                res()
+            } )
+
+            var id = setTimeout( function () {
+                console.error( 'timeout waiting for document ready' )
+                rej()
+            }, 20000 )
+        } ) )
     }
 
 // = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
@@ -555,32 +584,37 @@
             UTIL: util,
 
             CONFIG: {
-                name: 'SMK Default map',
+                name: 'SMK Default Map',
                 viewer: {
                     type: "leaflet",
                     location: {
                         extent: [ -139.1782, 47.6039, -110.3533, 60.5939 ],
-                        zoom: 5,
                     },
                     baseMap: 'Topographic',
+                    clusterOption: {
+                        showCoverageOnHover: false
+                    }
                 },
                 tools: [
-                    {
-                        type: "location",
-                        enabled: true,
-                    },
-                    {
-                        type: "search",
-                        enabled: true,
-                    },
-                    {
-                        type: "directions",
-                        enabled: true,
-                    },
-                    {
-                        type: "markup",
-                        enabled: true,
-                    }
+                    { type: 'about',        enabled: false },
+                    { type: 'baseMaps',     enabled: false },
+                    { type: 'coordinate',   enabled: false },
+                    { type: 'directions',   enabled: true },
+                    // { type: 'dropdown',     enabled: false }, -- so it won't be enabled by show-tools=all, no tools use it by default
+                    { type: 'identify',     enabled: false },
+                    { type: 'layers',       enabled: false },
+                    { type: 'location',     enabled: true },
+                    { type: 'markup',       enabled: true },
+                    { type: 'measure',      enabled: false },
+                    { type: 'menu',         enabled: false },
+                    { type: 'minimap',      enabled: false },
+                    { type: 'pan',          enabled: false },
+                    // { type: 'query',        enabled: false }, -- so it won't be enabled by show-tools=all, as it needs an instance
+                    { type: 'scale',        enabled: false },
+                    { type: 'search',       enabled: true },
+                    { type: 'select',       enabled: false },
+                    // { type: 'version',      enabled: false }, -- so it won't be enabled by show-tools=all
+                    { type: 'zoom',         enabled: false }
                 ]
             },
 
@@ -616,7 +650,9 @@
                     </div>\
                 '.replace( /\s+/g, ' ' ).replace( '{}', e || '' )
 
-                document.querySelector( 'body' ).appendChild( message )
+                whenDocumentReady().then( function () {
+                    document.querySelector( 'body' ).appendChild( message )
+                } )
             },
 
             BUILD: {

@@ -8,7 +8,7 @@ include.module( 'tool-identify', [ 'feature-list', 'widgets', 'tool-identify.pan
     Vue.component( 'identify-panel', {
         extends: inc.widgets.toolPanel,
         template: inc[ 'tool-identify.panel-identify-html' ],
-        props: [ 'busy', 'layers', 'highlightId', 'message', 'messageClass' ],
+        props: [ 'busy', 'layers', 'highlightId', 'statusMessage' ],
     } )
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
@@ -36,6 +36,8 @@ include.module( 'tool-identify', [ 'feature-list', 'widgets', 'tool-identify.pan
 
     IdentifyTool.prototype.afterInitialize.push( function ( smk ) {
         var self = this
+
+        self.setMessage( 'Click on map to identify features.' )
 
         self.changedActive( function () {
             if ( self.active ) {
@@ -68,6 +70,10 @@ include.module( 'tool-identify', [ 'feature-list', 'widgets', 'tool-identify.pan
                         return smk.$viewer.identified.get( ft.id )
                     } ) )
                 } )
+            },
+
+            'clear': function ( ev ) {
+                self.setMessage( 'Click on map to identify features.' )
             }
         } )
 

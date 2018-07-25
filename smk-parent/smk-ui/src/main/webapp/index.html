@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
   <head>
     <title>Configurations - SMK</title>
@@ -25,7 +26,6 @@
     
     <script src="resources/js/trumbowyg/plugins/allowtagsfrompaste/trumbowyg.allowtagsfrompaste.min.js"></script>
     <script src="resources/js/trumbowyg/plugins/base64/trumbowyg.base64.min.js"></script>
-    <!-- script src="resources/js/trumbowyg/plugins/cleanpaste/trumbowyg.cleanpaste.min.js"></script -->
     <script src="resources/js/trumbowyg/plugins/colors/trumbowyg.colors.min.js"></script>
     <script src="resources/js/trumbowyg/plugins/fontfamily/trumbowyg.fontfamily.min.js"></script>
     <script src="resources/js/trumbowyg/plugins/fontsize/trumbowyg.fontsize.min.js"></script>
@@ -218,7 +218,6 @@
 				<li class="tab col s3"><a href="#basemap" onclick="resetBasemapView()">Basemap</a></li>
 				<li class="tab col s3"><a href="#layers">Layers</a></li>
 				<li class="tab col s3"><a href="#tools">Tools</a></li>
-				<!-- <li class="tab col s3"><a href="#themes">Style &amp; Theme</a></li> -->
 			  </ul>
 			</div>
 			<div id="identity" class="col s12">
@@ -231,12 +230,6 @@
 	          						<label for="mashupName">Name/ID</label>
 								</div>
 							</div>
-							<!-- <div class="row" style="margin-bottom: 0px;">
-								<div class="col s12 input-field">
-									<input id="mashupTitle" type="text" class="validate active" v-model="surround.title">
-									<label for="mashupTitle">Title</label>
-								</div>
-							</div> -->
 							<div class="row" style="margin-top: 20px;">
 								<div class="col s12">
 									<p>What kind of map viewer do you want to use?</p>
@@ -257,9 +250,9 @@
 						</form>
 					</div>
 					<div class="card-action">
-		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="saveMapConfig();" style="width: 170px;"><i class="material-icons left">save</i>Save</a>
-		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="closeEditPanel();" style="width: 170px;"><i class="material-icons left">cancel</i>Close</a>
-		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="$('#editorTabs').tabs('select_tab', 'basemap')" style="width: 170px; position: absolute; right: 30px;"><i class="material-icons right">keyboard_arrow_right</i>Next</a>
+		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="saveMapConfig();" style="width: 170px;"><em style="position: absolute; top: 14px; left: 14px;" class="material-icons left">save</em>Save</a>
+		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="closeEditPanel();" style="width: 170px;"><em style="position: absolute; top: 14px; left: 14px;" class="material-icons left">cancel</em>Close</a>
+		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="$('#editorTabs').tabs('select_tab', 'basemap')" style="width: 170px; position: absolute; right: 30px;"><em style="position: absolute; top: 14px; right: 14px;" class="material-icons right">keyboard_arrow_right</em>Next</a>
 			     	</div>
 				</div>
 			</div>
@@ -305,22 +298,18 @@
 									<p>
 										Select a basemap above to set your applications default basemap. Pan and zoom the map to the right to set the applications initial extent.
 									</p>
-									<!-- <div style="height: 20px;"></div>
-									<p class="z-depth-2">
-										Current extent: {{viewer.initialExtent[0]}}, {{viewer.initialExtent[1]}}, {{viewer.initialExtent[2]}}, {{viewer.initialExtent[3]}}
-									</p>-->
 								</div>
-								<div class="col s8">
+								<div class="col s8" style="height: calc(100vh - 330px);">
 									<div id="basemapViewer" style="height: 100%; width: 100%;"></div>
 								</div>
 							</div>
 						</form>
 					</div>
 					<div class="card-action">
-		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="saveMapConfig();" style="width: 170px;"><i class="material-icons left">save</i>Save</a>
-		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="closeEditPanel();" style="width: 170px;"><i class="material-icons left">cancel</i>Close</a>
-		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="$('#editorTabs').tabs('select_tab', 'identity')" style="width: 170px; position: absolute; right: 204px;"><i class="material-icons left">keyboard_arrow_left</i>Back</a>
-		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="$('#editorTabs').tabs('select_tab', 'layers')" style="width: 170px; position: absolute; right: 30px;"><i class="material-icons right">keyboard_arrow_right</i>Next</a>
+		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="saveMapConfig();" style="width: 170px;"><em style="position: absolute; top: 14px; left: 14px;" class="material-icons left">save</em>Save</a>
+		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="closeEditPanel();" style="width: 170px;"><em style="position: absolute; top: 14px; left: 14px;" class="material-icons left">cancel</em>Close</a>
+		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="$('#editorTabs').tabs('select_tab', 'identity')" style="width: 170px; position: absolute; right: 204px;"><em style="position: absolute; top: 14px; left: 14px;" class="material-icons left">keyboard_arrow_left</em>Back</a>
+		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="$('#editorTabs').tabs('select_tab', 'layers')" style="width: 170px; position: absolute; right: 30px;"><em style="position: absolute; top: 14px; right: 14px;" class="material-icons right">keyboard_arrow_right</em>Next</a>
 			     	</div>
 				</div>
 			</div>
@@ -330,7 +319,7 @@
 						<form id="layersForm" style="padding: 0px; margin: 0px;">
 							<div id="editLayerPanel" class="row" style="height: 100%; display: none; padding: 0px; margin: 0px;">
 								<div style="position: absolute; bottom: 14px; right: 30px; z-index: 1000;">
-									<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="finishLayerEdits(true);" style="width: 343px; height: 56px;"><i class="material-icons left">backup</i>Done Edits</a>
+									<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="finishLayerEdits(true);" style="width: 343px; height: 56px;"><em style="position: absolute; top: 14px; left: 14px;" class="material-icons left">backup</em>Done Edits</a>
 								</div>
 								<div style="height: 100%;">
 									<div id="layerEditDataBCPanel" class="col s9" style="display: none; overflow: auto; height: 100%;">
@@ -537,7 +526,7 @@
 						</form>
 						<form id="layersDisplayForm" style="padding: 0px; margin: 0px;">
 							<div id="layerAddPanel" class="row" style="display: block; padding: 0px; margin: 0px;">
-								<div class="col s5">
+								<div class="col s5" style="height: calc(100vh - 330px);">
 									  <ul id="layerTypeTabs" class="tabs navbar tabs-fixed-width nrpp-blue-dark">
 										<div class="indicator nrpp-yellow" style="z-index:1"></div>
 										<li class="tab col s3"><a class="active" href="#dbcCatalog" onclick="selectLayerType('dbc')">DataBC</a></li>
@@ -551,7 +540,7 @@
 					          						<label for="searchDbcTree">Filter</label>
 											    </div>
 											    <div class="col s2" style="padding: 7px;">
-											    	<a id="btnResetDbcTreeSearch" class="waves-effect waves-light btn-large nrpp-blue-dark"><i class="material-icons center">cancel</i></a>
+											    	<a id="btnResetDbcTreeSearch" class="waves-effect waves-light btn-large nrpp-blue-dark"><em style="position: absolute; top: 14px; left: 14px;" class="material-icons center">cancel</em></a>
 											    </div>
 											    <div class="col s1">
 											    </div>
@@ -569,12 +558,8 @@
 													<input id="wmsUrlField" type="text">
 					          						<label for="wmsUrlField">WMS URL</label>
 												</div>
-												<!-- div class="col s2 input-field">
-													<input id="wmsVersionField" type="text">
-					          						<label for="wmsVersionField">Version</label>
-												</div-->
 												<div class="col s2">
-													<a id="wmsRefreshButton" class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="loadWmsLayers();" ><i class="material-icons center">cached</i></a>
+													<a id="wmsRefreshButton" class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="loadWmsLayers();" ><em style="position: absolute; top: 14px; left: 14px;" class="material-icons center">cached</em></a>
 													<div id="wmsPanelLoading" class="row" style="display: none;">
 									    				<div class="preloader-wrapper big active">
 														    <div class="spinner-layer spinner-blue-only">
@@ -599,7 +584,7 @@
 						          						<label for="searchWmsTree">Filter</label>
 												    </div>
 												    <div class="col s2" style="padding: 7px;">
-												    	<a id="btnResetWmsTreeSearch" class="waves-effect waves-light btn-large nrpp-blue-dark"><i class="material-icons center">cancel</i></a>
+												    	<a id="btnResetWmsTreeSearch" class="waves-effect waves-light btn-large nrpp-blue-dark"><em style="position: absolute; top: 14px; left: 14px;" class="material-icons center">cancel</em></a>
 												    </div>
 												    <div class="col s1">
 											    </div>
@@ -631,9 +616,6 @@
 												      <option value="kml">KML</option>
 												      <option value="kmz">KMZ</option>
 												      <option value="vector">GeoJSON</option>
-												      <!-- <option value="wkt">WKT</option>-->
-												      <!-- <option value="gml">GML</option>-->
-												      <!-- <option value="csv">CSV</option>-->
 												      <option value="shape">Shapefile (zip only)</option>
 												    </select>
 												</div>
@@ -653,108 +635,112 @@
 					          						<label for="kmlName">Name</label>
 												</div>
 							      			</div>
-							      			<div class="row">
-							      				<div class="col s4">
-													<input type="checkbox" id="kmlIsVisible" />
-													<label class="black-text" for="kmlIsVisible">Visible</label>
-												</div>
-												<div class="col s4">
-													<input type="checkbox" id="kmlQueryable" />
-													<label class="black-text" for="kmlQueryable">Identifiable</label>
-												</div>
-												<div class="col s4"> 
-												</div>
-											</div>
-											<div class="row">
-							      				<div class="col s4">
-													<input type="checkbox" id="kmlClustering" />
-													<label class="black-text" for="kmlClustering">Display as Cluster</label>
-												</div>
-												<div class="col s4">
-													<input type="checkbox" id="kmlHeatmapping" />
-													<label class="black-text" for="kmlHeatmapping">Display as Heatmap</label>
-												</div>
-							      			</div>
-							      			<div class="row" >
-												<div class="col s4 input-field">
-													<input id="kmlOpacity" type="text">
-					          						<label for="kmlOpacity">Layer Opacity</label>
-												</div>
-												<div class="col s4 input-field">
-													<input id="kmlStrokeOpacity" type="text">
-					          						<label for="kmlStrokeOpacity">Stroke Opacity</label>
-												</div>
-												<div class="col s4 input-field">
-													<input id="kmlFillOpacity" type="text">
-					          						<label for="kmlFillOpacity">Fill Opacity</label>
-												</div>
-							      			</div>
-							      			<div class="row" >
-							      				<div class="col s4 input-field">
-													<input id="kmlStrokeWidth" type="text">
-					          						<label for="kmlStrokeWidth">Stroke Width</label>
-												</div>
-												<div class="col s4 input-field">
-													<input id="kmlStrokeStyle" type="text">
-					          						<label for="kmlStrokeStyle">Stroke Style</label>
-												</div>
-											</div>
-											<div class="row" >
-							    				<div class="col s4">
-													<label for="kmlStrokeColor" class="black-text">Stroke Color</label>
-													<input id="kmlStrokeColor" type="color">
-												</div>
-												<div class="col s4">
-							    					<label for="kmlFillColor" class="black-text">Fill Color</label>
-													<input id="kmlFillColor" type="color">
-												</div>
-							      			</div>
-							      			<div class="row">
-												<div class="file-field input-field">
-													<div class="btn nrpp-blue-dark">
-														<span>Custom Point Marker</span>
-														<input type="file" id="customMarkerFileUploadNew">
+							      			<!-- Currently hiding vector edit on create to support splitting KML files on load -->
+							      			<div style="display: none;">
+								      			<div class="row">
+								      				<div class="col s4">
+														<input type="checkbox" id="kmlIsVisible" />
+														<label class="black-text" for="kmlIsVisible">Visible</label>
 													</div>
-													<div class="file-path-wrapper">
-														<input class="file-path validate" type="text">
+													<div class="col s4">
+														<input type="checkbox" id="kmlQueryable" />
+														<label class="black-text" for="kmlQueryable">Identifiable</label>
+													</div>
+													<div class="col s4"> 
 													</div>
 												</div>
+												<div class="row">
+								      				<div class="col s4">
+														<input type="checkbox" id="kmlClustering" />
+														<label class="black-text" for="kmlClustering">Display as Cluster</label>
+													</div>
+													<div class="col s4">
+														<input type="checkbox" id="kmlHeatmapping" />
+														<label class="black-text" for="kmlHeatmapping">Display as Heatmap</label>
+													</div>
+								      			</div>
+								      			<div class="row" >
+													<div class="col s4 input-field">
+														<input id="kmlOpacity" type="text">
+						          						<label for="kmlOpacity">Layer Opacity</label>
+													</div>
+													<div class="col s4 input-field">
+														<input id="kmlStrokeOpacity" type="text">
+						          						<label for="kmlStrokeOpacity">Stroke Opacity</label>
+													</div>
+													<div class="col s4 input-field">
+														<input id="kmlFillOpacity" type="text">
+						          						<label for="kmlFillOpacity">Fill Opacity</label>
+													</div>
+								      			</div>
+								      			<div class="row" >
+								      				<div class="col s4 input-field">
+														<input id="kmlStrokeWidth" type="text">
+						          						<label for="kmlStrokeWidth">Stroke Width</label>
+													</div>
+													<div class="col s4 input-field">
+														<input id="kmlStrokeStyle" type="text">
+						          						<label for="kmlStrokeStyle">Stroke Style</label>
+													</div>
+												</div>
+												<div class="row" >
+								    				<div class="col s4">
+														<label for="kmlStrokeColor" class="black-text">Stroke Color</label>
+														<input id="kmlStrokeColor" type="color">
+													</div>
+													<div class="col s4">
+								    					<label for="kmlFillColor" class="black-text">Fill Color</label>
+														<input id="kmlFillColor" type="color">
+													</div>
+								      			</div>
+								      			<div class="row">
+													<div class="file-field input-field">
+														<div class="btn nrpp-blue-dark">
+															<span>Custom Point Marker</span>
+															<input type="file" id="customMarkerFileUploadNew">
+														</div>
+														<div class="file-path-wrapper">
+															<input class="file-path validate" type="text">
+														</div>
+													</div>
+												</div>
+												<div class="row">
+													<div class="col s6 input-field">
+														<input id="kmlMarkerSizeX" type="text">
+						          						<label for="kmlMarkerSizeX">Marker Size X</label>
+													</div>
+													<div class="col s6 input-field">
+														<input id="kmlMarkerSizeY" type="text">
+						          						<label for="kmlMarkerSizeY">Marker Size Y</label>
+													</div>
+												</div>
+												<div class="row">
+													<div class="col s6 input-field">
+														<input id="kmlMarkerOffsetX" type="text">
+						          						<label for="kmlMarkerOffsetX">Marker Offset X</label>
+													</div>
+													<div class="col s6 input-field">
+														<input id="kmlMarkerOffsetY" type="text">
+						          						<label for="kmlMarkerOffsetY">Marker Offset Y</label>
+													</div>
+												</div>
 											</div>
-											<div class="row">
-												<div class="col s6 input-field">
-													<input id="kmlMarkerSizeX" type="text">
-					          						<label for="kmlMarkerSizeX">Marker Size X</label>
-												</div>
-												<div class="col s6 input-field">
-													<input id="kmlMarkerSizeY" type="text">
-					          						<label for="kmlMarkerSizeY">Marker Size Y</label>
-												</div>
-											</div>
-											<div class="row">
-												<div class="col s6 input-field">
-													<input id="kmlMarkerOffsetX" type="text">
-					          						<label for="kmlMarkerOffsetX">Marker Offset X</label>
-												</div>
-												<div class="col s6 input-field">
-													<input id="kmlMarkerOffsetY" type="text">
-					          						<label for="kmlMarkerOffsetY">Marker Offset Y</label>
-												</div>
-											</div>
+											<!-- End of kml edit block (currently hidden as commented above) -->
 											<div style="height: 100px;"></div>
 								    	</div>
 									</ul>
 								</div>
-								<div class="col s2">
+								<div class="col s2" style="height: calc(100vh - 330px);">
 									<div style="position: absolute; top: 50%; left: 50%; transform: translateX(-50%) translateY(-50%);">
 										<div class="row" style="padding: 0px; margin: 5px;">
-											<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="addSelectedDataLayer();"><i class="material-icons center">keyboard_arrow_right</i></a>
+											<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="addSelectedDataLayer();"><em style="position: absolute; top: 14px; left: 14px;" class="material-icons center">keyboard_arrow_right</em></a>
 										</div>
 										<div class="row" style="padding: 0px; margin: 5px;">
-											<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="removeSelectedLayer();"><i class="material-icons center">keyboard_arrow_left</i></a>
+											<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="removeSelectedLayer();"><em style="position: absolute; top: 14px; left: 14px;" class="material-icons center">keyboard_arrow_left</em></a>
 										</div>
 									</div>
 								</div>
-								<div class="col s5">
+								<div class="col s5" style="height: calc(100vh - 330px);">
 									<div id="layerData" style="height: 100%; width: 100%;">
 										<div class="row" style="margin: 0px;">
 											<h5 style="border-bottom: 2px solid #fcba19;">Active Layers</h5>
@@ -765,18 +751,17 @@
 				          						<label for="searchLayerTree">Filter</label>
 										    </div>
 										    <div class="col s2" style="padding: 7px;">
-										    	<a id="btnResetLayerTreeSearch" class="waves-effect waves-light btn-large nrpp-blue-dark"><i class="material-icons center">cancel</i></a>
+										    	<a id="btnResetLayerTreeSearch" class="waves-effect waves-light btn-large nrpp-blue-dark"><em style="position: absolute; top: 14px; left: 14px;" class="material-icons center">cancel</em></a>
 										    </div>
 										</div>
 										<div class="row" style="margin: 0px;">
 											<span id="LayerTreeMatches"></span>
 										</div>
 										<div class="row" style="margin: 0px;">
-						    				<div id="layer-tree" class="layer-container"></div>
+						    				<div id="layer-tree" class="layer-container" style="height: calc(100vh - 530px);"></div>
 						      			</div>
 						      			<div class="row" style="padding: 10px;">
-						      				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="editSelectedLayer();" style="width: 170px;"><i class="material-icons left">mode_edit</i>Edit</a>
-						      				<!-- a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="removeSelectedLayer();" style="width: 170px;"><i class="material-icons left">delete_forever</i>Remove</a -->
+						      				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="editSelectedLayer();" style="width: 170px;"><em style="position: absolute; top: 14px; left: 14px;" class="material-icons left">mode_edit</em>Edit</a>
 						      			</div>
 									</div>
 								</div>
@@ -784,10 +769,10 @@
 						</form>
 					</div>
 					<div class="card-action">
-		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="saveMapConfig();" style="width: 170px;"><i class="material-icons left">save</i>Save</a>
-		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="closeEditPanel();" style="width: 170px;"><i class="material-icons left">cancel</i>Close</a>
-		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="$('#editorTabs').tabs('select_tab', 'basemap')" style="width: 170px; position: absolute; right: 204px;"><i class="material-icons left">keyboard_arrow_left</i>Back</a>
-		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="$('#editorTabs').tabs('select_tab', 'tools')" style="width: 170px; position: absolute; right: 30px;"><i class="material-icons right">keyboard_arrow_right</i>Next</a>
+		  				<a id="layerSave" class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="saveMapConfig();" style="width: 170px;"><em style="position: absolute; top: 14px; left: 14px;" class="material-icons left">save</em>Save</a>
+		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="closeEditPanel();" style="width: 170px;"><em style="position: absolute; top: 14px; left: 14px;" class="material-icons left">cancel</em>Close</a>
+		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="$('#editorTabs').tabs('select_tab', 'basemap')" style="width: 170px; position: absolute; right: 204px;"><em style="position: absolute; top: 14px; left: 14px;" class="material-icons left">keyboard_arrow_left</em>Back</a>
+		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="$('#editorTabs').tabs('select_tab', 'tools')" style="width: 170px; position: absolute; right: 30px;"><em style="position: absolute; top: 14px; right: 14px;" class="material-icons right">keyboard_arrow_right</em>Next</a>
 			     	</div>
 				</div>
 			</div>
@@ -878,7 +863,7 @@
 									<div id="toolEditContainer">
 										<ul class="collapsible" data-collapsible="accordion">
 											<li id="aboutPanelOptions" style="display: none;">
-										      <div class="collapsible-header"><i class="material-icons">home</i>About Panel Options</div>
+										      <div class="collapsible-header"><em class="material-icons">home</em>About Panel Options</div>
 										      <div class="collapsible-body">
 										      	<div class="row" >
 										      		<div id="about-content" style="height: 75%"></div>
@@ -886,7 +871,7 @@
 											  </div>
 										    </li>
 										    <li id="zoomOptions" style="display: none;">
-										      <div class="collapsible-header"><i class="material-icons">zoom_out_map</i>Zooming Tool Options</div>
+										      <div class="collapsible-header"><em class="material-icons">zoom_out_map</em>Zooming Tool Options</div>
 										      <div class="collapsible-body">
 										      	<div class="row">
 										      		<p>
@@ -909,7 +894,7 @@
 											  </div>
 										    </li>
 										    <li id="scaleOptions" style="display: none;">
-										      <div class="collapsible-header"><i class="material-icons">my_location</i>Scale Tool Options</div>
+										      <div class="collapsible-header"><em class="material-icons">my_location</em>Scale Tool Options</div>
 										      <div class="collapsible-body">
 										      	<div class="row">
 										      		<p>
@@ -924,7 +909,7 @@
 											  </div>
 										    </li>
 										    <li id="minimapOptions" style="display: none;">
-										      <div class="collapsible-header"><i class="material-icons">satellite</i>Mini Map Options</div>
+										      <div class="collapsible-header"><em class="material-icons">satellite</em>Mini Map Options</div>
 										      <div class="collapsible-body">
 										      	<div class="row">
 										      		<p>
@@ -966,7 +951,7 @@
 											  </div>
 										    </li>
 										    <li id="basemapPanelOptions" style="display: none;">
-										      <div class="collapsible-header"><i class="material-icons">map</i>Base Maps Panel Options</div>
+										      <div class="collapsible-header"><em class="material-icons">map</em>Base Maps Panel Options</div>
 										      <div class="collapsible-body">
 										      		<p>
 										      			Select which basemaps to make available in the Basemap selector
@@ -1006,7 +991,7 @@
 											  </div>
 										    </li>
 										    <li id="identifyOptions" style="display: none;">
-										      <div class="collapsible-header"><i class="material-icons">search</i>Identify Options</div>
+										      <div class="collapsible-header"><em class="material-icons">search</em>Identify Options</div>
 										      <div class="collapsible-body">
 												<div class="row" >
 													<div class="col s4 input-field">
@@ -1055,7 +1040,7 @@
 											  </div>
 										    </li>
 										    <li id="selectionOptions" style="display: none;">
-										      <div class="collapsible-header"><i class="material-icons">select_all</i>Select Options</div>
+										      <div class="collapsible-header"><em class="material-icons">select_all</em>Select Options</div>
 										      <div class="collapsible-body">
 												<div class="row" >
 													<div class="col s4 input-field">
@@ -1101,44 +1086,13 @@
 						</form>
 					</div>
 					<div class="card-action">
-		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="saveMapConfig();" style="width: 170px;"><i class="material-icons left">save</i>Save</a>
-		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="closeEditPanel();" style="width: 170px;"><i class="material-icons left">cancel</i>Close</a>
-		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="$('#editorTabs').tabs('select_tab', 'layers')" style="width: 170px; position: absolute; right: 204px;"><i class="material-icons left">keyboard_arrow_left</i>Back</a>
-		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="$('#editorTabs').tabs('select_tab', 'themes')" style="width: 170px; position: absolute; right: 30px;"><i class="material-icons right">keyboard_arrow_right</i>Next</a>
+		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="saveMapConfig();" style="width: 170px;"><em style="position: absolute; top: 14px; left: 14px;" class="material-icons left">save</em>Save</a>
+		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="closeEditPanel();" style="width: 170px;"><em style="position: absolute; top: 14px; left: 14px;" class="material-icons left">cancel</em>Close</a>
+		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="$('#editorTabs').tabs('select_tab', 'layers')" style="width: 170px; position: absolute; right: 204px;"><em style="position: absolute; top: 14px; left: 14px;" class="material-icons left">keyboard_arrow_left</em>Back</a>
+		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="$('#editorTabs').tabs('select_tab', 'themes')" style="width: 170px; position: absolute; right: 30px;"><em style="position: absolute; top: 14px; right: 14px;" class="material-icons right">keyboard_arrow_right</em>Next</a>
 			     	</div>
 				</div>
 			</div>
-<!-- 			<div id="themes" class="col s12"> -->
-<!-- 				<div class="card white"> -->
-<!-- 					<div class="card-content black-text" style="height: calc(100vh - 280px); overflow: auto;"> -->
-<!-- 						<form id="themesForm" style="padding: 0px; margin: 0px;"> -->
-<!-- 							<div class="row"> -->
-<!-- 								<h5 style="border-bottom: 2px solid #fcba19;">Header Image</h5> -->
-<!-- 							</div> -->
-<!-- 							<div class="row"> -->
-<!-- 								<p>Upload a header image to replace the default header style.</p> -->
-<!-- 								<p>Once you've selected a file, click "Keep Changes" to load the file. It will be saved to your map once you click the save button.</p> -->
-<!-- 							</div> -->
-<!-- 							<div class="row"> -->
-<!-- 								<div class="file-field input-field"> -->
-<!-- 									<div class="btn nrpp-blue-dark"> -->
-<!-- 										<span>File</span> -->
-<!-- 										<input type="file" id="headerImageFileUpload"> -->
-<!-- 									</div> -->
-<!-- 									<div class="file-path-wrapper"> -->
-<!-- 										<input class="file-path validate" type="text"> -->
-<!-- 									</div> -->
-<!-- 								</div> -->
-<!-- 							</div> -->
-<!-- 						</form> -->
-<!-- 					</div> -->
-<!-- 					<div class="card-action"> -->
-<!-- 		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="saveMapConfig();" style="width: 170px;"><i class="material-icons left">save</i>Save</a> -->
-<!-- 		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="closeEditPanel();" style="width: 170px;"><i class="material-icons left">cancel</i>Close</a> -->
-<!-- 		  				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="$('#editorTabs').tabs('select_tab', 'tools')" style="width: 170px; position: absolute; right: 30px;"><i class="material-icons left">keyboard_arrow_left</i>Back</a> -->
-<!-- 			     	</div> -->
-<!-- 				</div> -->
-<!-- 			</div> -->
 		  </div>
 	    </div>
 		<!-- Footer -->
@@ -1193,7 +1147,7 @@
 				</div>
 			</div>
 			<div class="row">
-				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="addNewQuery();" style="width: 170px;"><i class="material-icons left">save</i>Add New</a>
+				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="addNewQuery();" style="width: 170px;"><em style="position: absolute; top: 14px; left: 14px;" class="material-icons left">save</em>Add New</a>
 			</div>
 		</div>
 		<div id="queryEditor" style="display: none;">
@@ -1214,7 +1168,7 @@
 						<label class="black-text" for="queryOnDropdown">Add to Dropdown (if tool is available)</label>
 					</div>
 					<div class="col s4 input-field">
-						<i id="iconDemo" class="material-icons prefix black-text">search</i>
+						<em style="position: absolute; top: 14px; left: 14px;" id="iconDemo" class="material-icons prefix black-text">search</em>
 						<input id="queryIcon" type="text" onchange="updateQueryIconPrefix();">
 						<label for="queryIcon">Query Icon ID</label>
 					</div>
@@ -1237,10 +1191,10 @@
 				<div id="queryArguments">
 				</div>
 				<div class="row">
-					<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="addNewQueryArgument();" style="width: 220px;"><i class="material-icons left">add</i>Add Argument</a>
+					<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="addNewQueryArgument();" style="width: 220px;"><em style="position: absolute; top: 14px; left: 14px;" class="material-icons left">add</em>Add Argument</a>
 				</div>
 				<div class="row">
-					<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="saveQuery();" style="width: 220px;"><i class="material-icons left">save</i>Save Query</a>
+					<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="saveQuery();" style="width: 220px;"><em style="position: absolute; top: 14px; left: 14px;" class="material-icons left">save</em>Save Query</a>
 				</div>
 			</form>
 		</div>
@@ -1260,10 +1214,10 @@
 		<div id="dropdownOptionsPanel">
 	    </div>
 	    <div class="row">
-			<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="addNewChoice();" style="width: 220px;"><i class="material-icons left">add</i>Add Choice</a>
+			<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="addNewChoice();" style="width: 220px;"><em style="position: absolute; top: 14px; left: 14px;" class="material-icons left">add</em>Add Choice</a>
 		</div>
 		<div class="row">
-			<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="loadDropdownChoiceFromLayer();" style="width: 220px;"><i class="material-icons left">redo</i>Load Choices</a>
+			<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="loadDropdownChoiceFromLayer();" style="width: 220px;"><em style="position: absolute; top: 14px; left: 14px;" class="material-icons left">redo</em>Load Choices</a>
 		</div>
       </div>
       <div class="modal-footer">
@@ -1287,7 +1241,30 @@
       <div class="modal-footer">
         <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat">Close</a>
       </div>
-    </div> 
+    </div>
+    <div id="kmlUploadModal" class="modal modal-fixed-footer">
+      <div class="modal-content">
+		<div class="row">
+			<h5>KML Uploading...</h5>
+		</div>
+		<div class="row">
+			<p>You've attempted to upload a KML file that contains multiple styles. This may potentially cause multiple layers to be created. They will be automatically generated, but you can edit them after the generation is complete.</p>
+			<div class="row">
+           		<div class="col s12">
+            		<div id="kmlUploadProgressBar" class="progress">
+      		  			<div class="indeterminate"></div>
+  					</div>
+  					<div id="kmlUploadProgressComplete" style="display: none;">
+      		  			<p>Processing Complete!</p>
+  					</div>
+  				</div>
+  			</div>
+		</div>
+      </div>
+      <div class="modal-footer">
+        <a id="kmlUploadButton" style="display: none;" href="#!" class="modal-action modal-close waves-effect waves-red btn-flat">Close</a>
+      </div>
+    </div>
 	<script type="text/javascript">
 	</script>
   </body>

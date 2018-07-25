@@ -6,6 +6,14 @@ include.module( 'tool-measure-esri3d', [ 'tool-measure', 'esri3d', 'types-esri3d
     SMK.TYPE.MeasureTool.prototype.afterInitialize.push( function ( smk ) {
         var self = this
 
+        this.changedActive( function () {
+            if ( self.active ) {
+                self.setMessage( "Select measurement method" )
+            }
+            else {
+            }
+        } )
+
         function newContainer() {
             return $( '<div>' ).appendTo( self.containerEl ).get( 0 )
         }
@@ -31,7 +39,7 @@ include.module( 'tool-measure-esri3d', [ 'tool-measure', 'esri3d', 'types-esri3d
 
             'start-area': function ( ev ) {
                 destroyWidget()
-                self.panel.placeholder = false
+                self.setMessage()
 
                 self.measureWidget = new E.widgets.AreaMeasurement3D( {
                     view:       smk.$viewer.view,
@@ -41,7 +49,7 @@ include.module( 'tool-measure-esri3d', [ 'tool-measure', 'esri3d', 'types-esri3d
 
             'start-distance': function ( ev ) {
                 destroyWidget()
-                self.panel.placeholder = false
+                self.setMessage()
 
                 self.measureWidget = new E.widgets.DirectLineMeasurement3D( {
                     view:       smk.$viewer.view,

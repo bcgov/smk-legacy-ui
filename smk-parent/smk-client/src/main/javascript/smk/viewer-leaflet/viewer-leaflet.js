@@ -35,8 +35,12 @@ include.module( 'viewer-leaflet', [ 'viewer', 'leaflet', 'layer-leaflet', 'featu
             self.map.fitBounds( [ [ bx[ 1 ], bx[ 0 ] ], [ bx[ 3 ], bx[ 2 ] ] ] )
         }
 
-        if ( smk.viewer.location.center && !smk.viewer.location.extent ) {
-            self.map.flyTo( [ smk.viewer.location.center[ 1 ], smk.viewer.location.center[ 0 ] ], smk.viewer.location.zoom, { animate: false } )
+        if ( smk.viewer.location.zoom ) {
+            self.map.setZoom( smk.viewer.location.zoom, { animate: false } )
+        }
+
+        if ( smk.viewer.location.center ) {
+            self.map.panTo( [ smk.viewer.location.center[ 1 ], smk.viewer.location.center[ 0 ] ], { animate: false } )
         }
 
         if ( smk.viewer.baseMap ) {

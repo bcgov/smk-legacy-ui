@@ -1,14 +1,19 @@
 package ca.bc.gov.app.smks.converter;
 
+import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -39,6 +44,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -50,6 +57,7 @@ import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
+import ca.bc.gov.app.smks.model.LayerStyle;
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
 
@@ -137,21 +145,6 @@ public class DocumentConverterFactory
         docStream.close();
         docStream = null;
         
-        // identify the styles
-        NodeList styleNodes = doc.getElementsByTagName("Style");
-        
-        if (styleNodes != null)
-        {
-            int length = styleNodes.getLength();
-            for (int featureIndex = 0; featureIndex < length; featureIndex++)
-            {
-                if (styleNodes.item(featureIndex).getNodeType() == Node.ELEMENT_NODE)
-                {
-                    Element style = (Element) styleNodes.item(featureIndex);
-                }
-            }
-        }
-        
         // Process the placemark geometry
         NodeList featureNodes = doc.getElementsByTagName("Placemark");
         
@@ -167,6 +160,9 @@ public class DocumentConverterFactory
 	                
 	                featureJson.put("type", "Feature");
 	                ObjectNode jsonProperties = featureJson.putObject("properties");
+	                
+	                // add the style ID as a property
+	                jsonProperties.put("styleUrl", feature.getElementsByTagName("styleUrl").item(0).getTextContent());
 	                
 	                // determine geometry type
 	                ObjectNode geometryObject = featureJson.putObject("geometry");
@@ -278,7 +274,7 @@ public class DocumentConverterFactory
         if(convertedJson != null)
         {
         	String resultText = convertedJson.toString();
-        	result = resultText.getBytes();
+        	result = resultText.getBytes("UTF-8");
         }
         
 		return result;
@@ -374,48 +370,7 @@ public class DocumentConverterFactory
 	
 	private static byte[] convertKmzDocument(byte[] document) throws SAXException, IOException, ParserConfigurationException, ZipException
 	{
-		ByteArrayInputStream docStream = new ByteArrayInputStream(document);
-		
-		// drop KMZ into temp
-		File kmzImportTemp = File.createTempFile("kmz_import", ".kmz");
-		logger.debug("    Copying zip to temp file '" + kmzImportTemp.getName() + "'...");
-		FileOutputStream os = new FileOutputStream(kmzImportTemp);
-	    IOUtils.copy(docStream, os);
-	    
-	    os.close();
-	    os = null;
-	    docStream.close();
-	    docStream = null;
-	    
-	    ZipFile zipFile = new ZipFile(kmzImportTemp);
-	    
-	    File tempKmzPath = new File(System.getProperty("java.io.tmpdir") + File.separator + "kmz" + File.separator + zipFile.getFile().getName() + File.separator);
-	    tempKmzPath.mkdirs();
-    	
-		// unzip the zip file into a temp path
-	    zipFile.extractAll(tempKmzPath.getPath());
-	    
-		// open the KML contained and get the bytes.
-	    byte[] fileBytes = null;
-	    File[] files = tempKmzPath.listFiles();
-	    for(File file : files)
-	    {
-	    	if(file.getName().toLowerCase().endsWith(".kml"))
-	    	{
-	    		FileInputStream fis = new FileInputStream(file);
-	    		fileBytes = IOUtils.toByteArray(fis);
-	    		
-	    		fis.close();
-	    		fis = null;
-	    	}
-	    	// start cleaning up the junk
-	    	file.delete();
-	    }
-
-	    // finish cleanup
-	    Files.delete(tempKmzPath.toPath());
-	    zipFile = null;
-	    kmzImportTemp.delete();
+		byte[] fileBytes = unzipKMZ(document);
 	    
 	    // push the bytes up the convertKmlDocument
 	    if(fileBytes != null) return convertKmlDocument(fileBytes);
@@ -481,7 +436,10 @@ public class DocumentConverterFactory
 	    	else 
     		{
 	    		logger.debug("    Deleted " + file.getName() + "...");
-	    		file.delete();
+	    		if(!file.delete())
+	    		{
+	                logger.error("    temp shp zip cleanup failed...");
+	            }
     		}
 	    }
 	    
@@ -605,21 +563,44 @@ public class DocumentConverterFactory
         iterator.close();
 
 	    // cleanup
-	    if(shapefile != null) shapefile.delete();
-	    if(projectionFile != null) projectionFile.delete();
-	    if(dataFile != null) dataFile.delete();
-	    if(shapeshx != null) shapeshx.delete();
+        boolean deletedFile = false;
+	    if(shapefile != null) deletedFile = shapefile.delete();
+	    if(!deletedFile)
+	    {
+            logger.error("    shape file cleanup failed...");
+        }
+	    
+	    if(projectionFile != null) deletedFile = projectionFile.delete();
+	    if(!deletedFile)
+        {
+            logger.error("    projection file cleanup failed...");
+        }
+	    
+	    if(dataFile != null) deletedFile = dataFile.delete();
+	    if(!deletedFile)
+        {
+            logger.error("    data file cleanup failed...");
+        }
+	    
+	    if(shapeshx != null) deletedFile = shapeshx.delete();
+	    if(!deletedFile)
+        {
+            logger.error("    shx file cleanup failed...");
+        }
+	    
 	    Files.delete(tempShapePath.toPath());
 	    zipFile = null;
-	    shapeImportTemp.delete();
-
+	    if(!shapeImportTemp.delete())
+	    {
+            logger.error("    temp shp import file cleanup failed...");
+        }
 	    // Now that the json object is built, convert it to bytes and send back
         byte[] result = null;
         
         if(convertedJson != null)
         {
         	String resultText = convertedJson.toString();
-        	result = resultText.getBytes();
+        	result = resultText.getBytes("UTF-8");
         }
         
 		return result;
@@ -663,7 +644,7 @@ public class DocumentConverterFactory
 		geometryObject.put("type", "Point");
 		ArrayNode coords = geometryObject.putArray("coordinates");
 
-		addCoord(coords, new BigDecimal(targetGeometry.getX()), new BigDecimal(targetGeometry.getY()), null);
+		addCoord(coords, BigDecimal.valueOf(targetGeometry.getX()), BigDecimal.valueOf(targetGeometry.getY()), null);
 	}
 	
 	private static void addCoords(ArrayNode jsonCoords, Coordinate[] coords)
@@ -672,7 +653,7 @@ public class DocumentConverterFactory
 		{
 			ArrayNode innerCoord = jsonCoords.addArray();
 			
-			addCoord(innerCoord, new BigDecimal(coord.x), new BigDecimal(coord.y), null);
+			addCoord(innerCoord, BigDecimal.valueOf(coord.x), BigDecimal.valueOf(coord.y), null);
 		}
 	}
 	
@@ -696,5 +677,205 @@ public class DocumentConverterFactory
 	private static byte[] convertWktDocument(byte[] document)
 	{
 		return document;
+	}
+	
+	public static String getImageBase64StringFromUrl(String imageUrl) throws IOException
+	{
+        // get content type
+        URL url = new URL(imageUrl);
+        HttpURLConnection connection = (HttpURLConnection)  url.openConnection();
+        connection.setRequestMethod("HEAD");
+        connection.connect();
+        String contentType = connection.getContentType();
+        
+        BufferedInputStream bis = new BufferedInputStream(url.openConnection().getInputStream());
+        
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        byte[] buffer = new byte[1024];
+        int read = 0;
+        
+        while ((read = bis.read(buffer, 0, buffer.length)) != -1) 
+        {
+            baos.write(buffer, 0, read);
+        }
+        baos.flush();
+        
+        String results = "data:" + contentType + ";base64," + Base64.getEncoder().encodeToString(baos.toByteArray());;
+        
+        bis.close();
+        baos.close();
+        
+        return results;
+	}
+	
+	private static byte[] unzipKMZ(byte[] document) throws IOException, ZipException
+	{
+	    ByteArrayInputStream docStream = new ByteArrayInputStream(document);
+        
+        // drop KMZ into temp
+        File kmzImportTemp = File.createTempFile("kmz_import", ".kmz");
+        logger.debug("    Copying zip to temp file '" + kmzImportTemp.getName() + "'...");
+        FileOutputStream os = new FileOutputStream(kmzImportTemp);
+        IOUtils.copy(docStream, os);
+        
+        os.close();
+        os = null;
+        docStream.close();
+        docStream = null;
+        
+        ZipFile zipFile = new ZipFile(kmzImportTemp);
+        
+        File tempKmzPath = new File(System.getProperty("java.io.tmpdir") + File.separator + "kmz" + File.separator + zipFile.getFile().getName() + File.separator);
+        tempKmzPath.mkdirs();
+        
+        // unzip the zip file into a temp path
+        zipFile.extractAll(tempKmzPath.getPath());
+        
+        // open the KML contained and get the bytes.
+        byte[] fileBytes = null;
+        File[] files = tempKmzPath.listFiles();
+        for(File file : files)
+        {
+            if(file.getName().toLowerCase().endsWith(".kml"))
+            {
+                FileInputStream fis = new FileInputStream(file);
+                fileBytes = IOUtils.toByteArray(fis);
+                
+                fis.close();
+                fis = null;
+            }
+            // start cleaning up the junk
+            if(!file.delete())
+            {
+                logger.error("    temp KML cleanup failed...");
+            }
+        }
+
+        // finish cleanup
+        Files.delete(tempKmzPath.toPath());     
+        zipFile = null;
+        if(!kmzImportTemp.delete())
+        {
+            logger.error("    temp KMZ zip cleanup failed...");
+        }
+        
+        return fileBytes;
+	}
+	
+	public static ObjectNode createlayersFromKMZ(byte[] document) throws SAXException, IOException, ParserConfigurationException, ZipException
+	{
+	    byte[] fileBytes = unzipKMZ(document);
+	    
+        if(fileBytes != null) return createlayersFromKML(fileBytes);
+        else return null;
+	}
+	
+	public static ObjectNode createlayersFromKML(byte[] document) throws SAXException, IOException, ParserConfigurationException
+	{
+	    // source json for parse:
+	    /*
+	     * {
+	     *    results:
+	     *    [
+	     *        {
+	     *            styleUrl: "",
+	     *            Style: <StyleObject>,
+	     *            markerImage: "<base64>",
+	     *            geojson: <json blob>
+	     *        }
+	     *    ]
+	     * }
+	     */
+	    
+	    ObjectNode resultsJson = JsonNodeFactory.instance.objectNode();
+        ArrayNode layerFeaturesArray = resultsJson.putArray("results");
+	    
+	    ObjectMapper objectMapper = new ObjectMapper();
+	    byte[] jsonBytes = convertKmlDocument(document);
+	    JsonNode sourceJsonNode = objectMapper.readValue(jsonBytes, JsonNode.class);
+
+        logger.debug("Parsing KML xml from document...");
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        factory.setNamespaceAware(true);
+        
+        ByteArrayInputStream docStream = new ByteArrayInputStream(document);
+        
+        Document doc = factory.newDocumentBuilder().parse(docStream);
+        logger.debug("Successfully parsed KML doc. Looping through styles/placemarks...");
+        
+        docStream.close();
+        docStream = null;
+        
+        NodeList styleNodes = doc.getElementsByTagName("Style");
+        
+        if (styleNodes != null)
+        
+        {
+            for (int styleIndex = 0; styleIndex < styleNodes.getLength(); styleIndex++)
+            {
+                if (styleNodes.item(styleIndex).getNodeType() == Node.ELEMENT_NODE)
+                {
+                    Element styleNode = (Element) styleNodes.item(styleIndex);
+                    ObjectNode layer = layerFeaturesArray.addObject();
+                    
+                    String styleName = styleNode.getAttribute("id");
+                    
+                    layer.put("styleUrl", styleName);
+                    
+                    LayerStyle styleInfo = new LayerStyle();
+                    styleInfo.setStrokeOpacity(1.0);
+                    styleInfo.setFillOpacity(0.65);
+                    styleInfo.setStrokeStyle("1");
+                    
+                    for (int styleChildIndex = 0; styleChildIndex < styleNode.getChildNodes().getLength(); styleChildIndex++)
+                    {
+                        if (styleNode.getChildNodes().item(styleChildIndex).getNodeType() == Node.ELEMENT_NODE)
+                        {
+                            Element childNode = (Element) styleNode.getChildNodes().item(styleChildIndex);
+
+                            if(childNode.getLocalName().equals("LineStyle"))
+                            {
+                                if(childNode.getElementsByTagName("width").getLength() > 0) styleInfo.setStrokeWidth(Double.parseDouble(childNode.getElementsByTagName("width").item(0).getTextContent()));
+                                if(childNode.getElementsByTagName("color").getLength() > 0)styleInfo.setFillColor(childNode.getElementsByTagName("color").item(0).getTextContent());
+                                if(childNode.getElementsByTagName("color").getLength() > 0)styleInfo.setStrokeColor(childNode.getElementsByTagName("color").item(0).getTextContent());
+                            }
+                            else if(childNode.getLocalName().equals("PolyStyle"))
+                            {
+                                if(childNode.getElementsByTagName("fill").getLength() > 0) styleInfo.setFillOpacity(Double.parseDouble(childNode.getElementsByTagName("fill").item(0).getTextContent()));
+                                if(childNode.getElementsByTagName("outline").getLength() > 0) styleInfo.setStrokeWidth(Double.parseDouble(childNode.getElementsByTagName("outline").item(0).getTextContent()));
+                                if(childNode.getElementsByTagName("color").getLength() > 0)styleInfo.setFillColor(childNode.getElementsByTagName("color").item(0).getTextContent());
+                                if(childNode.getElementsByTagName("color").getLength() > 0)styleInfo.setStrokeColor(childNode.getElementsByTagName("color").item(0).getTextContent());
+                            }
+                            else if(childNode.getLocalName().equals("IconStyle"))
+                            {
+                                String markerUrl = ((Element)childNode.getElementsByTagName("Icon").item(0)).getElementsByTagName("href").item(0).getTextContent();
+                                String base64 = getImageBase64StringFromUrl(markerUrl);
+                                
+                                layer.put("markerImage", base64);
+                            }
+                        }
+                    }
+                    
+                    layer.putPOJO("style", styleInfo);
+
+                    // style and layer basics are in place, now find all of the matching features and build a new json document.
+                    ObjectNode geoJsonBlob = layer.putObject("geojson");
+                    geoJsonBlob.put("type", "FeatureCollection");
+                    ArrayNode featuresArray = geoJsonBlob.putArray("features");
+                    
+                    // loop sourceJsonNodes features array
+                    ArrayNode sourceFeatures = (ArrayNode)sourceJsonNode.get("features");
+                    for(JsonNode node : sourceFeatures)
+                    {
+                        if(node.get("properties").get("styleUrl").textValue().equals("#" + styleName))
+                        {
+                            featuresArray.add(node);
+                        }
+                    }
+                }
+            }
+        }
+        
+        return resultsJson;
 	}
 }

@@ -8,7 +8,7 @@ include.module( 'tool-select', [ 'feature-list', 'widgets', 'tool-select.panel-s
     Vue.component( 'select-panel', {
         extends: inc.widgets.toolPanel,
         template: inc[ 'tool-select.panel-select-html' ],
-        props: [ 'busy', 'layers', 'highlightId', 'message', 'messageClass' ],
+        props: [ 'busy', 'layers', 'highlightId', 'statusMessage' ],
     } )
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
@@ -37,11 +37,16 @@ include.module( 'tool-select', [ 'feature-list', 'widgets', 'tool-select.panel-s
     SelectTool.prototype.afterInitialize.push( function ( smk ) {
         var self = this
 
+        self.setMessage( 'Click on map to identify features and then add them to the selection.' )
+
         smk.on( this.id, {
             'activate': function () {
                 if ( !self.visible || !self.enabled ) return
 
                 self.active = !self.active
+            },
+            'clear': function ( ev ) {
+                self.setMessage( 'Click on map to identify features and then add them to the selection.' )
             }
         } )
 

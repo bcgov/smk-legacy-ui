@@ -6,25 +6,21 @@
     </template>
 
     <template slot="commands">
-        <slot name="commands" v-bind:isEmpty="isEmpty"></slot>
+        <slot name="commands" v-bind:featureCount="featureCount"></slot>
 
         <div class="smk-command-row">
             <span class="smk-command" v-if="canClear"
-                v-bind:class="{ 'smk-disabled': isEmpty }"
+                v-bind:class="{ 'smk-disabled': featureCount == 0 }"
                 v-on:click="$$emit( 'clear' )"
             >Clear</span>
 
-            <slot name="command-row" v-bind:isEmpty="isEmpty"></slot>
+            <slot name="command-row" v-bind:featureCount="featureCount"></slot>
         </div>
     </template>
 
-    <div class="smk-message" v-bind:class="messageClass"><span v-html="message"></span></div>
-
-    <template slot="placeholder"
-        v-if="isEmpty" 
-    >
-        <slot name="placeholder"></slot>
-    </template>    
+    <template slot="status" v-if="statusMessage">
+        <status-message v-bind="statusMessage">
+    </template>
 
     <div class="smk-layer"
         v-for="layer in layers"

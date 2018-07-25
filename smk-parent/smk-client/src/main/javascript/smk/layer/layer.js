@@ -78,6 +78,7 @@ include.module( 'layer.layer-js', [ 'jquery', 'util', 'event' ], function () {
         return false
     }
 
+    // I know this looks backwards. But it makes sense if you think of the scale values as denominators.
     Layer.prototype.inScaleRange = function ( view ) {
         // console.log( this.config.title, this.config.minScale, view.scale, this.config.maxScale )
         if ( this.config.maxScale && view.scale < this.config.maxScale ) return false

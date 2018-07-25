@@ -39,10 +39,8 @@
         </select>
     </template>
 
-    <template slot="placeholder"
-        v-if="( !results || results.length == 0 ) && placeholder !== false"
-    >
-        {{ placeholder || "Select measurement method" }}
+    <template slot="status" v-if="statusMessage">
+        <status-message v-bind="statusMessage">
     </template>
 
     <div class="smk-measure-container"

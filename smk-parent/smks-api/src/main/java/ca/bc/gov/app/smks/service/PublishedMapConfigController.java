@@ -346,7 +346,10 @@ public class PublishedMapConfigController
 					tempPath.mkdirs();
 					
 					File exportTemplateZip = new File(tempLocationPath + "export.war");
-					exportTemplateZip.createNewFile();
+					if(!exportTemplateZip.createNewFile())
+					{
+					    logger.debug("    Failed to create temp export file...");
+					}
 					logger.debug("    Copying zip to temp file '" + exportTemplateZip.getName() + "'...");
 					FileOutputStream os = new FileOutputStream(exportTemplateZip);
 				    IOUtils.copy(targetStream, os);
@@ -363,7 +366,10 @@ public class PublishedMapConfigController
 				    // create config json
 				    ObjectMapper mapper = new ObjectMapper();
 				    File mapConfigTempFile = new File(tempLocationPath + "map-config.json");
-				    mapConfigTempFile.createNewFile();
+				    if(!mapConfigTempFile.createNewFile())
+				    {
+                        logger.debug("    Failed to create temp config file...");
+                    }
 				    mapper.writeValue(mapConfigTempFile, resource);
 				    String configString = mapper.writeValueAsString(resource);
 				    
@@ -398,7 +404,10 @@ public class PublishedMapConfigController
 								else postfix = "json";
 								
 								File attachmentFile = new File(tempAttchPath.getPath() + File.separator + key + "." + postfix);
-								attachmentFile.createNewFile();
+								if(!attachmentFile.createNewFile())
+								{
+			                        logger.debug("    Failed to create attachment temp file...");
+			                    }
 
 								tempFiles.add(attachmentFile);
 								
@@ -419,7 +428,10 @@ public class PublishedMapConfigController
 					    //delete temp files
 					    for(File file : tempFiles)
 					    {
-					    	file.delete();
+					    	if(!file.delete())
+					    	{
+		                        logger.debug("    Failed to delete temp file...");
+		                    }
 					    }
 					    //delete temp folder
 					    Files.delete(tempAttchPath.toPath());
@@ -445,30 +457,59 @@ public class PublishedMapConfigController
 				    */
 				    // done creating temp zip,
 				    
-				    File exportableZip = zipFile.getFile();
-			        InputStream exportStream = new FileInputStream(exportableZip);
+				    InputStream exportStream = null;
+				    File exportableZip = null;
 				    
-					//add zip to published document as an attachment file called "export"
-			        resource = couchDAO.getPublishedConfig(id);
-					Attachment newAttachment = new Attachment(EXPORT_ATTACHMENT_NAME, Base64.encodeBase64String(IOUtils.toByteArray(exportStream)), "application/octet-stream");
-				    resource.addInlineAttachment(newAttachment);
-
-				    // Commit the changes and reload the resource and the attachment, then submit the export file back to the caller
-				    couchDAO.updateResource(resource);
-				    resource = couchDAO.getPublishedConfig(id);
-				    
-				    attachment = couchDAO.getAttachment(resource, EXPORT_ATTACHMENT_NAME);
-				    
-				    // finish cleanup
-			        exportStream.close();
-				    exportStream = null;
-				    zipFile = null;
-				    //indexHtml.delete();
-				    exportTemplateZip.delete();
-				    mapConfigTempFile.delete();
-				    exportableZip.delete();
-				    tempPath.delete();
-				    tempPath = null;
+				    try
+				    {
+    				    exportableZip = zipFile.getFile();
+    			        exportStream = new FileInputStream(exportableZip);
+    				    
+    					//add zip to published document as an attachment file called "export"
+    			        resource = couchDAO.getPublishedConfig(id);
+    					Attachment newAttachment = new Attachment(EXPORT_ATTACHMENT_NAME, Base64.encodeBase64String(IOUtils.toByteArray(exportStream)), "application/octet-stream");
+    				    resource.addInlineAttachment(newAttachment);
+    
+    				    // Commit the changes and reload the resource and the attachment, then submit the export file back to the caller
+    				    couchDAO.updateResource(resource);
+    				    resource = couchDAO.getPublishedConfig(id);
+    				    
+    				    attachment = couchDAO.getAttachment(resource, EXPORT_ATTACHMENT_NAME);
+				    }
+				    catch(Exception ex)
+				    {
+				        logger.error("    ## Error building export zip file: " + e.getMessage());
+				        throw new Exception("Export not found and could not be created.", ex);
+				    }
+				    finally
+				    {
+                        // finish cleanup
+                        exportStream.close();
+                        exportStream = null;
+                        zipFile = null;
+                        //indexHtml.delete();
+                        if(!exportTemplateZip.delete())
+                        {
+                            logger.debug("    Failed to delete export template zip file...");
+                        }
+                        
+                        if(!mapConfigTempFile.delete())
+                        {
+                            logger.debug("    Failed to delete temp map config file...");
+                        }
+                        
+                        if(!exportableZip.delete())
+                        {
+                            logger.debug("    Failed to delete export zip file...");
+                        }
+                        
+                        if(!tempPath.delete())
+                        {
+                            logger.debug("    Failed to delete temp paths...");
+                        }
+                        
+                        tempPath = null;   
+				    }
 				}
 				
 				if(attachment != null)

@@ -125,6 +125,11 @@ include.module( 'smk-map', [ 'jquery', 'util' ], function () {
                 if ( !merge.viewer ) return
 
                 if ( base.viewer ) {
+                    if ( base.viewer.location && merge.viewer.location ) {                        
+                        Object.assign( base.viewer.location, merge.viewer.location )
+                        delete merge.viewer.location
+                    }
+
                     Object.assign( base.viewer, merge.viewer )
                 }
                 else {
@@ -252,6 +257,18 @@ include.module( 'smk-map', [ 'jquery', 'util' ], function () {
 
             if ( self.$option[ 'title-sel' ] )
                 $( self.$option[ 'title-sel' ] ).text( self.name )
+
+            if ( self.viewer.theme ) {
+                var id = self.viewer.theme.toLowerCase().replace( /[^a-z0-9]+/g, '-' ).replace( /^[-]|[-]$/g, '' )
+
+                $( self.$container )
+                    .addClass( 'smk-theme-' + id )
+
+                var tag = 'theme-' + id
+                include.tag( tag, { loader: 'style', url: include.option( 'baseUrl' ) + 'themes/' + self.viewer.theme + '.css'  } )
+
+                return include( tag )
+            }
         }
 
         function checkTools() {

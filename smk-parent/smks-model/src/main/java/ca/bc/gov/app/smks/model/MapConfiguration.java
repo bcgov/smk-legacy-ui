@@ -19,6 +19,7 @@ public class MapConfiguration extends CouchDbDocument implements Cloneable
 	// ID and naming
 	private String lmfId;
 	private int lmfRevision;
+	private String version;
 	private String name;
 	private String project;
 
@@ -163,5 +164,15 @@ public class MapConfiguration extends CouchDbDocument implements Cloneable
 		}
 
 		return null;
+	}
+	
+	public void setVersion(String version)
+	{
+	    this.version = version;
+	}
+	
+	public String getVersion()
+	{
+	    return this.version;
 	}
 }

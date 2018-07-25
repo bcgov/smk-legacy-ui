@@ -50,11 +50,9 @@
         </span>
     </template>
 
-    <div class="smk-message"
-        v-bind:class="messageClass"
-    >
-        <span>{{ message }}</span>
-    </div>
+    <template slot="status" v-if="statusMessage">
+        <status-message v-bind="statusMessage">
+    </template>
 
     <draggable class="smk-waypoints"
         v-bind:list="waypoints"

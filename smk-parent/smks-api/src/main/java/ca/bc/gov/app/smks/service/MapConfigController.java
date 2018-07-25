@@ -14,6 +14,7 @@ import org.ektorp.Attachment;
 import org.ektorp.AttachmentInputStream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -28,6 +29,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.core.JsonParser.Feature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -51,6 +53,9 @@ public class MapConfigController
 	@Autowired
 	private CouchDAO couchDAO;
 
+	@Autowired
+    private Environment env;
+	
 	@RequestMapping(value = "/", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<?> createMapConfig(@RequestBody MapConfiguration request)
@@ -68,6 +73,7 @@ public class MapConfigController
 			request.setLmfId(request.getName().toLowerCase().replaceAll(" ", "-").replaceAll("[^A-Za-z0-9]", "-"));
 			
 			request.setLmfRevision(1);
+			request.setVersion(env.getProperty("smk.version"));
 
 			// validate the ID, in case it's already in use.
 			MapConfiguration existingDocID = couchDAO.getMapConfiguration(request.getLmfId());
@@ -295,6 +301,7 @@ public class MapConfigController
 			resource.setSurround(request.getSurround());
 			resource.setTools(request.getTools());
 			resource.setViewer(request.getViewer());
+			resource.setVersion(request.getVersion());
 
 			// Update!
 			couchDAO.updateResource(resource);
@@ -336,6 +343,7 @@ public class MapConfigController
 					if(contentType.equals("application/vnd.google-earth.kml+xml")) type = "kml";
 					if(contentType.equals("application/vnd.google-earth.kmz")) type = "kmz";
 					if(contentType.equals("application/zip")) type = "shape";
+					if(contentType.equals("application/x-zip-compressed")) type = "shape";
 					
 					if(type.equals("kml")) { type = "vector"; docBytes = DocumentConverterFactory.convertDocument(request.getBytes(), DocumentType.KML); contentType = "application/octet-stream"; }
 					if(type.equals("kmz")) { type = "vector"; docBytes = DocumentConverterFactory.convertDocument(request.getBytes(), DocumentType.KMZ); contentType = "application/octet-stream"; }
@@ -358,6 +366,8 @@ public class MapConfigController
 				        Vector layer = (Vector)resource.getLayerByID(id);
 				        
     				    ObjectMapper objectMapper = new ObjectMapper();
+    				    objectMapper.configure(Feature.ALLOW_UNQUOTED_CONTROL_CHARS, true);
+    				    
     				    JsonNode node = objectMapper.readValue(docBytes, JsonNode.class);
 
     				    List<String> fieldNames = new ArrayList<String>();

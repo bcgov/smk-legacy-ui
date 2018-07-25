@@ -206,7 +206,7 @@ public class LayerCatalogDAO
         logger.debug("Successfully parsed XML. Creating Catalog Layer...");
 
         layer.setMpcmWorkspace(doc.getElementsByTagName("workspaceName").item(0).getTextContent());
-        layer.setId(id);
+        layer.setId(doc.getElementsByTagName("layerDisplayName").item(0).getTextContent().toLowerCase().replaceAll(" ", "-").replaceAll("[^A-Za-z0-9]", "-"));
         layer.setMpcmId(new Integer(doc.getElementsByTagName("layerId").item(0).getTextContent()));
         layer.setTitle(doc.getElementsByTagName("layerDisplayName").item(0).getTextContent());
 
