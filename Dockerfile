@@ -11,7 +11,7 @@ ADD jvmMemSettings.sh /jvmMemSettings.sh
 ENTRYPOINT ["/jvmMemSettings.sh"]
 
 # Add a tomcat users config for admin access, if desired
-COPY tomcat-users.xml ${TOMCAT_HOME}/conf/tomcat-users.xml
+#COPY tomcat-users.xml ${TOMCAT_HOME}/conf/tomcat-users.xml
 
 WORKDIR /tmp
 
