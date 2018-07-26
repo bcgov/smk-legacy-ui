@@ -25,16 +25,17 @@
                     'smk-obscured': !item.isActuallyVisible
                 }"
             >{{ item.title }}</span>
+        </div>
 
-            <!-- <div class="smk-layer-info" v-if="legend && item.hasLegend">
-                <div class="smk-legend">
-                    <span v-if="item.legends == 'waiting'">Requesting</span>
-                    <div v-for="legend in item.legends">
-                        <img v-bind:src="legend.url">
-                        <span>{{ legend.title }}</span>
-                    </div>
-                </div>
-            </div> -->
+        <div class="smk-legend" 
+            v-if="item.showLegend && item.legends"
+        >
+            <span v-if="item.showLegend == 'waiting'">Requesting</span>
+
+            <div v-for="legend in item.legends">
+                <img v-bind:src="legend.url">
+                <span>{{ legend.title }}</span>
+            </div>
         </div>
 
         <layer-display

@@ -91,20 +91,7 @@ include.module( 'tool-layers', [ 'tool', 'widgets', 'tool-layers.panel-layers-ht
             'config': function ( ev ) {
                 Object.assign( self.config, ev )
 
-                if ( ev.legend ) {
-                    smk.$viewer.layerIds.forEach( function ( id ) {
-                        var ly = layerModel[ id ]
-                        if ( ly.legends == null ) {
-                            ly.legends = 'waiting'
-                            smk.$viewer.layerId[ id ].getLegends( smk.$viewer )
-                                .then( function ( ls ) {
-                                    ly.legends = ls
-                                }, function () {
-                                    ly.legends = false
-                                } )
-                        }
-                    } )
-                }
+                smk.$viewer.layerDisplayContext.setLegendsVisible( ev.legend, smk.$viewer.layerId, smk.$viewer )
             },
 
             'set-all-layers-visible': function ( ev ) {
@@ -120,23 +107,6 @@ include.module( 'tool-layers', [ 'tool', 'widgets', 'tool-layers.panel-layers-ht
                 smk.$viewer.layerDisplayContext.setItemVisible( ev.id, ev.visible )
                 smk.$viewer.updateLayersVisible()
             },
-
-            // 'set-expanded': function ( ev ) {
-            //     ev.ids.forEach( function ( id ) {
-            //         var ly = layerModel[ id ]
-            //         ly.expanded = ev.expanded
-
-            //         if ( ly.expanded && ly.legends == null ) {
-            //             ly.legends = 'waiting'
-            //             smk.$viewer.layerId[ id ].getLegends()
-            //                 .then( function ( ls ) {
-            //                     ly.legends = ls
-            //                 }, function () {
-            //                     ly.legends = false
-            //                 } )
-            //         }
-            //     } )
-            // }
         } )
 
         var layerModel = {}

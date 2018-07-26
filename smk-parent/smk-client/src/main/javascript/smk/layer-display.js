@@ -7,7 +7,9 @@ include.module( 'layer-display', [ 'jquery', 'util', 'event' ], function () {
             opacity:    1,
             title:      null,
             isVisible:  true,
-            isActuallyVisible: null
+            isActuallyVisible: null,
+            showLegend: false,
+            legends:   null
         }, option )
 
         if ( forceVisible )
@@ -44,6 +46,11 @@ include.module( 'layer-display', [ 'jquery', 'util', 'event' ], function () {
         if ( itemCb )
             itemCb( this, parents )
     }
+
+    LayerDisplay.Layer.prototype.getLegends = function ( layerCatalog, viewer ) {
+        return layerCatalog[ this.layerId ].getLegends( viewer )
+    }
+
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
     LayerDisplay.Folder = function ( option, layerCatalog, forceVisible ) {
@@ -53,9 +60,7 @@ include.module( 'layer-display', [ 'jquery', 'util', 'event' ], function () {
         if ( !option.title )
             throw new Error( 'need title' )
 
-        LayerDisplay.prototype.constructor.call( this, Object.assign( {
-            isExpanded: null
-        }, option ), forceVisible )
+        LayerDisplay.prototype.constructor.call( this, option, forceVisible )
 
         forceVisible = forceVisible || this.isExpanded == null
 
@@ -71,11 +76,33 @@ include.module( 'layer-display', [ 'jquery', 'util', 'event' ], function () {
 
         if ( folderCb )
             folderCb( this, parents )
+        else if ( itemCb )
+            itemCb( this, parents )
 
         var p = [ this ].concat( parents )
         
         this.items.forEach( function ( item ) {
             item.each( itemCb, folderCb, p )
+        } )
+    }
+
+    LayerDisplay.Folder.prototype.getLegends = function ( layerCatalog, viewer ) {
+        return SMK.UTIL.resolved()
+    }
+    // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+    //
+    LayerDisplay.Group = function ( option, layerCatalog, forceVisible ) {
+        LayerDisplay.Folder.prototype.constructor.call( this, option, layerCatalog, forceVisible )
+    }
+
+    $.extend( LayerDisplay.Group.prototype, LayerDisplay.Folder.prototype )
+
+    LayerDisplay.Group.prototype.getLegends = function ( layerCatalog, viewer ) {
+        return SMK.UTIL.waitAll( this.items.map( function ( item ) {
+            return item.getLegends( layerCatalog, viewer )
+        } ) )
+        .then ( function ( legends ) {
+            return legends.reduce( function ( accum, v ) { return accum.concat( v ) }, [] )
         } )
     }
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
@@ -89,8 +116,10 @@ include.module( 'layer-display', [ 'jquery', 'util', 'event' ], function () {
 
         if ( 'layerId' in layerDisplay )
             return new LayerDisplay.Layer( layerDisplay, layerCatalog, forceVisible )
-        else
+        else if ( layerDisplay.isExpanded != null )
             return new LayerDisplay.Folder( layerDisplay, layerCatalog, forceVisible )
+        else
+            return new LayerDisplay.Group( layerDisplay, layerCatalog, forceVisible )
     } 
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
@@ -135,11 +164,8 @@ include.module( 'layer-display', [ 'jquery', 'util', 'event' ], function () {
         this.changedVisibility( function () {
             self.root.each( 
                 function ( item, parents ) {
-                    item.isActuallyVisible = self.isItemVisible( item.layerId )
-                }, 
-                function ( folder, parents ) {
-                    folder.isActuallyVisible = self.isItemVisible( folder.folderId )
-                } 
+                    item.isActuallyVisible = self.isItemVisible( item.layerId || item.folderId )
+                }
             )
         } )
 
@@ -193,6 +219,34 @@ include.module( 'layer-display', [ 'jquery', 'util', 'event' ], function () {
         }, 0 )
 
         return vc == 0 ? false : vc == this.layerIds.length ? true : null
+    }
+
+    LayerDisplayContext.prototype.setLegendsVisible = function ( visible, layerCatalog, viewer ) {
+        this.root.each( 
+            function ( item, parents ) {
+                if ( visible ) {
+                    if ( item.legends === false ) return
+                    if ( item.showLegend == 'waiting' ) return
+                    if ( item.legends ) {
+                        item.showLegend = true
+                        return
+                    }
+
+                    item.showLegend = 'waiting'
+                    item.getLegends( layerCatalog, viewer )
+                        .then( function ( ls ) {
+                            item.legends = ls
+                            item.showLegend = true
+                        }, function () {
+                            item.legends = false
+                            item.showLegend = false
+                        } )
+                }
+                else {
+                    item.showLegend = false
+                }
+            }
+        )
     }
 
 } )
