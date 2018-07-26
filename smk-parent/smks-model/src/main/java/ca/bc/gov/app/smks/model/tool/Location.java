@@ -8,25 +8,30 @@ import ca.bc.gov.app.smks.model.Tool;
 @JsonInclude(Include.NON_NULL)
 public class Location extends Tool
 {
-    public Location() {}
+    private static final long serialVersionUID = -4487798853622384925L;
 
-    protected Location( Location location ) {
+    public Location() 
+    {
+        // empty constructor
+    }
+
+    public Location( Location location ) {
         super( location );
     }
 
+    @Override
     public String getType() 
     {
-        return Tool.Type.location.toString();
+        return Tool.Type.LOCATION.toString();
     }
 
+    @Override
     public String getTitle() {
         return "Location";
     }
 
-    public Location clone()
-    {
-        Location clone = new Location( this );
-
-        return clone;
+    @Override
+    public boolean equals( Object other ) {
+        return super.equals(other);
     }
 }

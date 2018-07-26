@@ -1,5 +1,7 @@
 package ca.bc.gov.app.smks;
 
+import java.net.MalformedURLException;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +30,7 @@ public class WebConfig extends WebMvcConfigurerAdapter
 	private Environment env;
 
 	@Bean
-	public CouchDAO couchDAO() throws Exception
+	public CouchDAO couchDAO() throws SMKException, MalformedURLException
 	{
 		String name = env.getProperty("couchdb.name");
 		logger.debug(" >> WebConfig.couchDAO() : Initialize Couch DAO Bean " + name );
@@ -40,15 +42,13 @@ public class WebConfig extends WebMvcConfigurerAdapter
 	}
 
 	@Bean
-	public LayerCatalogDAO layerCatalogDao() throws Exception
+	public LayerCatalogDAO layerCatalogDao() throws SMKException
 	{
-		LayerCatalogDAO lcDao = new LayerCatalogDAO(env.getProperty("mpcm.rest.url"), env.getProperty("mpcm.arcgis.server"), env.getProperty("mpcm.wms.server"));
-
-		return lcDao;
+		return new LayerCatalogDAO(env.getProperty("mpcm.rest.url"), env.getProperty("mpcm.arcgis.server"), env.getProperty("mpcm.wms.server"));
 	}
 
 	@Bean
-	public CommonsMultipartResolver multipartResolver() throws Exception
+	public CommonsMultipartResolver multipartResolver() throws SMKException
 	{
 		CommonsMultipartResolver resolver = new CommonsMultipartResolver();
 		resolver.setMaxUploadSize(new Long(env.getProperty("attachment.max.size")));

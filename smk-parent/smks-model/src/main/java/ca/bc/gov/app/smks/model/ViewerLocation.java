@@ -6,7 +6,17 @@ public class ViewerLocation
     private Double[] center = {-139.1782, 47.6039};
     private Double zoom = 5.0;
     
-    public ViewerLocation(){}
+    public ViewerLocation()
+    {
+        //empty constructor
+    }
+    
+    public ViewerLocation(ViewerLocation clone)
+    {
+        this.setExtent(clone.getExtent());
+        this.setCenter(clone.getCenter());
+        this.setZoom(clone.getZoom());
+    }
     
     public Double[] getExtent() {
       if ( extent == null ) extent = new Double[4];

@@ -5,6 +5,9 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
+import java.io.Serializable;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import ca.bc.gov.app.smks.model.layer.EsriDynamic;
@@ -13,9 +16,6 @@ import ca.bc.gov.app.smks.model.layer.Vector;
 import ca.bc.gov.app.smks.model.layer.Group;
 import ca.bc.gov.app.smks.model.layer.Kml;
 import ca.bc.gov.app.smks.model.layer.Wms;
-
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @JsonTypeInfo(
 	use = JsonTypeInfo.Id.NAME,
@@ -31,15 +31,17 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 	@Type( name = "vector",      value = Vector.class )
 } )
 @JsonInclude(Include.NON_NULL)
-public class Layer implements Cloneable
+public class Layer implements Serializable 
 {
-	public enum Type {
-		EsriDynamic( "esri-dynamic" ),
-		Folder( "folder" ),
-		Group( "group" ),
-		Wms( "wms" ),
-		Kml( "kml" ),
-		Vector( "vector" );
+    private static final long serialVersionUID = -4522391129982811968L;
+
+    public enum Type {
+		ESRI_DYNAMIC( "esri-dynamic" ),
+		FOLDER( "folder" ),
+		GROUP( "group" ),
+		WMS( "wms" ),
+		KML( "kml" ),
+		VECTOR( "vector" );
 
 		private String jsonType;
 
@@ -189,11 +191,5 @@ public class Layer implements Cloneable
 	public String toString()
 	{
 		return this.getTitle();
-	}
-
-	public Layer clone()
-	{
-		Layer clone = new Layer( this );
-		return clone;
 	}
 }

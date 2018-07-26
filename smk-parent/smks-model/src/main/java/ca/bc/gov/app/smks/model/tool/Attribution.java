@@ -2,34 +2,35 @@ package ca.bc.gov.app.smks.model.tool;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import ca.bc.gov.app.smks.model.Tool;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @JsonInclude(Include.NON_NULL)
 public class Attribution extends Tool
 {
-	public Attribution() {}
+    private static final long serialVersionUID = -6835502853352254285L;
 
-	protected Attribution( Attribution about ) {
-		super( about );
+    public Attribution() 
+    {
+        // empty constructor
+    }
+
+	public Attribution( Attribution attr ) {
+		super( attr );
 	}
 
+	@Override
 	public String getType() {
-		return Tool.Type.attribution.toString();
+		return Tool.Type.ATTRIBUTION.toString();
 	}
 
+	@Override
 	public String getTitle() {
 		return "Attribution";
 	}
 
-	public Attribution clone()
-	{
-		Attribution clone = new Attribution( this );
-
-		return clone;
-	}
-
+    @Override
+    public boolean equals( Object other ) {
+        return super.equals(other);
+    }
 }

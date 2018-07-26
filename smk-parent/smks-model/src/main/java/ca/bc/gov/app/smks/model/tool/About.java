@@ -4,53 +4,50 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 import ca.bc.gov.app.smks.model.Tool;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 @JsonInclude(Include.NON_NULL)
 public class About extends Tool
 {
-	private static Log logger = LogFactory.getLog(About.class);
+    private static final long serialVersionUID = 8108413477451380277L;
 
     private String content;
 
 	public About() {}
 
-	protected About( About about ) {
+	public About( About about ) {
 		super( about );
 		this.setContent( about.getContent());
 	}
 
+	@Override
 	public String getType() {
-		return Tool.Type.about.toString();
+		return Tool.Type.ABOUT.toString();
 	}
 
+	@Override
 	public String getTitle() {
 		return "About Panel";
 	}
 
+	@Override
     public String getDescription() {
         return "Provide the contents of about panel.";
     }
 
+	@Override
     public boolean isConfigured() {
         return true;
     }
 
-	public String getContent() {
-		// logger.debug( "get " + content );
+    @Override
+    public boolean equals( Object other ) {
+        return super.equals(other);
+    }
+    
+    public String getContent() {
 		return content;
 	}
 	public void setContent(String content) {
-		// logger.debug( "set " + content );
 		this.content = content;
 	}
-
-	public About clone()
-	{
-		About clone = new About( this );
-
-		return clone;
-	}
-
 }

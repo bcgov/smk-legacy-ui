@@ -2,7 +2,6 @@ package ca.bc.gov.app.smks.model.tool;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import ca.bc.gov.app.smks.model.LayerStyle;
 import ca.bc.gov.app.smks.model.Tool;
@@ -10,33 +9,39 @@ import ca.bc.gov.app.smks.model.Tool;
 @JsonInclude(Include.NON_NULL)
 public class Identify extends Tool
 {
-	private LayerStyle style;
+    private static final long serialVersionUID = 4091129321421088691L;
+
+    private LayerStyle style;
 	private Double styleOpacity;
 	private Integer tolerance = 5;
-	public Identify() {}
+	
+	public Identify() 
+	{
+	    // empty constructor
+	}
 
-	protected Identify( Identify identify ) {
+	public Identify( Identify identify ) {
 		super( identify );
 		this.tolerance = identify.getTolerance();
 		this.styleOpacity = identify.getStyleOpacity();
-		this.style = identify.getStyle();
+		this.style = new LayerStyle(identify.getStyle());
 	}
 
+	@Override
 	public String getType() {
-		return Tool.Type.identify.toString();
+		return Tool.Type.IDENTIFY.toString();
 	}
 
+	@Override
 	public String getTitle() {
 		return "Identify Panel";
 	}
 
-	public Identify clone()
-	{
-		Identify clone = new Identify( this );
-		
-		return clone;
-	}
-
+    @Override
+    public boolean equals( Object other ) {
+        return super.equals(other);
+    }
+    
 	public LayerStyle getStyle()
 	{
 		if ( style == null ) style = new LayerStyle();

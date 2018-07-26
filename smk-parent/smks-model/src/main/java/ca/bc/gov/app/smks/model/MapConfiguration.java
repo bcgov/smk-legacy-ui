@@ -7,12 +7,35 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
+import ca.bc.gov.app.smks.model.layer.EsriDynamic;
+import ca.bc.gov.app.smks.model.layer.Vector;
+import ca.bc.gov.app.smks.model.layer.Wms;
+import ca.bc.gov.app.smks.model.tool.About;
+import ca.bc.gov.app.smks.model.tool.Attribution;
+import ca.bc.gov.app.smks.model.tool.BaseMaps;
+import ca.bc.gov.app.smks.model.tool.Coordinate;
+import ca.bc.gov.app.smks.model.tool.Directions;
+import ca.bc.gov.app.smks.model.tool.Dropdown;
+import ca.bc.gov.app.smks.model.tool.Identify;
+import ca.bc.gov.app.smks.model.tool.Layers;
+import ca.bc.gov.app.smks.model.tool.Location;
+import ca.bc.gov.app.smks.model.tool.Markup;
+import ca.bc.gov.app.smks.model.tool.Measure;
+import ca.bc.gov.app.smks.model.tool.Menu;
+import ca.bc.gov.app.smks.model.tool.Minimap;
+import ca.bc.gov.app.smks.model.tool.Pan;
+import ca.bc.gov.app.smks.model.tool.Query;
+import ca.bc.gov.app.smks.model.tool.Scale;
+import ca.bc.gov.app.smks.model.tool.Search;
+import ca.bc.gov.app.smks.model.tool.Select;
+import ca.bc.gov.app.smks.model.tool.Zoom;
+
 import org.ektorp.Attachment;
 import org.ektorp.support.CouchDbDocument;
 
 @JsonIgnoreProperties({"id", "revision"})
 @JsonInclude(Include.NON_DEFAULT)
-public class MapConfiguration extends CouchDbDocument implements Cloneable
+public class MapConfiguration extends CouchDbDocument
 {
 	private static final long serialVersionUID = -8711804469072616248L;
 
@@ -30,41 +53,56 @@ public class MapConfiguration extends CouchDbDocument implements Cloneable
 	// settings
 	private MapSurround surround;
 	private MapViewer viewer;
-//	private MapTools tools;
 
-	// private String viewerType;
-	// private boolean showHeader;
-	// private String headerImage; // the attachment ID for the header image, or the URL.
-	// private String aboutPage;
-	// private String defaultBasemap;
-	// private List<Double> bbox;
-	// private boolean allowMouseWheelZoom;
-
-	// // layer and tool configs
+	// layer and tool configs
     private List<Tool> tools;
+    
 	// layer configs
 	private List<Layer> layers;
 
-	public MapConfiguration() {}
+	public MapConfiguration() 
+	{
+	    // empty constructor
+	}
 
-	protected MapConfiguration( MapConfiguration mapConfiguration ) 
+	public MapConfiguration( MapConfiguration mapConfiguration ) 
 	{
 		this.setLmfId(mapConfiguration.getLmfId());
 		this.setLmfRevision(mapConfiguration.getLmfRevision());
+		this.setVersion(mapConfiguration.getVersion());
 		this.setName(mapConfiguration.getName());
 		this.setProject(mapConfiguration.getProject());
 
 		this.setCreatedBy(mapConfiguration.getCreatedBy());
 		this.setPublished(mapConfiguration.isPublished());
 
-		this.setSurround(mapConfiguration.getSurround().clone());
-		this.setViewer(mapConfiguration.getViewer().clone());
+		this.setSurround(new MapSurround(mapConfiguration.getSurround()));
+		this.setViewer(new MapViewer(mapConfiguration.getViewer()));
 
 		if(mapConfiguration.getTools() != null)
 		{
 			for(Tool tool : mapConfiguration.getTools())
 			{
-				getTools().add(tool.clone());
+				if (tool instanceof About) getTools().add(new About((About)tool));
+				else if (tool instanceof About) getTools().add(new About((About)tool));
+				else if (tool instanceof Attribution) getTools().add(new Attribution((Attribution)tool));
+				else if (tool instanceof BaseMaps) getTools().add(new BaseMaps((BaseMaps)tool));
+				else if (tool instanceof Coordinate) getTools().add(new Coordinate((Coordinate)tool));
+				else if (tool instanceof Directions) getTools().add(new Directions((Directions)tool));
+				else if (tool instanceof Dropdown) getTools().add(new Dropdown((Dropdown)tool));
+				else if (tool instanceof Identify) getTools().add(new Identify((Identify)tool));
+				else if (tool instanceof Layers) getTools().add(new Layers((Layers)tool));
+				else if (tool instanceof Location) getTools().add(new Location((Location)tool));
+				else if (tool instanceof Markup) getTools().add(new Markup((Markup)tool));
+				else if (tool instanceof Measure) getTools().add(new Measure((Measure)tool));
+				else if (tool instanceof Menu) getTools().add(new Menu((Menu)tool));
+				else if (tool instanceof Minimap) getTools().add(new Minimap((Minimap)tool));
+				else if (tool instanceof Pan) getTools().add(new Pan((Pan)tool));
+				else if (tool instanceof Query) getTools().add(new Query((Query)tool));
+				else if (tool instanceof Scale) getTools().add(new Scale((Scale)tool));
+				else if (tool instanceof Search) getTools().add(new Search((Search)tool));
+				else if (tool instanceof Select) getTools().add(new Select((Select)tool));
+				else if (tool instanceof Zoom) getTools().add(new Zoom((Zoom)tool));
 			}
 		}
 
@@ -72,7 +110,9 @@ public class MapConfiguration extends CouchDbDocument implements Cloneable
 		{
 			for(Layer layer : mapConfiguration.getLayers())
 			{
-				getLayers().add(layer.clone());
+			    if (layer instanceof EsriDynamic) getLayers().add(new EsriDynamic((EsriDynamic)layer));
+			    else if (layer instanceof Vector) getLayers().add(new Vector((Vector)layer));
+			    else if (layer instanceof Wms) getLayers().add(new Wms((Wms)layer));
 			}
 		}
 	}
@@ -143,14 +183,6 @@ public class MapConfiguration extends CouchDbDocument implements Cloneable
 	public Attachment getInlineAttachment(String id)
 	{
 		return super.getAttachments().get(id);
-	}
-
-
-	public MapConfiguration clone()
-	{
-		MapConfiguration clone = new MapConfiguration( this );
-
-		return clone;
 	}
 
 	public Layer getLayerByID(String layerId)

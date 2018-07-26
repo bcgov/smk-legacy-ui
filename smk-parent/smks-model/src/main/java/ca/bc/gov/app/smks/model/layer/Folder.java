@@ -9,21 +9,17 @@ import ca.bc.gov.app.smks.model.Layer;
 @JsonInclude(Include.NON_NULL)
 public class Folder extends CollectionLayer
 {
-	public Folder() { }
+    private static final long serialVersionUID = 1274298216353015757L;
+
+    public Folder() { }
 
 	protected Folder( Folder layer ) {
 		super( layer );
 	}
 
+	@Override
 	public String getType()
 	{
-		return Layer.Type.Folder.getJsonType();
-	}
-
-	public Folder clone()
-	{
-		Folder clone = new Folder( this );
-
-		return clone;
+		return Layer.Type.FOLDER.getJsonType();
 	}
 }

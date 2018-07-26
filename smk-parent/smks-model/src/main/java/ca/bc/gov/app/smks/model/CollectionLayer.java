@@ -9,13 +9,15 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 @JsonInclude(Include.NON_NULL)
 public class CollectionLayer extends Layer
 {
-	private List<Layer> layers;
+    private static final long serialVersionUID = 2521801403227172144L;
+ 
+    private List<Layer> layers;
 
 	public CollectionLayer()
 	{
 	}
 
-	protected CollectionLayer( Layer layer )
+	public CollectionLayer( CollectionLayer layer )
 	{
 		this.setId(layer.getId());
 		this.setTitle(layer.getTitle());
@@ -25,6 +27,11 @@ public class CollectionLayer extends Layer
 		this.setMaxScale(layer.getMaxScale());
 		this.setMinScale(layer.getMinScale());
 		this.setOpacity(layer.getOpacity());
+		
+		for(Layer a : layer.getLayers())
+        {
+            this.getLayers().add(a);
+        }
 	}
 
 	public List<Layer> getLayers()
@@ -37,17 +44,4 @@ public class CollectionLayer extends Layer
 	{
 		this.layers = layers;
 	}
-
-	public CollectionLayer clone()
-	{
-		CollectionLayer clone = new CollectionLayer( super.clone() );
-
-		for(Layer a : layers)
-		{
-			clone.getLayers().add(a.clone());
-		}
-
-		return clone;
-	}
-
 }

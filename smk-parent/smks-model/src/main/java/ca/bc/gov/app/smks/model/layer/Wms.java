@@ -9,14 +9,16 @@ import ca.bc.gov.app.smks.model.Layer;
 @JsonInclude(Include.NON_NULL)
 public class Wms extends FeatureLayer
 {
-	private String version;
+    private static final long serialVersionUID = 1815345350028101988L;
+
+    private String version;
 	private String serviceUrl;
 	private String layerName;
 	private String styleName;
 
 	public Wms() { }
 
-	protected Wms( Wms layer ) {
+	public Wms( Wms layer ) {
 		super( layer );
 
 		this.setVersion(layer.getVersion());
@@ -25,9 +27,10 @@ public class Wms extends FeatureLayer
 		this.setStyleName(layer.getStyleName());
 	}
 
+	@Override
 	public String getType()
 	{
-		return Layer.Type.Wms.getJsonType();
+		return Layer.Type.WMS.getJsonType();
 	}
 
 	public String getVersion()
@@ -68,12 +71,5 @@ public class Wms extends FeatureLayer
 	public void setLayerName(String layerName)
 	{
 		this.layerName = layerName;
-	}
-
-	public Wms clone()
-	{
-		Wms clone = new Wms( this );
-
-		return clone;
 	}
 }
