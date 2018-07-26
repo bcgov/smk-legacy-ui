@@ -11,8 +11,9 @@ public class WMSInfoStyle
 	private String format;
 	private String legendUrl;
 
-	public WMSInfoStyle()
-	{
+	public WMSInfoStyle() 
+	{ 
+	    //empty constructor
 	}
 
 	public String getName()

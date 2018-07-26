@@ -2,34 +2,35 @@ package ca.bc.gov.app.smks.model.tool;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import ca.bc.gov.app.smks.model.Tool;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @JsonInclude(Include.NON_NULL)
 public class Directions extends Tool
 {
-	public Directions() {}
+    private static final long serialVersionUID = 8232404283249540256L;
 
-	protected Directions( Directions about ) {
+    public Directions() 
+    {
+        // empty constructor
+    }
+
+    public Directions( Directions about ) {
 		super( about );
 	}
 
+	@Override
 	public String getType() {
-		return Tool.Type.directions.toString();
+		return Tool.Type.DIRECTIONS.toString();
 	}
 
+	@Override
 	public String getTitle() {
 		return "Directions";
 	}
 
-	public Directions clone()
-	{
-		Directions clone = new Directions( this );
-
-		return clone;
-	}
-
+    @Override
+    public boolean equals( Object other ) {
+        return super.equals(other);
+    }
 }

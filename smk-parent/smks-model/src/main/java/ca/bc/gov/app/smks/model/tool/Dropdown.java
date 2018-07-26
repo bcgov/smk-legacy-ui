@@ -8,25 +8,30 @@ import ca.bc.gov.app.smks.model.Tool;
 @JsonInclude(Include.NON_NULL)
 public class Dropdown extends Tool
 {
-	public Dropdown() {}
+    private static final long serialVersionUID = -5375300580602552422L;
 
-	protected Dropdown( Dropdown dropdown ) {
+    public Dropdown() 
+	{
+	    // empty constructor
+	}
+
+    public Dropdown( Dropdown dropdown ) {
 		super( dropdown );
 	}
 
+	@Override
 	public String getType() 
 	{
-		return Tool.Type.dropdown.toString();
+		return Tool.Type.DROPDOWN.toString();
 	}
 
+	@Override
 	public String getTitle() {
 		return "";
 	}
 
-	public Dropdown clone()
-	{
-		Dropdown clone = new Dropdown( this );
-
-		return clone;
-	}
+    @Override
+    public boolean equals( Object other ) {
+        return super.equals(other);
+    }
 }

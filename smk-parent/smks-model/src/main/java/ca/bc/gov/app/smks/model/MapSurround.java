@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 @JsonInclude(Include.NON_NULL)
-public class MapSurround implements Cloneable
+public class MapSurround
 {
 	private String type;
 	private String title;
@@ -17,6 +17,7 @@ public class MapSurround implements Cloneable
 	protected MapSurround( MapSurround mapSurround ) {
 		this.setType(mapSurround.getType());
 		this.setTitle(mapSurround.getTitle());
+		this.setImageSrc(mapSurround.getImageSrc());
 	}
 
 	public String getType() { return type; }
@@ -27,11 +28,4 @@ public class MapSurround implements Cloneable
 
 	public String getImageSrc() { return imageSrc; }
 	public void setImageSrc(String imageSrc) { this.imageSrc = imageSrc; }
-
-	public MapSurround clone()
-	{
-		MapSurround clone = new MapSurround( this );
-
-		return clone;
-	}
 }

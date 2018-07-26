@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 @JsonInclude(Include.NON_NULL)
-public class LayerStyle implements Cloneable
+public class LayerStyle
 {
 	private Double strokeWidth;
 	private String strokeStyle;
@@ -18,7 +18,7 @@ public class LayerStyle implements Cloneable
     		
 	public LayerStyle() { }
 
-	protected LayerStyle( LayerStyle layerStyle ) {
+	public LayerStyle( LayerStyle layerStyle ) {
 		this.setStrokeWidth(layerStyle.getStrokeWidth());
 		this.setStrokeStyle(layerStyle.getStrokeStyle());
 		this.setStrokeColor(layerStyle.getStrokeColor());
@@ -26,6 +26,8 @@ public class LayerStyle implements Cloneable
 		this.setFillColor(layerStyle.getFillColor());
 		this.setFillOpacity(layerStyle.getFillOpacity());
 		this.setMarkerUrl(layerStyle.getMarkerUrl());
+		this.setMarkerSize(layerStyle.getMarkerSize());
+		this.setMarkerOffset(layerStyle.getMarkerOffset());
 	}
 
 	public Double getStrokeWidth() { return strokeWidth; }
@@ -60,12 +62,4 @@ public class LayerStyle implements Cloneable
 		return markerOffset;
 	}
 	public void setMarkerOffset(Integer[] markerOffset) { this.markerOffset = markerOffset; }
-	
-	public LayerStyle clone()
-	{
-		LayerStyle clone = new LayerStyle( this );
-
-		return clone;
-	}
-
 }

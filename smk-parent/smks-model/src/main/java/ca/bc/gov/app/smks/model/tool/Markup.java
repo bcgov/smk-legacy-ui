@@ -2,34 +2,35 @@ package ca.bc.gov.app.smks.model.tool;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import ca.bc.gov.app.smks.model.Tool;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @JsonInclude(Include.NON_NULL)
 public class Markup extends Tool
 {
-	public Markup() {}
+    private static final long serialVersionUID = 8087942532656040075L;
 
-	protected Markup( Markup about ) {
-		super( about );
+    public Markup() 
+	{
+	    // empty constructor
 	}
 
+    public Markup( Markup markup ) {
+		super( markup );
+	}
+
+	@Override
 	public String getType() {
-		return Tool.Type.markup.toString();
+		return Tool.Type.MARKUP.toString();
 	}
 
+	@Override
 	public String getTitle() {
 		return "Markup";
 	}
 
-	public Markup clone()
-	{
-		Markup clone = new Markup( this );
-
-		return clone;
-	}
-
+    @Override
+    public boolean equals( Object other ) {
+        return super.equals(other);
+    }
 }

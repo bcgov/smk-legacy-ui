@@ -16,7 +16,7 @@ import ca.bc.gov.app.smks.model.tool.Scale;
 import ca.bc.gov.app.smks.model.tool.Zoom;
 
 @JsonInclude(Include.NON_NULL)
-public class MapTools implements Cloneable
+public class MapTools
 {
 	public enum Tool { measure };
 	
@@ -39,15 +39,15 @@ public class MapTools implements Cloneable
 
 	protected MapTools( MapTools mapTools ) {
 		this.setMeasure(mapTools.getMeasure());
-		this.setScale(mapTools.getScale().clone());
+		this.setScale(new Scale(mapTools.getScale()));
 		this.setCoordinate(mapTools.getCoordinate());
 		this.setMinimap(mapTools.getMinimap());
 		this.setMarkup(mapTools.getMarkup());
 		this.setDirections(mapTools.getDirections());
 		this.setPan(mapTools.getPan());
 		this.setAttribution(mapTools.getAttribution());
-		this.setZoom(mapTools.getZoom().clone());
-		this.setAbout(mapTools.getAbout().clone());
+		this.setZoom(new Zoom(mapTools.getZoom()));
+		this.setAbout(new About(mapTools.getAbout()));
 		this.setBaseMaps(mapTools.getBaseMaps());
 		this.setLayers(mapTools.getLayers());
 		this.setIdentify(mapTools.getIdentify());
@@ -104,13 +104,6 @@ public class MapTools implements Cloneable
 
 	public boolean getSelect() { return select; }
 	public void setSelect(boolean select) { this.select = select; }
-
-	public MapTools clone()
-	{
-		MapTools clone = new MapTools( this );
-
-		return clone;
-	}
 
 	public Map<String, Object> allTools() {
 		try {

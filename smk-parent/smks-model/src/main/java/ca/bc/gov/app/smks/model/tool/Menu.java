@@ -8,25 +8,30 @@ import ca.bc.gov.app.smks.model.Tool;
 @JsonInclude(Include.NON_NULL)
 public class Menu extends Tool
 {
-	public Menu() {}
+    private static final long serialVersionUID = 7160370252214201631L;
 
-	protected Menu( Menu menu ) {
+    public Menu() 
+    {
+        // empty constructor
+    }
+
+    public Menu( Menu menu ) {
 		super( menu );
 	}
 
+	@Override
 	public String getType() 
 	{
-		return Tool.Type.menu.toString();
+		return Tool.Type.MENU.toString();
 	}
 
+	@Override
 	public String getTitle() {
 		return "Menu";
 	}
 
-	public Menu clone()
-	{
-		Menu clone = new Menu( this );
-
-		return clone;
-	}
+    @Override
+    public boolean equals( Object other ) {
+        return super.equals(other);
+    }
 }

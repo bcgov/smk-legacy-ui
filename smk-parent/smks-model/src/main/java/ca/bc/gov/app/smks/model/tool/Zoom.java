@@ -8,6 +8,8 @@ import ca.bc.gov.app.smks.model.Tool;
 @JsonInclude(Include.NON_NULL)
 public class Zoom extends Tool
 {
+    private static final long serialVersionUID = 4439813223970757902L;
+
     private boolean mouseWheel = true;
     private boolean doubleClick = true;
     private boolean box = true;
@@ -15,7 +17,8 @@ public class Zoom extends Tool
 
 	public Zoom() {}
 
-	protected Zoom( Zoom zoom ) {
+	public Zoom( Zoom zoom ) 
+	{
 		super( zoom );
 		this.setBox( zoom.getBox());
 		this.setControl( zoom.getControl());
@@ -23,22 +26,31 @@ public class Zoom extends Tool
 		this.setMouseWheel( zoom.getMouseWheel());
 	}
 
+	@Override
 	public String getTitle() {
 		return "Zooming";
 	}
 
+	@Override
 	public String getType() {
-		return Tool.Type.zoom.toString();
+		return Tool.Type.ZOOM.toString();
 	}
 
+	@Override
     public String getDescription() {
         return "Zooming options for the viewer.";
     }
 
+    @Override
     public boolean isConfigured() {
         return true;
     }
 
+    @Override
+    public boolean equals( Object other ) {
+        return super.equals(other);
+    }
+    
 	public boolean getMouseWheel() { return mouseWheel; }
 	public void setMouseWheel(boolean mouseWheel) { this.mouseWheel = mouseWheel; }
 
@@ -50,12 +62,4 @@ public class Zoom extends Tool
 
 	public boolean getControl() { return control; }
 	public void setControl(boolean control) { this.control = control; }
-
-	public Zoom clone()
-	{
-		Zoom clone = new Zoom( this );
-
-		return clone;
-	}
-
 }

@@ -1,9 +1,10 @@
 package ca.bc.gov.app.smks.service;
 
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.apache.commons.codec.binary.Base64;
@@ -20,19 +21,25 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonParser.Feature;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import ca.bc.gov.app.smks.SMKException;
 import ca.bc.gov.app.smks.converter.DocumentConverterFactory;
 import ca.bc.gov.app.smks.converter.DocumentConverterFactory.DocumentType;
 import ca.bc.gov.app.smks.dao.CouchDAO;
@@ -51,24 +58,35 @@ public class MapConfigController
 	private static Log logger = LogFactory.getLog(MapConfigController.class);
 
 	@Autowired
+    private ObjectMapper jsonObjectMapper;
+	
+	private static final String SUCCESS = "    Success!";
+	private static final String ERR_MESSAGE = "{ \"status\": \"ERROR\", \"message\": \"";
+	private static final String SUCCESS_MESSAGE = "{ \"status\": \"Success!\" }";
+	private static final String SHAPE = "shape";
+	private static final String KML = "kml";
+	private static final String KMZ = "kmz";
+	private static final String VECTOR = "vector"; 
+	
+	@Autowired
 	private CouchDAO couchDAO;
 
 	@Autowired
     private Environment env;
 	
-	@RequestMapping(value = "/", method = RequestMethod.POST)
+	@PostMapping(value = "/")
 	@ResponseBody
-	public ResponseEntity<?> createMapConfig(@RequestBody MapConfiguration request)
+	public ResponseEntity<JsonNode> createMapConfig(@RequestBody MapConfiguration request) throws JsonParseException, JsonMappingException, IOException
 	{
 		logger.debug(" >> createMapConfig()");
-		ResponseEntity<?> result = null;
+		ResponseEntity<JsonNode> result = null;
 
 		try
 		{
 			logger.debug("    Creating new Map Configuration...");
 
-			if(request.getName() == null) throw new Exception("The SMK ID is null. This is a required field");
-			if(request.getName().length() == 0) throw new Exception("The SMK ID is empty. Please fill in a valid field");
+			if(request.getName() == null) throw new SMKException("The SMK ID is null. This is a required field");
+			if(request.getName().length() == 0) throw new SMKException("The SMK ID is empty. Please fill in a valid field");
 
 			request.setLmfId(request.getName().toLowerCase().replaceAll(" ", "-").replaceAll("[^A-Za-z0-9]", "-"));
 			
@@ -85,13 +103,13 @@ public class MapConfigController
 			}
 
 			couchDAO.createResource(request);
-			logger.debug("    Success!");
-			result = new ResponseEntity<String>("{ \"status\": \"Success\", \"couchId\": \"" + request.getId() + "\", \"lmfId\": \"" + request.getLmfId() + "\" }", HttpStatus.CREATED);
+			logger.debug(SUCCESS);
+			result = new ResponseEntity<JsonNode>(jsonObjectMapper.readValue("{ \"status\": \"Success\", \"couchId\": \"" + request.getId() + "\", \"lmfId\": \"" + request.getLmfId() + "\" }", JsonNode.class), HttpStatus.CREATED);
 		}
 		catch (Exception e)
 		{
 			logger.error("    ## Error creating Map Configuration resources " + e.getMessage());
-			result = new ResponseEntity<String>("{ \"status\": \"ERROR\", \"message\": \"" + e.getMessage() + "\" }", HttpStatus.BAD_REQUEST);
+			result = new ResponseEntity<JsonNode>(getErrorMessageAsJson(e), HttpStatus.BAD_REQUEST);
 		}
 
 		logger.info("    Create New Map Configuration completed. Response: " + result.getStatusCode().name());
@@ -99,17 +117,17 @@ public class MapConfigController
 		return result;
 	}
 
-	@RequestMapping(value = "/", method = RequestMethod.GET)
+	@GetMapping(value = "/")
 	@ResponseBody
-	public ResponseEntity<?> getAllMapConfigs()
+	public ResponseEntity<JsonNode> getAllMapConfigs() throws JsonParseException, JsonMappingException, IOException
 	{
 		logger.debug(" >> getAllMapConfigs()");
-		ResponseEntity<?> result = null;
+		ResponseEntity<JsonNode> result = null;
 
 		try
 		{
 			logger.debug("    Querying for all Map Resources...");
-			HashMap<String, String> resourceIds = couchDAO.getAllConfigs();
+			Map<String, String> resourceIds = couchDAO.getAllConfigs();
 			logger.debug("    Success, found " + resourceIds.size() + " valid results");
 
 			ArrayList<MapConfigInfo> configSnippets = new ArrayList<MapConfigInfo>();
@@ -135,12 +153,12 @@ public class MapConfigController
 			    }
 			}
 
-			result = new ResponseEntity<ArrayList<MapConfigInfo>>(configSnippets, HttpStatus.OK);
+			result = new ResponseEntity<JsonNode>(jsonObjectMapper.convertValue(configSnippets, JsonNode.class), HttpStatus.OK);
 		}
 		catch (Exception e)
 		{
 			logger.error("    ## Error querying Map Config Resources: " + e.getMessage());
-			result = new ResponseEntity<String>("{ \"status\": \"ERROR\", \"message\": \"" + e.getMessage() + "\" }", HttpStatus.BAD_REQUEST);
+			result = new ResponseEntity<JsonNode>(getErrorMessageAsJson(e), HttpStatus.BAD_REQUEST);
 		}
 
 		logger.info("    Get All Map Configurations completed. Response: " + result.getStatusCode().name());
@@ -148,12 +166,12 @@ public class MapConfigController
 		return result;
 	}
 
-	@RequestMapping(value = "/{id}", method = RequestMethod.GET)
+	@GetMapping(value = "/{id}")
 	@ResponseBody
-	public ResponseEntity<?> getMapConfig(@PathVariable String id, @RequestParam(value="version", required=false) String version)
+	public ResponseEntity<JsonNode> getMapConfig(@PathVariable String id, @RequestParam(value="version", required=false) String version) throws JsonParseException, JsonMappingException, IOException
 	{
 		logger.debug(" >> getMapConfig()");
-		ResponseEntity<?> result = null;
+		ResponseEntity<JsonNode> result = null;
 
 		try
 		{
@@ -172,15 +190,15 @@ public class MapConfigController
 
 			if(resource != null)
 			{
-				logger.debug("    Success!");
-				result = new ResponseEntity<MapConfiguration>(resource, HttpStatus.OK);
+				logger.debug(SUCCESS);
+				result = new ResponseEntity<JsonNode>(jsonObjectMapper.convertValue(resource, JsonNode.class), HttpStatus.OK);
 			}
-			else throw new Exception("Map Config not found for ID " + id + " and version " + version + " does not exist");
+			else throw new SMKException("Map Config not found for ID " + id + " and version " + version + " does not exist");
 		}
 		catch (Exception e)
 		{
 			logger.error("    ## Error querying Map Configuration resource " + id + ": " + e.getMessage());
-			result = new ResponseEntity<String>("{ \"status\": \"ERROR\", \"message\": \"" + e.getMessage() + "\" }", HttpStatus.BAD_REQUEST);
+			result = new ResponseEntity<JsonNode>(getErrorMessageAsJson(e), HttpStatus.BAD_REQUEST);
 		}
 
 		logger.info("    Get Map Configuration completed. Response: " + result.getStatusCode().name());
@@ -188,12 +206,12 @@ public class MapConfigController
 		return result;
 	}
 
-	@RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+	@DeleteMapping(value = "/{id}")
 	@ResponseBody
-	public ResponseEntity<?> deleteMapConfig(@PathVariable String id, @RequestParam(value="version", required=false) String version)
+	public ResponseEntity<JsonNode> deleteMapConfig(@PathVariable String id, @RequestParam(value="version", required=false) String version) throws JsonParseException, JsonMappingException, IOException
 	{
 		logger.debug(" >> deleteMapConfig()");
-		ResponseEntity<?> result = null;
+		ResponseEntity<JsonNode> result = null;
 
 		try
 		{
@@ -201,7 +219,7 @@ public class MapConfigController
 
 			// If we have a published version, cancel the delete and warn about un-publishing first
 			MapConfiguration published = couchDAO.getPublishedConfig(id);
-			if(published != null) throw new Exception("The Map Configuration has a published version. Please Un-Publish the configuration first via the {DELETE} /MapConfigurations/Published/{id} endpoint before deleting a configuration archive. ");
+			if(published != null) throw new SMKException("The Map Configuration has a published version. Please Un-Publish the configuration first via the {DELETE} /MapConfigurations/Published/{id} endpoint before deleting a configuration archive. ");
 			else // nothing is published, so lets go forward with the delete process
 			{
 				// Should we be deleting just the requested config (may be many versions!) or all of the versions?
@@ -216,10 +234,10 @@ public class MapConfigController
 					{
 						logger.debug("    Deleting Map Configuration " + id + " version " + version);
 						couchDAO.removeResource(resource);
-						logger.debug("    Success!");
-						result = new ResponseEntity<String>("{ \"status\": \"Success!\" }", HttpStatus.OK);
+						logger.debug(SUCCESS);
+						result = new ResponseEntity<JsonNode>(jsonObjectMapper.readValue(SUCCESS_MESSAGE, JsonNode.class), HttpStatus.OK);
 					}
-					else throw new Exception("Map Config not found for ID " + id + " and version " + version + " does not exist");
+					else throw new SMKException("Map Config not found for ID " + id + " and version " + version + " does not exist");
 				}
 				// delete everything!
 				else
@@ -231,14 +249,14 @@ public class MapConfigController
 					{
 						couchDAO.removeResource(config);
 					}
-					result = new ResponseEntity<String>("{ \"status\": \"Success!\" }", HttpStatus.OK);
+					result = new ResponseEntity<JsonNode>(jsonObjectMapper.readValue(SUCCESS_MESSAGE, JsonNode.class), HttpStatus.OK);
 				}
 			}
 		}
 		catch (Exception e)
 		{
 			logger.error("    ## Error deleting map configuration: " + e.getMessage());
-			result = new ResponseEntity<String>("{ \"status\": \"ERROR\", \"message\": \"" + e.getMessage() + "\" }", HttpStatus.BAD_REQUEST);
+			result = new ResponseEntity<JsonNode>(getErrorMessageAsJson(e), HttpStatus.BAD_REQUEST);
 		}
 
 		logger.info("    Delete Map Configuration completed. Response: " + result.getStatusCode().name());
@@ -246,18 +264,18 @@ public class MapConfigController
 		return result;
 	}
 
-	@RequestMapping(value = "/{id}", method = RequestMethod.PUT)
+	@PutMapping(value = "/{id}")
 	@ResponseBody
-	public ResponseEntity<?> updateMapConfig(@PathVariable String id, @RequestBody MapConfiguration request)
+	public ResponseEntity<JsonNode> updateMapConfig(@PathVariable String id, @RequestBody MapConfiguration request) throws JsonParseException, JsonMappingException, IOException
 	{
 		logger.debug(" >> updateMapConfig()");
-		ResponseEntity<?> result = null;
+		ResponseEntity<JsonNode> result = null;
 
 		try
 		{
 			logger.debug("    Updating a Map Configuration...");
 
-			if(request.isPublished()) throw new Exception("You cannot update the currently published Map Configuration. Please update the editable version.");
+			if(request.isPublished()) throw new SMKException("You cannot update the currently published Map Configuration. Please update the editable version.");
 			
 			MapConfiguration resource = couchDAO.getMapConfiguration(id);
 
@@ -265,12 +283,12 @@ public class MapConfigController
 			boolean layerRemoved = false;
             for(Layer originalLayer : resource.getLayers())
             {
-                if(originalLayer.getType().equals("vector"))
+                if(originalLayer.getType().equals(VECTOR))
                 {
                     boolean exists = false;
                     for(Layer layer : request.getLayers())
                     {
-                        if(layer.getType().equals("vector") && layer.getId().equals(originalLayer.getId()))
+                        if(layer.getType().equals(VECTOR) && layer.getId().equals(originalLayer.getId()))
                         {
                             exists = true;
                         }
@@ -297,7 +315,6 @@ public class MapConfigController
 			resource.setName(request.getName());
 			resource.setProject(request.getProject());
 			resource.setPublished(request.isPublished());
-			//resource.setRevision(request.getRevision());
 			resource.setSurround(request.getSurround());
 			resource.setTools(request.getTools());
 			resource.setViewer(request.getViewer());
@@ -305,12 +322,12 @@ public class MapConfigController
 
 			// Update!
 			couchDAO.updateResource(resource);
-			result = new ResponseEntity<String>("{ \"status\": \"Success!\" }", HttpStatus.OK);
+			result = new ResponseEntity<JsonNode>(jsonObjectMapper.readValue(SUCCESS_MESSAGE, JsonNode.class), HttpStatus.OK);
 		}
 		catch (Exception e)
 		{
 			logger.error("    ## Error Updating Map Configuration: " + e.getMessage());
-			result = new ResponseEntity<String>("{ \"status\": \"ERROR\", \"message\": \"" + e.getMessage() + "\" }", HttpStatus.BAD_REQUEST);
+			result = new ResponseEntity<JsonNode>(getErrorMessageAsJson(e), HttpStatus.BAD_REQUEST);
 		}
 
 		logger.info("    Update Map Configuration Completed. Response: " + result.getStatusCode().name());
@@ -318,12 +335,12 @@ public class MapConfigController
 		return result;
 	}
 
-	@RequestMapping(value = "/{config_id}/Attachments", headers=("content-type=multipart/form-data"), method = RequestMethod.POST)
+	@PostMapping(value = "/{configId}/Attachments", headers=("content-type=multipart/form-data"))
 	@ResponseBody
-	public ResponseEntity<?> createAttachment(@PathVariable String config_id, @RequestParam("file") MultipartFile request, @RequestParam("id") String id, @RequestParam("type") String type)
+	public ResponseEntity<JsonNode> createAttachment(@PathVariable String configId, @RequestParam("file") MultipartFile request, @RequestParam("id") String id, @RequestParam("type") String type) throws JsonParseException, JsonMappingException, IOException
 	{
 		logger.debug(" >> createAttachment()");
-		ResponseEntity<?> result = null;
+		ResponseEntity<JsonNode> result = null;
 
 		if(!request.isEmpty() && id != null && id.length() != 0)
 		{
@@ -331,7 +348,7 @@ public class MapConfigController
 			{
 				logger.debug("    Creating new Attachment...");
 
-				MapConfiguration resource = couchDAO.getMapConfiguration(config_id);
+				MapConfiguration resource = couchDAO.getMapConfiguration(configId);
 
 				if(resource != null)
 				{
@@ -340,17 +357,14 @@ public class MapConfigController
 					
 					String contentType = request.getContentType();
 					
-					if(contentType.equals("application/vnd.google-earth.kml+xml")) type = "kml";
-					if(contentType.equals("application/vnd.google-earth.kmz")) type = "kmz";
-					if(contentType.equals("application/zip")) type = "shape";
-					if(contentType.equals("application/x-zip-compressed")) type = "shape";
+					if(contentType.equals("application/vnd.google-earth.kml+xml")) type = KML;
+					if(contentType.equals("application/vnd.google-earth.kmz")) type = KMZ;
+					if(contentType.equals("application/zip")) type = SHAPE;
+					if(contentType.equals("application/x-zip-compressed")) type = SHAPE;
 					
-					if(type.equals("kml")) { type = "vector"; docBytes = DocumentConverterFactory.convertDocument(request.getBytes(), DocumentType.KML); contentType = "application/octet-stream"; }
-					if(type.equals("kmz")) { type = "vector"; docBytes = DocumentConverterFactory.convertDocument(request.getBytes(), DocumentType.KMZ); contentType = "application/octet-stream"; }
-					else if(type.equals("csv")) { type = "vector"; docBytes = DocumentConverterFactory.convertDocument(request.getBytes(), DocumentType.CSV); contentType = "application/octet-stream"; }
-					else if(type.equals("wkt")) { type = "vector"; docBytes = DocumentConverterFactory.convertDocument(request.getBytes(), DocumentType.WKT); contentType = "application/octet-stream"; }
-					else if(type.equals("gml")) { type = "vector"; docBytes = DocumentConverterFactory.convertDocument(request.getBytes(), DocumentType.GML); contentType = "application/octet-stream"; }
-					else if(type.equals("shape")) { type = "vector"; docBytes = DocumentConverterFactory.convertDocument(request.getBytes(), DocumentType.SHAPE); contentType = "application/octet-stream"; }
+					if(type.equals(KML)) { type = VECTOR; docBytes = DocumentConverterFactory.convertDocument(request.getBytes(), DocumentType.KML); contentType = "application/octet-stream"; }
+					if(type.equals(KMZ)) { type = VECTOR; docBytes = DocumentConverterFactory.convertDocument(request.getBytes(), DocumentType.KMZ); contentType = "application/octet-stream"; }
+					else if(type.equals(SHAPE)) { type = VECTOR; docBytes = DocumentConverterFactory.convertDocument(request.getBytes(), DocumentType.SHAPE); contentType = "application/octet-stream"; }
 					
 					Attachment attachment = new Attachment(id, Base64.encodeBase64String(docBytes), contentType);
 				    resource.addInlineAttachment(attachment);
@@ -361,7 +375,7 @@ public class MapConfigController
 				    }
 
 				    // if this is a geojson blob, make sure we have verified the properties set
-				    if(type.equals("vector"))
+				    if(type.equals(VECTOR))
 				    {
 				        Vector layer = (Vector)resource.getLayerByID(id);
 				        
@@ -403,40 +417,40 @@ public class MapConfigController
 				        }
 				    }
 
-				    MapConfiguration updatedResource = couchDAO.getMapConfiguration(config_id);
+				    MapConfiguration updatedResource = couchDAO.getMapConfiguration(configId);
 				    resource.setRevision(updatedResource.getRevision());
 				    couchDAO.updateResource(resource);
 
-				    logger.debug("    Success!");
-				    result = new ResponseEntity<String>("{ \"status\": \"Success!\" }", HttpStatus.OK);
+				    logger.debug(SUCCESS);
+				    result = new ResponseEntity<JsonNode>(jsonObjectMapper.readValue(SUCCESS_MESSAGE, JsonNode.class), HttpStatus.OK);
 				}
-				else throw new Exception("Map Configuration ID not found.");
+				else throw new SMKException("Map Configuration ID not found.");
 			}
 			catch (Exception e)
 			{
 				logger.error("    ## Error creating attachment resource: " + e.getMessage());
-				result = new ResponseEntity<String>("{ \"status\": \"ERROR\", \"message\": \"" + e.getMessage() + "\" }", HttpStatus.BAD_REQUEST);
+				result = new ResponseEntity<JsonNode>(getErrorMessageAsJson(e), HttpStatus.BAD_REQUEST);
 			}
 		}
-		else result = new ResponseEntity<String>("{ \"status\": \"ERROR\", \"message\": \"File or ID was not submitted. Please post your form with a file, and id\" }", HttpStatus.BAD_REQUEST);
+		else result = new ResponseEntity<JsonNode>(jsonObjectMapper.readValue("{ \"status\": \"ERROR\", \"message\": \"File or ID was not submitted. Please post your form with a file, and id\" }", JsonNode.class), HttpStatus.BAD_REQUEST);
 
 		logger.info("    Create New Attachment completed. Response: " + result.getStatusCode().name());
 		logger.debug(" >> createAttachment()");
 		return result;
 	}
 
-	@RequestMapping(value = "/{config_id}/Attachments", method = RequestMethod.GET)
+	@GetMapping(value = "/{configId}/Attachments")
 	@ResponseBody
-	public ResponseEntity<?> getAllAttachments(@PathVariable String config_id)
+	public ResponseEntity<JsonNode> getAllAttachments(@PathVariable String configId) throws JsonParseException, JsonMappingException, IOException
 	{
 		logger.debug(" >> getAllAttachments()");
-		ResponseEntity<?> result = null;
+		ResponseEntity<JsonNode> result = null;
 
 		try
 		{
 			logger.debug("    Fetching all Attachments...");
 
-			MapConfiguration resource = couchDAO.getMapConfiguration(config_id);
+			MapConfiguration resource = couchDAO.getMapConfiguration(configId);
 
 			if(resource != null)
 			{
@@ -448,15 +462,15 @@ public class MapConfigController
 					attachments.add("{ \"id\": \"" + key + "\", \"content-type\": \"" + attachment.getContentType() + "\", \"content-length\": \"" + attachment.getContentLength() + "\"  }");
 				}
 
-				logger.debug("    Success!");
-				result = new ResponseEntity<ArrayList<String>>(attachments, HttpStatus.OK);
+				logger.debug(SUCCESS);
+				result = new ResponseEntity<JsonNode>(jsonObjectMapper.convertValue(attachments, JsonNode.class), HttpStatus.OK);
 			}
-			else throw new Exception("Map Configuration ID not found.");
+			else throw new SMKException("Map Configuration ID not found.");
 		}
 		catch (Exception e)
 		{
 			logger.error("    ## Error fetching all attachment resource: " + e.getMessage());
-			result = new ResponseEntity<String>("{ \"status\": \"ERROR\", \"message\": \"" + e.getMessage() + "\" }", HttpStatus.BAD_REQUEST);
+			result = new ResponseEntity<JsonNode>(getErrorMessageAsJson(e), HttpStatus.BAD_REQUEST);
 		}
 
 		logger.info("    Get All Attachments completed. Response: " + result.getStatusCode().name());
@@ -464,22 +478,22 @@ public class MapConfigController
 		return result;
 	}
 
-	@RequestMapping(value = "/{config_id}/Attachments/{attachment_id}", method = RequestMethod.GET)
+	@GetMapping(value = "/{configId}/Attachments/{attachmentId}")
 	@ResponseBody
-	public ResponseEntity<?> getAttachment(@PathVariable String config_id, @PathVariable String attachment_id)
+	public ResponseEntity<byte[]> getAttachment(@PathVariable String configId, @PathVariable String attachmentId)
 	{
 		logger.debug(" >> getAttachment()");
-		ResponseEntity<?> result = null;
+		ResponseEntity<byte[]> result = null;
 
 		try
 		{
 			logger.debug("    Fetching an Attachment...");
 
-			MapConfiguration resource = couchDAO.getMapConfiguration(config_id);
+			MapConfiguration resource = couchDAO.getMapConfiguration(configId);
 
 			if(resource != null)
 			{
-				AttachmentInputStream attachment = couchDAO.getAttachment(resource, attachment_id);
+				AttachmentInputStream attachment = couchDAO.getAttachment(resource, attachmentId);
 				byte[] media = IOUtils.toByteArray(attachment);
 
 				final HttpHeaders httpHeaders= new HttpHeaders();
@@ -493,15 +507,15 @@ public class MapConfigController
 
 			    httpHeaders.setContentType(contentType);
 
-				logger.debug("    Success!");
+				logger.debug(SUCCESS);
 				result = new ResponseEntity<byte[]>(media, httpHeaders, HttpStatus.OK);
 			}
-			else throw new Exception("Map Configuration ID not found.");
+			else throw new SMKException("Map Configuration ID not found.");
 		}
 		catch (Exception e)
 		{
 			logger.error("    ## Error fetching attachment resource: " + e.getMessage());
-			result = new ResponseEntity<String>("{ \"status\": \"ERROR\", \"message\": \"" + e.getMessage() + "\" }", HttpStatus.BAD_REQUEST);
+			result = new ResponseEntity<byte[]>(((ERR_MESSAGE + e.getMessage() + "\" }").replaceAll("\\r\\n|\\r|\\n", " ")).getBytes(), HttpStatus.BAD_REQUEST);
 		}
 
 		logger.info("    Get Attachment completed. Response: " + result.getStatusCode().name());
@@ -509,34 +523,34 @@ public class MapConfigController
 		return result;
 	}
 
-	@RequestMapping(value = "/{config_id}/Attachments/{attachment_id}", method = RequestMethod.DELETE)
+	@DeleteMapping(value = "/{configId}/Attachments/{attachmentId}")
 	@ResponseBody
-	public ResponseEntity<?> deleteAttachment(@PathVariable String config_id, @PathVariable String attachment_id)
+	public ResponseEntity<JsonNode> deleteAttachment(@PathVariable String configId, @PathVariable String attachmentId) throws JsonParseException, JsonMappingException, IOException
 	{
 		logger.debug(" >> deleteAttachment()");
-		ResponseEntity<?> result = null;
+		ResponseEntity<JsonNode> result = null;
 
 		try
 		{
 			logger.debug("    Deleting a Map Configuration Attachment...");
-			MapConfiguration resource = couchDAO.getMapConfiguration(config_id);
+			MapConfiguration resource = couchDAO.getMapConfiguration(configId);
 
 			if(resource != null)
 			{
-				if(attachment_id != null && attachment_id.length() > 0 && resource.getAttachments().containsKey(attachment_id))
+				if(attachmentId != null && attachmentId.length() > 0 && resource.getAttachments().containsKey(attachmentId))
 				{
-					couchDAO.deleteAttachment(resource, attachment_id);
-					logger.debug("    Success!");
-					result = new ResponseEntity<String>("{ status: \"Success!\" }", HttpStatus.OK);
+					couchDAO.deleteAttachment(resource, attachmentId);
+					logger.debug(SUCCESS);
+					result = new ResponseEntity<JsonNode>(jsonObjectMapper.readValue("{ status: \"Success!\" }", JsonNode.class), HttpStatus.OK);
 				}
-				else throw new Exception("Attachment ID not found.");
+				else throw new SMKException("Attachment ID not found.");
 			}
-			else throw new Exception("Map Configuration ID not found.");
+			else throw new SMKException("Map Configuration ID not found.");
 		}
 		catch (Exception e)
 		{
 			logger.error("    ## Error deleting attachment: " + e.getMessage());
-			result = new ResponseEntity<String>("{ \"status\": \"ERROR\", \"message\": \"" + e.getMessage() + "\" }", HttpStatus.BAD_REQUEST);
+			result = new ResponseEntity<JsonNode>(getErrorMessageAsJson(e), HttpStatus.BAD_REQUEST);
 		}
 
 		logger.info("    Delete Attachment completed. Response: " + result.getStatusCode().name());
@@ -544,48 +558,53 @@ public class MapConfigController
 		return result;
 	}
 
-	@RequestMapping(value = "/{config_id}/Attachments/{attachment_id}", headers=("content-type=multipart/form-data"), method = RequestMethod.POST)
+	@PostMapping(value = "/{configId}/Attachments/{attachmentId}", headers=("content-type=multipart/form-data"))
 	@ResponseBody
-	public ResponseEntity<?> updateAttachment(@PathVariable String config_id, @PathVariable String attachment_id, @RequestParam("file") MultipartFile request)
+	public ResponseEntity<JsonNode> updateAttachment(@PathVariable String configId, @PathVariable String attachmentId, @RequestParam("file") MultipartFile request) throws JsonParseException, JsonMappingException, IOException
 	{
 		logger.debug(" >> updateAttachment()");
-		ResponseEntity<?> result = null;
+		ResponseEntity<JsonNode> result = null;
 
 		if(!request.isEmpty())
 		{
 			try
 			{
-				logger.debug("    Updating Attachment " + attachment_id + "...");
+				logger.debug("    Updating Attachment " + attachmentId + "...");
 
-				MapConfiguration resource = couchDAO.getMapConfiguration(config_id);
+				MapConfiguration resource = couchDAO.getMapConfiguration(configId);
 
 				if(resource != null)
 				{
-					couchDAO.deleteAttachment(resource, attachment_id);
+					couchDAO.deleteAttachment(resource, attachmentId);
 
 					// fetch the updated resource, so we're not out of date
-					resource = couchDAO.getMapConfiguration(config_id);
+					resource = couchDAO.getMapConfiguration(configId);
 
-					Attachment attachment = new Attachment(attachment_id, Base64.encodeBase64String(request.getBytes()), request.getContentType());
+					Attachment attachment = new Attachment(attachmentId, Base64.encodeBase64String(request.getBytes()), request.getContentType());
 					resource.addInlineAttachment(attachment);
 
 					couchDAO.updateResource(resource);
 
-				    logger.debug("    Success!");
-				    result = new ResponseEntity<String>("{ status: \"Success!\" }", HttpStatus.OK);
+				    logger.debug(SUCCESS);
+				    result = new ResponseEntity<JsonNode>(jsonObjectMapper.readValue("{ status: \"Success!\" }", JsonNode.class), HttpStatus.OK);
 				}
-				else throw new Exception("Map Configuration ID not found.");
+				else throw new SMKException("Map Configuration ID not found.");
 			}
 			catch (Exception e)
 			{
 				logger.error("    ## Error fetching all attachment resource: " + e.getMessage());
-				result = new ResponseEntity<String>("{ \"status\": \"ERROR\", \"message\": \"" + e.getMessage() + "\" }", HttpStatus.BAD_REQUEST);
+				result = new ResponseEntity<JsonNode>(getErrorMessageAsJson(e), HttpStatus.BAD_REQUEST);
 			}
 		}
-		else result = new ResponseEntity<String>("{ \"status\": \"ERROR\", \"message\": \"File or ID was not submitted. Please post your form with a file, and id\" }", HttpStatus.BAD_REQUEST);
+		else result = new ResponseEntity<JsonNode>(jsonObjectMapper.readValue("{ \"status\": \"ERROR\", \"message\": \"File or ID was not submitted. Please post your form with a file, and id\" }", JsonNode.class), HttpStatus.BAD_REQUEST);
 
 		logger.info("    Update Attachment completed. Response: " + result.getStatusCode().name());
 		logger.debug(" << updateAttachment()");
 		return result;
 	}
+	
+	private JsonNode getErrorMessageAsJson(Exception e) throws JsonParseException, JsonMappingException, IOException
+    {
+        return jsonObjectMapper.readValue(("{ \"status\": \"ERROR\", \"message\": \"" + e.getMessage() + "\" }").replaceAll("\\r\\n|\\r|\\n", " "), JsonNode.class);
+    }	
 }

@@ -168,14 +168,6 @@ function parseKmlLayerStyle(fileText, fileContents)
         			}
 	        		
 	        		// create blob from geojson
-	        		var jsonString = JSON.stringify(sourceLayer.geojson);
-    				var out = [];
-    				for (var jsIdx = 0; jsIdx < jsonString.length; jsIdx++ ) 
-    				{
-    					out[jsIdx] = jsonString.charCodeAt(jsIdx);
-    				}
-    				
-    				var unsignedData = new Uint8Array(out); 
     				var blob = new Blob([ JSON.stringify(sourceLayer.geojson) ], {encoding:"UTF-8",type:"application/json"});
 	        		
         			unsavedAttachments.push(
@@ -191,8 +183,8 @@ function parseKmlLayerStyle(fileText, fileContents)
         				newLayer.style.markerUrl = "@" +  newLayer.id + "-marker";
         				
         				// set marker dimensions
-        				var img = new Image();
-        			    img.addEventListener("load", function()
+        				var imgTag = new Image();
+        				imgTag.addEventListener("load", function()
         			    {
         			    	newLayer.style.markerSize[0] = parseInt(this.naturalWidth);
         			    	newLayer.style.markerSize[1] = parseInt(this.naturalHeight);
@@ -200,7 +192,7 @@ function parseKmlLayerStyle(fileText, fileContents)
         			    	newLayer.style.markerOffset[1] = parseInt(this.naturalHeight / 2);
         			    });
         			    
-        			    img.src = sourceLayer.markerImage;
+        				imgTag.src = sourceLayer.markerImage;
         			    
 	        			unsavedAttachments.push(
 	        			{
@@ -234,10 +226,7 @@ function parseKmlLayerStyle(fileText, fileContents)
 		var strokeStyle = options.dashArray != null ? options.dashArray : "1";
 		var strokeColor = options.color != null ? options.color : "#000000";
 		var fillColor = options.fillColor != null ? options.fillColor : options.color != null ? options.color : "#000000";
-		var markerSize = 20;
 		var markerUrl = null;
-		var markerOffsetX = 0;
-		var markerOffsetY = 0;
 		
 		for(var i = 0; i < styleNodes.length; i++)
 		{
@@ -267,8 +256,6 @@ function parseKmlLayerStyle(fileText, fileContents)
 						}
 						else if(styleNode.localName == "IconStyle")
 						{
-							if(styleNode.getElementsByTagName("hotSpot").length) markerOffsetX = styleNode.getElementsByTagName("hotSpot")[0].getAttribute("x").innerHTML;
-							if(styleNode.getElementsByTagName("hotSpot").length) markerOffsetY = styleNode.getElementsByTagName("hotSpot")[0].getAttribute("y").innerHTML;
 							if(styleNode.getElementsByTagName("Icon").length) markerUrl = styleNode.getElementsByTagName("Icon")[0].getElementsByTagName("href")[0].innerHTML;
 						}
 					}
@@ -323,8 +310,8 @@ function parseKmlLayerStyle(fileText, fileContents)
 			if(markerUrl != null)
 			{
 				// get the image dimensions and set size/offset accordingly
-				var img = new Image();
-			    img.addEventListener("load", function()
+				var image = new Image();
+				image.addEventListener("load", function()
 			    {
 			        $("#vectorMarkerSizeX").val(parseInt(this.naturalWidth));
 					$("#vectorMarkerSizeY").val(parseInt(this.naturalHeight));
@@ -336,7 +323,7 @@ function parseKmlLayerStyle(fileText, fileContents)
 					Materialize.updateTextFields();
 			    });
 			    
-			    img.src = markerUrl;
+				image.src = markerUrl;
 			}
 		}
 		
@@ -362,7 +349,7 @@ function loadMarkerImageBase64(markerUrl, layer)
         },
         error: function(status)
         {
-        	
+        	Materialize.toast("Failed to load marker image. Error: " + status.responseText, 4000);
         }
 	});
 }
@@ -382,8 +369,6 @@ function getBase64Image(imgUrl)
         
         var dataURL = canvas.toDataURL("image/png");
         callback(dataURL);
-        
-        canvas = null; 
     };
     
 	image.src = imgUrl;
@@ -1479,11 +1464,11 @@ function finishLayerEdits(save)
 			// if user activated clustering, change vector type
 			if(selectedLayerNode.data.type == "vector" && $("#vectorClustering").is(":checked")) 
 			{
-				selectedLayerNode.data.type == "clustered";
+				selectedLayerNode.data.type = "clustered";
 			}
 			if(selectedLayerNode.data.type == "clustered" && !$("#vectorClustering").is(":checked")) 
 			{
-				selectedLayerNode.data.type == "vector";
+				selectedLayerNode.data.type = "vector";
 			}
 			
 			selectedLayerNode.data.isVisible = $("#vectorVisible").is(":checked");
@@ -2266,6 +2251,10 @@ function uploadVectorLayer()
 		};
 	
 		reader.readAsText(fileContents);
+	}
+	if(fileContents.type == "application/vnd.google-earth.kmz")
+	{
+		// if it's a KMZ file, it must go to the server for processing.
 	}
 	else
 	{

@@ -1,6 +1,7 @@
 package ca.bc.gov.app.smks.model;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -14,7 +15,7 @@ public class MPCMInfoLayer
 	private int mpcmId;
 	private String label;
 	private String layerUrl;
-	private ArrayList<MPCMInfoLayer> sublayers;
+	private List<MPCMInfoLayer> sublayers;
 	
 	public MPCMInfoLayer() 
 	{ 
@@ -51,12 +52,12 @@ public class MPCMInfoLayer
 		this.label = label;
 	}
 
-	public ArrayList<MPCMInfoLayer> getSublayers() 
+	public List<MPCMInfoLayer> getSublayers() 
 	{
 		return sublayers;
 	}
 
-	public void setSublayers(ArrayList<MPCMInfoLayer> sublayers) 
+	public void setSublayers(List<MPCMInfoLayer> sublayers) 
 	{
 		this.sublayers = sublayers;
 	}

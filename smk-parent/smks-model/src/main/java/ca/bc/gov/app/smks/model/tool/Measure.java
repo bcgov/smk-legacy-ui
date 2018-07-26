@@ -2,34 +2,35 @@ package ca.bc.gov.app.smks.model.tool;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import ca.bc.gov.app.smks.model.Tool;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @JsonInclude(Include.NON_NULL)
 public class Measure extends Tool
 {
-	public Measure() {}
+    private static final long serialVersionUID = -6590326493245303797L;
 
-	protected Measure( Measure about ) {
+    public Measure() 
+	{
+	    // empty constructor
+	}
+
+    public Measure( Measure about ) {
 		super( about );
 	}
 
+	@Override
 	public String getType() {
-		return Tool.Type.measure.toString();
+		return Tool.Type.MEASURE.toString();
 	}
 
+	@Override
 	public String getTitle() {
 		return "Measurement";
 	}
 
-	public Measure clone()
-	{
-		Measure clone = new Measure( this );
-
-		return clone;
-	}
-
+    @Override
+    public boolean equals( Object other ) {
+        return super.equals(other);
+    }
 }

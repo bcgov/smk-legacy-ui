@@ -1,5 +1,7 @@
 package ca.bc.gov.app.smks;
 
+import java.net.MalformedURLException;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +14,9 @@ import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+
+import com.fasterxml.jackson.core.JsonParser.Feature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import ca.bc.gov.app.smks.dao.CouchDAO;
 import ca.bc.gov.app.smks.dao.LayerCatalogDAO;
@@ -28,7 +33,7 @@ public class WebConfig extends WebMvcConfigurerAdapter
 	private Environment env;
 
 	@Bean
-	public CouchDAO couchDAO() throws Exception
+	public CouchDAO couchDAO() throws SMKException, MalformedURLException
 	{
 		String name = env.getProperty("couchdb.name");
 		logger.debug(" >> WebConfig.couchDAO() : Initialize Couch DAO Bean " + name );
@@ -40,15 +45,13 @@ public class WebConfig extends WebMvcConfigurerAdapter
 	}
 
 	@Bean
-	public LayerCatalogDAO layerCatalogDao() throws Exception
+	public LayerCatalogDAO layerCatalogDao() throws SMKException
 	{
-		LayerCatalogDAO lcDao = new LayerCatalogDAO(env.getProperty("mpcm.rest.url"), env.getProperty("mpcm.arcgis.server"), env.getProperty("mpcm.wms.server"));
-
-		return lcDao;
+		return new LayerCatalogDAO(env.getProperty("mpcm.rest.url"), env.getProperty("mpcm.arcgis.server"), env.getProperty("mpcm.wms.server"));
 	}
 
 	@Bean
-	public CommonsMultipartResolver multipartResolver() throws Exception
+	public CommonsMultipartResolver multipartResolver() throws SMKException
 	{
 		CommonsMultipartResolver resolver = new CommonsMultipartResolver();
 		resolver.setMaxUploadSize(new Long(env.getProperty("attachment.max.size")));
@@ -56,6 +59,15 @@ public class WebConfig extends WebMvcConfigurerAdapter
 		return resolver;
 	}
 
+	@Bean
+	public ObjectMapper jsonObjectMapper() throws SMKException
+	{
+	    ObjectMapper mapper = new ObjectMapper();
+	    mapper.configure(Feature.ALLOW_UNQUOTED_CONTROL_CHARS, true);
+	    
+	    return mapper;
+	}
+	
 	@Override
 	public void addCorsMappings(CorsRegistry registry)
 	{

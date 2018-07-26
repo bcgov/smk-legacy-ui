@@ -1,12 +1,7 @@
 package ca.bc.gov.app.smks.service;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayOutputStream;
-import java.net.HttpURLConnection;
+import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Base64;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -16,16 +11,21 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
+import ca.bc.gov.app.smks.SMKException;
 import ca.bc.gov.app.smks.converter.DocumentConverterFactory;
 import ca.bc.gov.app.smks.dao.LayerCatalogDAO;
 import ca.bc.gov.app.smks.model.Layer;
@@ -38,17 +38,23 @@ import ca.bc.gov.app.smks.model.WMSInfoLayer;
 @PropertySource("classpath:application.properties")
 public class LayerCatalogController 
 {
-	private static Log logger = LogFactory.getLog(LayerCatalogController.class);
+	private static Log logger = LogFactory.getLog(LayerCatalogController.class);	
+
+	@Autowired
+    private ObjectMapper jsonObjectMapper;
 	
+    private static final String SUCCESS = "    Success!";
+    private static final String ERR_MESSAGE = "{ \"status\": \"ERROR\", \"message\": \"";
+    
 	@Autowired
 	private LayerCatalogDAO layerCatalogDao;
 	
-	@RequestMapping(value = "/wms/", method = RequestMethod.GET)
+	@GetMapping(value = "/wms/")
 	@ResponseBody
-	public ResponseEntity<?> getWmsConfigurations(@RequestParam(value="url", required=true) String url) 
+	public ResponseEntity<JsonNode> getWmsConfigurations(@RequestParam(value="url", required=true) String url) throws JsonParseException, JsonMappingException, IOException 
 	{
 		logger.debug(" >> getWmsConfigurations()");
-		ResponseEntity<?> result = null;
+		ResponseEntity<JsonNode> result = null;
 		
 		logger.debug("    Starting Get WMS Layer from provided URL...");
 		
@@ -58,22 +64,22 @@ public class LayerCatalogController
 			{
 				List<WMSInfoLayer> layers = layerCatalogDao.createWmsLayers(url);
 				logger.debug("    Successfully fetched WMS Layers");
-				result = new ResponseEntity<List<WMSInfoLayer>>(layers, HttpStatus.OK);
+				result = new ResponseEntity<JsonNode>(jsonObjectMapper.convertValue(layers, JsonNode.class), HttpStatus.OK);
 			}
 			catch (MalformedURLException e) 
 			{
 				logger.error("    ## Error querying WMS Server. URL is invalid: " + e.getMessage());
-				result = new ResponseEntity<String>("{ \"status\": \"ERROR\", \"message\": \"" + e.getMessage() + "\" }", HttpStatus.BAD_REQUEST);
+				result = new ResponseEntity<JsonNode>(jsonObjectMapper.readValue(((ERR_MESSAGE + e.getMessage() + "\" }").replaceAll("\\r\\n|\\r|\\n", " ")).replaceAll("\\r\\n|\\r|\\n", " "), JsonNode.class), HttpStatus.BAD_REQUEST);
 			}
 			catch (Exception e) 
 			{
 				logger.error("    ## Error querying WMS Server: " + e.getMessage());
-				result = new ResponseEntity<String>("{ \"status\": \"ERROR\", \"message\": \"" + e.getMessage() + "\" }", HttpStatus.BAD_REQUEST);
+				result = new ResponseEntity<JsonNode>(getErrorMessageAsJson(e), HttpStatus.BAD_REQUEST);
 			}
 		}
 		else
 		{
-			result = new ResponseEntity<String>("{ \"status\": \"ERROR\", \"message\": \"URL is invalid\" }", HttpStatus.BAD_REQUEST);
+			result = new ResponseEntity<JsonNode>(jsonObjectMapper.readValue("{ \"status\": \"ERROR\", \"message\": \"URL is invalid\" }", JsonNode.class), HttpStatus.BAD_REQUEST);
 		}
 		
 		logger.info("    Get WMS Layers completed. Response: " + result.getStatusCode().name());
@@ -81,12 +87,12 @@ public class LayerCatalogController
 		return result;
 	}
 	
-	@RequestMapping(value = "/wms/{id}", method = RequestMethod.GET)
+	@GetMapping(value = "/wms/{id}")
 	@ResponseBody
-	public ResponseEntity<?> getWmsLayer(@PathVariable String id) 
+	public ResponseEntity<JsonNode> getWmsLayer(@PathVariable String id) throws JsonParseException, JsonMappingException, IOException 
 	{
 		logger.debug(" >> getWmsLayer()");
-		ResponseEntity<?> result = null;
+		ResponseEntity<JsonNode> result = null;
 		
 		logger.debug("    Starting Get WMS Layer from DataBC GeoServer fetch...");
 		
@@ -96,22 +102,22 @@ public class LayerCatalogController
 			{
 				WMSInfoLayer layer = layerCatalogDao.createWmsLayer(id);
 				logger.debug("    Successfully fetched WMS Layer");
-				result = new ResponseEntity<WMSInfoLayer>(layer, HttpStatus.OK);
+				result = new ResponseEntity<JsonNode>(jsonObjectMapper.convertValue(layer, JsonNode.class), HttpStatus.OK);
 			}
 			catch (MalformedURLException e) 
 			{
 				logger.error("    ## Error querying WMS GeoServer. URL is invalid: " + e.getMessage());
-				result = new ResponseEntity<String>("{ \"status\": \"ERROR\", \"message\": \"" + e.getMessage() + "\" }", HttpStatus.BAD_REQUEST);
+				result = new ResponseEntity<JsonNode>(getErrorMessageAsJson(e), HttpStatus.BAD_REQUEST);
 			}
 			catch (Exception e) 
 			{
 				logger.error("    ## Error querying WMS layer: " + e.getMessage());
-				result = new ResponseEntity<String>("{ \"status\": \"ERROR\", \"message\": \"" + e.getMessage() + "\" }", HttpStatus.BAD_REQUEST);
+				result = new ResponseEntity<JsonNode>(getErrorMessageAsJson(e), HttpStatus.BAD_REQUEST);
 			}
 		}
 		else
 		{
-			result = new ResponseEntity<String>("{ \"status\": \"ERROR\", \"message\": \"ID is invalid\" }", HttpStatus.BAD_REQUEST);
+			result = new ResponseEntity<JsonNode>(jsonObjectMapper.readValue("{ \"status\": \"ERROR\", \"message\": \"ID is invalid\" }", JsonNode.class), HttpStatus.BAD_REQUEST);
 		}
 		
 		logger.info("    Get WMS Layer completed. Response: " + result.getStatusCode().name());
@@ -119,24 +125,24 @@ public class LayerCatalogController
 		return result;
 	}
 	
-	@RequestMapping(value = "/", method = RequestMethod.GET)
+	@GetMapping(value = "/")
 	@ResponseBody
-	public ResponseEntity<?> getLayers() 
+	public ResponseEntity<JsonNode> getLayers() throws JsonParseException, JsonMappingException, IOException 
 	{
 		logger.debug(" >> getLayers()");
-		ResponseEntity<?> result = null;
+		ResponseEntity<JsonNode> result = null;
 		
 		try
 		{
 			logger.debug("    Starting Get All Layers from MPCM fetch...");
-			ArrayList<MPCMInfoLayer> layers = layerCatalogDao.createMpcmLayers();
+			List<MPCMInfoLayer> layers = layerCatalogDao.createMpcmLayers();
 			logger.debug("    Successfully fetched all MPCM catalog Layers");
-			result = new ResponseEntity<ArrayList<MPCMInfoLayer>>(layers, HttpStatus.OK);
+			result = new ResponseEntity<JsonNode>(jsonObjectMapper.convertValue(layers, JsonNode.class), HttpStatus.OK);
 		}
 		catch (Exception e) 
 		{
 			logger.error("    ## Error querying WMS layer: " + e.getMessage());
-			result = new ResponseEntity<String>("{ \"status\": \"ERROR\", \"message\": \"" + e.getMessage() + "\" }", HttpStatus.BAD_REQUEST);
+			result = new ResponseEntity<JsonNode>(getErrorMessageAsJson(e), HttpStatus.BAD_REQUEST);
 		}
 		
 		logger.info("    Get Layers completed. Response: " + result.getStatusCode().name());
@@ -144,12 +150,12 @@ public class LayerCatalogController
 		return result;
 	}
 	
-	@RequestMapping(value = "/{id}", method = RequestMethod.GET)
+	@GetMapping(value = "/{id}")
 	@ResponseBody
-	public ResponseEntity<?> getLayer(@PathVariable String id) 
+	public ResponseEntity<JsonNode> getLayer(@PathVariable String id) throws JsonParseException, JsonMappingException, IOException 
 	{
 		logger.debug(" >> getLayer()");
-		ResponseEntity<?> result = null;
+		ResponseEntity<JsonNode> result = null;
 		
 		logger.debug("    Starting Get Layer from MPCM fetch...");
 		
@@ -159,22 +165,22 @@ public class LayerCatalogController
 			{
 				Layer layer = layerCatalogDao.createCatalogLayer(id);
 				logger.debug("    Successfully fetched MPCM Catalog Layer");
-				result = new ResponseEntity<Layer>(layer, HttpStatus.OK);
+				result = new ResponseEntity<JsonNode>(jsonObjectMapper.convertValue(layer, JsonNode.class), HttpStatus.OK);
 			} 
 			catch (MalformedURLException e) 
 			{
 				logger.error("    ## Error querying MPCM layer. REST service URL is invalid: " + e.getMessage());
-				result = new ResponseEntity<String>("{ \"status\": \"ERROR\", \"message\": \"" + e.getMessage() + "\" }", HttpStatus.BAD_REQUEST);
+				result = new ResponseEntity<JsonNode>(getErrorMessageAsJson(e), HttpStatus.BAD_REQUEST);
 			}
 			catch (Exception e) 
 			{
 				logger.error("    ## Error querying MPCM layer: " + e.getMessage());
-				result = new ResponseEntity<String>("{ \"status\": \"ERROR\", \"message\": \"" + e.getMessage() + "\" }", HttpStatus.BAD_REQUEST);
+				result = new ResponseEntity<JsonNode>(getErrorMessageAsJson(e), HttpStatus.BAD_REQUEST);
 			}
 		}
 		else
 		{
-			result = new ResponseEntity<String>("{ \"status\": \"ERROR\", \"message\": \"ID is invalid\" }", HttpStatus.BAD_REQUEST);
+			result = new ResponseEntity<JsonNode>(jsonObjectMapper.readValue("{ \"status\": \"ERROR\", \"message\": \"ID is invalid\" }", JsonNode.class), HttpStatus.BAD_REQUEST);
 		}
 		
 		logger.info("    Get Layer completed. Response: " + result.getStatusCode().name());
@@ -182,12 +188,12 @@ public class LayerCatalogController
 		return result;
 	}
 	
-    @RequestMapping(value = "/ImageToBase64", method = RequestMethod.GET)
+    @GetMapping(value = "/ImageToBase64")
     @ResponseBody
-    public ResponseEntity<?> getImageAsBase64(@RequestParam("url") String imageUrl)
+    public ResponseEntity<JsonNode> getImageAsBase64(@RequestParam("url") String imageUrl) throws JsonParseException, JsonMappingException, IOException
     {
         logger.debug(" >> getImageAsBase64()");
-        ResponseEntity<?> result = null;
+        ResponseEntity<JsonNode> result = null;
 
         try
         {
@@ -195,12 +201,12 @@ public class LayerCatalogController
             
             String base64 = DocumentConverterFactory.getImageBase64StringFromUrl(imageUrl);
             
-            result = new ResponseEntity<String>("{ \"image\": \"" + base64 + "\"}", HttpStatus.OK);
+            result = new ResponseEntity<JsonNode>(jsonObjectMapper.readValue("{ \"image\": \"" + base64 + "\"}", JsonNode.class), HttpStatus.OK);
         }
         catch (Exception e)
         {
             logger.error("    ## Error parsing KML file: " + e.getMessage());
-            result = new ResponseEntity<String>("{ \"status\": \"ERROR\", \"message\": \"" + e.getMessage() + "\" }", HttpStatus.BAD_REQUEST);
+            result = new ResponseEntity<JsonNode>(getErrorMessageAsJson(e), HttpStatus.BAD_REQUEST);
         }
 
         logger.info("    Building image Base64 complete. Response: " + result.getStatusCode().name());
@@ -208,12 +214,12 @@ public class LayerCatalogController
         return result;
     }
     
-    @RequestMapping(value = "/ProcessKML", headers=("content-type=multipart/form-data"), method = RequestMethod.POST)
+    @PostMapping(value = "/ProcessKML", headers=("content-type=multipart/form-data"))
     @ResponseBody
-    public ResponseEntity<?> processKML(@RequestParam("file") MultipartFile request)
+    public ResponseEntity<JsonNode> processKML(@RequestParam("file") MultipartFile request) throws JsonParseException, JsonMappingException, IOException
     {
         logger.debug(" >> processKML()");
-        ResponseEntity<?> result = null;
+        ResponseEntity<JsonNode> result = null;
 
         if(!request.isEmpty())
         {
@@ -223,7 +229,7 @@ public class LayerCatalogController
 
                 byte[] docBytes = request.getBytes();                
                 String contentType = request.getContentType();
-                ObjectNode resultingJson = null;
+                JsonNode resultingJson = null;
                 
                 if(contentType.equals("application/vnd.google-earth.kml+xml"))
                 {
@@ -237,24 +243,29 @@ public class LayerCatalogController
 
                 if(resultingJson == null)
                 {
-                    throw new Exception("Valid GEOJson could not be generated from this KML");
+                    throw new SMKException("Valid GEOJson could not be generated from this KML");
                 }
                 else
                 {
-                    logger.debug("    Success!");
-                    result = new ResponseEntity<ObjectNode>(resultingJson, HttpStatus.OK);
+                    logger.debug(SUCCESS);
+                    result = new ResponseEntity<JsonNode>(resultingJson, HttpStatus.OK);
                 }
             }
             catch (Exception e)
             {
                 logger.error("    ## Error creating resources from source KML: " + e.getMessage());
-                result = new ResponseEntity<String>("{ \"status\": \"ERROR\", \"message\": \"" + e.getMessage() + "\" }", HttpStatus.BAD_REQUEST);
+                result = new ResponseEntity<JsonNode>(getErrorMessageAsJson(e), HttpStatus.BAD_REQUEST);
             }
         }
-        else result = new ResponseEntity<String>("{ \"status\": \"ERROR\", \"message\": \"File or ID was not submitted. Please post your form with a file, and id\" }", HttpStatus.BAD_REQUEST);
+        else result = new ResponseEntity<JsonNode>(jsonObjectMapper.readValue("{ \"status\": \"ERROR\", \"message\": \"File or ID was not submitted. Please post your form with a file, and id\" }", JsonNode.class), HttpStatus.BAD_REQUEST);
 
         logger.info("    Create layers from KML completed. Response: " + result.getStatusCode().name());
         logger.debug(" >> processKML()");
         return result;
+    }
+    
+    private JsonNode getErrorMessageAsJson(Exception e) throws JsonParseException, JsonMappingException, IOException
+    {
+        return jsonObjectMapper.readValue(("{ \"status\": \"ERROR\", \"message\": \"" + e.getMessage() + "\" }").replaceAll("\\r\\n|\\r|\\n", " "), JsonNode.class);
     }
 }

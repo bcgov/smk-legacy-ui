@@ -2,34 +2,35 @@ package ca.bc.gov.app.smks.model.tool;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import ca.bc.gov.app.smks.model.Tool;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @JsonInclude(Include.NON_NULL)
 public class Coordinate extends Tool
 {
-	public Coordinate() {}
+    private static final long serialVersionUID = 3621757210040610392L;
 
-	protected Coordinate( Coordinate about ) {
+    public Coordinate() 
+    {
+        // empty constructor
+    }
+
+    public Coordinate( Coordinate about ) {
 		super( about );
 	}
 
+	@Override
 	public String getType() {
-		return Tool.Type.coordinate.toString();
+		return Tool.Type.COORDINATE.toString();
 	}
 
+	@Override
 	public String getTitle() {
 		return "Coordinate";
 	}
 
-	public Coordinate clone()
-	{
-		Coordinate clone = new Coordinate( this );
-
-		return clone;
-	}
-
+    @Override
+    public boolean equals( Object other ) {
+        return super.equals(other);
+    }
 }

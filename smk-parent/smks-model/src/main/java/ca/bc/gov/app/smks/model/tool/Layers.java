@@ -2,34 +2,35 @@ package ca.bc.gov.app.smks.model.tool;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import ca.bc.gov.app.smks.model.Tool;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @JsonInclude(Include.NON_NULL)
 public class Layers extends Tool
 {
-	public Layers() {}
+    private static final long serialVersionUID = -4283508441394064225L;
 
-	protected Layers( Layers about ) {
-		super( about );
+    public Layers() 
+    {
+        // empty constructor
+    }
+
+    public Layers( Layers layers ) {
+		super( layers );
 	}
 
+	@Override
 	public String getType() {
-		return Tool.Type.layers.toString();
+		return Tool.Type.LAYERS.toString();
 	}
 
+	@Override
 	public String getTitle() {
 		return "Layers Panel";
 	}
-
-	public Layers clone()
-	{
-		Layers clone = new Layers( this );
-
-		return clone;
-	}
-
+	
+    @Override
+    public boolean equals( Object other ) {
+        return super.equals(other);
+    }
 }

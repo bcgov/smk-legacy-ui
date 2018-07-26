@@ -4,8 +4,8 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,18 +24,25 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import ca.bc.gov.app.smks.SMKException;
 import ca.bc.gov.app.smks.dao.CouchDAO;
 import ca.bc.gov.app.smks.model.MapConfigInfo;
 import ca.bc.gov.app.smks.model.MapConfiguration;
 import net.lingala.zip4j.core.ZipFile;
+import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.ZipParameters;
 
 @CrossOrigin
@@ -47,14 +54,20 @@ public class PublishedMapConfigController
 	private static Log logger = LogFactory.getLog(PublishedMapConfigController.class);
 
 	@Autowired
+    private ObjectMapper jsonObjectMapper;
+	
+    private static final String SUCCESS = "    Success!";
+    private static final String SUCCESS_MESSAGE = "{ \"status\": \"Success!\" }";
+	    
+	@Autowired
 	private CouchDAO couchDAO;
 
-	@RequestMapping(value = "/Published", method = RequestMethod.GET)
+	@GetMapping(value = "/Published")
 	@ResponseBody
-	public ResponseEntity<?> getAllPublishedMapConfigs()
+	public ResponseEntity<JsonNode> getAllPublishedMapConfigs() throws JsonParseException, JsonMappingException, IOException
 	{
 		logger.debug(" >> getAllPublishedMapConfigs()");
-		ResponseEntity<?> result = null;
+		ResponseEntity<JsonNode> result = null;
 
 		try
 		{
@@ -68,12 +81,12 @@ public class PublishedMapConfigController
 				configSnippets.add(new MapConfigInfo(config));
 			}
 
-			result = new ResponseEntity<ArrayList<MapConfigInfo>>(configSnippets, HttpStatus.OK);
+			result = new ResponseEntity<JsonNode>(jsonObjectMapper.convertValue(configSnippets, JsonNode.class), HttpStatus.OK);
 		}
 		catch (Exception e)
 		{
 			logger.error("    ## Error querying Map Config Resources: " + e.getMessage());
-			result = new ResponseEntity<String>("{ \"status\": \"ERROR\", \"message\": \"" + e.getMessage() + "\" }", HttpStatus.BAD_REQUEST);
+			result = new ResponseEntity<JsonNode>(getErrorMessageAsJson(e), HttpStatus.BAD_REQUEST);
 		}
 
 		logger.info("    Get All Map Configurations completed. Response: " + result.getStatusCode().name());
@@ -81,12 +94,12 @@ public class PublishedMapConfigController
 		return result;
 	}
 
-	@RequestMapping(value = "/Published/{id}", method = RequestMethod.POST)
+	@PostMapping(value = "/Published/{id}")
 	@ResponseBody
-	public ResponseEntity<?> publishMapConfig(@PathVariable String id)
+	public ResponseEntity<JsonNode> publishMapConfig(@PathVariable String id) throws JsonParseException, JsonMappingException, IOException
 	{
 		logger.debug(" >> publishMapConfig()");
-		ResponseEntity<?> result = null;
+		ResponseEntity<JsonNode> result = null;
 
 		try
 		{
@@ -96,10 +109,10 @@ public class PublishedMapConfigController
 
 			if(resource != null)
 			{
-				if(resource.isPublished()) throw new Exception("The latest version of this map configuration has already been published");
+				if(resource.isPublished()) throw new SMKException("The latest version of this map configuration has already been published");
 
 				// clone the document, and create a new version for the edit state. You can't edit published documents
-				MapConfiguration clone = resource.clone();
+				MapConfiguration clone = new MapConfiguration(resource);
 				clone.setLmfRevision(resource.getLmfRevision() + 1);
 				clone.setPublished(false);
 
@@ -135,15 +148,15 @@ public class PublishedMapConfigController
 				// create the cloned new editable version
 				couchDAO.createResource(clone);
 
-				logger.debug("    Success!");
-				result = new ResponseEntity<String>("{ \"status:\" \"Success\", \"id\": \"" + id + "\" }", HttpStatus.CREATED);
+				logger.debug(SUCCESS);
+				result = new ResponseEntity<JsonNode>(jsonObjectMapper.readValue("{ \"status:\" \"Success\", \"id\": \"" + id + "\" }", JsonNode.class), HttpStatus.CREATED);
 			}
-			else throw new Exception("Map Configuration ID not found.");
+			else throw new SMKException("Map Configuration ID not found.");
 		}
 		catch (Exception e)
 		{
 			logger.error("    ## Error publishing Map Configuration resources " + e.getMessage());
-			result = new ResponseEntity<String>("{ \"status\": \"ERROR\", \"message\": \"" + e.getMessage() + "\" }", HttpStatus.BAD_REQUEST);
+			result = new ResponseEntity<JsonNode>(getErrorMessageAsJson(e), HttpStatus.BAD_REQUEST);
 		}
 
 		logger.info("   Published Map Configuration completed. Response: " + result.getStatusCode().name());
@@ -151,12 +164,12 @@ public class PublishedMapConfigController
 		return result;
 	}
 
-	@RequestMapping(value = "/Published/{id}", method = RequestMethod.GET)
+	@GetMapping(value = "/Published/{id}")
 	@ResponseBody
-	public ResponseEntity<?> getPublishedMapConfig(@PathVariable String id)
+	public ResponseEntity<JsonNode> getPublishedMapConfig(@PathVariable String id) throws JsonParseException, JsonMappingException, IOException
 	{
 		logger.debug(" >> getPublishedMapConfig()");
-		ResponseEntity<?> result = null;
+		ResponseEntity<JsonNode> result = null;
 
 		try
 		{
@@ -165,15 +178,15 @@ public class PublishedMapConfigController
 
 			if(resource != null)
 			{
-				logger.debug("    Success!");
-				result = new ResponseEntity<MapConfiguration>(resource, HttpStatus.OK);
+				logger.debug(SUCCESS);
+				result = new ResponseEntity<JsonNode>(jsonObjectMapper.convertValue(resource, JsonNode.class), HttpStatus.OK);
 			}
-			else throw new Exception("Map Configuration ID not found.");
+			else throw new SMKException("Map Configuration ID not found.");
 		}
 		catch (Exception e)
 		{
 			logger.error("    ## Error fetching map configuration: " + e.getMessage());
-			result = new ResponseEntity<String>("{ \"status\": \"ERROR\", \"message\": \"" + e.getMessage() + "\" }", HttpStatus.BAD_REQUEST);
+			result = new ResponseEntity<JsonNode>(getErrorMessageAsJson(e), HttpStatus.BAD_REQUEST);
 		}
 
 		logger.info("    Fetch published Map Configuration completed. Response: " + result.getStatusCode().name());
@@ -181,12 +194,12 @@ public class PublishedMapConfigController
 		return result;
 	}
 
-	@RequestMapping(value = "/Published/{id}", method = RequestMethod.DELETE)
+	@DeleteMapping(value = "/Published/{id}")
 	@ResponseBody
-	public ResponseEntity<?> deletePublishedMapConfig(@PathVariable String id)
+	public ResponseEntity<JsonNode> deletePublishedMapConfig(@PathVariable String id) throws JsonParseException, JsonMappingException, IOException
 	{
 		logger.debug(" >> deletePublishedMapConfig()");
-		ResponseEntity<?> result = null;
+		ResponseEntity<JsonNode> result = null;
 
 		try
 		{
@@ -200,15 +213,15 @@ public class PublishedMapConfigController
 				resource.setPublished(false);
 				couchDAO.updateResource(resource);
 
-				logger.debug("    Success!");
-				result = new ResponseEntity<String>("{ \"status\": \"Success!\" }", HttpStatus.OK);
+				logger.debug(SUCCESS);
+				result = new ResponseEntity<JsonNode>(jsonObjectMapper.readValue(SUCCESS_MESSAGE, JsonNode.class), HttpStatus.OK);
 			}
-			else throw new Exception("Map Configuration ID not found.");
+			else throw new SMKException("Map Configuration ID not found.");
 		}
 		catch (Exception e)
 		{
 			logger.error("    ## Error un publishing map configuration: " + e.getMessage());
-			result = new ResponseEntity<String>("{ \"status\": \"ERROR\", \"message\": \"" + e.getMessage() + "\" }", HttpStatus.BAD_REQUEST);
+			result = new ResponseEntity<JsonNode>(getErrorMessageAsJson(e), HttpStatus.BAD_REQUEST);
 		}
 
 		logger.info("    Delete/Un-Publish published Map Configuration completed. Response: " + result.getStatusCode().name());
@@ -216,12 +229,12 @@ public class PublishedMapConfigController
 		return result;
 	}
 
-	@RequestMapping(value = "/Published/{config_id}/Attachments/", method = RequestMethod.GET)
+	@GetMapping(value = "/Published/{config_id}/Attachments/")
 	@ResponseBody
-	public ResponseEntity<?> getAllPublishedAttachments(@PathVariable String config_id)
+	public ResponseEntity<JsonNode> getAllPublishedAttachments(@PathVariable String config_id) throws JsonParseException, JsonMappingException, IOException
 	{
 		logger.debug(" >> getAllPublishedAttachments()");
-		ResponseEntity<?> result = null;
+		ResponseEntity<JsonNode> result = null;
 
 		try
 		{
@@ -239,15 +252,15 @@ public class PublishedMapConfigController
 					attachments.add("{ \"id\": \"" + key + "\", \"content-type\": \"" + attachment.getContentType() + "\", \"content-length\": \"" + attachment.getContentLength() + "\"  }");
 				}
 
-				logger.debug("    Success!");
-				result = new ResponseEntity<ArrayList<String>>(attachments, HttpStatus.OK);
+				logger.debug(SUCCESS);
+				result = new ResponseEntity<JsonNode>(jsonObjectMapper.convertValue(attachments, JsonNode.class), HttpStatus.OK);
 			}
-			else throw new Exception("Map Configuration ID not found.");
+			else throw new SMKException("Map Configuration ID not found.");
 		}
 		catch (Exception e)
 		{
 			logger.error("    ## Error fetching all attachment resource: " + e.getMessage());
-			result = new ResponseEntity<String>("{ \"status\": \"ERROR\", \"message\": \"" + e.getMessage() + "\" }", HttpStatus.BAD_REQUEST);
+			result = new ResponseEntity<JsonNode>(getErrorMessageAsJson(e), HttpStatus.BAD_REQUEST);
 		}
 
 		logger.info("    Get All Attachments completed. Response: " + result.getStatusCode().name());
@@ -255,12 +268,12 @@ public class PublishedMapConfigController
 		return result;
 	}
 
-	@RequestMapping(value = "/Published/{config_id}/Attachments/{attachment_id}", method = RequestMethod.GET)
+	@GetMapping(value = "/Published/{config_id}/Attachments/{attachment_id}")
 	@ResponseBody
-	public ResponseEntity<?> getPublishedAttachment(@PathVariable String config_id, @PathVariable String attachment_id)
+	public ResponseEntity<byte[]> getPublishedAttachment(@PathVariable String config_id, @PathVariable String attachment_id) throws JsonParseException, JsonMappingException, IOException
 	{
 		logger.debug(" >> getAttachment()");
-		ResponseEntity<?> result = null;
+		ResponseEntity<byte[]> result = null;
 
 		try
 		{
@@ -284,15 +297,15 @@ public class PublishedMapConfigController
 
 			    httpHeaders.setContentType(contentType);
 
-				logger.debug("    Success!");
+				logger.debug(SUCCESS);
 				result = new ResponseEntity<byte[]>(media, httpHeaders, HttpStatus.OK);
 			}
-			else throw new Exception("Map Configuration ID not found.");
+			else throw new SMKException("Map Configuration ID not found.");
 		}
 		catch (Exception e)
 		{
 			logger.error("    ## Error fetching attachment resource: " + e.getMessage());
-			result = new ResponseEntity<String>("{ \"status\": \"ERROR\", \"message\": \"" + e.getMessage() + "\" }", HttpStatus.BAD_REQUEST);
+			result = new ResponseEntity<byte[]>(getErrorMessageAsJson(e).toString().getBytes(), HttpStatus.BAD_REQUEST);
 		}
 
 		logger.info("    Get Attachment completed. Response: " + result.getStatusCode().name());
@@ -304,12 +317,12 @@ public class PublishedMapConfigController
 	
 	private final static String EXPORT_ATTACHMENT_NAME = "export";
 	// Fetch the exported version of this publish. If it doesn't exist yet, create the export
-	@RequestMapping(value = "/Published/{id}/Export/", method = RequestMethod.GET)
+	@GetMapping(value = "/Published/{id}/Export/")
 	@ResponseBody
-	public ResponseEntity<?> getMapConfigExport(@PathVariable String id)
+	public ResponseEntity<byte[]> getMapConfigExport(@PathVariable String id) throws JsonParseException, JsonMappingException, IOException
 	{
 		logger.debug(" >> getMapConfigExport()");
-		ResponseEntity<?> result = null;
+		ResponseEntity<byte[]> result = null;
 
 		try
 		{
@@ -318,7 +331,7 @@ public class PublishedMapConfigController
 
 			if(resource != null)
 			{
-				logger.debug("    Success!");
+				logger.debug(SUCCESS);
 				AttachmentInputStream attachment = null;
 				// check if the attachment for export exists. If it does, return it. If it doesn't, create a new one
 				try
@@ -326,190 +339,11 @@ public class PublishedMapConfigController
 					logger.debug("    Load export attachment");
 					attachment = couchDAO.getAttachment(resource, EXPORT_ATTACHMENT_NAME);
 					
-					if(attachment == null) throw new Exception("Attachment Not Found");
+					if(attachment == null) throw new SMKException("Attachment Not Found");
 				}
 				catch(Exception e)
 				{
-					//Failed to fetch export
-					logger.debug("    No export exists. Generation new export attachment...");
-					
-					//copy template into temp
-					ClassLoader classLoader = getClass().getClassLoader();
-					File tempExportZip = new File(classLoader.getResource("smk-client.war").getFile());
-					InputStream targetStream = new FileInputStream(tempExportZip);
-					
-					String tempLocationPath = System.getProperty("java.io.tmpdir"); 
-					if(!tempLocationPath.endsWith(File.separator)) tempLocationPath += File.separator;
-					tempLocationPath += UUID.randomUUID() + File.separator;
-					
-					File tempPath = new File(tempLocationPath);
-					tempPath.mkdirs();
-					
-					File exportTemplateZip = new File(tempLocationPath + "export.war");
-					if(!exportTemplateZip.createNewFile())
-					{
-					    logger.debug("    Failed to create temp export file...");
-					}
-					logger.debug("    Copying zip to temp file '" + exportTemplateZip.getName() + "'...");
-					FileOutputStream os = new FileOutputStream(exportTemplateZip);
-				    IOUtils.copy(targetStream, os);
-				    
-				    os.close();
-				    os = null;
-				    targetStream.close();
-				    targetStream = null;
-				    
-				    //copy config json and all attachments into template temp
-				    ZipParameters params = new ZipParameters();
-				    ZipFile zipFile = new ZipFile(exportTemplateZip);
-				    
-				    // create config json
-				    ObjectMapper mapper = new ObjectMapper();
-				    File mapConfigTempFile = new File(tempLocationPath + "map-config.json");
-				    if(!mapConfigTempFile.createNewFile())
-				    {
-                        logger.debug("    Failed to create temp config file...");
-                    }
-				    mapper.writeValue(mapConfigTempFile, resource);
-				    String configString = mapper.writeValueAsString(resource);
-				    
-				    zipFile.addFile(mapConfigTempFile, params);
-				    
-				    String smkConfigDocumentNames = mapConfigTempFile.getName() + ",";
-				    // copy all attachments
-				    if(resource.getAttachments() != null)
-				    {
-				    	File tempAttchPath = new File(tempLocationPath + "attachments" + File.separator);
-				    	tempAttchPath.mkdirs();
-				    	ArrayList<File> tempFiles = new ArrayList<File>();
-				    	
-					    for(String key : resource.getAttachments().keySet())
-						{
-					    	AttachmentInputStream attch = couchDAO.getAttachment(resource, key);
-							byte[] data = IOUtils.toByteArray(attch);
-							
-							if(data != null)
-							{
-								InputStream dataStream = new ByteArrayInputStream(data);
-		
-								String contentType = attch.getContentType();
-								String postfix = "";
-								
-								if(contentType.equals("image/gif")) postfix = "gif";
-								else if(contentType.equals("image/jpg")) postfix = "jpg";
-								else if(contentType.equals("image/jpeg")) postfix = "jpg";
-								else if(contentType.equals("image/bmp")) postfix = "bmp";
-								else if(contentType.equals("image/png")) postfix = "png";
-								else if(contentType.equals("application/vnd.google-earth.kml+xml")) postfix = "kml";
-								else postfix = "json";
-								
-								File attachmentFile = new File(tempAttchPath.getPath() + File.separator + key + "." + postfix);
-								if(!attachmentFile.createNewFile())
-								{
-			                        logger.debug("    Failed to create attachment temp file...");
-			                    }
-
-								tempFiles.add(attachmentFile);
-								
-								FileOutputStream attchFileStream = new FileOutputStream(attachmentFile);
-								IOUtils.copy(dataStream, attchFileStream);
-								
-								dataStream.close();
-								dataStream = null;
-								attchFileStream.close();
-								attchFileStream = null;
-								
-								smkConfigDocumentNames += attachmentFile.getName() + ",";
-							}
-						}
-					    
-					    zipFile.addFolder(tempAttchPath.getPath(), params);
-					    
-					    //delete temp files
-					    for(File file : tempFiles)
-					    {
-					    	if(!file.delete())
-					    	{
-		                        logger.debug("    Failed to delete temp file...");
-		                    }
-					    }
-					    //delete temp folder
-					    Files.delete(tempAttchPath.toPath());
-				    }
-				    // trim out the trailing comma, if we have attachments
-				    if(smkConfigDocumentNames.length() > 0 && smkConfigDocumentNames.endsWith(",")) smkConfigDocumentNames = smkConfigDocumentNames.substring(0, smkConfigDocumentNames.length() - 1);
-				    
-				    // create index.html with refs to config and attachments, and insert
-				    /*
-				    File indexHtml = new File(tempLocationPath + "index.html");
-				    indexHtml.createNewFile();
-				    
-				    String indexCode = "<html><head><title>" + resource.getSurround().getTitle() + "</title></head><body><div id=\"smk-map-frame\"></div><script src=\"smk-bootstrap.js\" smk-standalone=\"true\">return " + configString + "</script></body></html>";
-				    
-				    PrintWriter out = new PrintWriter(indexHtml);
-				    out.write(indexCode);
-				    out.flush();
-				    
-				    zipFile.addFile(indexHtml, new ZipParameters());
-
-				    out.close();
-				    out = null;
-				    */
-				    // done creating temp zip,
-				    
-				    InputStream exportStream = null;
-				    File exportableZip = null;
-				    
-				    try
-				    {
-    				    exportableZip = zipFile.getFile();
-    			        exportStream = new FileInputStream(exportableZip);
-    				    
-    					//add zip to published document as an attachment file called "export"
-    			        resource = couchDAO.getPublishedConfig(id);
-    					Attachment newAttachment = new Attachment(EXPORT_ATTACHMENT_NAME, Base64.encodeBase64String(IOUtils.toByteArray(exportStream)), "application/octet-stream");
-    				    resource.addInlineAttachment(newAttachment);
-    
-    				    // Commit the changes and reload the resource and the attachment, then submit the export file back to the caller
-    				    couchDAO.updateResource(resource);
-    				    resource = couchDAO.getPublishedConfig(id);
-    				    
-    				    attachment = couchDAO.getAttachment(resource, EXPORT_ATTACHMENT_NAME);
-				    }
-				    catch(Exception ex)
-				    {
-				        logger.error("    ## Error building export zip file: " + e.getMessage());
-				        throw new Exception("Export not found and could not be created.", ex);
-				    }
-				    finally
-				    {
-                        // finish cleanup
-                        exportStream.close();
-                        exportStream = null;
-                        zipFile = null;
-                        //indexHtml.delete();
-                        if(!exportTemplateZip.delete())
-                        {
-                            logger.debug("    Failed to delete export template zip file...");
-                        }
-                        
-                        if(!mapConfigTempFile.delete())
-                        {
-                            logger.debug("    Failed to delete temp map config file...");
-                        }
-                        
-                        if(!exportableZip.delete())
-                        {
-                            logger.debug("    Failed to delete export zip file...");
-                        }
-                        
-                        if(!tempPath.delete())
-                        {
-                            logger.debug("    Failed to delete temp paths...");
-                        }
-                        
-                        tempPath = null;   
-				    }
+				    attachment = createExportFile(resource, id);
 				}
 				
 				if(attachment != null)
@@ -527,21 +361,197 @@ public class PublishedMapConfigController
 
 				    httpHeaders.setContentType(contentType);
 
-					logger.debug("    Success!");
+					logger.debug(SUCCESS);
 					result = new ResponseEntity<byte[]>(media, httpHeaders, HttpStatus.OK);
 				} 
-				else throw new Exception("Export not found and could not be created.");
+				else throw new SMKException("Export not found and could not be created.");
 			}
-			else throw new Exception("Map Configuration ID not found.");
+			else throw new SMKException("Map Configuration ID not found.");
 		}
 		catch (Exception e)
 		{
 			logger.error("    ## Error fetching map configuration: " + e.getMessage());
-			result = new ResponseEntity<String>("{ \"status\": \"ERROR\", \"message\": \"" + e.getMessage() + "\" }", HttpStatus.BAD_REQUEST);
+			result = new ResponseEntity<byte[]>(getErrorMessageAsJson(e).toString().getBytes(), HttpStatus.BAD_REQUEST);
 		}
 
 		logger.info("    Fetch published Map Configuration completed. Response: " + result.getStatusCode().name());
 		logger.debug(" << getMapConfigExport()");
 		return result;
 	}
+	
+	private AttachmentInputStream createExportFile(MapConfiguration resource, String id) throws SMKException, IOException, ZipException
+	{
+        // Failed to fetch export
+	    AttachmentInputStream result = null;
+	    
+        logger.debug("    No export exists. Generation new export attachment...");
+        
+        //copy template into temp
+        ClassLoader classLoader = getClass().getClassLoader();
+        File tempExportZip = new File(classLoader.getResource("smk-client.war").getFile());
+        InputStream targetStream = new FileInputStream(tempExportZip);
+        
+        String tempLocationPath = System.getProperty("java.io.tmpdir"); 
+        if(!tempLocationPath.endsWith(File.separator)) tempLocationPath += File.separator;
+        tempLocationPath += UUID.randomUUID() + File.separator;
+        
+        File tempPath = new File(tempLocationPath);
+        tempPath.mkdirs();
+        
+        File exportTemplateZip = new File(tempLocationPath + "export.war");
+        if(!exportTemplateZip.createNewFile())
+        {
+            logger.debug("    Failed to create temp export file...");
+        }
+        logger.debug("    Copying zip to temp file '" + exportTemplateZip.getName() + "'...");
+        FileOutputStream os = new FileOutputStream(exportTemplateZip);
+        IOUtils.copy(targetStream, os);
+        
+        os.close();
+        os = null;
+        targetStream.close();
+        targetStream = null;
+        
+        //copy config json and all attachments into template temp
+        ZipParameters params = new ZipParameters();
+        ZipFile zipFile = new ZipFile(exportTemplateZip);
+        
+        // create config json
+        ObjectMapper jsonObjectMapper = new ObjectMapper();
+        File mapConfigTempFile = new File(tempLocationPath + "map-config.json");
+        if(!mapConfigTempFile.createNewFile())
+        {
+            logger.debug("    Failed to create temp config file...");
+        }
+        jsonObjectMapper.writeValue(mapConfigTempFile, resource);
+        
+        zipFile.addFile(mapConfigTempFile, params);
+        
+        String smkConfigDocumentNames = mapConfigTempFile.getName() + ",";
+        // copy all attachments
+        if(resource.getAttachments() != null)
+        {
+            File tempAttchPath = new File(tempLocationPath + "attachments" + File.separator);
+            tempAttchPath.mkdirs();
+            ArrayList<File> tempFiles = new ArrayList<File>();
+            
+            for(String key : resource.getAttachments().keySet())
+            {
+                AttachmentInputStream attch = couchDAO.getAttachment(resource, key);
+                byte[] data = IOUtils.toByteArray(attch);
+                
+                if(data != null)
+                {
+                    InputStream dataStream = new ByteArrayInputStream(data);
+
+                    String contentType = attch.getContentType();
+                    String postfix = "";
+                    
+                    if(contentType.equals("image/gif")) postfix = "gif";
+                    else if(contentType.equals("image/jpg")) postfix = "jpg";
+                    else if(contentType.equals("image/jpeg")) postfix = "jpg";
+                    else if(contentType.equals("image/bmp")) postfix = "bmp";
+                    else if(contentType.equals("image/png")) postfix = "png";
+                    else if(contentType.equals("application/vnd.google-earth.kml+xml")) postfix = "kml";
+                    else postfix = "json";
+                    
+                    File attachmentFile = new File(tempAttchPath.getPath() + File.separator + key + "." + postfix);
+                    if(!attachmentFile.createNewFile())
+                    {
+                        logger.debug("    Failed to create attachment temp file...");
+                    }
+
+                    tempFiles.add(attachmentFile);
+                    
+                    FileOutputStream attchFileStream = new FileOutputStream(attachmentFile);
+                    IOUtils.copy(dataStream, attchFileStream);
+                    
+                    dataStream.close();
+                    dataStream = null;
+                    attchFileStream.close();
+                    attchFileStream = null;
+                    
+                    smkConfigDocumentNames += attachmentFile.getName() + ",";
+                }
+            }
+            
+            zipFile.addFolder(tempAttchPath.getPath(), params);
+            
+            //delete temp files
+            for(File file : tempFiles)
+            {
+                if(!file.delete())
+                {
+                    logger.debug("    Failed to delete temp file...");
+                }
+            }
+            //delete temp folder
+            Files.delete(tempAttchPath.toPath());
+        }
+        // trim out the trailing comma, if we have attachments
+        if(smkConfigDocumentNames.length() > 0 && smkConfigDocumentNames.endsWith(",")) smkConfigDocumentNames = smkConfigDocumentNames.substring(0, smkConfigDocumentNames.length() - 1);
+
+        // done creating temp zip,
+        
+        InputStream exportStream = null;
+        File exportableZip = null;
+        
+        try
+        {
+            exportableZip = zipFile.getFile();
+            exportStream = new FileInputStream(exportableZip);
+            
+            //add zip to published document as an attachment file called "export"
+            resource = couchDAO.getPublishedConfig(id);
+            Attachment newAttachment = new Attachment(EXPORT_ATTACHMENT_NAME, Base64.encodeBase64String(IOUtils.toByteArray(exportStream)), "application/octet-stream");
+            resource.addInlineAttachment(newAttachment);
+
+            // Commit the changes and reload the resource and the attachment, then submit the export file back to the caller
+            couchDAO.updateResource(resource);
+            resource = couchDAO.getPublishedConfig(id);
+            
+            result = couchDAO.getAttachment(resource, EXPORT_ATTACHMENT_NAME);
+        }
+        catch(Exception ex)
+        {
+            logger.error("    ## Error building export zip file: " + ex.getMessage());
+            throw new SMKException("Export not found and could not be created.", ex);
+        }
+        finally
+        {
+            // finish cleanup
+            exportStream.close();
+            exportStream = null;
+            zipFile = null;
+            //indexHtml.delete();
+            if(!exportTemplateZip.delete())
+            {
+                logger.debug("    Failed to delete export template zip file...");
+            }
+            
+            if(!mapConfigTempFile.delete())
+            {
+                logger.debug("    Failed to delete temp map config file...");
+            }
+            
+            if(!exportableZip.delete())
+            {
+                logger.debug("    Failed to delete export zip file...");
+            }
+            
+            if(!tempPath.delete())
+            {
+                logger.debug("    Failed to delete temp paths...");
+            }
+            
+            tempPath = null;   
+        }
+        
+        return result;
+	}
+	
+    private JsonNode getErrorMessageAsJson(Exception e) throws JsonParseException, JsonMappingException, IOException
+    {
+        return jsonObjectMapper.readValue(("{ \"status\": \"ERROR\", \"message\": \"" + e.getMessage() + "\" }").replaceAll("\\r\\n|\\r|\\n", " "), JsonNode.class);
+    }
 }

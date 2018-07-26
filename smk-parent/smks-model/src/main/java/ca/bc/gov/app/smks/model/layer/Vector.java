@@ -11,7 +11,9 @@ import ca.bc.gov.app.smks.model.LayerStyle;
 // Was Geojson class
 public class Vector extends FeatureLayer
 {
-	private String dataUrl;
+    private static final long serialVersionUID = 1492491489526634415L;
+ 
+    private String dataUrl;
 	private boolean useRaw;
 	private boolean useClustering;
 	private boolean useHeatmap;
@@ -19,19 +21,20 @@ public class Vector extends FeatureLayer
 
 	public Vector() { }
 
-	protected Vector( Vector layer ) {
+	public Vector( Vector layer ) {
 		super( layer );
 
 		this.setDataUrl(layer.getDataUrl());
 		this.setUseRaw(layer.getUseRaw());
 		this.setUseClustering(layer.getUseClustering());
 		this.setUseHeatmap(layer.getUseHeatmap());
-		this.setStyle(layer.getStyle().clone());
+		this.setStyle(new LayerStyle(layer.getStyle()));
 	}
 
+	@Override
 	public String getType()
 	{
-		return Layer.Type.Vector.getJsonType();
+		return Layer.Type.VECTOR.getJsonType();
 	}
 
 	public String getDataUrl()
@@ -83,12 +86,5 @@ public class Vector extends FeatureLayer
 	public void setStyle(LayerStyle style)
 	{
 		this.style = style;
-	}
-
-	public Vector clone()
-	{
-		Vector clone = new Vector( this );
-
-		return clone;
 	}
 }

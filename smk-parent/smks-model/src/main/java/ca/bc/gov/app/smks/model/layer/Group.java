@@ -9,21 +9,17 @@ import ca.bc.gov.app.smks.model.Layer;
 @JsonInclude(Include.NON_NULL)
 public class Group extends CollectionLayer
 {
-	public Group() { }
+    private static final long serialVersionUID = -5270343788295638530L;
+
+    public Group() { }
 
 	protected Group( Group layer ) {
 		super( layer );
 	}
 
+	@Override
 	public String getType()
 	{
-		return Layer.Type.Group.getJsonType();
-	}
-
-	public Group clone()
-	{
-		Group clone = new Group( this );
-
-		return clone;
+		return Layer.Type.GROUP.getJsonType();
 	}
 }
