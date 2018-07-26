@@ -36,7 +36,7 @@ include.module( 'layer-display', [ 'jquery', 'util', 'event' ], function () {
 
         if ( !( 'isVisible' in option ) )
             option.isVisible = ly.config.isVisible 
-        
+
         LayerDisplay.prototype.constructor.call( this, option, forceVisible )
     }
 
@@ -74,16 +74,18 @@ include.module( 'layer-display', [ 'jquery', 'util', 'event' ], function () {
     LayerDisplay.Folder.prototype.each = function ( itemCb, folderCb, parents ) {
         if ( !parents ) parents = []
 
+        var recurse
         if ( folderCb )
-            folderCb( this, parents )
+            recurse = folderCb( this, parents )
         else if ( itemCb )
-            itemCb( this, parents )
+            recurse = itemCb( this, parents )
 
         var p = [ this ].concat( parents )
-        
-        this.items.forEach( function ( item ) {
-            item.each( itemCb, folderCb, p )
-        } )
+
+        if ( recurse !== false )        
+            this.items.forEach( function ( item ) {
+                item.each( itemCb, folderCb, p )
+            } )
     }
 
     LayerDisplay.Folder.prototype.getLegends = function ( layerCatalog, viewer ) {
@@ -107,19 +109,19 @@ include.module( 'layer-display', [ 'jquery', 'util', 'event' ], function () {
     }
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
-    function createLayerDisplay( layerDisplay, layerCatalog, forceVisible ) {
-        if ( 'layerId' in layerDisplay && 'items' in layerDisplay )
+    function createLayerDisplay( option, layerCatalog, forceVisible ) {
+        if ( 'layerId' in option && 'items' in option )
             throw new Error( 'layerDisplay can\'t define both layerId and items' )
 
-        if ( !( 'layerId' in layerDisplay ) && !( 'items' in layerDisplay ) )
+        if ( !( 'layerId' in option ) && !( 'items' in option ) )
             throw new Error( 'layerDisplay must define one of layerId or items' )
 
-        if ( 'layerId' in layerDisplay )
-            return new LayerDisplay.Layer( layerDisplay, layerCatalog, forceVisible )
-        else if ( layerDisplay.isExpanded != null )
-            return new LayerDisplay.Folder( layerDisplay, layerCatalog, forceVisible )
+        if ( 'layerId' in option )
+            return new LayerDisplay.Layer( Object.assign( { isLayer: true }, option ), layerCatalog, forceVisible )
+        else if ( option.isExpanded != null )
+            return new LayerDisplay.Folder( Object.assign( { isFolder: true }, option ), layerCatalog, forceVisible )
         else
-            return new LayerDisplay.Group( layerDisplay, layerCatalog, forceVisible )
+            return new LayerDisplay.Group( Object.assign( { isGroup: true }, option ), layerCatalog, forceVisible )
     } 
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
@@ -209,6 +211,7 @@ include.module( 'layer-display', [ 'jquery', 'util', 'event' ], function () {
         if ( deep ) {
             lds[ 0 ].each( function ( item ) {
                 item.isVisible = visible
+                if ( item.isGroup ) return false 
             } )
         }
 
@@ -251,6 +254,8 @@ include.module( 'layer-display', [ 'jquery', 'util', 'event' ], function () {
                 else {
                     item.showLegend = false
                 }
+
+                if ( item.isGroup ) return false 
             }
         )
     }
