@@ -57,7 +57,6 @@ public class PublishedMapConfigController
     private ObjectMapper jsonObjectMapper;
 	
     private static final String SUCCESS = "    Success!";
-    private static final String ERR_MESSAGE = "{ \"status\": \"ERROR\", \"message\": \"";
     private static final String SUCCESS_MESSAGE = "{ \"status\": \"Success!\" }";
 	    
 	@Autowired
@@ -87,7 +86,7 @@ public class PublishedMapConfigController
 		catch (Exception e)
 		{
 			logger.error("    ## Error querying Map Config Resources: " + e.getMessage());
-			result = new ResponseEntity<JsonNode>(jsonObjectMapper.readValue(ERR_MESSAGE + e.getMessage() + "\" }", JsonNode.class), HttpStatus.BAD_REQUEST);
+			result = new ResponseEntity<JsonNode>(getErrorMessageAsJson(e), HttpStatus.BAD_REQUEST);
 		}
 
 		logger.info("    Get All Map Configurations completed. Response: " + result.getStatusCode().name());
@@ -157,7 +156,7 @@ public class PublishedMapConfigController
 		catch (Exception e)
 		{
 			logger.error("    ## Error publishing Map Configuration resources " + e.getMessage());
-			result = new ResponseEntity<JsonNode>(jsonObjectMapper.readValue(ERR_MESSAGE + e.getMessage() + "\" }", JsonNode.class), HttpStatus.BAD_REQUEST);
+			result = new ResponseEntity<JsonNode>(getErrorMessageAsJson(e), HttpStatus.BAD_REQUEST);
 		}
 
 		logger.info("   Published Map Configuration completed. Response: " + result.getStatusCode().name());
@@ -187,7 +186,7 @@ public class PublishedMapConfigController
 		catch (Exception e)
 		{
 			logger.error("    ## Error fetching map configuration: " + e.getMessage());
-			result = new ResponseEntity<JsonNode>(jsonObjectMapper.readValue(ERR_MESSAGE + e.getMessage() + "\" }", JsonNode.class), HttpStatus.BAD_REQUEST);
+			result = new ResponseEntity<JsonNode>(getErrorMessageAsJson(e), HttpStatus.BAD_REQUEST);
 		}
 
 		logger.info("    Fetch published Map Configuration completed. Response: " + result.getStatusCode().name());
@@ -222,7 +221,7 @@ public class PublishedMapConfigController
 		catch (Exception e)
 		{
 			logger.error("    ## Error un publishing map configuration: " + e.getMessage());
-			result = new ResponseEntity<JsonNode>(jsonObjectMapper.readValue(ERR_MESSAGE + e.getMessage() + "\" }", JsonNode.class), HttpStatus.BAD_REQUEST);
+			result = new ResponseEntity<JsonNode>(getErrorMessageAsJson(e), HttpStatus.BAD_REQUEST);
 		}
 
 		logger.info("    Delete/Un-Publish published Map Configuration completed. Response: " + result.getStatusCode().name());
@@ -261,7 +260,7 @@ public class PublishedMapConfigController
 		catch (Exception e)
 		{
 			logger.error("    ## Error fetching all attachment resource: " + e.getMessage());
-			result = new ResponseEntity<JsonNode>(jsonObjectMapper.readValue(ERR_MESSAGE + e.getMessage() + "\" }", JsonNode.class), HttpStatus.BAD_REQUEST);
+			result = new ResponseEntity<JsonNode>(getErrorMessageAsJson(e), HttpStatus.BAD_REQUEST);
 		}
 
 		logger.info("    Get All Attachments completed. Response: " + result.getStatusCode().name());
@@ -271,7 +270,7 @@ public class PublishedMapConfigController
 
 	@GetMapping(value = "/Published/{config_id}/Attachments/{attachment_id}")
 	@ResponseBody
-	public ResponseEntity<byte[]> getPublishedAttachment(@PathVariable String config_id, @PathVariable String attachment_id)
+	public ResponseEntity<byte[]> getPublishedAttachment(@PathVariable String config_id, @PathVariable String attachment_id) throws JsonParseException, JsonMappingException, IOException
 	{
 		logger.debug(" >> getAttachment()");
 		ResponseEntity<byte[]> result = null;
@@ -306,7 +305,7 @@ public class PublishedMapConfigController
 		catch (Exception e)
 		{
 			logger.error("    ## Error fetching attachment resource: " + e.getMessage());
-			result = new ResponseEntity<byte[]>((ERR_MESSAGE + e.getMessage() + "\" }").getBytes(), HttpStatus.BAD_REQUEST);
+			result = new ResponseEntity<byte[]>(getErrorMessageAsJson(e).toString().getBytes(), HttpStatus.BAD_REQUEST);
 		}
 
 		logger.info("    Get Attachment completed. Response: " + result.getStatusCode().name());
@@ -320,7 +319,7 @@ public class PublishedMapConfigController
 	// Fetch the exported version of this publish. If it doesn't exist yet, create the export
 	@GetMapping(value = "/Published/{id}/Export/")
 	@ResponseBody
-	public ResponseEntity<byte[]> getMapConfigExport(@PathVariable String id)
+	public ResponseEntity<byte[]> getMapConfigExport(@PathVariable String id) throws JsonParseException, JsonMappingException, IOException
 	{
 		logger.debug(" >> getMapConfigExport()");
 		ResponseEntity<byte[]> result = null;
@@ -372,7 +371,7 @@ public class PublishedMapConfigController
 		catch (Exception e)
 		{
 			logger.error("    ## Error fetching map configuration: " + e.getMessage());
-			result = new ResponseEntity<byte[]>((ERR_MESSAGE + e.getMessage() + "\" }").getBytes(), HttpStatus.BAD_REQUEST);
+			result = new ResponseEntity<byte[]>(getErrorMessageAsJson(e).toString().getBytes(), HttpStatus.BAD_REQUEST);
 		}
 
 		logger.info("    Fetch published Map Configuration completed. Response: " + result.getStatusCode().name());
@@ -550,4 +549,9 @@ public class PublishedMapConfigController
         
         return result;
 	}
+	
+    private JsonNode getErrorMessageAsJson(Exception e) throws JsonParseException, JsonMappingException, IOException
+    {
+        return jsonObjectMapper.readValue(("{ \"status\": \"ERROR\", \"message\": \"" + e.getMessage() + "\" }").replaceAll("\\r\\n|\\r|\\n", " "), JsonNode.class);
+    }
 }

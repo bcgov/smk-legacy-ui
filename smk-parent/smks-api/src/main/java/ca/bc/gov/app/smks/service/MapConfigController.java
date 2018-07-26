@@ -109,7 +109,7 @@ public class MapConfigController
 		catch (Exception e)
 		{
 			logger.error("    ## Error creating Map Configuration resources " + e.getMessage());
-			result = new ResponseEntity<JsonNode>(jsonObjectMapper.readValue(ERR_MESSAGE + e.getMessage() + "\" }", JsonNode.class), HttpStatus.BAD_REQUEST);
+			result = new ResponseEntity<JsonNode>(getErrorMessageAsJson(e), HttpStatus.BAD_REQUEST);
 		}
 
 		logger.info("    Create New Map Configuration completed. Response: " + result.getStatusCode().name());
@@ -158,7 +158,7 @@ public class MapConfigController
 		catch (Exception e)
 		{
 			logger.error("    ## Error querying Map Config Resources: " + e.getMessage());
-			result = new ResponseEntity<JsonNode>(jsonObjectMapper.readValue(ERR_MESSAGE + e.getMessage() + "\" }", JsonNode.class), HttpStatus.BAD_REQUEST);
+			result = new ResponseEntity<JsonNode>(getErrorMessageAsJson(e), HttpStatus.BAD_REQUEST);
 		}
 
 		logger.info("    Get All Map Configurations completed. Response: " + result.getStatusCode().name());
@@ -198,7 +198,7 @@ public class MapConfigController
 		catch (Exception e)
 		{
 			logger.error("    ## Error querying Map Configuration resource " + id + ": " + e.getMessage());
-			result = new ResponseEntity<JsonNode>(jsonObjectMapper.readValue(ERR_MESSAGE + e.getMessage() + "\" }", JsonNode.class), HttpStatus.BAD_REQUEST);
+			result = new ResponseEntity<JsonNode>(getErrorMessageAsJson(e), HttpStatus.BAD_REQUEST);
 		}
 
 		logger.info("    Get Map Configuration completed. Response: " + result.getStatusCode().name());
@@ -256,7 +256,7 @@ public class MapConfigController
 		catch (Exception e)
 		{
 			logger.error("    ## Error deleting map configuration: " + e.getMessage());
-			result = new ResponseEntity<JsonNode>(jsonObjectMapper.readValue(ERR_MESSAGE + e.getMessage() + "\" }", JsonNode.class), HttpStatus.BAD_REQUEST);
+			result = new ResponseEntity<JsonNode>(getErrorMessageAsJson(e), HttpStatus.BAD_REQUEST);
 		}
 
 		logger.info("    Delete Map Configuration completed. Response: " + result.getStatusCode().name());
@@ -327,7 +327,7 @@ public class MapConfigController
 		catch (Exception e)
 		{
 			logger.error("    ## Error Updating Map Configuration: " + e.getMessage());
-			result = new ResponseEntity<JsonNode>(jsonObjectMapper.readValue(ERR_MESSAGE + e.getMessage() + "\" }", JsonNode.class), HttpStatus.BAD_REQUEST);
+			result = new ResponseEntity<JsonNode>(getErrorMessageAsJson(e), HttpStatus.BAD_REQUEST);
 		}
 
 		logger.info("    Update Map Configuration Completed. Response: " + result.getStatusCode().name());
@@ -429,7 +429,7 @@ public class MapConfigController
 			catch (Exception e)
 			{
 				logger.error("    ## Error creating attachment resource: " + e.getMessage());
-				result = new ResponseEntity<JsonNode>(jsonObjectMapper.readValue(ERR_MESSAGE + e.getMessage() + "\" }", JsonNode.class), HttpStatus.BAD_REQUEST);
+				result = new ResponseEntity<JsonNode>(getErrorMessageAsJson(e), HttpStatus.BAD_REQUEST);
 			}
 		}
 		else result = new ResponseEntity<JsonNode>(jsonObjectMapper.readValue("{ \"status\": \"ERROR\", \"message\": \"File or ID was not submitted. Please post your form with a file, and id\" }", JsonNode.class), HttpStatus.BAD_REQUEST);
@@ -470,7 +470,7 @@ public class MapConfigController
 		catch (Exception e)
 		{
 			logger.error("    ## Error fetching all attachment resource: " + e.getMessage());
-			result = new ResponseEntity<JsonNode>(jsonObjectMapper.readValue(ERR_MESSAGE + e.getMessage() + "\" }", JsonNode.class), HttpStatus.BAD_REQUEST);
+			result = new ResponseEntity<JsonNode>(getErrorMessageAsJson(e), HttpStatus.BAD_REQUEST);
 		}
 
 		logger.info("    Get All Attachments completed. Response: " + result.getStatusCode().name());
@@ -515,7 +515,7 @@ public class MapConfigController
 		catch (Exception e)
 		{
 			logger.error("    ## Error fetching attachment resource: " + e.getMessage());
-			result = new ResponseEntity<byte[]>((ERR_MESSAGE + e.getMessage() + "\" }").getBytes(), HttpStatus.BAD_REQUEST);
+			result = new ResponseEntity<byte[]>(((ERR_MESSAGE + e.getMessage() + "\" }").replaceAll("\\r\\n|\\r|\\n", " ")).getBytes(), HttpStatus.BAD_REQUEST);
 		}
 
 		logger.info("    Get Attachment completed. Response: " + result.getStatusCode().name());
@@ -550,7 +550,7 @@ public class MapConfigController
 		catch (Exception e)
 		{
 			logger.error("    ## Error deleting attachment: " + e.getMessage());
-			result = new ResponseEntity<JsonNode>(jsonObjectMapper.readValue(ERR_MESSAGE + e.getMessage() + "\" }", JsonNode.class), HttpStatus.BAD_REQUEST);
+			result = new ResponseEntity<JsonNode>(getErrorMessageAsJson(e), HttpStatus.BAD_REQUEST);
 		}
 
 		logger.info("    Delete Attachment completed. Response: " + result.getStatusCode().name());
@@ -593,7 +593,7 @@ public class MapConfigController
 			catch (Exception e)
 			{
 				logger.error("    ## Error fetching all attachment resource: " + e.getMessage());
-				result = new ResponseEntity<JsonNode>(jsonObjectMapper.readValue(ERR_MESSAGE + e.getMessage() + "\" }", JsonNode.class), HttpStatus.BAD_REQUEST);
+				result = new ResponseEntity<JsonNode>(getErrorMessageAsJson(e), HttpStatus.BAD_REQUEST);
 			}
 		}
 		else result = new ResponseEntity<JsonNode>(jsonObjectMapper.readValue("{ \"status\": \"ERROR\", \"message\": \"File or ID was not submitted. Please post your form with a file, and id\" }", JsonNode.class), HttpStatus.BAD_REQUEST);
@@ -602,4 +602,9 @@ public class MapConfigController
 		logger.debug(" << updateAttachment()");
 		return result;
 	}
+	
+	private JsonNode getErrorMessageAsJson(Exception e) throws JsonParseException, JsonMappingException, IOException
+    {
+        return jsonObjectMapper.readValue(("{ \"status\": \"ERROR\", \"message\": \"" + e.getMessage() + "\" }").replaceAll("\\r\\n|\\r|\\n", " "), JsonNode.class);
+    }	
 }

@@ -54,7 +54,7 @@ public class ServiceController
 		catch(Exception e)
 		{
 			logger.error("    ## Error generating top level: " + e.getMessage());
-			result = new ResponseEntity<JsonNode>(jsonObjectMapper.readValue("{ \"status\": \"ERROR\", \"message\": \"" + e.getMessage() + "\" }", JsonNode.class), HttpStatus.BAD_REQUEST);
+			result = new ResponseEntity<JsonNode>(getErrorMessageAsJson(e), HttpStatus.BAD_REQUEST);
 		}
 		
 		logger.info("    Top Level request complete. Response: " + result.getStatusCode().name());
@@ -83,11 +83,16 @@ public class ServiceController
 		catch(Exception e)
 		{
 			logger.error("    ## Error generating health status: " + e.getMessage());
-			result = new ResponseEntity<JsonNode>(jsonObjectMapper.readValue("{ \"status\": \"ERROR\", \"message\": \"" + e.getMessage() + "\" }", JsonNode.class), HttpStatus.BAD_REQUEST);
+			result = new ResponseEntity<JsonNode>(getErrorMessageAsJson(e), HttpStatus.BAD_REQUEST);
 		}
 		
 		logger.info("    Health check completed. Response: " + result.getStatusCode().name());
 		logger.debug(" << healthCheck()");
 		return result;
+	}
+	
+	private JsonNode getErrorMessageAsJson(Exception e) throws JsonParseException, JsonMappingException, IOException
+	{
+	    return jsonObjectMapper.readValue(("{ \"status\": \"ERROR\", \"message\": \"" + e.getMessage() + "\" }").replaceAll("\\r\\n|\\r|\\n", " "), JsonNode.class);
 	}
 }

@@ -40,7 +40,8 @@ public class LayerCatalogDAO
 	private static final String LAYERS = "layers";
     private static final String LAYER_DISPLAY_NAME = "layerDisplayName";
 	
-    private static final String NAME = "Name";
+    private static final String NAME_UC = "Name";
+    private static final String NAME_LC = "Name";
     private static final String TITLE = "Title";
     private static final String FORMAT = "Format";
     private static final String LEGENDURL = "LegendURL";
@@ -346,7 +347,7 @@ public class LayerCatalogDAO
 	private void processWmsLayerNode(Element layerElement, List<WMSInfoLayer> serviceLayers, String url)
 	{
         String title = layerElement.getElementsByTagName(TITLE).item(0).getTextContent();
-        String name = layerElement.getElementsByTagName(NAME).item(0).getTextContent();
+        String name = layerElement.getElementsByTagName(NAME_UC).item(0).getTextContent();
 
         WMSInfoLayer layer = new WMSInfoLayer();
         layer.setTitle(title);
@@ -364,7 +365,7 @@ public class LayerCatalogDAO
                 Element styleElement = (Element) layerStyles.item(styleIndex);
 
                 WMSInfoStyle style = new WMSInfoStyle();
-                style.setName( styleElement.getElementsByTagName(NAME).item(0).getTextContent());
+                style.setName( styleElement.getElementsByTagName(NAME_UC).item(0).getTextContent());
                 style.setTitle( styleElement.getElementsByTagName(TITLE).item(0).getTextContent().replace("_", " "));
 
                 if (!styles.contains(style)) styles.add(style);
@@ -388,9 +389,10 @@ public class LayerCatalogDAO
                 if(!property.get("localType").asText().equals("Geometry"))
                 {
                     Attribute attr = new Attribute();
-                    attr.setId(property.get(NAME).asText());
-                    attr.setName(property.get(NAME).asText());
-                    attr.setTitle(property.get(NAME).asText());
+                    
+                    attr.setId(property.get(NAME_LC).asText());
+                    attr.setName(property.get(NAME_LC).asText());
+                    attr.setTitle(property.get(NAME_LC).asText());
                     attr.setVisible(true);
                     
                     layer.getAttributes().add(attr);
@@ -447,7 +449,7 @@ public class LayerCatalogDAO
 	private void processWmsLayerNode(Element layerElement, WMSInfoLayer layer)
 	{
         String title = layerElement.getElementsByTagName(TITLE).item(0).getTextContent();
-        String name = layerElement.getElementsByTagName(NAME).item(0).getTextContent();
+        String name = layerElement.getElementsByTagName(NAME_UC).item(0).getTextContent();
 
         layer.setName(name);
         layer.setTitle(title);
@@ -478,7 +480,7 @@ public class LayerCatalogDAO
             {
                 Element styleElement = (Element) layerStyles.item(s);
 
-                String styleName = styleElement.getElementsByTagName(NAME).item(0).getTextContent();
+                String styleName = styleElement.getElementsByTagName(NAME_UC).item(0).getTextContent();
                 String styleTitle = styleElement.getElementsByTagName(TITLE).item(0).getTextContent();
 
                 WMSInfoStyle style = new WMSInfoStyle();

@@ -69,12 +69,12 @@ public class LayerCatalogController
 			catch (MalformedURLException e) 
 			{
 				logger.error("    ## Error querying WMS Server. URL is invalid: " + e.getMessage());
-				result = new ResponseEntity<JsonNode>(jsonObjectMapper.readValue(ERR_MESSAGE + e.getMessage() + "\" }", JsonNode.class), HttpStatus.BAD_REQUEST);
+				result = new ResponseEntity<JsonNode>(jsonObjectMapper.readValue(((ERR_MESSAGE + e.getMessage() + "\" }").replaceAll("\\r\\n|\\r|\\n", " ")).replaceAll("\\r\\n|\\r|\\n", " "), JsonNode.class), HttpStatus.BAD_REQUEST);
 			}
 			catch (Exception e) 
 			{
 				logger.error("    ## Error querying WMS Server: " + e.getMessage());
-				result = new ResponseEntity<JsonNode>(jsonObjectMapper.readValue(ERR_MESSAGE + e.getMessage() + "\" }", JsonNode.class), HttpStatus.BAD_REQUEST);
+				result = new ResponseEntity<JsonNode>(getErrorMessageAsJson(e), HttpStatus.BAD_REQUEST);
 			}
 		}
 		else
@@ -107,12 +107,12 @@ public class LayerCatalogController
 			catch (MalformedURLException e) 
 			{
 				logger.error("    ## Error querying WMS GeoServer. URL is invalid: " + e.getMessage());
-				result = new ResponseEntity<JsonNode>(jsonObjectMapper.readValue(ERR_MESSAGE + e.getMessage() + "\" }", JsonNode.class), HttpStatus.BAD_REQUEST);
+				result = new ResponseEntity<JsonNode>(getErrorMessageAsJson(e), HttpStatus.BAD_REQUEST);
 			}
 			catch (Exception e) 
 			{
 				logger.error("    ## Error querying WMS layer: " + e.getMessage());
-				result = new ResponseEntity<JsonNode>(jsonObjectMapper.readValue(ERR_MESSAGE + e.getMessage() + "\" }", JsonNode.class), HttpStatus.BAD_REQUEST);
+				result = new ResponseEntity<JsonNode>(getErrorMessageAsJson(e), HttpStatus.BAD_REQUEST);
 			}
 		}
 		else
@@ -142,7 +142,7 @@ public class LayerCatalogController
 		catch (Exception e) 
 		{
 			logger.error("    ## Error querying WMS layer: " + e.getMessage());
-			result = new ResponseEntity<JsonNode>(jsonObjectMapper.readValue(ERR_MESSAGE + e.getMessage() + "\" }", JsonNode.class), HttpStatus.BAD_REQUEST);
+			result = new ResponseEntity<JsonNode>(getErrorMessageAsJson(e), HttpStatus.BAD_REQUEST);
 		}
 		
 		logger.info("    Get Layers completed. Response: " + result.getStatusCode().name());
@@ -170,12 +170,12 @@ public class LayerCatalogController
 			catch (MalformedURLException e) 
 			{
 				logger.error("    ## Error querying MPCM layer. REST service URL is invalid: " + e.getMessage());
-				result = new ResponseEntity<JsonNode>(jsonObjectMapper.readValue(ERR_MESSAGE + e.getMessage() + "\" }", JsonNode.class), HttpStatus.BAD_REQUEST);
+				result = new ResponseEntity<JsonNode>(getErrorMessageAsJson(e), HttpStatus.BAD_REQUEST);
 			}
 			catch (Exception e) 
 			{
 				logger.error("    ## Error querying MPCM layer: " + e.getMessage());
-				result = new ResponseEntity<JsonNode>(jsonObjectMapper.readValue(ERR_MESSAGE + e.getMessage() + "\" }", JsonNode.class), HttpStatus.BAD_REQUEST);
+				result = new ResponseEntity<JsonNode>(getErrorMessageAsJson(e), HttpStatus.BAD_REQUEST);
 			}
 		}
 		else
@@ -206,7 +206,7 @@ public class LayerCatalogController
         catch (Exception e)
         {
             logger.error("    ## Error parsing KML file: " + e.getMessage());
-            result = new ResponseEntity<JsonNode>(jsonObjectMapper.readValue(ERR_MESSAGE + e.getMessage() + "\" }", JsonNode.class), HttpStatus.BAD_REQUEST);
+            result = new ResponseEntity<JsonNode>(getErrorMessageAsJson(e), HttpStatus.BAD_REQUEST);
         }
 
         logger.info("    Building image Base64 complete. Response: " + result.getStatusCode().name());
@@ -254,7 +254,7 @@ public class LayerCatalogController
             catch (Exception e)
             {
                 logger.error("    ## Error creating resources from source KML: " + e.getMessage());
-                result = new ResponseEntity<JsonNode>(jsonObjectMapper.readValue(ERR_MESSAGE + e.getMessage() + "\" }", JsonNode.class), HttpStatus.BAD_REQUEST);
+                result = new ResponseEntity<JsonNode>(getErrorMessageAsJson(e), HttpStatus.BAD_REQUEST);
             }
         }
         else result = new ResponseEntity<JsonNode>(jsonObjectMapper.readValue("{ \"status\": \"ERROR\", \"message\": \"File or ID was not submitted. Please post your form with a file, and id\" }", JsonNode.class), HttpStatus.BAD_REQUEST);
@@ -262,5 +262,10 @@ public class LayerCatalogController
         logger.info("    Create layers from KML completed. Response: " + result.getStatusCode().name());
         logger.debug(" >> processKML()");
         return result;
+    }
+    
+    private JsonNode getErrorMessageAsJson(Exception e) throws JsonParseException, JsonMappingException, IOException
+    {
+        return jsonObjectMapper.readValue(("{ \"status\": \"ERROR\", \"message\": \"" + e.getMessage() + "\" }").replaceAll("\\r\\n|\\r|\\n", " "), JsonNode.class);
     }
 }
