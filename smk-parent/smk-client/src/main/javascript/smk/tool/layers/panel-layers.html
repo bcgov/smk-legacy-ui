@@ -7,9 +7,9 @@
     <template slot="commands">
         <i class="smk-all-visibility material-icons smk-command smk-icon"
             title="Toggle visibility of all layers"
-            v-on:click="$$emit( 'set-visible', { ids: allLayerIds(), visible: !isAllVisible() } )"
-            v-bind:class="{ 'smk-some-visible': isAllVisible() == null }"
-        >{{ isAllVisible() !== false ? 'visibility' : 'visibility_off' }}</i>
+            v-on:click="$$emit( 'set-all-layers-visible', { visible: !allVisible } )"
+            v-bind:class="{ 'smk-some-visible': allVisible == null }"
+        >{{ allVisible !== false ? 'visibility' : 'visibility_off' }}</i>
 
         <input class="smk-filter" placeholder="Filter layers" v-model="filter">
 
@@ -20,13 +20,12 @@
         >Legend</label>
     </template>
 
-    <template slot="status" v-if="!layers || layers.length == 0">
+    <template slot="status" v-if="!items || items.length == 0">
         <status-message message="No layers are configured" status="warning">
     </template>
 
     <layer-display 
-        v-bind:layers="layers"
-        parentId=""
+        v-bind:items="items"
         id="layers"
     ></layer-display>
 </side-panel>

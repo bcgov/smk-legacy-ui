@@ -7,14 +7,20 @@ include.module( 'tool-layers', [ 'tool', 'widgets', 'tool-layers.panel-layers-ht
 
     Vue.component( 'layer-display', {
         template: inc[ 'tool-layers.layer-display-html' ],
-        props: [ 'id', 'layers', 'parentId' ],
+        props: [ 'id', 'items' ],
         mixins: [ inc.widgets.emit ],
+        methods: {
+            areAllItemsVisible: function ( folder ) {
+                // console.log( folder )
+                return folder.areAllItemsVisible()
+            }
+        }
     } )
 
     Vue.component( 'layers-panel', {
         extends: inc.widgets.toolPanel,
         template: inc[ 'tool-layers.panel-layers-html' ],
-        props: [ 'busy', 'layers', 'config' ],
+        props: [ 'busy', 'items', 'config', 'allVisible' ],
         data: function () {
             return Object.assign( {}, this.config )
         },
@@ -36,9 +42,9 @@ include.module( 'tool-layers', [ 'tool', 'widgets', 'tool-layers.panel-layers-ht
                 return state
             },
 
-            isAllVisible: function () {
+            // isAllVisible: function () {
                 // return this.layers.every( isLayerVisible ) || ( this.layers.some( isLayerVisible ) ? null : false )
-            },
+            // },
 
             isChildrenVisible: function ( layerId ) {
                 // var v = this.layers
@@ -78,7 +84,8 @@ include.module( 'tool-layers', [ 'tool', 'widgets', 'tool-layers.panel-layers-ht
     function LayersTool( option ) {
         this.makePropWidget( 'icon', 'layers' )
         this.makePropPanel( 'busy', false )
-        this.makePropPanel( 'layers', [] )
+        this.makePropPanel( 'items', [] )
+        this.makePropPanel( 'allVisible', [] )
         this.makePropPanel( 'config', {
             legend: false,
             filter: null
@@ -128,18 +135,26 @@ include.module( 'tool-layers', [ 'tool', 'widgets', 'tool-layers.panel-layers-ht
                 }
             },
 
-            'set-visible': function ( ev ) {
-                smk.$viewer.setLayersVisible( ev.ids, ev.visible )
-                smk.$viewer.layerIds.forEach( function ( id ) {
-                    layerModel[ id ].visible = smk.$viewer.isLayerVisible( id )
-                } )
+            'set-all-layers-visible': function ( ev ) {
             },
 
-            'set-expanded': function ( ev ) {
-                console.log(ev)
-                smk.$viewer.setLayerExpand( ev.ids[ 0 ], ev.expanded )
+            'set-layer-visible': function ( ev ) {
+                smk.$viewer.setLayersVisible( [ ev.id ], ev.visible )
+                // smk.$viewer.layerIds.forEach( function ( id ) {
+                    // layerModel[ id ].visible = smk.$viewer.isLayerVisible( id )
+                // } )
             },
 
+            'set-folder-expanded': function ( ev ) {
+                // console.log(ev)
+                smk.$viewer.layerDisplayContext.setFolderExpanded( ev.id, ev.expanded )
+            },
+
+            'set-folder-visible': function ( ev ) {
+                // console.log(ev)
+                smk.$viewer.layerDisplayContext.setFolderVisible( ev.id, ev.visible )
+                smk.$viewer.updateLayersVisible()
+            },
             // 'set-expanded': function ( ev ) {
             //     ev.ids.forEach( function ( id ) {
             //         var ly = layerModel[ id ]
@@ -166,7 +181,10 @@ include.module( 'tool-layers', [ 'tool', 'widgets', 'tool-layers.panel-layers-ht
 
         var layerModel = {}
 
-        this.layers = smk.$viewer.layerDisplay.layerList
+        if ( this.display )
+            smk.$viewer.setLayerDisplay( this.display )
+
+        this.items = smk.$viewer.layerDisplayContext.root.items
         // this.layers = smk.$viewer.layerIds.map( function ( id, i ) {
         //     var ly = smk.$viewer.layerId[ id ]
 
@@ -184,6 +202,10 @@ include.module( 'tool-layers', [ 'tool', 'widgets', 'tool-layers.panel-layers-ht
         //     } )
         // } )
 
+        smk.$viewer.changedLayerVisibility( function () {
+            self.allVisible = smk.$viewer.layerDisplayContext.areAllLayersVisible()
+        } )
+
         smk.$viewer.startedLoading( function ( ev ) {
             self.busy = true
         } )
@@ -191,6 +213,8 @@ include.module( 'tool-layers', [ 'tool', 'widgets', 'tool-layers.panel-layers-ht
         smk.$viewer.finishedLoading( function ( ev ) {
             self.busy = false
         } )
+
+        return smk.$viewer.updateLayersVisible()
     } )
 
     return LayersTool

@@ -1,27 +1,40 @@
 <div class="smk-folder">
     <template
-        v-for="layer in layers"
+        v-for="item in items"
     >
-        <div class="smk-item">
+        <div class="smk-item"
+            v-bind:class="{ 
+                'smk-visible': item.isVisible,
+                'smk-expanded': item.isExpanded 
+            }"
+        >
             <div class="smk-layer-title">
-                <i class="smk-layer-expand material-icons smk-command smk-icon"
-                    v-if="layer.isExpanded != null"
-                    v-bind:title="'Expand ' + layer.title"
-                    v-on:click="$$emit( 'set-expanded', { ids: [ ( parentId ? parentId + '--' : '' ) + layer.id ], expanded: !layer.isExpanded } )"
-                >{{ layer.isExpanded ? 'arrow_drop_down' : 'arrow_right' }}</i>
+                <i class="smk-folder-expand material-icons smk-command smk-icon"
+                    v-if="item.isExpanded != null"
+                    v-bind:title="'Expand ' + item.title + '\n[' + item.id + ']'"
+                    v-on:click="$$emit( 'set-folder-expanded', { id: item.id, expanded: !item.isExpanded } )"
+                >{{ item.isExpanded ? 'arrow_drop_down' : 'arrow_right' }}</i>
+
+                <i class="smk-folder-visibility material-icons smk-command smk-icon"
+                    v-if="item.items"
+                    v-bind:title="'Toggle visibility of folder ' + item.title + '\n[' + item.id + ']'"
+                    v-on:click="$$emit( 'set-folder-visible', { id: item.id, visible: !item.isVisible } )"
+                    v-bind:class="{ 'smk-some-visible': areAllItemsVisible( item ) == null }"
+                >{{ item.isVisible && areAllItemsVisible( item ) !== false ? 'visibility' : 'visibility_off' }}</i>
 
                 <i class="smk-layer-visibility material-icons smk-command smk-icon"
-                    v-bind:title="'Toggle visibility of ' + layer.title"
-                    v-on:click="$$emit( 'set-visible', { ids: [ layer.id ], visible: !layer.isVisible } )"
-                >{{ layer.isVisible ? 'visibility' : 'visibility_off' }}</i>
+                    v-if="item.layerId"
+                    v-bind:title="'Toggle visibility of layer ' + item.title"
+                    v-on:click="$$emit( 'set-layer-visible', { id: item.id, visible: !item.isVisible } )"
+                >{{ item.isVisible ? 'visibility' : 'visibility_off' }}</i>
 
-                <span v-bind:class="[ layer.class ]">{{ layer.title }}</span>
+                <span v-bind:class="[ item.class ]">{{ item.title }}</span>
             </div>
 
-            <!-- <div class="smk-layer-info" v-if="legend && layer.hasLegend">
+            <!-- <div class="smk-layer-info" v-if="legend && item.hasLegend">
                 <div class="smk-legend">
-                    <span v-if="layer.legends == 'waiting'">Requesting</span>
-                    <div v-for="legend in layer.legends">
+                    <span v-if="item.legends == 'waiting'">Requesting</span>
+                    <div v-for="legend in item.legends">
                         <img v-bind:src="legend.url">
                         <span>{{ legend.title }}</span>
                     </div>
@@ -30,9 +43,8 @@
         </div>
 
         <layer-display
-            v-if="layer.layerList && layer.isExpanded"
-            v-bind:layers="layer.layerList"
-            v-bind:parentId="( parentId ? parentId + '--' : '' ) + layer.id"
+            v-if="item.isExpanded"
+            v-bind:items="item.items"
             v-bind:id="id"
         ></layer-display>
     </template>

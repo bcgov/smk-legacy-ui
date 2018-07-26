@@ -45,7 +45,7 @@
     cursor: pointer;
 } */
 
-.smk-layers-panel .smk-layer {
+.smk-layers-panel .smk-item {
     font-size: 14px;
 }
 
@@ -63,23 +63,28 @@
     position: relative;
 }
 
-.smk-layers-panel .smk-layer-title .smk-layer-expand {
+.smk-layers-panel .smk-layer-title .smk-folder-expand {
     position: absolute;
     left: -20px;
 }
 
-.smk-layers-panel .smk-layer-title .smk-layer-visibility {
-    opacity: .5;
+.smk-layers-panel .smk-layer-title .smk-folder-visibility {
+    /* opacity: .5; */
     padding: 0;
     align-self: flex-start;
 }
 
-.smk-layers-panel .smk-layer.smk-layer-visible .smk-layer-title .smk-layer-visibility {
+/* .smk-layers-panel .smk-item.smk-layer-visible .smk-layer-title .smk-folder-visibility {
     opacity: 1;
+} */
+
+.smk-layers-panel .smk-layer-title .smk-folder-visibility.smk-some-visible {
+    opacity: .5;
 }
 
-.smk-layers-panel .smk-layer.smk-layer-visible .smk-layer-title .smk-layer-visibility.smk-some-visible {
-    opacity: .5;
+.smk-layers-panel .smk-layer-title .smk-layer-visibility {
+    padding: 0;
+    align-self: flex-start;
 }
 
 .smk-layers-panel .smk-layer-title span {
@@ -93,7 +98,7 @@
     font-style: italic;
 }
 
-.smk-layers-panel .smk-layer-expand {
+.smk-layers-panel .smk-folder-expand {
     position: absolute;
     top: 0;
     right: 0;

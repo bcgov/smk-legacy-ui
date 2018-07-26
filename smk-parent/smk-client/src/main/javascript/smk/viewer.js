@@ -10,7 +10,8 @@ include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', '
         'finishedIdentify',
         'pickedLocation',
         'changedLocation',
-        'changedPopup'
+        'changedPopup',
+        'changedLayerVisibility'
     ] )
 
     function Viewer() {
@@ -134,9 +135,9 @@ include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', '
         this.visibleLayer = {}
         this.layerIdPromise = {}
         this.deadViewerLayer = {}
-        this.layerDisplay = null
-        this.layerDisplayId = null
-        this.layerDisplayIds = null
+        // this.layerDisplay = null
+        // this.layerDisplayId = null
+        this.layerDisplayContext = null
 
 
         this.pickHandlers = []
@@ -200,7 +201,7 @@ include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', '
                         title: ly.config.title,
                         isVisible: ly.config.isVisible,
                         isExpanded: false,
-                        layerList: list
+                        items: list
                     }
                 }
                 else {
@@ -247,9 +248,10 @@ include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', '
 
         if ( !smk.layers || smk.layers.length == 0 ) return SMK.UTIL.resolved()
 
-        var ids = self.layerDisplayIds.filter( function ( id ) {
-            var v = self.isLayerVisible( id )
-            self.layerDisplayId[ id ][ 0 ].isVisible = false
+        var ids = self.layerDisplayContext.layerIds.filter( function ( id ) {
+            var v = self.layerDisplayContext.isLayerVisible( id )
+            self.layerDisplayContext.setLayerVisible( id, false )
+            // self.layerDisplayId[ id ][ 0 ].isVisible = false
             return v
         } )
 
@@ -257,40 +259,16 @@ include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', '
             .catch( function () {} )
     }
 
-    Viewer.prototype.setLayerDisplay = function ( layerList ) {
-        var ld = SMK.TYPE.LayerDisplay.create( { 
-            id: '--root', 
-            title: '(Root)', 
-            isExpanded: true, 
-            layerList: layerList
-        }, this )
-
-        var layerId = {}
-        var ids = []
-        var folderId = {}
-
-        function eachItem( list, parents ) {
-            list.forEach( function ( item ) {
-                if ( item.layerId ) {
-                    if ( item.layerId in layerId ) 
-                        throw new Error( item.layerId + ' appears more than once in layer display' )
-
-                    layerId[ item.layerId ] = [ item ].concat( parents )
-                    ids.push( item.layerId )
-                }
-                else {
-                    folderId[ parents.reduceRight( function ( a, v ) { return a + v.id + '--' }, '' ) + item.id ] = item
-                    eachItem( item.layerList, [ item ].concat( parents ) )
-                }
-            } )
-        }
-
-        eachItem( ld.layerList, [] )
+    Viewer.prototype.setLayerDisplay = function ( layerItems ) {
+        var self = this
         
-        this.layerDisplay = ld
-        this.layerDisplayId = layerId
-        this.layerDisplayIds = ids
-        this.layerDisplayFolderId = folderId
+        this.layerDisplayContext = new SMK.TYPE.LayerDisplayContext( layerItems, this.layerId )
+
+        this.layerDisplayContext.changedVisibility( function () {
+            self.changedLayerVisibility()
+        } ) 
+
+        // return this.updateLayersVisible()
     }
 
     Viewer.prototype.handlePick = function ( priority, handler ) {
@@ -312,57 +290,39 @@ include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', '
             } )
     }
 
-    Viewer.prototype.isLayerVisible = function ( layerId ) {
-        if ( !( layerId in this.layerDisplayId ) ) return false
-
-        var lds = this.layerDisplayId[ layerId ]
-        return lds.reduce( function ( accum, ld ) {
-            return accum && ld.isVisible
-        }, true )
-    }
-
-    Viewer.prototype.setLayerExpand = function ( folderId, expand ) {
-        if ( !( folderId in this.layerDisplayFolderId ) )
-            throw new Error( folderId + ' not defined' )
-
-        if ( this.layerDisplayFolderId[ folderId ].isExpanded != null )
-            this.layerDisplayFolderId[ folderId ].isExpanded = expand
-    }
-
     Viewer.prototype.setLayersVisible = function ( layerIds, visible ) {
         var self = this
 
         var layerCount = this.layerIds.length
         if ( layerCount == 0 ) return SMK.UTIL.resolved()
 
-        if ( layerIds.every( function ( id ) { return !self.isLayerVisible( id ) == !visible } ) ) return SMK.UTIL.resolved()
+        var madeChange = false
+        layerIds.forEach( function ( id ) {
+            if ( self.layerDisplayContext.setLayerVisible( id, visible ) != null )
+                madeChange = true
+        } )
+
+        if ( !madeChange ) return SMK.UTIL.resolved()
+        
+        return this.updateLayersVisible()
+    }
+
+    Viewer.prototype.updateLayersVisible = function () {
+        var self = this
 
         var pending = {}
-        self.layerIds.forEach( function ( id ) {
+        self.layerDisplayContext.layerIds.forEach( function ( id ) {
             pending[ id ] = true
         } )
         Object.keys( self.visibleLayer ).forEach( function ( id ) {
             pending[ id ] = true
         } )
 
-        layerIds.forEach( function ( id ) {
-            var ly = self.layerId[ id ]
-
-            var lds = self.layerDisplayId[ id ]
-
-            if ( visible )
-                lds.forEach( function ( ld ) {
-                    ld.isVisible = true
-                } )
-            else
-                lds[ 0 ].isVisible = false
-        } )
-
         var visibleLayers = []
         var merged
-        this.layerDisplayIds.forEach( function ( id, i ) {
+        this.layerDisplayContext.layerIds.forEach( function ( id, i ) {
             // console.log( id,self.isLayerVisible( id ),self.layerId[ id ].isContainer,self.layerId[ id ].config );
-            if ( !self.isLayerVisible( id )  ) return
+            if ( !self.layerDisplayContext.isLayerVisible( id )  ) return
 
             var ly = self.layerId[ id ]
             if ( !merged ) {
