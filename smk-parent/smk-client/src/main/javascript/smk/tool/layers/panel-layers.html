@@ -6,11 +6,14 @@
 
     <template slot="commands">
         <i class="smk-all-visibility material-icons smk-command smk-icon"
-            title="Toggle visibility of all layers"
+            v-bind:title="'Toggle visibility of all layers.\nSHIFT-click to toggle visibility on each layer.'"
             v-on:click="$$emit( 'set-all-layers-visible', { visible: !allVisible, deep: $event.shiftKey } )"
         >{{ allVisible ? 'visibility' : 'visibility_off' }}</i>
 
-        <input class="smk-filter" placeholder="Filter layers" v-model="filter">
+        <input class="smk-filter" placeholder="Filter layers" 
+            v-model="filter" 
+            v-on:input="$$emit( 'config', getConfigState() )"
+        >
 
         <label class="smk-command"
         ><input type="checkbox"

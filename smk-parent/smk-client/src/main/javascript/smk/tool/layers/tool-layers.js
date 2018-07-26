@@ -35,18 +35,6 @@ include.module( 'tool-layers', [ 'tool', 'widgets', 'tool-layers.panel-layers-ht
                 } )
                 return state
             },
-
-            matchesFilter: function ( layer ) {
-                return this.filterRegExp.test( layer.title )
-            },
-        },
-        computed: {
-            filterRegExp: function () {
-                if ( !this.filter ) return /.*/;
-                var f = this.filter.trim()
-                if ( !f ) return /.*/;
-                return new RegExp( f.toLowerCase().split( /\s+/ ).map( function ( part ) { return '(?=.*' + part + ')' } ).join( '' ), 'i' )
-            }
         }
     } )
 
@@ -89,9 +77,19 @@ include.module( 'tool-layers', [ 'tool', 'widgets', 'tool-layers.panel-layers-ht
             },
 
             'config': function ( ev ) {
+                // console.log( ev )
                 Object.assign( self.config, ev )
 
                 smk.$viewer.layerDisplayContext.setLegendsVisible( ev.legend, smk.$viewer.layerId, smk.$viewer )
+
+                var re 
+                if ( !ev.filter || !ev.filter.trim() ) 
+                    re = /.*/;
+                else {
+                    var f = ev.filter.trim()
+                    re = new RegExp( f.toLowerCase().split( /\s+/ ).map( function ( part ) { return '(?=.*' + part + ')' } ).join( '' ), 'i' )
+                }
+                smk.$viewer.layerDisplayContext.setFilter( re )
             },
 
             'set-all-layers-visible': function ( ev ) {

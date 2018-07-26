@@ -1,6 +1,7 @@
 <div class="smk-folder">
     <template
         v-for="item in items"
+        v-if="item.inFilter"
     >
         <div class="smk-item"
             v-bind:class="{ 
@@ -15,7 +16,7 @@
             >{{ item.isExpanded ? 'arrow_drop_down' : 'arrow_right' }}</i>
 
             <i class="smk-visibility material-icons smk-command smk-icon"
-                v-bind:title="'Toggle visibility of \'' + item.title + '\''"
+                v-bind:title="'Toggle visibility of \'' + item.title + '\'' + ( item.isFolder ? '\nSHIFT-click to toggle visibility on internal layers.' : '' ) "
                 v-on:click="$$emit( 'set-item-visible', { id: item.layerId || item.folderId, visible: !item.isVisible, deep: $event.shiftKey } )"
             >{{ item.isVisible ? 'visibility' : 'visibility_off' }}</i>
 

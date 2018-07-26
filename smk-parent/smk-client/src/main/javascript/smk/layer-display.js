@@ -8,8 +8,9 @@ include.module( 'layer-display', [ 'jquery', 'util', 'event' ], function () {
             title:      null,
             isVisible:  true,
             isActuallyVisible: null,
+            inFilter:   true,
             showLegend: false,
-            legends:   null
+            legends:    null
         }, option )
 
         if ( forceVisible )
@@ -260,4 +261,19 @@ include.module( 'layer-display', [ 'jquery', 'util', 'event' ], function () {
         )
     }
 
+    LayerDisplayContext.prototype.setFilter = function ( regex ) {
+        var self = this
+
+        this.root.each( 
+            function ( item ) {
+                item.inFilter = false
+                if ( regex.test( item.title ) )
+                    self.layerId[ item.layerId || item.folderId ].forEach( function ( i ) {
+                        i.inFilter = true 
+                    } )
+
+                if ( item.isGroup ) return false 
+            }
+        )
+    }
 } )
