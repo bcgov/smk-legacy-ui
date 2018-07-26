@@ -16,7 +16,7 @@
 
             <i class="smk-visibility material-icons smk-command smk-icon"
                 v-bind:title="'Toggle visibility of \'' + item.title + '\''"
-                v-on:click="$$emit( 'set-item-visible', { id: item.layerId || item.folderId, visible: !item.isVisible } )"
+                v-on:click="$$emit( 'set-item-visible', { id: item.layerId || item.folderId, visible: !item.isVisible, deep: $event.shiftKey } )"
             >{{ item.isVisible ? 'visibility' : 'visibility_off' }}</i>
 
             <span class="smk-title"

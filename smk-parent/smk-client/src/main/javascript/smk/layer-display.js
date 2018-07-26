@@ -194,7 +194,7 @@ include.module( 'layer-display', [ 'jquery', 'util', 'event' ], function () {
         }, true )
     }
 
-    LayerDisplayContext.prototype.setItemVisible = function ( layerId, visible ) {
+    LayerDisplayContext.prototype.setItemVisible = function ( layerId, visible, deep ) {
         if ( !( layerId in this.layerId ) ) return 
 
         var lds = this.layerId[ layerId ]
@@ -205,6 +205,12 @@ include.module( 'layer-display', [ 'jquery', 'util', 'event' ], function () {
             } )
         else
             lds[ 0 ].isVisible = false
+
+        if ( deep ) {
+            lds[ 0 ].each( function ( item ) {
+                item.isVisible = visible
+            } )
+        }
 
         this.changedVisibility()        
 
