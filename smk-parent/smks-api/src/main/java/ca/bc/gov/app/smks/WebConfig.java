@@ -15,6 +15,9 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
+import com.fasterxml.jackson.core.JsonParser.Feature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import ca.bc.gov.app.smks.dao.CouchDAO;
 import ca.bc.gov.app.smks.dao.LayerCatalogDAO;
 
@@ -56,6 +59,15 @@ public class WebConfig extends WebMvcConfigurerAdapter
 		return resolver;
 	}
 
+	@Bean
+	public ObjectMapper jsonObjectMapper() throws SMKException
+	{
+	    ObjectMapper mapper = new ObjectMapper();
+	    mapper.configure(Feature.ALLOW_UNQUOTED_CONTROL_CHARS, true);
+	    
+	    return mapper;
+	}
+	
 	@Override
 	public void addCorsMappings(CorsRegistry registry)
 	{

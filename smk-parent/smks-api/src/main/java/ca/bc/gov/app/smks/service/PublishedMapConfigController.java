@@ -52,7 +52,9 @@ import net.lingala.zip4j.model.ZipParameters;
 public class PublishedMapConfigController 
 {
 	private static Log logger = LogFactory.getLog(PublishedMapConfigController.class);
-	private ObjectMapper mapper = new ObjectMapper();
+
+	@Autowired
+    private ObjectMapper jsonObjectMapper;
 	
     private static final String SUCCESS = "    Success!";
     private static final String ERR_MESSAGE = "{ \"status\": \"ERROR\", \"message\": \"";
@@ -80,12 +82,12 @@ public class PublishedMapConfigController
 				configSnippets.add(new MapConfigInfo(config));
 			}
 
-			result = new ResponseEntity<JsonNode>(mapper.convertValue(configSnippets, JsonNode.class), HttpStatus.OK);
+			result = new ResponseEntity<JsonNode>(jsonObjectMapper.convertValue(configSnippets, JsonNode.class), HttpStatus.OK);
 		}
 		catch (Exception e)
 		{
 			logger.error("    ## Error querying Map Config Resources: " + e.getMessage());
-			result = new ResponseEntity<JsonNode>(mapper.readValue(ERR_MESSAGE + e.getMessage() + "\" }", JsonNode.class), HttpStatus.BAD_REQUEST);
+			result = new ResponseEntity<JsonNode>(jsonObjectMapper.readValue(ERR_MESSAGE + e.getMessage() + "\" }", JsonNode.class), HttpStatus.BAD_REQUEST);
 		}
 
 		logger.info("    Get All Map Configurations completed. Response: " + result.getStatusCode().name());
@@ -148,14 +150,14 @@ public class PublishedMapConfigController
 				couchDAO.createResource(clone);
 
 				logger.debug(SUCCESS);
-				result = new ResponseEntity<JsonNode>(mapper.readValue("{ \"status:\" \"Success\", \"id\": \"" + id + "\" }", JsonNode.class), HttpStatus.CREATED);
+				result = new ResponseEntity<JsonNode>(jsonObjectMapper.readValue("{ \"status:\" \"Success\", \"id\": \"" + id + "\" }", JsonNode.class), HttpStatus.CREATED);
 			}
 			else throw new SMKException("Map Configuration ID not found.");
 		}
 		catch (Exception e)
 		{
 			logger.error("    ## Error publishing Map Configuration resources " + e.getMessage());
-			result = new ResponseEntity<JsonNode>(mapper.readValue(ERR_MESSAGE + e.getMessage() + "\" }", JsonNode.class), HttpStatus.BAD_REQUEST);
+			result = new ResponseEntity<JsonNode>(jsonObjectMapper.readValue(ERR_MESSAGE + e.getMessage() + "\" }", JsonNode.class), HttpStatus.BAD_REQUEST);
 		}
 
 		logger.info("   Published Map Configuration completed. Response: " + result.getStatusCode().name());
@@ -178,14 +180,14 @@ public class PublishedMapConfigController
 			if(resource != null)
 			{
 				logger.debug(SUCCESS);
-				result = new ResponseEntity<JsonNode>(mapper.convertValue(resource, JsonNode.class), HttpStatus.OK);
+				result = new ResponseEntity<JsonNode>(jsonObjectMapper.convertValue(resource, JsonNode.class), HttpStatus.OK);
 			}
 			else throw new SMKException("Map Configuration ID not found.");
 		}
 		catch (Exception e)
 		{
 			logger.error("    ## Error fetching map configuration: " + e.getMessage());
-			result = new ResponseEntity<JsonNode>(mapper.readValue(ERR_MESSAGE + e.getMessage() + "\" }", JsonNode.class), HttpStatus.BAD_REQUEST);
+			result = new ResponseEntity<JsonNode>(jsonObjectMapper.readValue(ERR_MESSAGE + e.getMessage() + "\" }", JsonNode.class), HttpStatus.BAD_REQUEST);
 		}
 
 		logger.info("    Fetch published Map Configuration completed. Response: " + result.getStatusCode().name());
@@ -213,14 +215,14 @@ public class PublishedMapConfigController
 				couchDAO.updateResource(resource);
 
 				logger.debug(SUCCESS);
-				result = new ResponseEntity<JsonNode>(mapper.readValue(SUCCESS_MESSAGE, JsonNode.class), HttpStatus.OK);
+				result = new ResponseEntity<JsonNode>(jsonObjectMapper.readValue(SUCCESS_MESSAGE, JsonNode.class), HttpStatus.OK);
 			}
 			else throw new SMKException("Map Configuration ID not found.");
 		}
 		catch (Exception e)
 		{
 			logger.error("    ## Error un publishing map configuration: " + e.getMessage());
-			result = new ResponseEntity<JsonNode>(mapper.readValue(ERR_MESSAGE + e.getMessage() + "\" }", JsonNode.class), HttpStatus.BAD_REQUEST);
+			result = new ResponseEntity<JsonNode>(jsonObjectMapper.readValue(ERR_MESSAGE + e.getMessage() + "\" }", JsonNode.class), HttpStatus.BAD_REQUEST);
 		}
 
 		logger.info("    Delete/Un-Publish published Map Configuration completed. Response: " + result.getStatusCode().name());
@@ -252,14 +254,14 @@ public class PublishedMapConfigController
 				}
 
 				logger.debug(SUCCESS);
-				result = new ResponseEntity<JsonNode>(mapper.convertValue(attachments, JsonNode.class), HttpStatus.OK);
+				result = new ResponseEntity<JsonNode>(jsonObjectMapper.convertValue(attachments, JsonNode.class), HttpStatus.OK);
 			}
 			else throw new SMKException("Map Configuration ID not found.");
 		}
 		catch (Exception e)
 		{
 			logger.error("    ## Error fetching all attachment resource: " + e.getMessage());
-			result = new ResponseEntity<JsonNode>(mapper.readValue(ERR_MESSAGE + e.getMessage() + "\" }", JsonNode.class), HttpStatus.BAD_REQUEST);
+			result = new ResponseEntity<JsonNode>(jsonObjectMapper.readValue(ERR_MESSAGE + e.getMessage() + "\" }", JsonNode.class), HttpStatus.BAD_REQUEST);
 		}
 
 		logger.info("    Get All Attachments completed. Response: " + result.getStatusCode().name());
@@ -416,13 +418,13 @@ public class PublishedMapConfigController
         ZipFile zipFile = new ZipFile(exportTemplateZip);
         
         // create config json
-        ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper jsonObjectMapper = new ObjectMapper();
         File mapConfigTempFile = new File(tempLocationPath + "map-config.json");
         if(!mapConfigTempFile.createNewFile())
         {
             logger.debug("    Failed to create temp config file...");
         }
-        mapper.writeValue(mapConfigTempFile, resource);
+        jsonObjectMapper.writeValue(mapConfigTempFile, resource);
         
         zipFile.addFile(mapConfigTempFile, params);
         

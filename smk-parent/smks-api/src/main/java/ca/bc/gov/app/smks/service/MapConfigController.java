@@ -57,7 +57,8 @@ public class MapConfigController
 {
 	private static Log logger = LogFactory.getLog(MapConfigController.class);
 
-	private ObjectMapper mapper = new ObjectMapper();
+	@Autowired
+    private ObjectMapper jsonObjectMapper;
 	
 	private static final String SUCCESS = "    Success!";
 	private static final String ERR_MESSAGE = "{ \"status\": \"ERROR\", \"message\": \"";
@@ -103,12 +104,12 @@ public class MapConfigController
 
 			couchDAO.createResource(request);
 			logger.debug(SUCCESS);
-			result = new ResponseEntity<JsonNode>(mapper.readValue("{ \"status\": \"Success\", \"couchId\": \"" + request.getId() + "\", \"lmfId\": \"" + request.getLmfId() + "\" }", JsonNode.class), HttpStatus.CREATED);
+			result = new ResponseEntity<JsonNode>(jsonObjectMapper.readValue("{ \"status\": \"Success\", \"couchId\": \"" + request.getId() + "\", \"lmfId\": \"" + request.getLmfId() + "\" }", JsonNode.class), HttpStatus.CREATED);
 		}
 		catch (Exception e)
 		{
 			logger.error("    ## Error creating Map Configuration resources " + e.getMessage());
-			result = new ResponseEntity<JsonNode>(mapper.readValue(ERR_MESSAGE + e.getMessage() + "\" }", JsonNode.class), HttpStatus.BAD_REQUEST);
+			result = new ResponseEntity<JsonNode>(jsonObjectMapper.readValue(ERR_MESSAGE + e.getMessage() + "\" }", JsonNode.class), HttpStatus.BAD_REQUEST);
 		}
 
 		logger.info("    Create New Map Configuration completed. Response: " + result.getStatusCode().name());
@@ -152,12 +153,12 @@ public class MapConfigController
 			    }
 			}
 
-			result = new ResponseEntity<JsonNode>(mapper.convertValue(configSnippets, JsonNode.class), HttpStatus.OK);
+			result = new ResponseEntity<JsonNode>(jsonObjectMapper.convertValue(configSnippets, JsonNode.class), HttpStatus.OK);
 		}
 		catch (Exception e)
 		{
 			logger.error("    ## Error querying Map Config Resources: " + e.getMessage());
-			result = new ResponseEntity<JsonNode>(mapper.readValue(ERR_MESSAGE + e.getMessage() + "\" }", JsonNode.class), HttpStatus.BAD_REQUEST);
+			result = new ResponseEntity<JsonNode>(jsonObjectMapper.readValue(ERR_MESSAGE + e.getMessage() + "\" }", JsonNode.class), HttpStatus.BAD_REQUEST);
 		}
 
 		logger.info("    Get All Map Configurations completed. Response: " + result.getStatusCode().name());
@@ -190,14 +191,14 @@ public class MapConfigController
 			if(resource != null)
 			{
 				logger.debug(SUCCESS);
-				result = new ResponseEntity<JsonNode>(mapper.convertValue(resource, JsonNode.class), HttpStatus.OK);
+				result = new ResponseEntity<JsonNode>(jsonObjectMapper.convertValue(resource, JsonNode.class), HttpStatus.OK);
 			}
 			else throw new SMKException("Map Config not found for ID " + id + " and version " + version + " does not exist");
 		}
 		catch (Exception e)
 		{
 			logger.error("    ## Error querying Map Configuration resource " + id + ": " + e.getMessage());
-			result = new ResponseEntity<JsonNode>(mapper.readValue(ERR_MESSAGE + e.getMessage() + "\" }", JsonNode.class), HttpStatus.BAD_REQUEST);
+			result = new ResponseEntity<JsonNode>(jsonObjectMapper.readValue(ERR_MESSAGE + e.getMessage() + "\" }", JsonNode.class), HttpStatus.BAD_REQUEST);
 		}
 
 		logger.info("    Get Map Configuration completed. Response: " + result.getStatusCode().name());
@@ -234,7 +235,7 @@ public class MapConfigController
 						logger.debug("    Deleting Map Configuration " + id + " version " + version);
 						couchDAO.removeResource(resource);
 						logger.debug(SUCCESS);
-						result = new ResponseEntity<JsonNode>(mapper.readValue(SUCCESS_MESSAGE, JsonNode.class), HttpStatus.OK);
+						result = new ResponseEntity<JsonNode>(jsonObjectMapper.readValue(SUCCESS_MESSAGE, JsonNode.class), HttpStatus.OK);
 					}
 					else throw new SMKException("Map Config not found for ID " + id + " and version " + version + " does not exist");
 				}
@@ -248,14 +249,14 @@ public class MapConfigController
 					{
 						couchDAO.removeResource(config);
 					}
-					result = new ResponseEntity<JsonNode>(mapper.readValue(SUCCESS_MESSAGE, JsonNode.class), HttpStatus.OK);
+					result = new ResponseEntity<JsonNode>(jsonObjectMapper.readValue(SUCCESS_MESSAGE, JsonNode.class), HttpStatus.OK);
 				}
 			}
 		}
 		catch (Exception e)
 		{
 			logger.error("    ## Error deleting map configuration: " + e.getMessage());
-			result = new ResponseEntity<JsonNode>(mapper.readValue(ERR_MESSAGE + e.getMessage() + "\" }", JsonNode.class), HttpStatus.BAD_REQUEST);
+			result = new ResponseEntity<JsonNode>(jsonObjectMapper.readValue(ERR_MESSAGE + e.getMessage() + "\" }", JsonNode.class), HttpStatus.BAD_REQUEST);
 		}
 
 		logger.info("    Delete Map Configuration completed. Response: " + result.getStatusCode().name());
@@ -321,12 +322,12 @@ public class MapConfigController
 
 			// Update!
 			couchDAO.updateResource(resource);
-			result = new ResponseEntity<JsonNode>(mapper.readValue(SUCCESS_MESSAGE, JsonNode.class), HttpStatus.OK);
+			result = new ResponseEntity<JsonNode>(jsonObjectMapper.readValue(SUCCESS_MESSAGE, JsonNode.class), HttpStatus.OK);
 		}
 		catch (Exception e)
 		{
 			logger.error("    ## Error Updating Map Configuration: " + e.getMessage());
-			result = new ResponseEntity<JsonNode>(mapper.readValue(ERR_MESSAGE + e.getMessage() + "\" }", JsonNode.class), HttpStatus.BAD_REQUEST);
+			result = new ResponseEntity<JsonNode>(jsonObjectMapper.readValue(ERR_MESSAGE + e.getMessage() + "\" }", JsonNode.class), HttpStatus.BAD_REQUEST);
 		}
 
 		logger.info("    Update Map Configuration Completed. Response: " + result.getStatusCode().name());
@@ -421,17 +422,17 @@ public class MapConfigController
 				    couchDAO.updateResource(resource);
 
 				    logger.debug(SUCCESS);
-				    result = new ResponseEntity<JsonNode>(mapper.readValue(SUCCESS_MESSAGE, JsonNode.class), HttpStatus.OK);
+				    result = new ResponseEntity<JsonNode>(jsonObjectMapper.readValue(SUCCESS_MESSAGE, JsonNode.class), HttpStatus.OK);
 				}
 				else throw new SMKException("Map Configuration ID not found.");
 			}
 			catch (Exception e)
 			{
 				logger.error("    ## Error creating attachment resource: " + e.getMessage());
-				result = new ResponseEntity<JsonNode>(mapper.readValue(ERR_MESSAGE + e.getMessage() + "\" }", JsonNode.class), HttpStatus.BAD_REQUEST);
+				result = new ResponseEntity<JsonNode>(jsonObjectMapper.readValue(ERR_MESSAGE + e.getMessage() + "\" }", JsonNode.class), HttpStatus.BAD_REQUEST);
 			}
 		}
-		else result = new ResponseEntity<JsonNode>(mapper.readValue("{ \"status\": \"ERROR\", \"message\": \"File or ID was not submitted. Please post your form with a file, and id\" }", JsonNode.class), HttpStatus.BAD_REQUEST);
+		else result = new ResponseEntity<JsonNode>(jsonObjectMapper.readValue("{ \"status\": \"ERROR\", \"message\": \"File or ID was not submitted. Please post your form with a file, and id\" }", JsonNode.class), HttpStatus.BAD_REQUEST);
 
 		logger.info("    Create New Attachment completed. Response: " + result.getStatusCode().name());
 		logger.debug(" >> createAttachment()");
@@ -462,14 +463,14 @@ public class MapConfigController
 				}
 
 				logger.debug(SUCCESS);
-				result = new ResponseEntity<JsonNode>(mapper.convertValue(attachments, JsonNode.class), HttpStatus.OK);
+				result = new ResponseEntity<JsonNode>(jsonObjectMapper.convertValue(attachments, JsonNode.class), HttpStatus.OK);
 			}
 			else throw new SMKException("Map Configuration ID not found.");
 		}
 		catch (Exception e)
 		{
 			logger.error("    ## Error fetching all attachment resource: " + e.getMessage());
-			result = new ResponseEntity<JsonNode>(mapper.readValue(ERR_MESSAGE + e.getMessage() + "\" }", JsonNode.class), HttpStatus.BAD_REQUEST);
+			result = new ResponseEntity<JsonNode>(jsonObjectMapper.readValue(ERR_MESSAGE + e.getMessage() + "\" }", JsonNode.class), HttpStatus.BAD_REQUEST);
 		}
 
 		logger.info("    Get All Attachments completed. Response: " + result.getStatusCode().name());
@@ -540,7 +541,7 @@ public class MapConfigController
 				{
 					couchDAO.deleteAttachment(resource, attachmentId);
 					logger.debug(SUCCESS);
-					result = new ResponseEntity<JsonNode>(mapper.readValue("{ status: \"Success!\" }", JsonNode.class), HttpStatus.OK);
+					result = new ResponseEntity<JsonNode>(jsonObjectMapper.readValue("{ status: \"Success!\" }", JsonNode.class), HttpStatus.OK);
 				}
 				else throw new SMKException("Attachment ID not found.");
 			}
@@ -549,7 +550,7 @@ public class MapConfigController
 		catch (Exception e)
 		{
 			logger.error("    ## Error deleting attachment: " + e.getMessage());
-			result = new ResponseEntity<JsonNode>(mapper.readValue(ERR_MESSAGE + e.getMessage() + "\" }", JsonNode.class), HttpStatus.BAD_REQUEST);
+			result = new ResponseEntity<JsonNode>(jsonObjectMapper.readValue(ERR_MESSAGE + e.getMessage() + "\" }", JsonNode.class), HttpStatus.BAD_REQUEST);
 		}
 
 		logger.info("    Delete Attachment completed. Response: " + result.getStatusCode().name());
@@ -585,17 +586,17 @@ public class MapConfigController
 					couchDAO.updateResource(resource);
 
 				    logger.debug(SUCCESS);
-				    result = new ResponseEntity<JsonNode>(mapper.readValue("{ status: \"Success!\" }", JsonNode.class), HttpStatus.OK);
+				    result = new ResponseEntity<JsonNode>(jsonObjectMapper.readValue("{ status: \"Success!\" }", JsonNode.class), HttpStatus.OK);
 				}
 				else throw new SMKException("Map Configuration ID not found.");
 			}
 			catch (Exception e)
 			{
 				logger.error("    ## Error fetching all attachment resource: " + e.getMessage());
-				result = new ResponseEntity<JsonNode>(mapper.readValue(ERR_MESSAGE + e.getMessage() + "\" }", JsonNode.class), HttpStatus.BAD_REQUEST);
+				result = new ResponseEntity<JsonNode>(jsonObjectMapper.readValue(ERR_MESSAGE + e.getMessage() + "\" }", JsonNode.class), HttpStatus.BAD_REQUEST);
 			}
 		}
-		else result = new ResponseEntity<JsonNode>(mapper.readValue("{ \"status\": \"ERROR\", \"message\": \"File or ID was not submitted. Please post your form with a file, and id\" }", JsonNode.class), HttpStatus.BAD_REQUEST);
+		else result = new ResponseEntity<JsonNode>(jsonObjectMapper.readValue("{ \"status\": \"ERROR\", \"message\": \"File or ID was not submitted. Please post your form with a file, and id\" }", JsonNode.class), HttpStatus.BAD_REQUEST);
 
 		logger.info("    Update Attachment completed. Response: " + result.getStatusCode().name());
 		logger.debug(" << updateAttachment()");

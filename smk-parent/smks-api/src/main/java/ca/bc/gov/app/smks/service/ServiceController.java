@@ -29,7 +29,8 @@ public class ServiceController
 {
 	private static Log logger = LogFactory.getLog(LayerCatalogController.class);
 	
-	private ObjectMapper mapper = new ObjectMapper();
+	@Autowired
+	private ObjectMapper jsonObjectMapper;
 	
 	@Autowired
 	private CouchDAO couchDAO;
@@ -48,12 +49,12 @@ public class ServiceController
 			final HttpHeaders httpHeaders = new HttpHeaders();
 			httpHeaders.setContentType(MediaType.APPLICATION_JSON);
 
-			result = new ResponseEntity<JsonNode>(mapper.readValue("{ \"version\": \"1.0.0\", \"description\": \"The SMK Service API is a restful service providing access to SMK application configurations.\" }", JsonNode.class), httpHeaders, HttpStatus.OK);
+			result = new ResponseEntity<JsonNode>(jsonObjectMapper.readValue("{ \"version\": \"1.0.0\", \"description\": \"The SMK Service API is a restful service providing access to SMK application configurations.\" }", JsonNode.class), httpHeaders, HttpStatus.OK);
 		}
 		catch(Exception e)
 		{
 			logger.error("    ## Error generating top level: " + e.getMessage());
-			result = new ResponseEntity<JsonNode>(mapper.readValue("{ \"status\": \"ERROR\", \"message\": \"" + e.getMessage() + "\" }", JsonNode.class), HttpStatus.BAD_REQUEST);
+			result = new ResponseEntity<JsonNode>(jsonObjectMapper.readValue("{ \"status\": \"ERROR\", \"message\": \"" + e.getMessage() + "\" }", JsonNode.class), HttpStatus.BAD_REQUEST);
 		}
 		
 		logger.info("    Top Level request complete. Response: " + result.getStatusCode().name());
@@ -77,12 +78,12 @@ public class ServiceController
 			
 			String couchStatus = couchDAO != null ? "Service is Available" : "Service Unavailable";
 			
-			result = new ResponseEntity<JsonNode>(mapper.readValue("{ \"serviceStatus\": \"Service is available\", \"couchDBStatus\": \"" + couchStatus + "\" }", JsonNode.class), httpHeaders, HttpStatus.OK);
+			result = new ResponseEntity<JsonNode>(jsonObjectMapper.readValue("{ \"serviceStatus\": \"Service is available\", \"couchDBStatus\": \"" + couchStatus + "\" }", JsonNode.class), httpHeaders, HttpStatus.OK);
 		}
 		catch(Exception e)
 		{
 			logger.error("    ## Error generating health status: " + e.getMessage());
-			result = new ResponseEntity<JsonNode>(mapper.readValue("{ \"status\": \"ERROR\", \"message\": \"" + e.getMessage() + "\" }", JsonNode.class), HttpStatus.BAD_REQUEST);
+			result = new ResponseEntity<JsonNode>(jsonObjectMapper.readValue("{ \"status\": \"ERROR\", \"message\": \"" + e.getMessage() + "\" }", JsonNode.class), HttpStatus.BAD_REQUEST);
 		}
 		
 		logger.info("    Health check completed. Response: " + result.getStatusCode().name());
