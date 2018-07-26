@@ -1,17 +1,24 @@
-FROM tomcat:8-jre8-alpine
+FROM anapsix/alpine-java:jre8
 
-# Set Catalina/Tomcat Home
-ENV TOMCAT_HOME="/usr/local/tomcat"
+RUN apk upgrade --update && \
+    apk add --update curl unzip && \
+    curl -jksSLH "Cookie: oraclelicense=accept-securebackup-cookie" -o /tmp/unlimited_jce_policy.zip "http://download.oracle.com/otn-pub/java/jce/8/jce_policy-8.zip" && \
+    unzip -jo -d ${JAVA_HOME}/jre/lib/security /tmp/unlimited_jce_policy.zip
 
-# APK upgrade, add curl
-RUN apk upgrade --update && apk add --update curl
+ENV TOMCAT_MAJOR=8 \
+    TOMCAT_VERSION=8.5.3 \
+    TOMCAT_HOME=/opt/tomcat \
+    CATALINA_HOME=/opt/tomcat \
+    CATALINA_OUT=/opt/tomcat/logs
 
-# Java memory settings
+RUN curl -jksSL -o /tmp/apache-tomcat.tar.gz http://archive.apache.org/dist/tomcat/tomcat-${TOMCAT_MAJOR}/v${TOMCAT_VERSION}/bin/apache-tomcat-${TOMCAT_VERSION}.tar.gz && \
+    gunzip /tmp/apache-tomcat.tar.gz && \
+    tar -C /opt -xf /tmp/apache-tomcat.tar && \
+    ln -s /opt/apache-tomcat-${TOMCAT_VERSION} ${TOMCAT_HOME}
+
 ADD jvmMemSettings.sh /jvmMemSettings.sh
+RUN chmod +x /jvmMemSettings.sh
 ENTRYPOINT ["/jvmMemSettings.sh"]
-
-# Add a tomcat users config for admin access, if desired
-COPY tomcat-users.xml ${TOMCAT_HOME}/conf/tomcat-users.xml
 
 WORKDIR /tmp
 
@@ -33,12 +40,14 @@ RUN echo "couchdb.admin.password=password" >> ${TOMCAT_HOME}/webapps/smks-api/WE
 
 # add a tomcat user
 RUN adduser -S tomcat
-RUN chown -R tomcat:0 `readlink -f ${TOMCAT_HOME}` &&\
-  chmod -R 770 `readlink -f ${TOMCAT_HOME}` &&\
-  chown -h tomcat:0 ${TOMCAT_HOME}
+RUN chown -R tomcat:0 `readlink -f ${CATALINA_HOME}` &&\
+  chmod -R 770 `readlink -f ${CATALINA_HOME}` &&\
+  chown -h tomcat:0 ${CATALINA_HOME}
 
+# run as tomcat user
 USER tomcat
 
 EXPOSE 8080
+WORKDIR ${CATALINA_HOME}/bin
 
-CMD catalina.sh run
+CMD ./catalina.sh run
