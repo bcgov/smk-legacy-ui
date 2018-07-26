@@ -6,7 +6,8 @@ include.module( 'layer-display', [ 'jquery', 'util', 'event' ], function () {
             id:         null,
             opacity:    1,
             title:      null,
-            isVisible:  true
+            isVisible:  true,
+            isActuallyVisible: null
         }, option )
 
         if ( forceVisible )
@@ -77,14 +78,6 @@ include.module( 'layer-display', [ 'jquery', 'util', 'event' ], function () {
             item.each( itemCb, folderCb, p )
         } )
     }
-
-    LayerDisplay.Folder.prototype.areAllItemsVisible = function () {
-        var vc = this.items.reduce( function ( accum, item ) {
-            return accum + ( item.isVisible ? 1 : 0 )
-        }, 0 )
-// console.log( this.id, vc)
-        return vc == 0 ? false : vc == this.items.length ? true : null
-    }
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
     function createLayerDisplay( layerDisplay, layerCatalog, forceVisible ) {
@@ -106,6 +99,8 @@ include.module( 'layer-display', [ 'jquery', 'util', 'event' ], function () {
     ] )
 
     function LayerDisplayContext( items, layerCatalog ) {
+        var self = this
+
         LayerDisplayContextEvent.prototype.constructor.call( this )
 
         this.root = createLayerDisplay( { 
@@ -118,7 +113,6 @@ include.module( 'layer-display', [ 'jquery', 'util', 'event' ], function () {
 
         var id = this.layerId = {}
         var ids = this.layerIds = []
-        var folderId = this.folderId = {}
 
         this.root.each( 
             function ( item, parents ) {
@@ -129,14 +123,27 @@ include.module( 'layer-display', [ 'jquery', 'util', 'event' ], function () {
                 ids.push( item.layerId )
             }, 
             function ( folder, parents ) {
-                var fId = parents.reduceRight( function ( a, v ) { return a + v.id + '--' }, '' ) + folder.id                
-                if ( fId in folderId )
-                    throw new Error( 'folder id ' + fId + ' is duplicated in layer display' )
+                folder.folderId = parents.slice( 0, parents.length - 1 ).reduceRight( function ( a, v ) { return a + v.id + '--' }, '' ) + folder.id
 
-                folder.id = fId
-                folderId[ fId ] = folder 
+                if ( folder.folderId in id )
+                    throw new Error( 'folder id ' + folder.folderId + ' is duplicated in layer display' )
+
+                id[ folder.folderId ] = [ folder ].concat( parents )
             } 
         )
+
+        this.changedVisibility( function () {
+            self.root.each( 
+                function ( item, parents ) {
+                    item.isActuallyVisible = self.isItemVisible( item.layerId )
+                }, 
+                function ( folder, parents ) {
+                    folder.isActuallyVisible = self.isItemVisible( folder.folderId )
+                } 
+            )
+        } )
+
+        this.changedVisibility()
     }
 
     SMK.TYPE.LayerDisplayContext = LayerDisplayContext
@@ -145,24 +152,15 @@ include.module( 'layer-display', [ 'jquery', 'util', 'event' ], function () {
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
     LayerDisplayContext.prototype.setFolderExpanded = function ( folderId, expanded ) {
-        if ( !( folderId in this.folderId ) )
+        if ( !( folderId in this.layerId ) )
             throw new Error( 'folder ' + folderId + ' not defined' )
 
-        if ( this.folderId[ folderId ].isExpanded == null ) return
+        if ( this.layerId[ folderId ][ 0 ].isExpanded == null ) return
 
-        this.folderId[ folderId ].isExpanded = expanded
+        this.layerId[ folderId ][ 0 ].isExpanded = expanded
     }
 
-    LayerDisplayContext.prototype.setFolderVisible = function ( folderId, visible ) {
-        if ( !( folderId in this.folderId ) )
-            throw new Error( 'folder ' + folderId + ' not defined' )
-
-        this.folderId[ folderId ].isVisible = visible
-
-        this.changedVisibility()        
-    }
-
-    LayerDisplayContext.prototype.isLayerVisible = function ( layerId ) {
+    LayerDisplayContext.prototype.isItemVisible = function ( layerId ) {
         if ( !( layerId in this.layerId ) ) return false
 
         return this.layerId[ layerId ].reduce( function ( accum, ld ) {
@@ -170,9 +168,8 @@ include.module( 'layer-display', [ 'jquery', 'util', 'event' ], function () {
         }, true )
     }
 
-    LayerDisplayContext.prototype.setLayerVisible = function ( layerId, visible ) {
+    LayerDisplayContext.prototype.setItemVisible = function ( layerId, visible ) {
         if ( !( layerId in this.layerId ) ) return 
-        // if ( this.isLayerVisible( layerId ) == !!visible ) return 
 
         var lds = this.layerId[ layerId ]
 
@@ -192,7 +189,7 @@ include.module( 'layer-display', [ 'jquery', 'util', 'event' ], function () {
         var self = this
 
         var vc = this.layerIds.reduce( function ( accum, id ) {
-            return accum + ( self.isLayerVisible( id ) ? 1 : 0 )
+            return accum + ( self.isItemVisible( id ) ? 1 : 0 )
         }, 0 )
 
         return vc == 0 ? false : vc == this.layerIds.length ? true : null

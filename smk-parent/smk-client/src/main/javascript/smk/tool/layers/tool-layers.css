@@ -31,20 +31,6 @@
     opacity: .5;
 }
 
-/* .smk-layers-panel .smk-all-collapse {
-    position: absolute;
-    top: 20px;
-    right: 0px;
-    cursor: pointer;
-}
-
-.smk-layers-panel .smk-all-expand {
-    position: absolute;
-    top: 30px;
-    right: 0px;
-    cursor: pointer;
-} */
-
 .smk-layers-panel .smk-item {
     font-size: 14px;
 }
@@ -53,57 +39,27 @@
     padding-left: 10px;
 }
 
-.smk-layers-panel .smk-body > .smk-folder {
-    /* padding-left: 0; */
-}
-
-.smk-layers-panel .smk-layer-title {
+.smk-layers-panel .smk-folder .smk-item {
     display: flex;
     align-items: center;
     position: relative;
 }
 
-.smk-layers-panel .smk-layer-title .smk-folder-expand {
+.smk-layers-panel .smk-folder .smk-item .smk-folder-expand {
     position: absolute;
     left: -20px;
 }
 
-.smk-layers-panel .smk-layer-title .smk-folder-visibility {
-    /* opacity: .5; */
-    padding: 0;
-    align-self: flex-start;
-}
-
-/* .smk-layers-panel .smk-item.smk-layer-visible .smk-layer-title .smk-folder-visibility {
-    opacity: 1;
-} */
-
-.smk-layers-panel .smk-layer-title .smk-folder-visibility.smk-some-visible {
-    opacity: .5;
-}
-
-.smk-layers-panel .smk-layer-title .smk-layer-visibility {
-    padding: 0;
-    align-self: flex-start;
-}
-
-.smk-layers-panel .smk-layer-title span {
+.smk-layers-panel .smk-folder .smk-item .smk-title {
     display: inline-block;
     margin-left: 5px;
     margin-top: 5px;
     margin-bottom: 5px;
 }
 
-.smk-layers-panel .smk-layer-title span.smk-sub-layer {
+.smk-layers-panel .smk-folder .smk-item .smk-title.smk-obscured {
     font-style: italic;
-}
-
-.smk-layers-panel .smk-folder-expand {
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 20px;
-    cursor: pointer;
+    color: gray;
 }
 
 .smk-layers-panel .smk-layer-info {

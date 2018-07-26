@@ -135,10 +135,8 @@ include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', '
         this.visibleLayer = {}
         this.layerIdPromise = {}
         this.deadViewerLayer = {}
-        // this.layerDisplay = null
-        // this.layerDisplayId = null
-        this.layerDisplayContext = null
 
+        this.layerDisplayContext = null
 
         this.pickHandlers = []
         this.query = {}
@@ -249,9 +247,9 @@ include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', '
         if ( !smk.layers || smk.layers.length == 0 ) return SMK.UTIL.resolved()
 
         var ids = self.layerDisplayContext.layerIds.filter( function ( id ) {
-            var v = self.layerDisplayContext.isLayerVisible( id )
-            self.layerDisplayContext.setLayerVisible( id, false )
-            // self.layerDisplayId[ id ][ 0 ].isVisible = false
+            var v = self.layerDisplayContext.isItemVisible( id )
+            self.layerDisplayContext.setItemVisible( id, false )
+
             return v
         } )
 
@@ -278,18 +276,6 @@ include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', '
     }
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
-    Viewer.prototype.filterLayers = function ( predicate ) {
-        var self = this
-
-        return this.layerIds
-            .filter( function ( id ) {
-                return predicate( self.layerId[ id ] )
-            } )
-            .map( function ( id ) {
-                return self.layerId[ id ]
-            } )
-    }
-
     Viewer.prototype.setLayersVisible = function ( layerIds, visible ) {
         var self = this
 
@@ -298,7 +284,7 @@ include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', '
 
         var madeChange = false
         layerIds.forEach( function ( id ) {
-            if ( self.layerDisplayContext.setLayerVisible( id, visible ) != null )
+            if ( self.layerDisplayContext.setItemVisible( id, visible ) != null )
                 madeChange = true
         } )
 
@@ -321,8 +307,7 @@ include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', '
         var visibleLayers = []
         var merged
         this.layerDisplayContext.layerIds.forEach( function ( id, i ) {
-            // console.log( id,self.isLayerVisible( id ),self.layerId[ id ].isContainer,self.layerId[ id ].config );
-            if ( !self.layerDisplayContext.isLayerVisible( id )  ) return
+            if ( !self.layerDisplayContext.isItemVisible( id )  ) return
 
             var ly = self.layerId[ id ]
             if ( !merged ) {

@@ -8,28 +8,23 @@
                 'smk-expanded': item.isExpanded 
             }"
         >
-            <div class="smk-layer-title">
-                <i class="smk-folder-expand material-icons smk-command smk-icon"
-                    v-if="item.isExpanded != null"
-                    v-bind:title="'Expand ' + item.title + '\n[' + item.id + ']'"
-                    v-on:click="$$emit( 'set-folder-expanded', { id: item.id, expanded: !item.isExpanded } )"
-                >{{ item.isExpanded ? 'arrow_drop_down' : 'arrow_right' }}</i>
+            <i class="smk-folder-expand material-icons smk-command smk-icon"
+                v-if="item.isExpanded != null"
+                v-bind:title="'Expand ' + item.title"
+                v-on:click="$$emit( 'set-folder-expanded', { id: item.folderId, expanded: !item.isExpanded } )"
+            >{{ item.isExpanded ? 'arrow_drop_down' : 'arrow_right' }}</i>
 
-                <i class="smk-folder-visibility material-icons smk-command smk-icon"
-                    v-if="item.items"
-                    v-bind:title="'Toggle visibility of folder ' + item.title + '\n[' + item.id + ']'"
-                    v-on:click="$$emit( 'set-folder-visible', { id: item.id, visible: !item.isVisible } )"
-                    v-bind:class="{ 'smk-some-visible': areAllItemsVisible( item ) == null }"
-                >{{ item.isVisible && areAllItemsVisible( item ) !== false ? 'visibility' : 'visibility_off' }}</i>
+            <i class="smk-visibility material-icons smk-command smk-icon"
+                v-bind:title="'Toggle visibility of \'' + item.title + '\''"
+                v-on:click="$$emit( 'set-item-visible', { id: item.layerId || item.folderId, visible: !item.isVisible } )"
+            >{{ item.isVisible ? 'visibility' : 'visibility_off' }}</i>
 
-                <i class="smk-layer-visibility material-icons smk-command smk-icon"
-                    v-if="item.layerId"
-                    v-bind:title="'Toggle visibility of layer ' + item.title"
-                    v-on:click="$$emit( 'set-layer-visible', { id: item.id, visible: !item.isVisible } )"
-                >{{ item.isVisible ? 'visibility' : 'visibility_off' }}</i>
-
-                <span v-bind:class="[ item.class ]">{{ item.title }}</span>
-            </div>
+            <span class="smk-title"
+                v-bind:title="'ID: ' + ( item.layerId || item.folderId )"
+                v-bind:class="{
+                    'smk-obscured': !item.isActuallyVisible
+                }"
+            >{{ item.title }}</span>
 
             <!-- <div class="smk-layer-info" v-if="legend && item.hasLegend">
                 <div class="smk-legend">
