@@ -84,7 +84,6 @@ public class MapConfiguration extends CouchDbDocument
 			for(Tool tool : mapConfiguration.getTools())
 			{
 				if (tool instanceof About) getTools().add(new About((About)tool));
-				else if (tool instanceof About) getTools().add(new About((About)tool));
 				else if (tool instanceof Attribution) getTools().add(new Attribution((Attribution)tool));
 				else if (tool instanceof BaseMaps) getTools().add(new BaseMaps((BaseMaps)tool));
 				else if (tool instanceof Coordinate) getTools().add(new Coordinate((Coordinate)tool));
@@ -169,7 +168,7 @@ public class MapConfiguration extends CouchDbDocument
 		this.layers = layers;
 	}
 
-
+	@Override
 	public void addInlineAttachment(Attachment a)
 	{
 		super.addInlineAttachment(a);

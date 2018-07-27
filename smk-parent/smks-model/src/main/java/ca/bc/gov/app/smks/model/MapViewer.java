@@ -1,12 +1,16 @@
 package ca.bc.gov.app.smks.model;
 
+import java.io.Serializable;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 @JsonInclude(Include.NON_NULL)
-public class MapViewer
+public class MapViewer implements Serializable 
 {
-	private String type;
+    private static final long serialVersionUID = -5151996772459032477L;
+    
+    private String type;
 	private ViewerLocation location;
 	private String baseMap;
 	private String activeTool;

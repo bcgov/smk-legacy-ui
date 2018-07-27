@@ -45,13 +45,13 @@ public class WebConfig extends WebMvcConfigurerAdapter
 	}
 
 	@Bean
-	public LayerCatalogDAO layerCatalogDao() throws SMKException
+	public LayerCatalogDAO layerCatalogDao()
 	{
 		return new LayerCatalogDAO(env.getProperty("mpcm.rest.url"), env.getProperty("mpcm.arcgis.server"), env.getProperty("mpcm.wms.server"));
 	}
 
 	@Bean
-	public CommonsMultipartResolver multipartResolver() throws SMKException
+	public CommonsMultipartResolver multipartResolver()
 	{
 		CommonsMultipartResolver resolver = new CommonsMultipartResolver();
 		resolver.setMaxUploadSize(new Long(env.getProperty("attachment.max.size")));
@@ -60,7 +60,7 @@ public class WebConfig extends WebMvcConfigurerAdapter
 	}
 
 	@Bean
-	public ObjectMapper jsonObjectMapper() throws SMKException
+	public ObjectMapper jsonObjectMapper()
 	{
 	    ObjectMapper mapper = new ObjectMapper();
 	    mapper.configure(Feature.ALLOW_UNQUOTED_CONTROL_CHARS, true);

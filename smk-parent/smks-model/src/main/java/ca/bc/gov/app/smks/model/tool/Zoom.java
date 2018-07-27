@@ -51,6 +51,11 @@ public class Zoom extends Tool
         return super.equals(other);
     }
     
+    @Override
+    public int hashCode() {
+        return getType().hashCode();
+    }
+    
 	public boolean getMouseWheel() { return mouseWheel; }
 	public void setMouseWheel(boolean mouseWheel) { this.mouseWheel = mouseWheel; }
 

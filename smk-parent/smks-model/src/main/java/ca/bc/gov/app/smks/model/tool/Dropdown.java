@@ -34,4 +34,9 @@ public class Dropdown extends Tool
     public boolean equals( Object other ) {
         return super.equals(other);
     }
+    
+    @Override
+    public int hashCode() {
+        return getType().hashCode();
+    }
 }

@@ -55,6 +55,155 @@ var data = {
 	    _rev: null
 	};
 
+function convertKmlToLayers(fileContents)
+{
+	var documentData = new FormData();
+	documentData.append('file', fileContents);
+	
+	$.ajax
+	({
+		url: serviceUrl + "LayerLibrary/ProcessKML/",
+		type: "post",
+	    data: documentData,
+	    crossDomain: true,
+	    withCredentials: true,
+	    cache: false,
+	    contentType: false,
+	    processData: false,
+        success: function (status)
+        {
+        	status.results.forEach(function(sourceLayer)
+		   	{
+        		var generatedID = fileContents.name.replace(/[^a-z0-9]+/gi, "-").replace(" ", "-") + "-" + sourceLayer.styleUrl.replace(/[^a-z0-9]+/gi, '-').replace(" ", "-").toLowerCase();
+        		var newLayer;
+        		var update = false;
+        		// if a layer exists with the same ID, this should be an update, not a new add?
+        		for(var lyrIdx = 0; lyrIdx < data.layers.length; lyrIdx++)
+    			{
+        			var existingLayer = data.layers[lyrIdx];
+        			if(existingLayer.id == generatedID)
+    				{
+        				update = true;
+        				newLayer = existingLayer;
+        				break;
+    				}
+    			}
+        		
+        		if(update)
+    			{
+        			newLayer.style = sourceLayer.style;
+        			
+        			$("#vectorStrokeOpacity").val(newLayer.style.strokeOpacity);
+        			$("#vectorFillOpacity").val(newLayer.style.fillOpacity);
+        			$("#vectorStrokeWidth").val(newLayer.style.strokeWidth);
+        			$("#vectorStrokeStyle").val(newLayer.style.strokeStyle);
+        			$("#vectorStrokeColor").val(newLayer.style.strokeColor);
+        			$("#vectorFillColor").val(newLayer.style.fillColor);
+        			
+        			if(sourceLayer.markerImage != null)
+        			{
+        				// get the image dimensions and set size/offset accordingly
+        				var img = new Image();
+        			    img.addEventListener("load", function()
+        			    {
+        			        $("#vectorMarkerSizeX").val(parseInt(this.naturalWidth));
+        					$("#vectorMarkerSizeY").val(parseInt(this.naturalHeight));
+        					$("#vectorMarkerOffsetX").val(parseInt(this.naturalWidth / 2));
+        					$("#vectorMarkerOffsetY").val(parseInt(this.naturalHeight / 2));
+
+        					Materialize.updateTextFields();
+        			    });
+        			    
+        			    img.src = sourceLayer.markerImage;
+        			}
+    			}
+        		else
+    			{
+	        		newLayer =
+	        		{
+	        			type: "vector",
+	        			id: generatedID,
+	        		    title: generatedID,
+	        		    isVisible: true,
+	        		    isQueryable: true,
+	        		    opacity: 0.65,
+	        		    attributes: [],
+	        		    useRaw: true,
+	        			useClustering: false,
+	        			useHeatmap: false,
+	        			dataUrl: null,
+	        			style: sourceLayer.style
+	        		};
+
+	        		data.layers.push(newLayer);
+	        		
+	        		// add to layer tree
+	        		var lyrNode =
+	        		{
+	        			title: newLayer.title,
+	        			folder: false,
+	        			expanded: false,
+	        			data: newLayer,
+	        			children: []
+	        		};
+
+	        		var tree = $('#layer-tree').fancytree('getTree');
+	        		var layerSource = tree.getRootNode().children;
+	        		layerSource.push(lyrNode);
+	        		tree.reload(layerSource);
+    			}
+        		
+        		// create blob from geojson
+				var blob = new Blob([ JSON.stringify(sourceLayer.geojson) ], {encoding:"UTF-8",type:"application/json"});
+        		
+    			unsavedAttachments.push(
+    			{
+    				type: "vector",
+    				layer: newLayer,
+    				contents: blob
+    			});
+        			
+    			// style marker
+    			if(sourceLayer.markerImage != null)
+				{
+    				newLayer.style.markerUrl = "@" +  newLayer.id + "-marker";
+    				
+    				// set marker dimensions
+    				var imgTag = new Image();
+    				imgTag.addEventListener("load", function()
+    			    {
+    			    	newLayer.style.markerSize[0] = parseInt(this.naturalWidth);
+    			    	newLayer.style.markerSize[1] = parseInt(this.naturalHeight);
+    			    	newLayer.style.markerOffset[0] = parseInt(this.naturalWidth / 2);
+    			    	newLayer.style.markerOffset[1] = parseInt(this.naturalHeight / 2);
+    			    });
+    			    
+    				imgTag.src = sourceLayer.markerImage;
+    			    
+        			unsavedAttachments.push(
+        			{
+        				type: "marker_upload",
+        				layer: newLayer,
+        				contents: sourceLayer.markerImage
+        			});
+				}
+		   	});
+        	
+        	document.getElementById("layersDisplayForm").reset();
+        	$('#kmlUploadButton').show();
+        	$('#kmlUploadProgressBar').hide();
+        	$('#kmlUploadProgressComplete').show();
+        	//$('#kmlUploadModal').modal('close');
+        },
+        error: function(status)
+        {
+        	Materialize.toast("There was an error attempting to read the supplied KML File: " + status.responseText, 4000);
+        	document.getElementById("layersDisplayForm").reset();
+        	$('#kmlUploadModal').modal('close');
+        }
+	});	
+}
+
 function parseKmlLayerStyle(fileText, fileContents)
 {
 	var parsedLayer = omnivore.kml.parse(fileText);
@@ -71,151 +220,7 @@ function parseKmlLayerStyle(fileText, fileContents)
     	$('#kmlUploadProgressComplete').hide();
 		$('#kmlUploadModal').modal('open');
 		
-		var documentData = new FormData();
-		documentData.append('file', fileContents);
-		
-		$.ajax
-		({
-			url: serviceUrl + "LayerLibrary/ProcessKML/",
-			type: "post",
-		    data: documentData,
-		    crossDomain: true,
-		    withCredentials: true,
-		    cache: false,
-		    contentType: false,
-		    processData: false,
-	        success: function (status)
-	        {
-	        	status.results.forEach(function(sourceLayer)
-    		   	{
-	        		var generatedID = fileContents.name.replace(/[^a-z0-9]+/gi, "-").replace(" ", "-") + "-" + sourceLayer.styleUrl.replace(/[^a-z0-9]+/gi, '-').replace(" ", "-").toLowerCase();
-	        		var newLayer;
-	        		var update = false;
-	        		// if a layer exists with the same ID, this should be an update, not a new add?
-	        		for(var lyrIdx = 0; lyrIdx < data.layers.length; lyrIdx++)
-        			{
-	        			var existingLayer = data.layers[lyrIdx];
-	        			if(existingLayer.id == generatedID)
-        				{
-	        				update = true;
-	        				newLayer = existingLayer;
-	        				break;
-        				}
-        			}
-	        		
-	        		if(update)
-        			{
-	        			newLayer.style = sourceLayer.style;
-	        			
-	        			$("#vectorStrokeOpacity").val(newLayer.style.strokeOpacity);
-	        			$("#vectorFillOpacity").val(newLayer.style.fillOpacity);
-	        			$("#vectorStrokeWidth").val(newLayer.style.strokeWidth);
-	        			$("#vectorStrokeStyle").val(newLayer.style.strokeStyle);
-	        			$("#vectorStrokeColor").val(newLayer.style.strokeColor);
-	        			$("#vectorFillColor").val(newLayer.style.fillColor);
-	        			
-	        			if(sourceLayer.markerImage != null)
-	        			{
-	        				// get the image dimensions and set size/offset accordingly
-	        				var img = new Image();
-	        			    img.addEventListener("load", function()
-	        			    {
-	        			        $("#vectorMarkerSizeX").val(parseInt(this.naturalWidth));
-	        					$("#vectorMarkerSizeY").val(parseInt(this.naturalHeight));
-	        					$("#vectorMarkerOffsetX").val(parseInt(this.naturalWidth / 2));
-	        					$("#vectorMarkerOffsetY").val(parseInt(this.naturalHeight / 2));
-
-	        					Materialize.updateTextFields();
-	        			    });
-	        			    
-	        			    img.src = sourceLayer.markerImage;
-	        			}
-        			}
-	        		else
-        			{
-		        		newLayer =
-		        		{
-		        			type: "vector",
-		        			id: generatedID,
-		        		    title: generatedID,
-		        		    isVisible: true,
-		        		    isQueryable: true,
-		        		    opacity: 0.65,
-		        		    attributes: [],
-		        		    useRaw: true,
-		        			useClustering: false,
-		        			useHeatmap: false,
-		        			dataUrl: null,
-		        			style: sourceLayer.style
-		        		};
-	
-		        		data.layers.push(newLayer);
-		        		
-		        		// add to layer tree
-		        		var lyrNode =
-		        		{
-		        			title: newLayer.title,
-		        			folder: false,
-		        			expanded: false,
-		        			data: newLayer,
-		        			children: []
-		        		};
-	
-		        		var tree = $('#layer-tree').fancytree('getTree');
-		        		var layerSource = tree.getRootNode().children;
-		        		layerSource.push(lyrNode);
-		        		tree.reload(layerSource);
-        			}
-	        		
-	        		// create blob from geojson
-    				var blob = new Blob([ JSON.stringify(sourceLayer.geojson) ], {encoding:"UTF-8",type:"application/json"});
-	        		
-        			unsavedAttachments.push(
-        			{
-        				type: "vector",
-        				layer: newLayer,
-        				contents: blob
-        			});
-	        			
-        			// style marker
-        			if(sourceLayer.markerImage != null)
-    				{
-        				newLayer.style.markerUrl = "@" +  newLayer.id + "-marker";
-        				
-        				// set marker dimensions
-        				var imgTag = new Image();
-        				imgTag.addEventListener("load", function()
-        			    {
-        			    	newLayer.style.markerSize[0] = parseInt(this.naturalWidth);
-        			    	newLayer.style.markerSize[1] = parseInt(this.naturalHeight);
-        			    	newLayer.style.markerOffset[0] = parseInt(this.naturalWidth / 2);
-        			    	newLayer.style.markerOffset[1] = parseInt(this.naturalHeight / 2);
-        			    });
-        			    
-        				imgTag.src = sourceLayer.markerImage;
-        			    
-	        			unsavedAttachments.push(
-	        			{
-	        				type: "marker_upload",
-	        				layer: newLayer,
-	        				contents: sourceLayer.markerImage
-	        			});
-    				}
-    		   	});
-	        	
-	        	document.getElementById("layersDisplayForm").reset();
-	        	$('#kmlUploadButton').show();
-	        	$('#kmlUploadProgressBar').hide();
-	        	$('#kmlUploadProgressComplete').show();
-	        	//$('#kmlUploadModal').modal('close');
-	        },
-	        error: function(status)
-	        {
-	        	Materialize.toast("There was an error attempting to read the supplied KML File: " + status.responseText, 4000);
-	        	document.getElementById("layersDisplayForm").reset();
-	        	$('#kmlUploadModal').modal('close');
-	        }
-		});
+		convertKmlToLayers(fileContents);
 	}
 	else
 	{
@@ -2252,9 +2257,9 @@ function uploadVectorLayer()
 	
 		reader.readAsText(fileContents);
 	}
-	if(fileContents.type == "application/vnd.google-earth.kmz")
+	else if(fileContents.type == "application/vnd.google-earth.kmz")
 	{
-		// if it's a KMZ file, it must go to the server for processing.
+		convertKmlToLayers(fileContents);
 	}
 	else
 	{

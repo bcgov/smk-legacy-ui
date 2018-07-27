@@ -33,7 +33,6 @@ import org.geotools.referencing.CRS;
 import org.opengis.feature.Feature;
 import org.opengis.feature.GeometryAttribute;
 import org.opengis.feature.Property;
-import org.opengis.geometry.MismatchedDimensionException;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
@@ -165,15 +164,7 @@ public class DocumentConverterFactory
 	    }
         
         // Now that the json object is built, convert it to bytes and send back
-        byte[] result = null;
-        
-        if(convertedJson != null)
-        {
-        	String resultText = convertedJson.toString();
-        	result = resultText.getBytes("UTF-8");
-        }
-        
-		return result;
+		return convertedJson.toString().getBytes("UTF-8");
 	}
 	
 	private static void processKmlFeatureNode(Element feature, ArrayNode featureArray)
@@ -200,7 +191,7 @@ public class DocumentConverterFactory
         else
         {
             // process a single geometry
-            processKmlSingleGeometry(geometryObject, geoms, feature);
+            processKmlSingleGeometry(geometryObject, feature);
         }
         
         // fetch DESCRIPTION attribute
@@ -264,8 +255,10 @@ public class DocumentConverterFactory
         }
 	}
 	
-	private static void processKmlSingleGeometry(ObjectNode geometryObject, NodeList geoms, Element feature)
+	private static void processKmlSingleGeometry(ObjectNode geometryObject, Element feature)
 	{
+	    NodeList geoms = null;
+	    
 	    geoms = feature.getElementsByTagName(POINT);
         if(geoms != null && geoms.getLength() > 0) processKmlGeometryObject(geometryObject, geoms, POINT);
         
@@ -287,9 +280,8 @@ public class DocumentConverterFactory
             {
                 Element innerFeature = (Element) geoms.item(geomIndex); 
                 ObjectNode innerGeomObject = multiGeoms.addObject();
-                NodeList innerGeoms = null;
                 
-                processKmlSingleGeometry(innerGeomObject, innerGeoms, innerFeature);
+                processKmlSingleGeometry(innerGeomObject, innerFeature);
             }
         }
 	}
@@ -467,58 +459,53 @@ public class DocumentConverterFactory
     		}
 	    }
 	    
-	    logger.debug("    Opening shapefile for processing...");
-	    
-	    Map<String, String> connect = new HashMap<String, String>();
-	    connect.put("url", shapefile.toURI().toString());
-
-	    DataStore dataStore = DataStoreFinder.getDataStore(connect);
-	    String[] typeNames = dataStore.getTypeNames();
-	    String typeName = typeNames[0];
-
-	    logger.debug("    Reading content " + typeName);
-
-	    FeatureSource featureSource = dataStore.getFeatureSource(typeName);
-	    FeatureCollection collection = featureSource.getFeatures();
-	    FeatureIterator iterator = collection.features();
-
-	    CoordinateReferenceSystem sourceCRS = CRS.parseWKT(WGS84_WKT);
-	    
-	    // create a JSON object to hold our data
-	    ObjectNode convertedJson = JsonNodeFactory.instance.objectNode();
-		convertedJson.put(TYPE, FEATURE_COLLECTION);
-		ArrayNode featureArray = convertedJson.putArray(FEATURES);
-	    
-    	while (iterator.hasNext()) 
-    	{
-    		Feature feature = iterator.next();
-    		processShapeFeature(feature, featureArray, dataFile, projectionFile, sourceCRS);
-        }
-    
-        iterator.close();
-
-	    // cleanup
-        shapefile.delete();
-	    projectionFile.delete();
-	    dataFile.delete();
-	    shapeshx.delete();
-	    
-	    Files.delete(tempShapePath.toPath());
-	    if(!shapeImportTemp.delete())
+	 // create a JSON object to hold our data
+        ObjectNode convertedJson = JsonNodeFactory.instance.objectNode();
+        convertedJson.put(TYPE, FEATURE_COLLECTION);
+        ArrayNode featureArray = convertedJson.putArray(FEATURES);
+        
+	    if(shapefile != null)
 	    {
-            logger.error("    temp shp import file cleanup failed...");
-        }
+    	    logger.debug("    Opening shapefile for processing...");
+    	    
+    	    Map<String, String> connect = new HashMap<String, String>();
+    	    connect.put("url", shapefile.toURI().toString());
+    
+    	    DataStore dataStore = DataStoreFinder.getDataStore(connect);
+    	    String[] typeNames = dataStore.getTypeNames();
+    	    String typeName = typeNames[0];
+    
+    	    logger.debug("    Reading content " + typeName);
+    
+    	    FeatureSource featureSource = dataStore.getFeatureSource(typeName);
+    	    FeatureCollection collection = featureSource.getFeatures();
+    	    FeatureIterator iterator = collection.features();
+    
+    	    CoordinateReferenceSystem sourceCRS = CRS.parseWKT(WGS84_WKT);
+    	    
+        	while (iterator.hasNext()) 
+        	{
+        		Feature feature = iterator.next();
+        		processShapeFeature(feature, featureArray, dataFile, projectionFile, sourceCRS);
+            }
+        
+            iterator.close();
+    
+    	    // cleanup
+            if(shapefile.delete()) logger.debug("    Deleted temp shape file");
+    	    if(projectionFile != null && projectionFile.delete()) logger.debug("    Deleted temp projection file");
+    	    if(dataFile != null && dataFile.delete()) logger.debug("    Deleted temp data file");
+    	    if(shapeshx != null && shapeshx.delete()) logger.debug("    Deleted temp shape shx file");
+    	    
+    	    Files.delete(tempShapePath.toPath());
+    	    if(!shapeImportTemp.delete())
+    	    {
+                logger.error("    temp shp import file cleanup failed...");
+            }
+	    }
 	    
 	    // Now that the json object is built, convert it to bytes and send back
-        byte[] result = null;
-        
-        if(convertedJson != null)
-        {
-        	String resultText = convertedJson.toString();
-        	result = resultText.getBytes("UTF-8");
-        }
-        
-		return result;
+		return convertedJson.toString().getBytes("UTF-8");
 	}
 	
 	private static void processShapeFeature(Feature feature, ArrayNode featureArray, File dataFile, File projectionFile, CoordinateReferenceSystem sourceCRS) throws IOException, FactoryException, TransformException
@@ -650,7 +637,7 @@ public class DocumentConverterFactory
 		addCoords(coords, targetGeometry.getCoordinates());
 	}
 	
-	private static void processShapePoint(Point sourceGeometry, MathTransform transform, ObjectNode geometryObject) throws MismatchedDimensionException, TransformException
+	private static void processShapePoint(Point sourceGeometry, MathTransform transform, ObjectNode geometryObject) throws TransformException
 	{
 		Point targetGeometry = (Point)JTS.transform(sourceGeometry, transform);
 		
@@ -717,9 +704,7 @@ public class DocumentConverterFactory
         IOUtils.copy(docStream, os);
         
         os.close();
-        os = null;
         docStream.close();
-        docStream = null;
         
         ZipFile zipFile = new ZipFile(kmzImportTemp);
         
@@ -789,7 +774,7 @@ public class DocumentConverterFactory
         
         NodeList styleNodes = doc.getElementsByTagName("Style");
         
-        if (styleNodes != null)
+        if (styleNodes != null && styleNodes.getLength() > 0)
         {
             for (int styleIndex = 0; styleIndex < styleNodes.getLength(); styleIndex++)
             {
@@ -798,6 +783,25 @@ public class DocumentConverterFactory
                     processMultiStyleKml((Element)styleNodes.item(styleIndex), layerFeaturesArray, sourceJsonNode);
                 }
             }
+        }
+        else
+        {
+            ObjectNode layer = layerFeaturesArray.addObject();
+            layer.put(STYLE_URL, ""); // this will be an ID, so make it readable
+            
+            // empty style
+            LayerStyle styleInfo = new LayerStyle();
+            styleInfo.setStrokeOpacity(1.0);
+            styleInfo.setFillOpacity(0.65);
+            styleInfo.setStrokeStyle("1");
+            styleInfo.setStrokeWidth(1.0);
+            styleInfo.setFillColor("#fc9905");
+            styleInfo.setStrokeColor("#fc9905");
+            
+            layer.putPOJO("style", styleInfo);
+            layer.set("geojson", sourceJsonNode);
+            
+            layer.putNull("markerImage");
         }
         
         return resultsJson;

@@ -60,7 +60,7 @@ public class LayerCatalogDAO
 		this.wmsUri = wmsUri;
 	}
 
-	public List<MPCMInfoLayer> createMpcmLayers() throws SMKException, SAXException, IOException, ParserConfigurationException
+	public List<MPCMInfoLayer> createMpcmLayers() throws SAXException, IOException, ParserConfigurationException
 	{
 		logger.debug(" >> createMpcmLayers()");
 		List<MPCMInfoLayer> catalogNodes = new ArrayList<MPCMInfoLayer>();
@@ -458,18 +458,7 @@ public class LayerCatalogDAO
 
         if (metadata != null && metadata.getChildNodes() != null)
         {
-            for (int s = 0; s < metadata.getChildNodes().getLength(); s++)
-            {
-                if (metadata.getChildNodes().item(s).getNodeType() == Node.ELEMENT_NODE)
-                {
-                    Element metadataElement = (Element) metadata.getChildNodes().item(s);
-                    if(metadataElement.getNodeName().equals(ONLINERESOURCE))
-                    {
-                        layer.setMetadataUrl(metadataElement.getAttributes().getNamedItem(XLINK_HREF).getNodeValue());
-                        break;
-                    }
-                }
-            }
+            processWmsMetadata(metadata, layer);
         }
 
         NodeList layerStyles = layerElement.getElementsByTagName("Style");
@@ -505,6 +494,22 @@ public class LayerCatalogDAO
                         String url = styleNodeElement.getAttributes().getNamedItem(XLINK_HREF).getNodeValue();
                         style.setLegendUrl(url);
                     }
+                }
+            }
+        }
+	}
+	
+	private void processWmsMetadata(Node metadata, WMSInfoLayer layer)
+	{
+	    for (int s = 0; s < metadata.getChildNodes().getLength(); s++)
+        {
+            if (metadata.getChildNodes().item(s).getNodeType() == Node.ELEMENT_NODE)
+            {
+                Element metadataElement = (Element) metadata.getChildNodes().item(s);
+                if(metadataElement.getNodeName().equals(ONLINERESOURCE))
+                {
+                    layer.setMetadataUrl(metadataElement.getAttributes().getNamedItem(XLINK_HREF).getNodeValue());
+                    break;
                 }
             }
         }

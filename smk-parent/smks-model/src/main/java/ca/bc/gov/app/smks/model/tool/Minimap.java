@@ -44,6 +44,11 @@ public class Minimap extends Tool
         return super.equals(other);
     }
     
+    @Override
+    public int hashCode() {
+        return getType().hashCode();
+    }
+    
 	public String getBaseMap() { return baseMap; }
 	public void setBaseMap( String baseMap ) { this.baseMap = baseMap; }
 }

@@ -3,6 +3,7 @@ package ca.bc.gov.app.smks.model;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
@@ -16,9 +17,11 @@ import ca.bc.gov.app.smks.model.tool.Scale;
 import ca.bc.gov.app.smks.model.tool.Zoom;
 
 @JsonInclude(Include.NON_NULL)
-public class MapTools
+public class MapTools implements Serializable 
 {
-	public enum Tool { measure };
+    private static final long serialVersionUID = -6479452094517424523L;
+
+    public enum Tool { MEASURE }
 	
     private boolean measure;
     private Scale scale;

@@ -1,5 +1,6 @@
 package ca.bc.gov.app.smks.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,9 +10,11 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 @JsonIgnoreProperties({})
 @JsonInclude(Include.NON_NULL)
-public class MPCMInfoLayer 
+public class MPCMInfoLayer implements Serializable  
 {
-	private int id;
+    private static final long serialVersionUID = 660251431583697516L;
+    
+    private int id;
 	private int mpcmId;
 	private String label;
 	private String layerUrl;

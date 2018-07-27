@@ -20,8 +20,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -36,22 +34,21 @@ import ca.bc.gov.app.smks.model.WMSInfoLayer;
 @RestController
 @RequestMapping("/LayerLibrary")
 @PropertySource("classpath:application.properties")
-public class LayerCatalogController 
+public class LayerCatalogService 
 {
-	private static Log logger = LogFactory.getLog(LayerCatalogController.class);	
+	private static Log logger = LogFactory.getLog(LayerCatalogService.class);	
 
 	@Autowired
     private ObjectMapper jsonObjectMapper;
 	
     private static final String SUCCESS = "    Success!";
-    private static final String ERR_MESSAGE = "{ \"status\": \"ERROR\", \"message\": \"";
     
 	@Autowired
 	private LayerCatalogDAO layerCatalogDao;
 	
 	@GetMapping(value = "/wms/")
 	@ResponseBody
-	public ResponseEntity<JsonNode> getWmsConfigurations(@RequestParam(value="url", required=true) String url) throws JsonParseException, JsonMappingException, IOException 
+	public ResponseEntity<JsonNode> getWmsConfigurations(@RequestParam(value="url", required=true) String url) throws IOException 
 	{
 		logger.debug(" >> getWmsConfigurations()");
 		ResponseEntity<JsonNode> result = null;
@@ -69,7 +66,7 @@ public class LayerCatalogController
 			catch (MalformedURLException e) 
 			{
 				logger.error("    ## Error querying WMS Server. URL is invalid: " + e.getMessage());
-				result = new ResponseEntity<JsonNode>(jsonObjectMapper.readValue(((ERR_MESSAGE + e.getMessage() + "\" }").replaceAll("\\r\\n|\\r|\\n", " ")).replaceAll("\\r\\n|\\r|\\n", " "), JsonNode.class), HttpStatus.BAD_REQUEST);
+				result = new ResponseEntity<JsonNode>(getErrorMessageAsJson(e), HttpStatus.BAD_REQUEST);
 			}
 			catch (Exception e) 
 			{
@@ -89,7 +86,7 @@ public class LayerCatalogController
 	
 	@GetMapping(value = "/wms/{id}")
 	@ResponseBody
-	public ResponseEntity<JsonNode> getWmsLayer(@PathVariable String id) throws JsonParseException, JsonMappingException, IOException 
+	public ResponseEntity<JsonNode> getWmsLayer(@PathVariable String id) throws IOException 
 	{
 		logger.debug(" >> getWmsLayer()");
 		ResponseEntity<JsonNode> result = null;
@@ -127,7 +124,7 @@ public class LayerCatalogController
 	
 	@GetMapping(value = "/")
 	@ResponseBody
-	public ResponseEntity<JsonNode> getLayers() throws JsonParseException, JsonMappingException, IOException 
+	public ResponseEntity<JsonNode> getLayers() throws IOException 
 	{
 		logger.debug(" >> getLayers()");
 		ResponseEntity<JsonNode> result = null;
@@ -152,7 +149,7 @@ public class LayerCatalogController
 	
 	@GetMapping(value = "/{id}")
 	@ResponseBody
-	public ResponseEntity<JsonNode> getLayer(@PathVariable String id) throws JsonParseException, JsonMappingException, IOException 
+	public ResponseEntity<JsonNode> getLayer(@PathVariable String id) throws IOException 
 	{
 		logger.debug(" >> getLayer()");
 		ResponseEntity<JsonNode> result = null;
@@ -190,7 +187,7 @@ public class LayerCatalogController
 	
     @GetMapping(value = "/ImageToBase64")
     @ResponseBody
-    public ResponseEntity<JsonNode> getImageAsBase64(@RequestParam("url") String imageUrl) throws JsonParseException, JsonMappingException, IOException
+    public ResponseEntity<JsonNode> getImageAsBase64(@RequestParam("url") String imageUrl) throws IOException
     {
         logger.debug(" >> getImageAsBase64()");
         ResponseEntity<JsonNode> result = null;
@@ -216,7 +213,7 @@ public class LayerCatalogController
     
     @PostMapping(value = "/ProcessKML", headers=("content-type=multipart/form-data"))
     @ResponseBody
-    public ResponseEntity<JsonNode> processKML(@RequestParam("file") MultipartFile request) throws JsonParseException, JsonMappingException, IOException
+    public ResponseEntity<JsonNode> processKML(@RequestParam("file") MultipartFile request) throws IOException
     {
         logger.debug(" >> processKML()");
         ResponseEntity<JsonNode> result = null;
@@ -264,7 +261,7 @@ public class LayerCatalogController
         return result;
     }
     
-    private JsonNode getErrorMessageAsJson(Exception e) throws JsonParseException, JsonMappingException, IOException
+    private JsonNode getErrorMessageAsJson(Exception e) throws IOException
     {
         return jsonObjectMapper.readValue(("{ \"status\": \"ERROR\", \"message\": \"" + e.getMessage() + "\" }").replaceAll("\\r\\n|\\r|\\n", " "), JsonNode.class);
     }

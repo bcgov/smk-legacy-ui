@@ -1,12 +1,16 @@
 package ca.bc.gov.app.smks.model;
 
+import java.io.Serializable;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 @JsonInclude(Include.NON_NULL)
-public class MapSurround
+public class MapSurround implements Serializable 
 {
-	private String type;
+    private static final long serialVersionUID = 4179616701339603291L;
+    
+    private String type;
 	private String title;
 	private String imageSrc;
 

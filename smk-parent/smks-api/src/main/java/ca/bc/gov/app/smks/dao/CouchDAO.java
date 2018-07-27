@@ -62,7 +62,7 @@ public class CouchDAO
 		logger.info("Initialization of CouchDB DAO complete.");
 	}
 
-	private void createSMKDB() throws SMKException
+	private void createSMKDB()
 	{
 		// create the database
 		logger.info("     Build Database...");
@@ -249,22 +249,19 @@ public class CouchDAO
 				String addedRowId = addedRow.getKey();
 				int addedRowRevision = addedRow.getValueAsInt();
 
-				if(addedRowId.equals(id))
-				{
-				    if(addedRowRevision != revision)
-				    {
-    					if(addedRowRevision > revision)
-    					{
-    						addedConfig = true;
-    					}
-    					else if(addedRowRevision < revision)
-    					{
-    						rowToExclude = addedRow;
-    					}
-    					
-    					break;
-				    }
-				}
+				if(addedRowId.equals(id) && addedRowRevision != revision)
+			    {
+					if(addedRowRevision > revision)
+					{
+						addedConfig = true;
+					}
+					else
+					{
+						rowToExclude = addedRow;
+					}
+					
+					break;
+			    }
 			}
 
 			if(!addedConfig) rowsToParse.add(row);

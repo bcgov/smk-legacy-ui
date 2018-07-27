@@ -1,11 +1,14 @@
 package ca.bc.gov.app.smks.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class WMSInfoLayer
+public class WMSInfoLayer implements Serializable 
 {
-	private String title;
+    private static final long serialVersionUID = -6343787694319107349L;
+    
+    private String title;
 	private String name;
 	private String serviceUrl;
 	private String wmsVersion;
