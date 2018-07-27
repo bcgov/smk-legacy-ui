@@ -154,9 +154,30 @@ include.module( 'smk-map', [ 'jquery', 'util' ], function () {
                             delete m.type
                             Object.assign( base, m )
                         }
+                        else if ( merge.type === 'layers' ) {
+                            mergeLayerDisplays( base, merge )
+                            Object.assign( base, merge )
+                        }
                         else {
                             Object.assign( base, merge )
                         }
+                    }
+                } )
+            }
+
+            function mergeLayerDisplays( base, merge ) {
+                return mergeCollection( base, merge, 'display', {
+                    findFn: function ( merge ) {
+                        return function ( base ) {
+                            if ( base.layerId ) return merge.layerId == base.layerId
+                            if ( base.folderId ) return merge.folderId == base.folderId
+                            if ( base.groupId ) return merge.groupId == base.groupId
+                        }
+                    },
+                    mergeFn: function ( base, merge ) {
+                        mergeLayerDisplays( base, merge )
+
+                        Object.assign( base, merge )
                     }
                 } )
             }

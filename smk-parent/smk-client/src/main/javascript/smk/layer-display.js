@@ -163,10 +163,19 @@ include.module( 'layer-display', [ 'jquery', 'util', 'event' ], function () {
         this.itemId = {}
         this.layerIds = []
 
+        var c = 1000
         this.root.each( 
             function ( item, parents ) {
                 if ( item.id in self.itemId ) {
-                    throw new Error( item.id + ' is duplicated in layer display' )
+                    if ( item.isLayer ) {
+                        console.warn( 'Layer "' + item.id + '" is duplicated in layer display' )
+                        item.isEnabled = false
+                    }
+                    else {
+                        console.warn( ( item.isFolder ? 'Folder "' : 'Group "' ) + item.id + '" is duplicated in layer display' )
+                        while ( ( item.id + '=' + c ) in self.itemId ) c =+ 1
+                        item.id = item.id + '=' + c
+                    }
                 }
 
                 self.itemId[ item.id ] = [ item ].concat( parents )
