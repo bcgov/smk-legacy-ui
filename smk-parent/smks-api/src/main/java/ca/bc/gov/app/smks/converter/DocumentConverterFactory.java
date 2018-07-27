@@ -481,12 +481,10 @@ public class DocumentConverterFactory
     	    FeatureCollection collection = featureSource.getFeatures();
     	    FeatureIterator iterator = collection.features();
     
-    	    CoordinateReferenceSystem sourceCRS = CRS.parseWKT(WGS84_WKT);
-    	    
         	while (iterator.hasNext()) 
         	{
         		Feature feature = iterator.next();
-        		processShapeFeature(feature, featureArray, dataFile, projectionFile, sourceCRS);
+        		processShapeFeature(feature, featureArray, dataFile, projectionFile);
             }
         
             iterator.close();
@@ -511,7 +509,7 @@ public class DocumentConverterFactory
         
 	}
 	
-	private static void processShapeFeature(Feature feature, ArrayNode featureArray, File dataFile, File projectionFile, CoordinateReferenceSystem sourceCRS) throws IOException, FactoryException, TransformException
+	private static void processShapeFeature(Feature feature, ArrayNode featureArray, File dataFile, File projectionFile) throws IOException, FactoryException, TransformException
 	{
 	    GeometryAttribute sourceGeometry = feature.getDefaultGeometryProperty();
 	    
@@ -521,8 +519,7 @@ public class DocumentConverterFactory
         ObjectNode geometryObject = featureJson.putObject("geometry");
         
         CoordinateReferenceSystem targetCRS = CRS.parseWKT(WGS84_WKT);
-
-        setProjection(projectionFile, sourceCRS);
+        CoordinateReferenceSystem sourceCRS = setProjection(projectionFile);
 
         MathTransform transform = CRS.findMathTransform(sourceCRS, targetCRS, false); // set leniancy to true for smoother handling?
         
@@ -586,19 +583,35 @@ public class DocumentConverterFactory
         processShapeFeatureProperties(feature, dataFile, jsonProperties);
 	}
 	
-	   private static void setProjection(File projectionFile, CoordinateReferenceSystem sourceCRS) throws IOException, FactoryException
-	    {
-	        if(projectionFile != null)
-	        {
-	            String projectionString = new String(Files.readAllBytes(Paths.get(projectionFile.getPath()))); 
-	            sourceCRS = CRS.parseWKT(projectionString);
-	            
-	            if(!sourceCRS.getIdentifiers().isEmpty() && sourceCRS.getIdentifiers().iterator().next().getCode().equals("3005"))
-	            {
-	                sourceCRS = CRS.parseWKT(BCALBERS_WKT);
-	            }
-	        }
-	    }
+    private static CoordinateReferenceSystem setProjection(File projectionFile) throws FactoryException
+    {
+        CoordinateReferenceSystem defaultCrs = CRS.parseWKT(WGS84_WKT);
+        
+        try
+        {
+            if(projectionFile != null)
+            {
+                String projectionString = new String(Files.readAllBytes(Paths.get(projectionFile.getPath()))); 
+                CoordinateReferenceSystem parsedCRS = CRS.parseWKT(projectionString);
+                
+                if(!parsedCRS.getIdentifiers().isEmpty() && parsedCRS.getIdentifiers().iterator().next().getCode().equals("3005"))
+                {
+                    // replace with our default BC Albers
+                    return CRS.parseWKT(BCALBERS_WKT);
+                }
+                else
+                {
+                    return parsedCRS;
+                }
+            }
+        }
+        catch(Exception e)
+        {
+            logger.error("Could not locate or translate provided projection. Using WGS84 default...");
+        }
+        
+        return defaultCrs;
+    }
 	   
 	private static void processShapeFeatureProperties(Feature feature, File dataFile, ObjectNode jsonProperties)
 	{

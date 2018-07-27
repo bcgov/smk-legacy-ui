@@ -33,9 +33,9 @@ public class PublishedMapConfigServiceController
 {
     private Log logger = LogFactory.getLog(PublishedMapConfigServiceController.class);
 
-    private final String MAP_CONFIG_NOT_FOUND_MSG = "Map Configuration ID not found.";
-    private final String SUCCESS = "    Success!";
-    private final String EXPORT_ATTACHMENT_NAME = "export";
+    private static final String MAP_CONFIG_NOT_FOUND_MSG = "Map Configuration ID not found.";
+    private static final String SUCCESS = "    Success!";
+    private static final String EXPORT_ATTACHMENT_NAME = "export";
     
     public PublishedMapConfigServiceController()
     {
@@ -204,7 +204,7 @@ public class PublishedMapConfigServiceController
         tempPath.mkdirs();
         
         File exportTemplateZip = new File(tempLocationPath + "export.war");
-        if(!exportTemplateZip.createNewFile()) logger.debug("Error creating temp export war");;
+        if(!exportTemplateZip.createNewFile()) logger.debug("Error creating temp export war");
         
         logger.debug("    Copying zip to temp file '" + exportTemplateZip.getName() + "'...");
         FileOutputStream os = new FileOutputStream(exportTemplateZip);
@@ -221,7 +221,7 @@ public class PublishedMapConfigServiceController
         
         // create config json
         File mapConfigTempFile = new File(tempLocationPath + "map-config.json");
-        if(!mapConfigTempFile.createNewFile()) logger.debug("Error creating temp config file");;
+        if(!mapConfigTempFile.createNewFile()) logger.debug("Error creating temp config file");
         
         jsonObjectMapper.writeValue(mapConfigTempFile, resource);
         

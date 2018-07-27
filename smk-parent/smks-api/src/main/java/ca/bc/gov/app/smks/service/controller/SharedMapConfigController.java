@@ -12,6 +12,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import ca.bc.gov.app.smks.SMKException;
 import ca.bc.gov.app.smks.dao.CouchDAO;
 import ca.bc.gov.app.smks.model.MapConfiguration;
@@ -26,9 +29,22 @@ public class SharedMapConfigController
     @Autowired
     private CouchDAO couchDAO;
 
+    @Autowired
+    private ObjectMapper jsonObjectMapper;
+    
     public SharedMapConfigController()
     {
         // empty constructor
+    }
+    
+    public ResponseEntity<JsonNode> handleError(Exception e) throws IOException
+    {
+        return new ResponseEntity<JsonNode>(getErrorMessageAsJson(e), HttpStatus.BAD_REQUEST);
+    }
+    
+    public JsonNode getErrorMessageAsJson(Exception e) throws IOException
+    {
+        return jsonObjectMapper.readValue(("{ \"status\": \"ERROR\", \"message\": \"" + e.getMessage() + "\" }").replaceAll("\\r\\n|\\r|\\n", " "), JsonNode.class);
     }
     
     public ResponseEntity<byte[]> handleGetAttachment(MapConfiguration resource, String attachmentId) throws SMKException, IOException
