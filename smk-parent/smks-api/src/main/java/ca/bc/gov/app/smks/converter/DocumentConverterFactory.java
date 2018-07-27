@@ -33,7 +33,6 @@ import org.geotools.referencing.CRS;
 import org.opengis.feature.Feature;
 import org.opengis.feature.GeometryAttribute;
 import org.opengis.feature.Property;
-import org.opengis.geometry.MismatchedDimensionException;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
@@ -775,7 +774,7 @@ public class DocumentConverterFactory
         
         NodeList styleNodes = doc.getElementsByTagName("Style");
         
-        if (styleNodes != null)
+        if (styleNodes != null && styleNodes.getLength() > 0)
         {
             for (int styleIndex = 0; styleIndex < styleNodes.getLength(); styleIndex++)
             {
@@ -784,6 +783,25 @@ public class DocumentConverterFactory
                     processMultiStyleKml((Element)styleNodes.item(styleIndex), layerFeaturesArray, sourceJsonNode);
                 }
             }
+        }
+        else
+        {
+            ObjectNode layer = layerFeaturesArray.addObject();
+            layer.put(STYLE_URL, ""); // this will be an ID, so make it readable
+            
+            // empty style
+            LayerStyle styleInfo = new LayerStyle();
+            styleInfo.setStrokeOpacity(1.0);
+            styleInfo.setFillOpacity(0.65);
+            styleInfo.setStrokeStyle("1");
+            styleInfo.setStrokeWidth(1.0);
+            styleInfo.setFillColor("#fc9905");
+            styleInfo.setStrokeColor("#fc9905");
+            
+            layer.putPOJO("style", styleInfo);
+            layer.set("geojson", sourceJsonNode);
+            
+            layer.putNull("markerImage");
         }
         
         return resultsJson;
