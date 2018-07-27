@@ -24,7 +24,7 @@
 
 .smk-theme-gamma .smk-command:hover {
     border: 2px solid white;
-    outline: 1px solid rgb(126, 126, 126);;
+    outline: 1px solid rgb(126, 126, 126);
 }
 
 .smk-theme-gamma .smk-command.smk-disabled {
