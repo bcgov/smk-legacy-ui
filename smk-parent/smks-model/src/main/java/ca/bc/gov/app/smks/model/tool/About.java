@@ -34,11 +34,6 @@ public class About extends Tool
         return "Provide the contents of about panel.";
     }
 
-	@Override
-    public boolean isConfigured() {
-        return true;
-    }
-
     @Override
     public boolean equals( Object other ) {
         return super.equals(other);
@@ -47,6 +42,11 @@ public class About extends Tool
     @Override
     public int hashCode() {
         return getType().hashCode();
+    }
+    
+	@Override
+    public boolean isConfigured() {
+        return true;
     }
     
     public String getContent() {

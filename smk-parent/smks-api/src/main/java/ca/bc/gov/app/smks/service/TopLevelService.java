@@ -52,7 +52,7 @@ public class TopLevelService
 		catch(Exception e)
 		{
 			logger.error("    ## Error generating top level: " + e.getMessage());
-			result = new ResponseEntity<JsonNode>(getErrorMessageAsJson(e), HttpStatus.BAD_REQUEST);
+			result = handleError(e);
 		}
 		
 		logger.info("    Top Level request complete. Response: " + result.getStatusCode().name());
@@ -81,13 +81,18 @@ public class TopLevelService
 		catch(Exception e)
 		{
 			logger.error("    ## Error generating health status: " + e.getMessage());
-			result = new ResponseEntity<JsonNode>(getErrorMessageAsJson(e), HttpStatus.BAD_REQUEST);
+			result = handleError(e);
 		}
 		
 		logger.info("    Health check completed. Response: " + result.getStatusCode().name());
 		logger.debug(" << healthCheck()");
 		return result;
 	}
+	
+	private ResponseEntity<JsonNode> handleError(Exception e) throws IOException
+    {
+        return new ResponseEntity<JsonNode>(getErrorMessageAsJson(e), HttpStatus.BAD_REQUEST);
+    }
 	
 	private JsonNode getErrorMessageAsJson(Exception e) throws IOException
 	{

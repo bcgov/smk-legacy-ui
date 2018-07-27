@@ -492,20 +492,23 @@ public class DocumentConverterFactory
             iterator.close();
     
     	    // cleanup
-            if(shapefile.delete()) logger.debug("    Deleted temp shape file");
-    	    if(projectionFile != null && projectionFile.delete()) logger.debug("    Deleted temp projection file");
-    	    if(dataFile != null && dataFile.delete()) logger.debug("    Deleted temp data file");
-    	    if(shapeshx != null && shapeshx.delete()) logger.debug("    Deleted temp shape shx file");
+            cleanupShapefileParts(shapefile, projectionFile, dataFile, shapeshx, shapeImportTemp);
     	    
     	    Files.delete(tempShapePath.toPath());
-    	    if(!shapeImportTemp.delete())
-    	    {
-                logger.error("    temp shp import file cleanup failed...");
-            }
 	    }
 	    
 	    // Now that the json object is built, convert it to bytes and send back
 		return convertedJson.toString().getBytes("UTF-8");
+	}
+	
+	private static void cleanupShapefileParts(File shapefile, File projectionFile, File dataFile, File shapeshx, File shapeImportTemp)
+	{
+        if(shapefile.delete()) logger.error("    Deleted temp shape file");
+        if(projectionFile != null && projectionFile.delete()) logger.error("    Deleted temp projection file");
+        if(dataFile != null && dataFile.delete()) logger.error("    Deleted temp data file");
+        if(shapeshx != null && shapeshx.delete()) logger.error("    Deleted temp shape shx file");
+        if(!shapeImportTemp.delete()) logger.error("    temp shp import file cleanup failed...");
+        
 	}
 	
 	private static void processShapeFeature(Feature feature, ArrayNode featureArray, File dataFile, File projectionFile, CoordinateReferenceSystem sourceCRS) throws IOException, FactoryException, TransformException
@@ -519,16 +522,7 @@ public class DocumentConverterFactory
         
         CoordinateReferenceSystem targetCRS = CRS.parseWKT(WGS84_WKT);
 
-        if(projectionFile != null)
-        {
-            String projectionString = new String(Files.readAllBytes(Paths.get(projectionFile.getPath()))); 
-            sourceCRS = CRS.parseWKT(projectionString);
-            
-            if(!sourceCRS.getIdentifiers().isEmpty() && sourceCRS.getIdentifiers().iterator().next().getCode().equals("3005"))
-            {
-                sourceCRS = CRS.parseWKT(BCALBERS_WKT);
-            }
-        }
+        setProjection(projectionFile, sourceCRS);
 
         MathTransform transform = CRS.findMathTransform(sourceCRS, targetCRS, false); // set leniancy to true for smoother handling?
         
@@ -592,6 +586,20 @@ public class DocumentConverterFactory
         processShapeFeatureProperties(feature, dataFile, jsonProperties);
 	}
 	
+	   private static void setProjection(File projectionFile, CoordinateReferenceSystem sourceCRS) throws IOException, FactoryException
+	    {
+	        if(projectionFile != null)
+	        {
+	            String projectionString = new String(Files.readAllBytes(Paths.get(projectionFile.getPath()))); 
+	            sourceCRS = CRS.parseWKT(projectionString);
+	            
+	            if(!sourceCRS.getIdentifiers().isEmpty() && sourceCRS.getIdentifiers().iterator().next().getCode().equals("3005"))
+	            {
+	                sourceCRS = CRS.parseWKT(BCALBERS_WKT);
+	            }
+	        }
+	    }
+	   
 	private static void processShapeFeatureProperties(Feature feature, File dataFile, ObjectNode jsonProperties)
 	{
 	    if(feature.getProperties() != null && dataFile != null)

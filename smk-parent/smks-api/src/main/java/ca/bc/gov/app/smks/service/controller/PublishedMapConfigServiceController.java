@@ -17,11 +17,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ektorp.Attachment;
 import org.ektorp.AttachmentInputStream;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import ca.bc.gov.app.smks.SMKException;
-import ca.bc.gov.app.smks.StaticContextAccessor;
 import ca.bc.gov.app.smks.dao.CouchDAO;
 import ca.bc.gov.app.smks.model.MapConfigInfo;
 import ca.bc.gov.app.smks.model.MapConfiguration;
@@ -31,23 +31,24 @@ import net.lingala.zip4j.model.ZipParameters;
 
 public class PublishedMapConfigServiceController
 {
-    private static Log logger = LogFactory.getLog(PublishedMapConfigServiceController.class);
+    private Log logger = LogFactory.getLog(PublishedMapConfigServiceController.class);
 
-    private static final String MAP_CONFIG_NOT_FOUND_MSG = "Map Configuration ID not found.";
-    private static final String SUCCESS = "    Success!";
-    private static final String EXPORT_ATTACHMENT_NAME = "export";
+    private final String MAP_CONFIG_NOT_FOUND_MSG = "Map Configuration ID not found.";
+    private final String SUCCESS = "    Success!";
+    private final String EXPORT_ATTACHMENT_NAME = "export";
     
-    public static CouchDAO couchDAO()
+    public PublishedMapConfigServiceController()
     {
-        return StaticContextAccessor.getBean(CouchDAO.class);
+        // empty private constructor
     }
     
-    public static ObjectMapper jsonObjectMapper()
-    {
-        return StaticContextAccessor.getBean(ObjectMapper.class);
-    }
+    @Autowired
+    private CouchDAO couchDAO;
     
-    public static List<MapConfigInfo> getAllPublishedMapConfigurationSnippets()
+    @Autowired
+    private ObjectMapper jsonObjectMapper;
+    
+    public List<MapConfigInfo> getAllPublishedMapConfigurationSnippets()
     {
         logger.debug("    Querying for all published Map Resources...");
         List<MapConfiguration> resources = getAllPublishedMapConfigurations();
@@ -62,32 +63,32 @@ public class PublishedMapConfigServiceController
         return configSnippets;
     }
     
-    public static List<MapConfiguration> getAllPublishedMapConfigurations()
+    public List<MapConfiguration> getAllPublishedMapConfigurations()
     {
-        return couchDAO().getPublishedConfigs();
+        return couchDAO.getPublishedConfigs();
     }
     
-    public static MapConfiguration getPublishedMapConfiguration(String id)
+    public MapConfiguration getPublishedMapConfiguration(String id)
     {
-        return couchDAO().getPublishedConfig(id);
+        return couchDAO.getPublishedConfig(id);
     }
     
-    public static void deletePublishedMapConfiguration(String id) throws SMKException
+    public void deletePublishedMapConfiguration(String id) throws SMKException
     {
         logger.debug("    Un-publishing a published Map Configuration...");
-        MapConfiguration resource = couchDAO().getPublishedConfig(id);
+        MapConfiguration resource = couchDAO.getPublishedConfig(id);
 
         if(resource == null) throw new SMKException(MAP_CONFIG_NOT_FOUND_MSG);
         
         // we don't actually delete a map configuration that's been published
         // instead, we just set it to un-published. It can be deleted the old fashioned way.
         resource.setPublished(false);
-        couchDAO().updateResource(resource);
+        couchDAO.updateResource(resource);
 
         logger.debug(SUCCESS);
     }
     
-    public static List<String> getPublishedMapConfigAttachmentSnippets(String configId) throws SMKException
+    public List<String> getPublishedMapConfigAttachmentSnippets(String configId) throws SMKException
     {
         logger.debug("    Fetching all Published Attachments for " + configId + "...");
 
@@ -108,11 +109,11 @@ public class PublishedMapConfigServiceController
         return attachments;
     }
     
-    public static void publishMapConfiguration(String id) throws IOException, SMKException
+    public void publishMapConfiguration(String id) throws IOException, SMKException
     {
         logger.debug("    Publishing Map Configuration " + id + "...");
         
-        MapConfiguration resource = couchDAO().getMapConfiguration(id);
+        MapConfiguration resource = couchDAO.getMapConfiguration(id);
 
         if(resource == null) throw new SMKException(MAP_CONFIG_NOT_FOUND_MSG);
         if(resource.isPublished()) throw new SMKException("The latest version of this map configuration has already been published");
@@ -129,7 +130,7 @@ public class PublishedMapConfigServiceController
             for(String key : resource.getAttachments().keySet())
             {
                 // get the attachment byte stream
-                AttachmentInputStream attachmentStream = couchDAO().getAttachment(resource, key);
+                AttachmentInputStream attachmentStream = couchDAO.getAttachment(resource, key);
                 byte[] media = IOUtils.toByteArray(attachmentStream);
 
                 // clone it and add it to the new doc
@@ -141,26 +142,26 @@ public class PublishedMapConfigServiceController
         }
 
         // "un" publish the previous version, if it exists
-        MapConfiguration existinPublishedResource = couchDAO().getPublishedConfig(id);
+        MapConfiguration existinPublishedResource = couchDAO.getPublishedConfig(id);
         if(existinPublishedResource != null)
         {
             existinPublishedResource.setPublished(false);
-            couchDAO().updateResource(existinPublishedResource);
+            couchDAO.updateResource(existinPublishedResource);
         }
         
         // set the publish flag on the current resource commit
         resource.setPublished(true);
-        couchDAO().updateResource(resource);
+        couchDAO.updateResource(resource);
         // create the cloned new editable version
-        couchDAO().createResource(clone);
+        couchDAO.createResource(clone);
 
         logger.debug(SUCCESS);
     }
     
-    public static AttachmentInputStream processConfigExport(String id) throws SMKException, IOException, ZipException
+    public AttachmentInputStream processConfigExport(String id) throws SMKException, IOException, ZipException
     {
         logger.debug("    Fetching a published Map Configuration...");
-        MapConfiguration resource = couchDAO().getPublishedConfig(id);
+        MapConfiguration resource = couchDAO.getPublishedConfig(id);
 
         if(resource == null) throw new SMKException(MAP_CONFIG_NOT_FOUND_MSG);
         
@@ -170,7 +171,7 @@ public class PublishedMapConfigServiceController
         try
         {
             logger.debug("    Load export attachment");
-            attachment = couchDAO().getAttachment(resource, EXPORT_ATTACHMENT_NAME);
+            attachment = couchDAO.getAttachment(resource, EXPORT_ATTACHMENT_NAME);
             
             if(attachment == null) throw new SMKException("Attachment Not Found");
         }
@@ -183,7 +184,7 @@ public class PublishedMapConfigServiceController
         return attachment;
     }
     
-    private static AttachmentInputStream createExportFile(MapConfiguration resource, String id) throws SMKException, IOException, ZipException
+    private AttachmentInputStream createExportFile(MapConfiguration resource, String id) throws SMKException, IOException, ZipException
     {
         // Failed to fetch export
         AttachmentInputStream result = null;
@@ -203,7 +204,7 @@ public class PublishedMapConfigServiceController
         tempPath.mkdirs();
         
         File exportTemplateZip = new File(tempLocationPath + "export.war");
-        exportTemplateZip.createNewFile();
+        if(!exportTemplateZip.createNewFile()) logger.debug("Error creating temp export war");;
         
         logger.debug("    Copying zip to temp file '" + exportTemplateZip.getName() + "'...");
         FileOutputStream os = new FileOutputStream(exportTemplateZip);
@@ -220,9 +221,9 @@ public class PublishedMapConfigServiceController
         
         // create config json
         File mapConfigTempFile = new File(tempLocationPath + "map-config.json");
-        mapConfigTempFile.createNewFile();
+        if(!mapConfigTempFile.createNewFile()) logger.debug("Error creating temp config file");;
         
-        jsonObjectMapper().writeValue(mapConfigTempFile, resource);
+        jsonObjectMapper.writeValue(mapConfigTempFile, resource);
         
         zipFile.addFile(mapConfigTempFile, params);
         
@@ -248,15 +249,15 @@ public class PublishedMapConfigServiceController
             exportStream = new FileInputStream(exportableZip);
             
             //add zip to published document as an attachment file called "export"
-            resource = couchDAO().getPublishedConfig(id);
+            resource = couchDAO.getPublishedConfig(id);
             Attachment newAttachment = new Attachment(EXPORT_ATTACHMENT_NAME, Base64.encodeBase64String(IOUtils.toByteArray(exportStream)), "application/octet-stream");
             resource.addInlineAttachment(newAttachment);
 
             // Commit the changes and reload the resource and the attachment, then submit the export file back to the caller
-            couchDAO().updateResource(resource);
-            resource = couchDAO().getPublishedConfig(id);
+            couchDAO.updateResource(resource);
+            resource = couchDAO.getPublishedConfig(id);
             
-            result = couchDAO().getAttachment(resource, EXPORT_ATTACHMENT_NAME);
+            result = couchDAO.getAttachment(resource, EXPORT_ATTACHMENT_NAME);
         }
         catch(Exception ex)
         {
@@ -270,6 +271,18 @@ public class PublishedMapConfigServiceController
             exportStream = null;
             zipFile = null;
 
+            cleanupTempZips(exportTemplateZip, mapConfigTempFile, exportableZip, tempPath);
+            
+            tempPath = null;   
+        }
+        
+        return result;
+    }
+    
+    private void cleanupTempZips(File exportTemplateZip, File mapConfigTempFile, File exportableZip, File tempPath)
+    {
+        try
+        {
             if(!exportTemplateZip.delete())
             {
                 logger.debug("    Failed to delete export template zip file...");
@@ -280,7 +293,7 @@ public class PublishedMapConfigServiceController
                 logger.debug("    Failed to delete temp map config file...");
             }
             
-            if(!exportableZip.delete())
+            if(exportableZip != null && !exportableZip.delete())
             {
                 logger.debug("    Failed to delete export zip file...");
             }
@@ -289,14 +302,14 @@ public class PublishedMapConfigServiceController
             {
                 logger.debug("    Failed to delete temp paths...");
             }
-            
-            tempPath = null;   
         }
-        
-        return result;
+        catch(SecurityException sx)
+        {
+            logger.error("Unable to delete temporary zip files due to permissions lock.");
+        }
     }
     
-    private static void processExportAttachments(String tempLocationPath, MapConfiguration resource, String smkConfigDocumentNames, ZipFile zipFile, ZipParameters params) throws IOException, ZipException
+    private void processExportAttachments(String tempLocationPath, MapConfiguration resource, String smkConfigDocumentNames, ZipFile zipFile, ZipParameters params) throws IOException, ZipException
     {
         File tempAttchPath = new File(tempLocationPath + "attachments" + File.separator);
         tempAttchPath.mkdirs();
@@ -304,7 +317,7 @@ public class PublishedMapConfigServiceController
         
         for(String key : resource.getAttachments().keySet())
         {
-            AttachmentInputStream attch = couchDAO().getAttachment(resource, key);
+            AttachmentInputStream attch = couchDAO.getAttachment(resource, key);
             byte[] data = IOUtils.toByteArray(attch);
             
             if(data != null)
@@ -312,15 +325,11 @@ public class PublishedMapConfigServiceController
                 InputStream dataStream = new ByteArrayInputStream(data);
 
                 String contentType = attch.getContentType();
-                String postfix = "";
+                String postfix = "json";
                 
-                if(contentType.equals("image/gif")) postfix = "gif";
-                else if(contentType.equals("image/jpg")) postfix = "jpg";
-                else if(contentType.equals("image/jpeg")) postfix = "jpg";
-                else if(contentType.equals("image/bmp")) postfix = "bmp";
-                else if(contentType.equals("image/png")) postfix = "png";
+                if(contentType.equals("image/jpeg")) postfix = "jpg";
+                else if(contentType.startsWith("image/")) postfix = contentType.split("/")[1];
                 else if(contentType.equals("application/vnd.google-earth.kml+xml")) postfix = "kml";
-                else postfix = "json";
                 
                 File attachmentFile = new File(tempAttchPath.getPath() + File.separator + key + "." + postfix);
                 if(!attachmentFile.createNewFile())
@@ -334,9 +343,7 @@ public class PublishedMapConfigServiceController
                 IOUtils.copy(dataStream, attchFileStream);
                 
                 dataStream.close();
-                dataStream = null;
                 attchFileStream.close();
-                attchFileStream = null;
                 
                 smkConfigDocumentNames += attachmentFile.getName() + ",";
             }

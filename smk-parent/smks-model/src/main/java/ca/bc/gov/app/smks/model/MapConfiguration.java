@@ -83,25 +83,7 @@ public class MapConfiguration extends CouchDbDocument
 		{
 			for(Tool tool : mapConfiguration.getTools())
 			{
-				if (tool instanceof About) getTools().add(new About((About)tool));
-				else if (tool instanceof Attribution) getTools().add(new Attribution((Attribution)tool));
-				else if (tool instanceof BaseMaps) getTools().add(new BaseMaps((BaseMaps)tool));
-				else if (tool instanceof Coordinate) getTools().add(new Coordinate((Coordinate)tool));
-				else if (tool instanceof Directions) getTools().add(new Directions((Directions)tool));
-				else if (tool instanceof Dropdown) getTools().add(new Dropdown((Dropdown)tool));
-				else if (tool instanceof Identify) getTools().add(new Identify((Identify)tool));
-				else if (tool instanceof Layers) getTools().add(new Layers((Layers)tool));
-				else if (tool instanceof Location) getTools().add(new Location((Location)tool));
-				else if (tool instanceof Markup) getTools().add(new Markup((Markup)tool));
-				else if (tool instanceof Measure) getTools().add(new Measure((Measure)tool));
-				else if (tool instanceof Menu) getTools().add(new Menu((Menu)tool));
-				else if (tool instanceof Minimap) getTools().add(new Minimap((Minimap)tool));
-				else if (tool instanceof Pan) getTools().add(new Pan((Pan)tool));
-				else if (tool instanceof Query) getTools().add(new Query((Query)tool));
-				else if (tool instanceof Scale) getTools().add(new Scale((Scale)tool));
-				else if (tool instanceof Search) getTools().add(new Search((Search)tool));
-				else if (tool instanceof Select) getTools().add(new Select((Select)tool));
-				else if (tool instanceof Zoom) getTools().add(new Zoom((Zoom)tool));
+			    cloneTool(tool);
 			}
 		}
 
@@ -116,6 +98,30 @@ public class MapConfiguration extends CouchDbDocument
 		}
 	}
 
+	// required due to sonarqube requirement to not use clone?
+	private void cloneTool(Tool tool)
+	{
+	    if (tool instanceof About) getTools().add(new About((About)tool));
+        else if (tool instanceof Attribution) getTools().add(new Attribution((Attribution)tool));
+        else if (tool instanceof BaseMaps) getTools().add(new BaseMaps((BaseMaps)tool));
+        else if (tool instanceof Coordinate) getTools().add(new Coordinate((Coordinate)tool));
+        else if (tool instanceof Directions) getTools().add(new Directions((Directions)tool));
+        else if (tool instanceof Dropdown) getTools().add(new Dropdown((Dropdown)tool));
+        else if (tool instanceof Identify) getTools().add(new Identify((Identify)tool));
+        else if (tool instanceof Layers) getTools().add(new Layers((Layers)tool));
+        else if (tool instanceof Location) getTools().add(new Location((Location)tool));
+        else if (tool instanceof Markup) getTools().add(new Markup((Markup)tool));
+        else if (tool instanceof Measure) getTools().add(new Measure((Measure)tool));
+        else if (tool instanceof Menu) getTools().add(new Menu((Menu)tool));
+        else if (tool instanceof Minimap) getTools().add(new Minimap((Minimap)tool));
+        else if (tool instanceof Pan) getTools().add(new Pan((Pan)tool));
+        else if (tool instanceof Query) getTools().add(new Query((Query)tool));
+        else if (tool instanceof Scale) getTools().add(new Scale((Scale)tool));
+        else if (tool instanceof Search) getTools().add(new Search((Search)tool));
+        else if (tool instanceof Select) getTools().add(new Select((Select)tool));
+        else if (tool instanceof Zoom) getTools().add(new Zoom((Zoom)tool));
+	}
+	
 	public String getLmfId() { return lmfId; }
 	public void setLmfId(String lmfId) { this.lmfId = lmfId; }
 

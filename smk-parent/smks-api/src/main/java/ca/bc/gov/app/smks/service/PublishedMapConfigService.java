@@ -30,6 +30,7 @@ import ca.bc.gov.app.smks.dao.CouchDAO;
 import ca.bc.gov.app.smks.model.MapConfigInfo;
 import ca.bc.gov.app.smks.model.MapConfiguration;
 import ca.bc.gov.app.smks.service.controller.PublishedMapConfigServiceController;
+import ca.bc.gov.app.smks.service.controller.SharedMapConfigController;
 
 @CrossOrigin
 @RestController
@@ -39,6 +40,12 @@ public class PublishedMapConfigService
 {
 	private static Log logger = LogFactory.getLog(PublishedMapConfigService.class);
 
+	@Autowired
+    private PublishedMapConfigServiceController publishedMapConfigServiceController;
+	
+	@Autowired
+	private SharedMapConfigController sharedMapConfigController;
+	
 	@Autowired
     private ObjectMapper jsonObjectMapper;
 	
@@ -58,13 +65,13 @@ public class PublishedMapConfigService
 
 		try
 		{
-			List<MapConfigInfo> configSnippets = PublishedMapConfigServiceController.getAllPublishedMapConfigurationSnippets();
+			List<MapConfigInfo> configSnippets = publishedMapConfigServiceController.getAllPublishedMapConfigurationSnippets();
 			result = new ResponseEntity<JsonNode>(jsonObjectMapper.convertValue(configSnippets, JsonNode.class), HttpStatus.OK);
 		}
 		catch (Exception e)
 		{
 			logger.error("    ## Error querying Map Config Resources: " + e.getMessage());
-			result = new ResponseEntity<JsonNode>(getErrorMessageAsJson(e), HttpStatus.BAD_REQUEST);
+			result = handleError(e);
 		}
 
 		logger.info("    Get All Map Configurations completed. Response: " + result.getStatusCode().name());
@@ -81,13 +88,13 @@ public class PublishedMapConfigService
 
 		try
 		{
-			PublishedMapConfigServiceController.publishMapConfiguration(id);
+			publishedMapConfigServiceController.publishMapConfiguration(id);
 			result = new ResponseEntity<JsonNode>(jsonObjectMapper.readValue("{ \"status:\" \"Success\", \"id\": \"" + id + "\" }", JsonNode.class), HttpStatus.CREATED);
 		}
 		catch (Exception e)
 		{
 			logger.error("    ## Error publishing Map Configuration resources " + e.getMessage());
-			result = new ResponseEntity<JsonNode>(getErrorMessageAsJson(e), HttpStatus.BAD_REQUEST);
+			result = handleError(e);
 		}
 
 		logger.info("   Published Map Configuration completed. Response: " + result.getStatusCode().name());
@@ -105,7 +112,7 @@ public class PublishedMapConfigService
 		try
 		{
 			logger.debug("    Fetching a published Map Configuration...");
-			MapConfiguration resource = PublishedMapConfigServiceController.getPublishedMapConfiguration(id);
+			MapConfiguration resource = publishedMapConfigServiceController.getPublishedMapConfiguration(id);
 
 			if(resource == null) throw new SMKException(MAP_CONFIG_NOT_FOUND_MSG);
 			
@@ -115,7 +122,7 @@ public class PublishedMapConfigService
 		catch (Exception e)
 		{
 			logger.error("    ## Error fetching map configuration: " + e.getMessage());
-			result = new ResponseEntity<JsonNode>(getErrorMessageAsJson(e), HttpStatus.BAD_REQUEST);
+			result = handleError(e);
 		}
 
 		logger.info("    Fetch published Map Configuration completed. Response: " + result.getStatusCode().name());
@@ -132,14 +139,14 @@ public class PublishedMapConfigService
 
 		try
 		{
-		    PublishedMapConfigServiceController.deletePublishedMapConfiguration(id);
+		    publishedMapConfigServiceController.deletePublishedMapConfiguration(id);
 			result = new ResponseEntity<JsonNode>(jsonObjectMapper.readValue(SUCCESS_MESSAGE, JsonNode.class), HttpStatus.OK);
 
 		}
 		catch (Exception e)
 		{
 			logger.error("    ## Error un publishing map configuration: " + e.getMessage());
-			result = new ResponseEntity<JsonNode>(getErrorMessageAsJson(e), HttpStatus.BAD_REQUEST);
+			result = handleError(e);
 		}
 
 		logger.info("    Delete/Un-Publish published Map Configuration completed. Response: " + result.getStatusCode().name());
@@ -156,13 +163,13 @@ public class PublishedMapConfigService
 
 		try
 		{
-			List<String> attachments = PublishedMapConfigServiceController.getPublishedMapConfigAttachmentSnippets(configId);
+			List<String> attachments = publishedMapConfigServiceController.getPublishedMapConfigAttachmentSnippets(configId);
 			result = new ResponseEntity<JsonNode>(jsonObjectMapper.convertValue(attachments, JsonNode.class), HttpStatus.OK);
 		}
 		catch (Exception e)
 		{
 			logger.error("    ## Error fetching all attachment resource: " + e.getMessage());
-			result = new ResponseEntity<JsonNode>(getErrorMessageAsJson(e), HttpStatus.BAD_REQUEST);
+			result = handleError(e);
 		}
 
 		logger.info("    Get All Attachments completed. Response: " + result.getStatusCode().name());
@@ -179,30 +186,8 @@ public class PublishedMapConfigService
 
 		try
 		{
-			logger.debug("    Fetching an Attachment...");
-
 			MapConfiguration resource = couchDAO.getPublishedConfig(configId);
-
-			if(resource != null)
-			{
-				AttachmentInputStream attachment = couchDAO.getAttachment(resource, attachmentId);
-				byte[] media = IOUtils.toByteArray(attachment);
-
-				final HttpHeaders httpHeaders= new HttpHeaders();
-				MediaType contentType = MediaType.TEXT_PLAIN;
-
-				if(attachment.getContentType() != null && attachment.getContentType().length() > 0)
-				{
-					String[] contentTypeVals = attachment.getContentType().split("/");
-					contentType = new MediaType(contentTypeVals[0], contentTypeVals[1]);
-				}
-
-			    httpHeaders.setContentType(contentType);
-
-				logger.debug(SUCCESS);
-				result = new ResponseEntity<byte[]>(media, httpHeaders, HttpStatus.OK);
-			}
-			else throw new SMKException(MAP_CONFIG_NOT_FOUND_MSG);
+			result = sharedMapConfigController.handleGetAttachment(resource, attachmentId);
 		}
 		catch (Exception e)
 		{
@@ -227,7 +212,7 @@ public class PublishedMapConfigService
 		try
 		{
 			logger.debug(SUCCESS);
-			AttachmentInputStream attachment = PublishedMapConfigServiceController.processConfigExport(id);
+			AttachmentInputStream attachment = publishedMapConfigServiceController.processConfigExport(id);
 			
 			if(attachment == null) throw new SMKException("Export not found and could not be created.");
 			
@@ -258,6 +243,11 @@ public class PublishedMapConfigService
 		return result;
 	}
 	
+    private ResponseEntity<JsonNode> handleError(Exception e) throws IOException
+    {
+        return new ResponseEntity<JsonNode>(getErrorMessageAsJson(e), HttpStatus.BAD_REQUEST);
+    }
+    
     private JsonNode getErrorMessageAsJson(Exception e) throws IOException
     {
         return jsonObjectMapper.readValue(("{ \"status\": \"ERROR\", \"message\": \"" + e.getMessage() + "\" }").replaceAll("\\r\\n|\\r|\\n", " "), JsonNode.class);
