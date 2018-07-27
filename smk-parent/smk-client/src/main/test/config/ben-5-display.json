@@ -1,0 +1,73 @@
+{
+    "tools": [
+        {
+            "type": "layers",
+            "display": [
+                { 
+                    "folderId": "folder1",
+                    "title": "Railway Track Line",
+                    "isVisible": true,
+                    "isExpanded": false,
+                    "items": [                
+                        { "layerId": "pub:WHSE_BASEMAPPING.GBA_RAILWAY_TRACKS_SP-Railway_Tracks" },
+                        { "layerId": "pub:WHSE_BASEMAPPING.GBA_RAILWAY_TRACKS_SP-4756" },
+                        { "layerId": "pub:WHSE_BASEMAPPING.GBA_RAILWAY_TRACKS_SP-4790" },
+                        { "layerId": "pub:WHSE_BASEMAPPING.GBA_RAILWAY_TRACKS_SP-5234" },
+                        { "layerId": "pub:WHSE_BASEMAPPING.GBA_RAILWAY_TRACKS_SP-5235" },
+                        { "layerId": "pub:WHSE_BASEMAPPING.GBA_RAILWAY_TRACKS_SP-6631" }
+                    ]
+                },
+                { "layerId": "pub:WHSE_BASEMAPPING.TRIM_WATER_LINES-3345" },
+                { 
+                    "groupId": "group1",
+                    "title": "All FTEN",
+                    "isVisible": true,
+                    "items": [                
+                        { "layerId": "pub:WHSE_FOREST_TENURE.FTEN_MAP_NOTATN_POLY_SVW-2904_2905" },
+                        { "layerId": "pub:WHSE_FOREST_TENURE.FTEN_RECREATION_POLY_SVW-3213_3214" }
+                    ]
+                },
+                { 
+                    "groupId": "group2",
+                    "title": "Mixed",
+                    "isVisible": true,
+                    "items": [                
+                        { "layerId": "pub:WHSE_IMAGERY_AND_BASE_MAPS.DRP_BCTC_TRANSMISSION_LINES_SP-4395" },
+                        { "layerId": "3214" }
+                    ]
+                },
+                { 
+                    "groupId": "group3",
+                    "title": "Nested Group",
+                    "isVisible": false,
+                    "items": [                
+                        { "layerId": "4395" },
+                        { "layerId": "4054" },
+                        { "layerId": "750" },
+                        { 
+                            "groupId": "group2",
+                            "title": "Nested Group",
+                            "isVisible": false,
+                            "items": [                
+                                { "layerId": "5907" },
+                                { "layerId": "1714" },
+                                { "layerId": "2176" },
+                                { 
+                                    "folderId": "group1",
+                                    "title": "Nested Group",
+                                    "isVisible": false,
+                                    "items": [                
+                                        { "layerId": "2178" },
+                                        { "layerId": "2905" },
+                                        { "layerId": "6863" },
+                                        { "layerId": "413" }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

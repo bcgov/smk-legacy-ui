@@ -4,10 +4,11 @@ include.module( 'layer-display', [ 'jquery', 'util', 'event' ], function () {
     function LayerDisplay( option, forceVisible ) {
         Object.assign( this, {
             id:         null,
-            opacity:    1,
+            // opacity:    1,
             title:      null,
             isVisible:  true,
             isActuallyVisible: null,
+            isEnabled:  true,
             inFilter:   true,
             showLegend: false,
             legends:    null
@@ -21,22 +22,30 @@ include.module( 'layer-display', [ 'jquery', 'util', 'event' ], function () {
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
     LayerDisplay.Layer = function ( option, layerCatalog, forceVisible ) {
-        if ( !( option.layerId in layerCatalog ) )
-            throw new Error( 'layer id "' + option.layerId + '" isn\'t defined' )
-
-        var ly = layerCatalog[ option.layerId ]
-
         if ( !option.id )
             option.id = option.layerId
 
-        if ( !option.opacity )
-            option.opacity = ly.config.opacity 
+        if ( !( option.layerId in layerCatalog ) ) {
+            console.warn( 'layer id "' + option.layerId + '" isn\'t defined' )
+            option.isEnabled = false
 
-        if ( !option.title )
-            option.title = ly.config.title 
+            if ( !option.title )
+                option.title = option.layerId
 
-        if ( !( 'isVisible' in option ) )
-            option.isVisible = ly.config.isVisible 
+            option.isVisible = false
+        }
+        else {
+            var ly = layerCatalog[ option.layerId ]
+
+            // if ( !option.opacity )
+            //     option.opacity = ly.config.opacity 
+
+            if ( !option.title )
+                option.title = ly.config.title 
+
+            if ( !( 'isVisible' in option ) )
+                option.isVisible = ly.config.isVisible 
+        }
 
         LayerDisplay.prototype.constructor.call( this, option, forceVisible )
     }
@@ -44,11 +53,15 @@ include.module( 'layer-display', [ 'jquery', 'util', 'event' ], function () {
     $.extend( LayerDisplay.Layer.prototype, LayerDisplay.prototype )
 
     LayerDisplay.Layer.prototype.each = function ( itemCb, folderCb, parents ) {
+        if ( !this.isEnabled ) return
+
         if ( itemCb )
             itemCb( this, parents )
     }
 
     LayerDisplay.Layer.prototype.getLegends = function ( layerCatalog, viewer ) {
+        if ( !this.isEnabled ) return SMK.UTIL.resolved()
+
         return layerCatalog[ this.layerId ].getLegends( viewer )
     }
 
@@ -56,14 +69,14 @@ include.module( 'layer-display', [ 'jquery', 'util', 'event' ], function () {
     //
     LayerDisplay.Folder = function ( option, layerCatalog, forceVisible ) {
         if ( !option.id )
-            throw new Error( 'need id' )
+            option.id = SMK.UTIL.makeId( option.folderId, option.title )
 
         if ( !option.title )
-            throw new Error( 'need title' )
+            option.title = option.folderId
 
         LayerDisplay.prototype.constructor.call( this, option, forceVisible )
 
-        forceVisible = forceVisible || this.isExpanded == null
+        forceVisible = forceVisible || this.isGroup
 
         this.items = option.items.map( function ( item ) {
             return createLayerDisplay( item, layerCatalog, forceVisible )
@@ -95,12 +108,20 @@ include.module( 'layer-display', [ 'jquery', 'util', 'event' ], function () {
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
     LayerDisplay.Group = function ( option, layerCatalog, forceVisible ) {
+        if ( !option.id )
+            option.id = SMK.UTIL.makeId( option.groupId, option.title )
+
+        if ( !option.title )
+            option.title = option.groupId
+
         LayerDisplay.Folder.prototype.constructor.call( this, option, layerCatalog, forceVisible )
     }
 
     $.extend( LayerDisplay.Group.prototype, LayerDisplay.Folder.prototype )
 
     LayerDisplay.Group.prototype.getLegends = function ( layerCatalog, viewer ) {
+        if ( !this.isEnabled ) return
+
         return SMK.UTIL.waitAll( this.items.map( function ( item ) {
             return item.getLegends( layerCatalog, viewer )
         } ) )
@@ -111,15 +132,12 @@ include.module( 'layer-display', [ 'jquery', 'util', 'event' ], function () {
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
     function createLayerDisplay( option, layerCatalog, forceVisible ) {
-        if ( 'layerId' in option && 'items' in option )
-            throw new Error( 'layerDisplay can\'t define both layerId and items' )
-
-        if ( !( 'layerId' in option ) && !( 'items' in option ) )
-            throw new Error( 'layerDisplay must define one of layerId or items' )
+        if ( ( 'layerId' in option ) + ( 'folderId' in option ) + ( 'groupId' in option ) != 1 )
+            throw new Error( 'layerDisplay must define exactly one of layerId, folderId, or groupId' )
 
         if ( 'layerId' in option )
             return new LayerDisplay.Layer( Object.assign( { isLayer: true }, option ), layerCatalog, forceVisible )
-        else if ( option.isExpanded != null )
+        else if ( 'folderId' in option )
             return new LayerDisplay.Folder( Object.assign( { isFolder: true }, option ), layerCatalog, forceVisible )
         else
             return new LayerDisplay.Group( Object.assign( { isGroup: true }, option ), layerCatalog, forceVisible )
@@ -136,38 +154,32 @@ include.module( 'layer-display', [ 'jquery', 'util', 'event' ], function () {
         LayerDisplayContextEvent.prototype.constructor.call( this )
 
         this.root = createLayerDisplay( { 
-            id: '$root', 
-            title: '(Root)', 
+            folderId:   'root', 
             isExpanded: true, 
-            isVisible: true,
-            items: items
+            isVisible:  true,
+            items:      items
         }, layerCatalog )
 
-        var id = this.layerId = {}
-        var ids = this.layerIds = []
+        this.itemId = {}
+        this.layerIds = []
 
         this.root.each( 
             function ( item, parents ) {
-                if ( item.layerId in id )
-                    throw new Error( item.layerId + ' is duplicated in layer display' )
+                if ( item.id in self.itemId ) {
+                    throw new Error( item.id + ' is duplicated in layer display' )
+                }
 
-                id[ item.layerId ] = [ item ].concat( parents )
-                ids.push( item.layerId )
-            }, 
-            function ( folder, parents ) {
-                folder.folderId = parents.slice( 0, parents.length - 1 ).reduceRight( function ( a, v ) { return a + v.id + '--' }, '' ) + folder.id
+                self.itemId[ item.id ] = [ item ].concat( parents )
 
-                if ( folder.folderId in id )
-                    throw new Error( 'folder id ' + folder.folderId + ' is duplicated in layer display' )
-
-                id[ folder.folderId ] = [ folder ].concat( parents )
-            } 
+                if ( item.isLayer )
+                    self.layerIds.push( item.layerId )
+            }
         )
 
         this.changedVisibility( function () {
             self.root.each( 
                 function ( item, parents ) {
-                    item.isActuallyVisible = self.isItemVisible( item.layerId || item.folderId )
+                    item.isActuallyVisible = self.isItemVisible( item.id )
                 }
             )
         } )
@@ -180,27 +192,29 @@ include.module( 'layer-display', [ 'jquery', 'util', 'event' ], function () {
     $.extend( LayerDisplayContext.prototype, LayerDisplayContextEvent.prototype )
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
-    LayerDisplayContext.prototype.setFolderExpanded = function ( folderId, expanded ) {
-        if ( !( folderId in this.layerId ) )
-            throw new Error( 'folder ' + folderId + ' not defined' )
-
-        if ( this.layerId[ folderId ][ 0 ].isExpanded == null ) return
-
-        this.layerId[ folderId ][ 0 ].isExpanded = expanded
+    LayerDisplayContext.prototype.getLayerIds = function () {
+        return this.layerIds
     }
 
-    LayerDisplayContext.prototype.isItemVisible = function ( layerId ) {
-        if ( !( layerId in this.layerId ) ) return false
+    LayerDisplayContext.prototype.setFolderExpanded = function ( id, expanded ) {
+        if ( !( id in this.itemId ) ) return 
 
-        return this.layerId[ layerId ].reduce( function ( accum, ld ) {
+        if ( this.itemId[ id ][ 0 ].isFolder )
+            this.itemId[ id ][ 0 ].isExpanded = expanded
+    }
+
+    LayerDisplayContext.prototype.isItemVisible = function ( id ) {
+        if ( !( id in this.itemId ) ) return false
+
+        return this.itemId[ id ].reduce( function ( accum, ld ) {
             return accum && ld.isVisible
         }, true )
     }
 
-    LayerDisplayContext.prototype.setItemVisible = function ( layerId, visible, deep ) {
-        if ( !( layerId in this.layerId ) ) return 
+    LayerDisplayContext.prototype.setItemVisible = function ( id, visible, deep ) {
+        if ( !( id in this.itemId ) ) return 
 
-        var lds = this.layerId[ layerId ]
+        var lds = this.itemId[ id ]
 
         if ( visible )
             lds.forEach( function ( ld ) {
@@ -221,16 +235,6 @@ include.module( 'layer-display', [ 'jquery', 'util', 'event' ], function () {
         return visible
     }
 
-    LayerDisplayContext.prototype.areAllLayersVisible = function () {
-        var self = this
-
-        var vc = this.layerIds.reduce( function ( accum, id ) {
-            return accum + ( self.isItemVisible( id ) ? 1 : 0 )
-        }, 0 )
-
-        return vc == 0 ? false : vc == this.layerIds.length ? true : null
-    }
-
     LayerDisplayContext.prototype.setLegendsVisible = function ( visible, layerCatalog, viewer ) {
         this.root.each( 
             function ( item, parents ) {
@@ -246,7 +250,8 @@ include.module( 'layer-display', [ 'jquery', 'util', 'event' ], function () {
                     item.getLegends( layerCatalog, viewer )
                         .then( function ( ls ) {
                             item.legends = ls
-                            item.showLegend = true
+                            if ( item.showLegend == 'waiting' )
+                                item.showLegend = true
                         }, function () {
                             item.legends = false
                             item.showLegend = false
@@ -268,7 +273,7 @@ include.module( 'layer-display', [ 'jquery', 'util', 'event' ], function () {
             function ( item ) {
                 item.inFilter = false
                 if ( regex.test( item.title ) )
-                    self.layerId[ item.layerId || item.folderId ].forEach( function ( i ) {
+                    self.itemId[ item.id ].forEach( function ( i ) {
                         i.inFilter = true 
                     } )
 

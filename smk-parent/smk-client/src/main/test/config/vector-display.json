@@ -3,15 +3,15 @@
         {
             "type": "layers",
             "display": [
+                { "layerId": "foo" },
                 { 
-                    "id": "1-multipolygon-hole",
+                    "layerId": "1-multipolygon-hole",
                     "title": "Multi-polygon Hole",
                     "opacity": 0.3,
-                    "isVisible": true,
-                    "layerId": "1-multipolygon-hole"
+                    "isVisible": true
                 },
                 { 
-                    "id": "folder1",
+                    "folderId": "folder1",
                     "title": "folder 1",
                     "opacity": 0.7,
                     "isVisible": true,
@@ -22,35 +22,33 @@
                     ]
                 },
                 { 
-                    "id": "group1",
+                    "groupId": "group1",
                     "title": "group 1",
                     "opacity": 0.7,
                     "isVisible": true,
-                    "isExpanded": null,
                     "items": [                
                         { "layerId": "3-polygons" },
                         { "layerId": "4-points-marker" }
                     ]
                 },
                 { 
-                    "id": "folder2",
+                    "folderId": "folder2",
                     "title": "folder 2",
                     "isVisible": false,
                     "isExpanded": false,
                     "items": [                
                         { "layerId": "4-points" },
                         { 
-                            "id": "group1",
-                            "title": "group 1",
+                            "groupId": "group2",
+                            "title": "group 2",
                             "isVisible": true,
-                            "isExpanded": null,
                             "items": [                
                                 { "layerId": "multipoint" },
                                 { "layerId": "point-polygon" }
                             ]
                         },
                         { 
-                            "id": "folder1",
+                            "folderId": "folder2",
                             "title": "folder 1",
                             "isVisible": true,
                             "isExpanded": true,

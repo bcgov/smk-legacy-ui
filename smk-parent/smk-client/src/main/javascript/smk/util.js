@@ -317,6 +317,15 @@ include.module( 'util', null, function ( inc ) {
                     return accum
                 }, {} )
             }
+        },
+
+        makeId: function () {
+            var a = [].slice.call( arguments )
+            return a
+                .filter( function ( v ) { return v !== undefined } )
+                .map( function ( v ) { return ( '' + v ).toLowerCase().replace( /[^a-z0-9]+/g, '-' ).replace( /^[-]|[-]$/g, '' ) } )
+                .map( function ( v ) { return v ? v : '~' } )
+                .join( '=' )
         }
 
     } )

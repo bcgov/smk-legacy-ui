@@ -6,25 +6,24 @@
         <div class="smk-item"
             v-bind:class="{ 
                 'smk-visible': item.isVisible,
-                'smk-expanded': item.isExpanded 
+                'smk-expanded': item.isExpanded, 
+                'smk-disabled': !item.isEnabled,
+                'smk-obscured': !item.isActuallyVisible
             }"
         >
             <i class="smk-folder-expand material-icons smk-command smk-icon"
                 v-if="item.isExpanded != null"
                 v-bind:title="'Expand ' + item.title"
-                v-on:click="$$emit( 'set-folder-expanded', { id: item.folderId, expanded: !item.isExpanded } )"
+                v-on:click="$$emit( 'set-folder-expanded', { id: item.id, expanded: !item.isExpanded } )"
             >{{ item.isExpanded ? 'arrow_drop_down' : 'arrow_right' }}</i>
 
             <i class="smk-visibility material-icons smk-command smk-icon"
                 v-bind:title="'Toggle visibility of \'' + item.title + '\'' + ( item.isFolder ? '\nSHIFT-click to toggle visibility on internal layers.' : '' ) "
-                v-on:click="$$emit( 'set-item-visible', { id: item.layerId || item.folderId, visible: !item.isVisible, deep: $event.shiftKey } )"
+                v-on:click="$$emit( 'set-item-visible', { id: item.id, visible: !item.isVisible, deep: $event.shiftKey } )"
             >{{ item.isVisible ? 'visibility' : 'visibility_off' }}</i>
 
             <span class="smk-title"
-                v-bind:title="'ID: ' + ( item.layerId || item.folderId )"
-                v-bind:class="{
-                    'smk-obscured': !item.isActuallyVisible
-                }"
+                v-bind:title="'ID: ' + ( item.id )"
             >{{ item.title }}</span>
         </div>
 

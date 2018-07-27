@@ -93,7 +93,7 @@ include.module( 'tool-layers', [ 'tool', 'widgets', 'tool-layers.panel-layers-ht
             },
 
             'set-all-layers-visible': function ( ev ) {
-                smk.$viewer.layerDisplayContext.setItemVisible( '$root', ev.visible, ev.deep )
+                smk.$viewer.layerDisplayContext.setItemVisible( smk.$viewer.layerDisplayContext.root.folderId, ev.visible, ev.deep )
                 smk.$viewer.updateLayersVisible()
             },
 
@@ -107,15 +107,9 @@ include.module( 'tool-layers', [ 'tool', 'widgets', 'tool-layers.panel-layers-ht
             },
         } )
 
-        var layerModel = {}
-
-        if ( this.display )
-            smk.$viewer.setLayerDisplay( this.display )
-
-        this.items = smk.$viewer.layerDisplayContext.root.items
 
         smk.$viewer.changedLayerVisibility( function () {
-            self.allVisible = smk.$viewer.layerDisplayContext.isItemVisible( '$root' )
+            self.allVisible = smk.$viewer.layerDisplayContext.isItemVisible( smk.$viewer.layerDisplayContext.root.folderId )
         } )
 
         smk.$viewer.startedLoading( function ( ev ) {
@@ -125,6 +119,12 @@ include.module( 'tool-layers', [ 'tool', 'widgets', 'tool-layers.panel-layers-ht
         smk.$viewer.finishedLoading( function ( ev ) {
             self.busy = false
         } )
+
+
+        if ( this.display )
+            smk.$viewer.setLayerDisplay( this.display )
+
+        this.items = smk.$viewer.layerDisplayContext.root.items
 
         return smk.$viewer.updateLayersVisible()
     } )

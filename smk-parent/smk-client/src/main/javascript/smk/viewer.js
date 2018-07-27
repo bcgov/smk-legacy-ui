@@ -195,7 +195,7 @@ include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', '
                     } )
 
                     return {
-                        id: ly.id,
+                        folderId: ly.id,
                         title: ly.config.title,
                         isVisible: ly.config.isVisible,
                         isExpanded: false,
@@ -246,15 +246,7 @@ include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', '
 
         if ( !smk.layers || smk.layers.length == 0 ) return SMK.UTIL.resolved()
 
-        var ids = self.layerDisplayContext.layerIds.filter( function ( id ) {
-            var v = self.layerDisplayContext.isItemVisible( id )
-            self.layerDisplayContext.setItemVisible( id, false )
-
-            return v
-        } )
-
-        return self.setLayersVisible( ids, true )
-            .catch( function () {} )
+        return self.updateLayersVisible()
     }
 
     Viewer.prototype.setLayerDisplay = function ( layerItems ) {
@@ -265,8 +257,6 @@ include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', '
         this.layerDisplayContext.changedVisibility( function () {
             self.changedLayerVisibility()
         } ) 
-
-        // return this.updateLayersVisible()
     }
 
     Viewer.prototype.handlePick = function ( priority, handler ) {
@@ -297,7 +287,7 @@ include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', '
         var self = this
 
         var pending = {}
-        self.layerDisplayContext.layerIds.forEach( function ( id ) {
+        self.layerDisplayContext.getLayerIds().forEach( function ( id ) {
             pending[ id ] = true
         } )
         Object.keys( self.visibleLayer ).forEach( function ( id ) {
@@ -306,7 +296,7 @@ include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', '
 
         var visibleLayers = []
         var merged
-        this.layerDisplayContext.layerIds.forEach( function ( id, i ) {
+        this.layerDisplayContext.getLayerIds().forEach( function ( id, i ) {
             if ( !self.layerDisplayContext.isItemVisible( id )  ) return
 
             var ly = self.layerId[ id ]
