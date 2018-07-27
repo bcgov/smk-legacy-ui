@@ -180,8 +180,10 @@ include.module( 'layer-display', [ 'jquery', 'util', 'event' ], function () {
 
                 self.itemId[ item.id ] = [ item ].concat( parents )
 
-                if ( item.isLayer )
+                if ( item.isLayer && item.isEnabled ) {
+                    item.index = self.layerIds.length
                     self.layerIds.push( item.layerId )
+                }
             }
         )
 
@@ -203,6 +205,13 @@ include.module( 'layer-display', [ 'jquery', 'util', 'event' ], function () {
     //
     LayerDisplayContext.prototype.getLayerIds = function () {
         return this.layerIds
+    }
+
+    LayerDisplayContext.prototype.getLayerIndex = function ( id ) {
+        if ( !( id in this.itemId ) ) return 
+
+        if ( this.itemId[ id ][ 0 ].isLayer )
+            return this.itemId[ id ][ 0 ].index
     }
 
     LayerDisplayContext.prototype.setFolderExpanded = function ( id, expanded ) {

@@ -415,7 +415,8 @@ include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', '
         this.layerIds.forEach( function ( id, i ) {
             var ly = self.layerId[ id ]
 
-            if ( !ly.visible ) return
+            // if ( !ly.visible ) return
+            if ( !self.layerDisplayContext.isItemVisible( id ) ) return
             if ( ly.config.isQueryable === false ) return
             if ( !ly.inScaleRange( view ) ) return
 
