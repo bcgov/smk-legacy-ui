@@ -12,28 +12,18 @@ public class About extends Tool
 
     private String content;
 
-	public About() {}
+	public About() 
+	{
+	    this.setTitle("About Panel");
+	    this.setDescription("Provide the contents of about panel.");
+	    this.setType(Tool.Type.ABOUT.toString());
+	}
 
 	public About( About about ) {
 		super( about );
 		this.setContent( about.getContent());
 	}
-
-	@Override
-	public String getType() {
-		return Tool.Type.ABOUT.toString();
-	}
-
-	@Override
-	public String getTitle() {
-		return "About Panel";
-	}
-
-	@Override
-    public String getDescription() {
-        return "Provide the contents of about panel.";
-    }
-
+	
     @Override
     public boolean equals( Object other ) {
         return super.equals(other);

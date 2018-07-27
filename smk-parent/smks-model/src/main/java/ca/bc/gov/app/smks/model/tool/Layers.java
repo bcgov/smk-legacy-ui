@@ -12,21 +12,13 @@ public class Layers extends Tool
 
     public Layers() 
     {
-        // empty constructor
+        this.setTitle("Layers Panel");
+        this.setDescription("Layers Panel");
+        this.setType(Tool.Type.LAYERS.toString());
     }
 
     public Layers( Layers layers ) {
 		super( layers );
-	}
-
-	@Override
-	public String getType() {
-		return Tool.Type.LAYERS.toString();
-	}
-
-	@Override
-	public String getTitle() {
-		return "Layers Panel";
 	}
 	
     @Override

@@ -12,21 +12,13 @@ public class Measure extends Tool
 
     public Measure() 
 	{
-	    // empty constructor
+	    this.setTitle("Measurement");
+	    this.setDescription("Measurement Tools");
+	    this.setType(Tool.Type.MEASURE.toString());
 	}
 
-    public Measure( Measure about ) {
-		super( about );
-	}
-
-	@Override
-	public String getType() {
-		return Tool.Type.MEASURE.toString();
-	}
-
-	@Override
-	public String getTitle() {
-		return "Measurement";
+    public Measure( Measure measure ) {
+		super( measure );
 	}
 
     @Override

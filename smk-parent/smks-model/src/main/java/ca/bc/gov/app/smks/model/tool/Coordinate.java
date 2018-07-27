@@ -12,21 +12,13 @@ public class Coordinate extends Tool
 
     public Coordinate() 
     {
-        // empty constructor
+        this.setTitle("Coordinate");
+        this.setDescription("Coordinate Tool");
+        this.setType(Tool.Type.COORDINATE.toString());
     }
 
-    public Coordinate( Coordinate about ) {
-		super( about );
-	}
-
-	@Override
-	public String getType() {
-		return Tool.Type.COORDINATE.toString();
-	}
-
-	@Override
-	public String getTitle() {
-		return "Coordinate";
+    public Coordinate( Coordinate coordinate ) {
+		super( coordinate );
 	}
 
     @Override

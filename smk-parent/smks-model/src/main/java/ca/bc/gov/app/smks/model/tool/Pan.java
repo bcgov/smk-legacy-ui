@@ -10,20 +10,15 @@ public class Pan extends Tool
 {
     private static final long serialVersionUID = 2596068091296209558L;
 
-    public Pan() {}
+    public Pan() 
+    {
+        this.setTitle("Panning");
+        this.setDescription("Panning Tool");
+        this.setType(Tool.Type.PAN.toString());
+    }
 
-    public Pan( Pan about ) {
-		super( about );
-	}
-
-	@Override
-	public String getType() {
-		return Tool.Type.PAN.toString();
-	}
-
-	@Override
-	public String getTitle() {
-		return "Panning";
+    public Pan( Pan pan ) {
+		super( pan );
 	}
 	
     @Override

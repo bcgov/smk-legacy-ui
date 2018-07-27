@@ -12,23 +12,15 @@ public class Directions extends Tool
 
     public Directions() 
     {
-        // empty constructor
+        this.setTitle("Directions");
+        this.setDescription("Directions tool");
+        this.setType(Tool.Type.DIRECTIONS.toString());
     }
 
-    public Directions( Directions about ) {
-		super( about );
+    public Directions( Directions directions ) {
+		super( directions );
 	}
-
-	@Override
-	public String getType() {
-		return Tool.Type.DIRECTIONS.toString();
-	}
-
-	@Override
-	public String getTitle() {
-		return "Directions";
-	}
-
+    
     @Override
     public boolean equals( Object other ) {
         return super.equals(other);

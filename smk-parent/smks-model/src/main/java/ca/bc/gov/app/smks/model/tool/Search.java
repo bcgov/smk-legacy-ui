@@ -12,30 +12,25 @@ public class Search extends Tool
 
     public Search() 
     {
-        // empty constructor
+        this.setTitle("Search Panel");
+        this.setDescription("Search Panel");
+        this.setType(Tool.Type.SEARCH.toString());
     }
 
-	public Search( Search search ) {
+	public Search( Search search ) 
+	{
 		super( search );
 	}
 
-	@Override
-	public String getType() {
-		return Tool.Type.SEARCH.toString();
-	}
-
-	@Override
-	public String getTitle() {
-		return "Search Panel";
-	}
-
     @Override
-    public boolean equals( Object other ) {
+    public boolean equals( Object other ) 
+    {
         return super.equals(other);
     }
     
     @Override
-    public int hashCode() {
+    public int hashCode() 
+    {
         return getType().hashCode();
     }
 }

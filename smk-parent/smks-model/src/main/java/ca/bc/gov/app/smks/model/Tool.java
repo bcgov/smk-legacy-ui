@@ -102,6 +102,8 @@ public class Tool implements Serializable
 
     protected boolean enabled;
     protected String title;
+    protected String description;
+    protected String type;
     protected String icon;
     protected int order;
     protected String instance;
@@ -110,6 +112,8 @@ public class Tool implements Serializable
     
     public Tool() {
     	title = "Unknown"; 
+    	description = "";
+    	type = Type.UNKNOWN.toString();
         enabled = true;
         showPanel = true;
     }
@@ -117,6 +121,8 @@ public class Tool implements Serializable
     protected Tool( Tool tool ) 
     {
     	title = tool.title;
+    	description = tool.description;
+    	type = tool.type;
     	enabled = tool.enabled;
     	icon = tool.icon;
     	order = tool.order;
@@ -169,12 +175,22 @@ public class Tool implements Serializable
     
 	@JsonIgnore
     public String getType() {
-        return Type.UNKNOWN.toString();
+        return type;
     }
 
+	public void setType(String type)
+	{
+	    this.type = type;
+	}
+	
     @JsonIgnore
     public String getDescription() {
-        return "This is the base class";
+        return description;
+    }
+    
+    public void setDescription(String description)
+    {
+        this.description = description;
     }
 
     @JsonIgnore

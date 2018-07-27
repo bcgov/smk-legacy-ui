@@ -12,22 +12,13 @@ public class Dropdown extends Tool
 
     public Dropdown() 
 	{
-	    // empty constructor
+	    this.setTitle("Dropdown");
+	    this.setDescription("Dropdown menu");
+	    this.setType(Tool.Type.DROPDOWN.toString());
 	}
 
     public Dropdown( Dropdown dropdown ) {
 		super( dropdown );
-	}
-
-	@Override
-	public String getType() 
-	{
-		return Tool.Type.DROPDOWN.toString();
-	}
-
-	@Override
-	public String getTitle() {
-		return "";
 	}
 
     @Override
