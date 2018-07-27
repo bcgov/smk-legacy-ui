@@ -1,14 +1,20 @@
-include.module( 'tool-layers', [ 'tool', 'widgets', 'tool-layers.panel-layers-html' ], function ( inc ) {
+include.module( 'tool-layers', [ 'tool', 'widgets', 'tool-layers.panel-layers-html', 'tool-layers.layer-display-html' ], function ( inc ) {
     "use strict";
 
     Vue.component( 'layers-widget', {
         extends: inc.widgets.toolButton,
     } )
 
+    Vue.component( 'layer-display', {
+        template: inc[ 'tool-layers.layer-display-html' ],
+        props: [ 'id', 'items' ],
+        mixins: [ inc.widgets.emit ],
+    } )
+
     Vue.component( 'layers-panel', {
         extends: inc.widgets.toolPanel,
         template: inc[ 'tool-layers.panel-layers-html' ],
-        props: [ 'busy', 'layers', 'config' ],
+        props: [ 'busy', 'items', 'config', 'allVisible' ],
         data: function () {
             return Object.assign( {}, this.config )
         },
@@ -29,40 +35,6 @@ include.module( 'tool-layers', [ 'tool', 'widgets', 'tool-layers.panel-layers-ht
                 } )
                 return state
             },
-
-            isAllVisible: function () {
-                return this.layers.every( isLayerVisible ) || ( this.layers.some( isLayerVisible ) ? null : false )
-            },
-
-            isChildrenVisible: function ( layerId ) {
-                var v = this.layers
-                    .filter( function ( ly ) { return ly.parentId == layerId } )
-                    .reduce( function ( accum, ly ) {
-                        // console.log( accum,ly.id,ly.visible )
-                        return accum === undefined ? ly.visible
-                            : accum == null ? null
-                            : ly.visible == accum ? accum
-                            : null
-                    }, undefined )
-                // console.log( layerId, v )
-                return v
-            },
-
-            matchesFilter: function ( layer ) {
-                return this.filterRegExp.test( layer.title )
-            },
-
-            allLayerIds: function () {
-                return this.layers.map( function ( l ) { return l.id } )
-            },
-        },
-        computed: {
-            filterRegExp: function () {
-                if ( !this.filter ) return /.*/;
-                var f = this.filter.trim()
-                if ( !f ) return /.*/;
-                return new RegExp( f.toLowerCase().split( /\s+/ ).map( function ( part ) { return '(?=.*' + part + ')' } ).join( '' ), 'i' )
-            }
         }
     } )
 
@@ -72,7 +44,8 @@ include.module( 'tool-layers', [ 'tool', 'widgets', 'tool-layers.panel-layers-ht
     function LayersTool( option ) {
         this.makePropWidget( 'icon', 'layers' )
         this.makePropPanel( 'busy', false )
-        this.makePropPanel( 'layers', [] )
+        this.makePropPanel( 'items', [] )
+        this.makePropPanel( 'allVisible', true )
         this.makePropPanel( 'config', {
             legend: false,
             filter: null
@@ -104,71 +77,39 @@ include.module( 'tool-layers', [ 'tool', 'widgets', 'tool-layers.panel-layers-ht
             },
 
             'config': function ( ev ) {
+                // console.log( ev )
                 Object.assign( self.config, ev )
 
-                if ( ev.legend ) {
-                    smk.$viewer.layerIds.forEach( function ( id ) {
-                        var ly = layerModel[ id ]
-                        if ( ly.legends == null ) {
-                            ly.legends = 'waiting'
-                            smk.$viewer.layerId[ id ].getLegends( smk.$viewer )
-                                .then( function ( ls ) {
-                                    ly.legends = ls
-                                }, function () {
-                                    ly.legends = false
-                                } )
-                        }
-                    } )
+                smk.$viewer.layerDisplayContext.setLegendsVisible( ev.legend, smk.$viewer.layerId, smk.$viewer )
+
+                var re 
+                if ( !ev.filter || !ev.filter.trim() ) 
+                    re = /.*/;
+                else {
+                    var f = ev.filter.trim()
+                    re = new RegExp( f.toLowerCase().split( /\s+/ ).map( function ( part ) { return '(?=.*' + part + ')' } ).join( '' ), 'i' )
                 }
+                smk.$viewer.layerDisplayContext.setFilter( re )
             },
 
-            'set-visible': function ( ev ) {
-                smk.$viewer.setLayersVisible( ev.ids, ev.visible )
-                smk.$viewer.layerIds.forEach( function ( id ) {
-                    layerModel[ id ].visible = smk.$viewer.isLayerVisible( id )
-                } )
+            'set-all-layers-visible': function ( ev ) {
+                smk.$viewer.layerDisplayContext.setItemVisible( smk.$viewer.layerDisplayContext.root.folderId, ev.visible, ev.deep )
+                smk.$viewer.updateLayersVisible()
             },
 
-            // 'set-expanded': function ( ev ) {
-            //     ev.ids.forEach( function ( id ) {
-            //         var ly = layerModel[ id ]
-            //         ly.expanded = ev.expanded
+            'set-folder-expanded': function ( ev ) {
+                smk.$viewer.layerDisplayContext.setFolderExpanded( ev.id, ev.expanded )
+            },
 
-            //         if ( ly.expanded && ly.legends == null ) {
-            //             ly.legends = 'waiting'
-            //             smk.$viewer.layerId[ id ].getLegends()
-            //                 .then( function ( ls ) {
-            //                     ly.legends = ls
-            //                 }, function () {
-            //                     ly.legends = false
-            //                 } )
-            //         }
-            //     } )
-            // }
+            'set-item-visible': function ( ev ) {
+                smk.$viewer.layerDisplayContext.setItemVisible( ev.id, ev.visible, ev.deep )
+                smk.$viewer.updateLayersVisible()
+            },
         } )
 
-        // aux.widget.vm.$on( 'layers-widget.click', function () {
-        //     if ( !self.visible || !self.enabled ) return
 
-        //     self.active = !self.active
-        // } )
-
-        var layerModel = {}
-        this.layers = smk.$viewer.layerIds.map( function ( id, i ) {
-            var ly = smk.$viewer.layerId[ id ]
-
-            return ( layerModel[ id ] = {
-                id:             id,
-                title:          ly.config.title,
-                visible:        smk.$viewer.isLayerVisible( id ),
-                expanded:       false,
-                legends:        null,
-                indent:         ly.parentId ? 1 : 0,
-                parentId:       ly.parentId,
-                isContainer:    ly.isContainer,
-                hasLegend:      !ly.config.useHeatmap && !ly.isContainer,
-                class:          ly.parentId && 'smk-sub-layer'
-            } )
+        smk.$viewer.changedLayerVisibility( function () {
+            self.allVisible = smk.$viewer.layerDisplayContext.isItemVisible( smk.$viewer.layerDisplayContext.root.folderId )
         } )
 
         smk.$viewer.startedLoading( function ( ev ) {
@@ -178,6 +119,14 @@ include.module( 'tool-layers', [ 'tool', 'widgets', 'tool-layers.panel-layers-ht
         smk.$viewer.finishedLoading( function ( ev ) {
             self.busy = false
         } )
+
+
+        if ( this.display )
+            smk.$viewer.setLayerDisplay( this.display )
+
+        this.items = smk.$viewer.layerDisplayContext.root.items
+
+        return smk.$viewer.updateLayersVisible()
     } )
 
     return LayersTool

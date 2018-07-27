@@ -39,6 +39,7 @@ exports.gen = function () {
     t.script( 'tool',       'smk/tool.js' )
     t.script( 'feature-set','smk/feature-set.js' )
     t.script( 'projections','smk/projections.js' )
+    t.script( 'layer-display','smk/layer-display.js' )
 
     t.group( 'layer' )
         .dir( 'smk/layer/**/*' )

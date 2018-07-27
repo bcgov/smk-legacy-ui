@@ -70,6 +70,7 @@
     border-radius: 5px;
     margin-left: -2px;
     font-size: 12px;
+    user-select: none;
 }
 
 .smk-map-frame .smk-command.smk-icon {
@@ -114,7 +115,6 @@
 }
 
 .smk-map-frame .smk-item {
-    /* border: 1px solid lightgray; */
     border-radius: 5px;
     margin-bottom: 1px;
     cursor: default;
@@ -122,7 +122,10 @@
 
 .smk-map-frame .smk-item:hover {
     background-color: #d2d9e6;
-    /* border: 1px solid #d2d9e6; */
+}
+
+.smk-map-frame .smk-item.smk-disabled:hover {
+    background-color: transparent;
 }
 
 /*************************************************************/
