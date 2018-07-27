@@ -21,7 +21,7 @@ include.module( 'tool-directions', [ 'tool', 'widgets', 'tool-directions.panel-d
                 url:        'https://routerdlv.api.gov.bc.ca/' + ( option.optimal ? 'optimalDirections' : 'directions' ) + '.json',
                 data:       query,
                 headers: {
-                    apikey: 'ndLv6oEJN4z5FwwhDyaNoF4NfnYWXwVJ'
+                    apikey: option.apiKey
                 }
             } ) ).then( res, rej )
         } )
@@ -183,7 +183,8 @@ include.module( 'tool-directions', [ 'tool', 'widgets', 'tool-directions.panel-d
             optimal:    false,
             roundTrip:  false,
             criteria:   'shortest',
-            newAddress: null
+            newAddress: null,
+            apiKey:     option.apiKey
         } )
 
         SMK.TYPE.Tool.prototype.constructor.call( this, $.extend( {
