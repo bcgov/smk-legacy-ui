@@ -15,7 +15,12 @@ public class Zoom extends Tool
     private boolean box = true;
     private boolean control = true;
 
-	public Zoom() {}
+	public Zoom() 
+	{
+	    setTitle("Zooming");
+	    setDescription("Zooming options for the viewer.");
+	    setType(Tool.Type.ZOOM.toString());
+	}
 
 	public Zoom( Zoom zoom ) 
 	{
@@ -25,22 +30,7 @@ public class Zoom extends Tool
 		this.setDoubleClick( zoom.getDoubleClick());
 		this.setMouseWheel( zoom.getMouseWheel());
 	}
-
-	@Override
-	public String getTitle() {
-		return "Zooming";
-	}
-
-	@Override
-	public String getType() {
-		return Tool.Type.ZOOM.toString();
-	}
-
-	@Override
-    public String getDescription() {
-        return "Zooming options for the viewer.";
-    }
-
+	
     @Override
     public boolean isConfigured() {
         return true;

@@ -10,21 +10,15 @@ public class Query extends Tool
 {
     private static final long serialVersionUID = -8358469360934843369L;
 
-    public Query() {}
+    public Query() 
+    {
+        this.setTitle("Query");
+        this.setDescription("Query Tool");
+        this.setType(Tool.Type.QUERY.toString());
+    }
 
     public Query( Query query ) {
 		super( query );
-	}
-
-    @Override
-	public String getType() 
-	{
-		return Tool.Type.QUERY.toString();
-	}
-
-    @Override
-	public String getTitle() {
-		return "Query";
 	}
 
     @Override

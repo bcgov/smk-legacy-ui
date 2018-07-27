@@ -12,28 +12,18 @@ public class Minimap extends Tool
 
     private String baseMap;
 
-	public Minimap() {}
+	public Minimap() 
+	{
+	    this.setTitle("Mini Map");
+	    this.setDescription("Select the base map for the mini map.");
+	    this.setType(Tool.Type.MINIMAP.toString());
+	}
 
 	public Minimap( Minimap minimap ) {
 		super( minimap );
 		this.baseMap = minimap.getBaseMap();
 	}
-
-	@Override
-	public String getType() {
-		return Tool.Type.MINIMAP.toString();
-	}
-
-	@Override
-	public String getTitle() {
-		return "Mini Map";
-	}
-
-	@Override
-    public String getDescription() {
-        return "Select the base map for the mini map.";
-    }
-
+	
     @Override
     public boolean isConfigured() {
         return true;

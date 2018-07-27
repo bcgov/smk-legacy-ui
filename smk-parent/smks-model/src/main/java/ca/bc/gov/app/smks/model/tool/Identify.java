@@ -17,7 +17,9 @@ public class Identify extends Tool
 	
 	public Identify() 
 	{
-	    // empty constructor
+	    this.setTitle("Identify Panel");
+	    this.setDescription("Identify Panel");
+	    this.setType(Tool.Type.IDENTIFY.toString());
 	}
 
 	public Identify( Identify identify ) {
@@ -25,16 +27,6 @@ public class Identify extends Tool
 		this.tolerance = identify.getTolerance();
 		this.styleOpacity = identify.getStyleOpacity();
 		this.style = new LayerStyle(identify.getStyle());
-	}
-
-	@Override
-	public String getType() {
-		return Tool.Type.IDENTIFY.toString();
-	}
-
-	@Override
-	public String getTitle() {
-		return "Identify Panel";
 	}
 
     @Override

@@ -12,29 +12,19 @@ public class BaseMaps extends Tool
  
     private String[] choices;
 
-	public BaseMaps() {}
+	public BaseMaps() 
+	{
+	    this.setTitle("Base Maps Panel");
+	    this.setDescription("Select the base maps available as choices.");
+	    this.setType(Tool.Type.BASEMAPS.toString());
+	}
 
-	public BaseMaps( BaseMaps about ) {
-		super( about );
+	public BaseMaps( BaseMaps basemaps ) {
+		super( basemaps );
 		
-		if(about.choices == null) this.choices = new String[0];
-		else this.choices = about.choices.clone();
+		if(basemaps.choices == null) this.choices = new String[0];
+		else this.choices = basemaps.choices.clone();		
 	}
-
-	@Override
-	public String getType() {
-		return Tool.Type.BASEMAPS.toString();
-	}
-
-	@Override
-	public String getTitle() {
-		return "Base Maps Panel";
-	}
-
-	@Override
-    public String getDescription() {
-        return "Select the base maps available as choices.";
-    }
 
     @Override
     public boolean isConfigured() {

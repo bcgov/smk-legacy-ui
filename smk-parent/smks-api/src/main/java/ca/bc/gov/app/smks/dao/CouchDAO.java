@@ -22,7 +22,6 @@ import org.ektorp.impl.StdCouchDbInstance;
 import org.ektorp.support.DesignDocument;
 import org.springframework.stereotype.Repository;
 
-import ca.bc.gov.app.smks.SMKException;
 import ca.bc.gov.app.smks.model.Layer;
 import ca.bc.gov.app.smks.model.MapConfiguration;
 
@@ -39,7 +38,7 @@ public class CouchDAO
 	private static final String FETCH_ALL_CONFIGS = "fetch-all-configs";
 	private static final String FETCH_PUBLISHED_CONFIGS = "fetch-published-configs";
 	
-	public CouchDAO(String couchUrl, String databaseName, String user, String password) throws SMKException, MalformedURLException
+	public CouchDAO(String couchUrl, String databaseName, String user, String password) throws MalformedURLException
 	{
 		logger.info("Initializing CouchDB DAO with the following settings:");
 		logger.info(" - Couch URL: " + couchUrl);
@@ -238,39 +237,44 @@ public class CouchDAO
 		
 		for(Row row : queryRslt.getRows())
 		{
-			String id = row.getKey();
-			int revision = row.getValueAsInt();
-
-			boolean addedConfig = false;
-			Row rowToExclude = null;
-			
-			for(Row addedRow : rowsToParse)
-			{
-				String addedRowId = addedRow.getKey();
-				int addedRowRevision = addedRow.getValueAsInt();
-
-				if(addedRowId.equals(id) && addedRowRevision != revision)
-			    {
-					if(addedRowRevision > revision)
-					{
-						addedConfig = true;
-					}
-					else
-					{
-						rowToExclude = addedRow;
-					}
-					
-					break;
-			    }
-			}
-
-			if(!addedConfig) rowsToParse.add(row);
-			if(rowToExclude != null) rowsToParse.remove(rowToExclude);
+		    processViewRows(row, rowsToParse);
 		}
 
 		return rowsToParse;
 	}
 
+	private void processViewRows(Row row, List<Row> rowsToParse)
+	{
+	    String id = row.getKey();
+        int revision = row.getValueAsInt();
+
+        boolean addedConfig = false;
+        Row rowToExclude = null;
+        
+        for(Row addedRow : rowsToParse)
+        {
+            String addedRowId = addedRow.getKey();
+            int addedRowRevision = addedRow.getValueAsInt();
+
+            if(addedRowId.equals(id) && addedRowRevision != revision)
+            {
+                if(addedRowRevision > revision)
+                {
+                    addedConfig = true;
+                }
+                else
+                {
+                    rowToExclude = addedRow;
+                }
+                
+                break;
+            }
+        }
+
+        if(!addedConfig) rowsToParse.add(row);
+        if(rowToExclude != null) rowsToParse.remove(rowToExclude);
+	}
+	
 	public void deleteAttachment(MapConfiguration resource, Layer documentLayer)
 	{
 		deleteAttachment(resource, documentLayer.getTitle());

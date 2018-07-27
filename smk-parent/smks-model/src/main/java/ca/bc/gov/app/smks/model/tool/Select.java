@@ -14,7 +14,12 @@ public class Select extends Tool
     private LayerStyle style;
 	private Double styleOpacity;
 	
-	public Select() {}
+	public Select() 
+	{
+	    this.setTitle("Selection Panel");
+	    this.setDescription("Select Panel");
+	    this.setType(Tool.Type.SELECT.toString());
+	}
 
 	public Select( Select select ) {
 		super( select );
@@ -23,16 +28,6 @@ public class Select extends Tool
 		this.setStyleOpacity(select.getStyleOpacity());
 	}
 
-	@Override
-	public String getType() {
-		return Tool.Type.SELECT.toString();
-	}
-
-	@Override
-	public String getTitle() {
-		return "Selection Panel";
-	}
-	
     @Override
     public boolean equals( Object other ) {
         return super.equals(other);

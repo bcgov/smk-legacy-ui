@@ -12,21 +12,13 @@ public class Attribution extends Tool
 
     public Attribution() 
     {
-        // empty constructor
+        this.setTitle("Attribution");
+        this.setDescription("Attribution");
+        this.setType(Tool.Type.ATTRIBUTION.toString());
     }
 
 	public Attribution( Attribution attr ) {
 		super( attr );
-	}
-
-	@Override
-	public String getType() {
-		return Tool.Type.ATTRIBUTION.toString();
-	}
-
-	@Override
-	public String getTitle() {
-		return "Attribution";
 	}
 
     @Override

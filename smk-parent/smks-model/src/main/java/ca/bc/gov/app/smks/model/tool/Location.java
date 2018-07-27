@@ -12,22 +12,13 @@ public class Location extends Tool
 
     public Location() 
     {
-        // empty constructor
+        this.setTitle("Location");
+        this.setDescription("Location tools");
+        this.setType(Tool.Type.LOCATION.toString());
     }
 
     public Location( Location location ) {
         super( location );
-    }
-
-    @Override
-    public String getType() 
-    {
-        return Tool.Type.LOCATION.toString();
-    }
-
-    @Override
-    public String getTitle() {
-        return "Location";
     }
 
     @Override

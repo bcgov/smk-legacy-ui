@@ -12,21 +12,13 @@ public class Markup extends Tool
 
     public Markup() 
 	{
-	    // empty constructor
+	    setTitle("Markup");
+	    this.setDescription("Markup Tools");
+	    this.setType(Tool.Type.MARKUP.toString());
 	}
 
     public Markup( Markup markup ) {
 		super( markup );
-	}
-
-	@Override
-	public String getType() {
-		return Tool.Type.MARKUP.toString();
-	}
-
-	@Override
-	public String getTitle() {
-		return "Markup";
 	}
 
     @Override

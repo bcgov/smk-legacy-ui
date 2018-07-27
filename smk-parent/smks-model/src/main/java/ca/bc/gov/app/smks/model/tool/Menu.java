@@ -12,22 +12,13 @@ public class Menu extends Tool
 
     public Menu() 
     {
-        // empty constructor
+        this.setTitle("Menu");
+        this.setDescription("Menu");
+        this.setType(Tool.Type.MENU.toString());
     }
 
     public Menu( Menu menu ) {
 		super( menu );
-	}
-
-	@Override
-	public String getType() 
-	{
-		return Tool.Type.MENU.toString();
-	}
-
-	@Override
-	public String getTitle() {
-		return "Menu";
 	}
 
     @Override

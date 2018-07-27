@@ -13,7 +13,12 @@ public class Scale extends Tool
     private boolean showFactor = true;
     private boolean showBar = true;
 
-	public Scale() {}
+	public Scale()
+	{
+	    this.setTitle("Scale");
+	    this.setDescription("Scale options for the map.");
+	    this.setType(Tool.Type.SCALE.toString());
+	}
 
 	public Scale( Scale scale ) 
 	{
@@ -21,22 +26,7 @@ public class Scale extends Tool
 		this.setShowBar( scale.getShowBar());
 		this.setShowFactor( scale.getShowFactor());
 	}
-
-	@Override
-	public String getType() {
-		return Tool.Type.SCALE.toString();
-	}
-
-	@Override
-	public String getTitle() {
-		return "Scale";
-	}
-
-	@Override
-    public String getDescription() {
-        return "Scale options for the map.";
-    }
-
+	
     @Override
     public boolean isConfigured() {
         return true;

@@ -15,10 +15,8 @@ import org.apache.commons.logging.LogFactory;
 import org.ektorp.Attachment;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.TransformException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.multipart.MultipartFile;
 import org.xml.sax.SAXException;
 
 import com.fasterxml.jackson.core.JsonParser.Feature;
@@ -26,7 +24,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import ca.bc.gov.app.smks.SMKException;
-import ca.bc.gov.app.smks.StaticContextAccessor;
 import ca.bc.gov.app.smks.converter.DocumentConverterFactory;
 import ca.bc.gov.app.smks.converter.DocumentConverterFactory.DocumentType;
 import ca.bc.gov.app.smks.dao.CouchDAO;
@@ -39,33 +36,28 @@ import net.lingala.zip4j.exception.ZipException;
 
 public class MapConfigServiceController
 {
-    private static Log logger = LogFactory.getLog(MapConfigServiceController.class);
+    private Log logger = LogFactory.getLog(MapConfigServiceController.class);
 
-    private static final String MAP_CONFIG_NOT_FOUND_MSG = "Map Configuration ID not found.";
-    private static final String SUCCESS = "    Success!";
-    private static final String SUCCESS_MESSAGE = "{ \"status\": \"Success!\" }";
-    private static final String SHAPE = "shape";
-    private static final String KML = "kml";
-    private static final String KMZ = "kmz";
-    private static final String VECTOR = "vector"; 
-    private static final String DEFAULT_CONTENT_TYPE = "application/octet-stream";
+    private final String MAP_CONFIG_NOT_FOUND_MSG = "Map Configuration ID not found.";
+    private final String SUCCESS = "    Success!";
+    private final String SHAPE = "shape";
+    private final String KML = "kml";
+    private final String KMZ = "kmz";
+    private final String VECTOR = "vector"; 
+    private final String DEFAULT_CONTENT_TYPE = "application/octet-stream";
     
-    public static CouchDAO couchDAO()
+    public MapConfigServiceController()
     {
-        return StaticContextAccessor.getBean(CouchDAO.class);
+        // empty constructor
     }
     
-    public static ObjectMapper jsonObjectMapper()
-    {
-        return StaticContextAccessor.getBean(ObjectMapper.class);
-    }
+    @Autowired
+    private CouchDAO couchDAO;
     
-    public static Environment env()
-    {
-        return StaticContextAccessor.getBean(Environment.class);
-    }
+    @Autowired
+    private Environment env;
     
-    public static void createMapConfiguration(MapConfiguration request) throws SMKException
+    public void createMapConfiguration(MapConfiguration request) throws SMKException
     {
         logger.debug("    Creating new Map Configuration...");
 
@@ -75,10 +67,10 @@ public class MapConfigServiceController
         request.setLmfId(request.getName().toLowerCase().replaceAll(" ", "-").replaceAll("[^A-Za-z0-9]", "-"));
         
         request.setLmfRevision(1);
-        request.setVersion(env().getProperty("smk.version"));
+        request.setVersion(env.getProperty("smk.version"));
 
         // validate the ID, in case it's already in use.
-        MapConfiguration existingDocID = couchDAO().getMapConfiguration(request.getLmfId());
+        MapConfiguration existingDocID = couchDAO.getMapConfiguration(request.getLmfId());
 
         if(existingDocID != null)
         {
@@ -86,14 +78,14 @@ public class MapConfigServiceController
             request.setLmfId(UUID.randomUUID().toString());
         }
 
-        couchDAO().createResource(request);
+        couchDAO.createResource(request);
         logger.debug(SUCCESS);
     }
     
-    public static List<MapConfigInfo> getMapConfigSnippets()
+    public List<MapConfigInfo> getMapConfigSnippets()
     {
         logger.debug("    Querying for all Map Resources...");
-        Map<String, String> resourceIds = couchDAO().getAllConfigs();
+        Map<String, String> resourceIds = couchDAO.getAllConfigs();
         logger.debug("    Success, found " + resourceIds.size() + " valid results");
         
         List<MapConfigInfo> configSnippets = new ArrayList<MapConfigInfo>();
@@ -104,7 +96,7 @@ public class MapConfigServiceController
             
             try
             {
-                MapConfiguration config = couchDAO().getMapConfiguration(value);
+                MapConfiguration config = couchDAO.getMapConfiguration(value);
                 configSnippets.add(new MapConfigInfo(config));
             }
             catch(Exception e)
@@ -125,19 +117,19 @@ public class MapConfigServiceController
         return configSnippets;
     }
     
-    public static MapConfiguration getMapConfiguration(String id, String version) throws SMKException
+    public MapConfiguration getMapConfiguration(String id, String version) throws SMKException
     {
         logger.debug("    Fetching Map Configuration " + id);
         MapConfiguration resource = null;
         if(version != null && version.length() > 0)
         {
             logger.debug("    Getting version " + version);
-            resource = couchDAO().getMapConfiguration(id, Integer.parseInt(version));
+            resource = couchDAO.getMapConfiguration(id, Integer.parseInt(version));
         }
         else
         {
             logger.debug("    Getting current version");
-            resource = couchDAO().getMapConfiguration(id);
+            resource = couchDAO.getMapConfiguration(id);
         }
 
         if(resource == null) throw new SMKException("Map Config not found for ID " + id + " and version " + version + " does not exist");
@@ -146,16 +138,16 @@ public class MapConfigServiceController
         return resource;
     }
     
-    public static void deleteMapConfiguration(String id) throws SMKException
+    public void deleteMapConfiguration(String id) throws SMKException
     {
         deleteMapConfiguration(id, null);
     }
     
-    public static void deleteMapConfiguration(String id, String version) throws SMKException
+    public void deleteMapConfiguration(String id, String version) throws SMKException
     {
         logger.debug("    Deleting a Map Configuration...");
         // If we have a published version, cancel the delete and warn about un-publishing first
-        MapConfiguration published = couchDAO().getPublishedConfig(id);
+        MapConfiguration published = couchDAO.getPublishedConfig(id);
         if(published != null) throw new SMKException("The Map Configuration has a published version. Please Un-Publish the configuration first via the {DELETE} /MapConfigurations/Published/{id} endpoint before deleting a configuration archive. ");
 
         // Should we be deleting just the requested config (may be many versions!) or all of the versions?
@@ -163,12 +155,12 @@ public class MapConfigServiceController
         if(version != null && version.length() > 0)
         {
             logger.debug("    Getting version " + version);
-            MapConfiguration resource = couchDAO().getMapConfiguration(id, Integer.parseInt(version));
+            MapConfiguration resource = couchDAO.getMapConfiguration(id, Integer.parseInt(version));
 
             if(resource == null) throw new SMKException("Map Config not found for ID " + id + " and version " + version + " does not exist");
             
             logger.debug("    Deleting Map Configuration " + id + " version " + version);
-            couchDAO().removeResource(resource);
+            couchDAO.removeResource(resource);
             logger.debug(SUCCESS);
         }
         // delete everything!
@@ -176,21 +168,21 @@ public class MapConfigServiceController
         {
             logger.debug("    Deleting all versions");
 
-            List<MapConfiguration> resources = couchDAO().getAllMapConfigurationVersions(id);
+            List<MapConfiguration> resources = couchDAO.getAllMapConfigurationVersions(id);
             for(MapConfiguration config : resources)
             {
-                couchDAO().removeResource(config);
+                couchDAO.removeResource(config);
             }
         }
     }
     
-    public static void updateMapConfiguration(String id, MapConfiguration request) throws SMKException
+    public void updateMapConfiguration(String id, MapConfiguration request) throws SMKException
     {
         logger.debug("    Updating a Map Configuration...");
 
         if(request.isPublished()) throw new SMKException("You cannot update the currently published Map Configuration. Please update the editable version.");
         
-        MapConfiguration resource = couchDAO().getMapConfiguration(id);
+        MapConfiguration resource = couchDAO.getMapConfiguration(id);
 
          // find out if we're removing layers. If so, we may have to remove attachments as well
         boolean layerRemoved = false;
@@ -219,7 +211,7 @@ public class MapConfigServiceController
         }
         
         // refresh, in case we've turfed any layer attachments
-        if(layerRemoved) resource = couchDAO().getMapConfiguration(id);
+        if(layerRemoved) resource = couchDAO.getMapConfiguration(id);
         
         // Clone, to prevent removal of the attachments
         resource.setCreatedBy(request.getCreatedBy());
@@ -236,14 +228,14 @@ public class MapConfigServiceController
         resource.setVersion(request.getVersion());
 
         // Update!
-        couchDAO().updateResource(resource);
+        couchDAO.updateResource(resource);
     }
     
-    public static void createAttachment(String configId, String id, byte[] docBytes, String contentType, String type) throws SMKException, SAXException, IOException, ParserConfigurationException, ZipException, FactoryException, TransformException
+    public void createAttachment(String configId, String id, byte[] docBytes, String contentType, String type) throws SMKException, SAXException, IOException, ParserConfigurationException, ZipException, FactoryException, TransformException
     {
         logger.debug("    Creating new Attachment...");
 
-        MapConfiguration resource = couchDAO().getMapConfiguration(configId);
+        MapConfiguration resource = couchDAO.getMapConfiguration(configId);
 
         if(resource == null) throw new SMKException(MAP_CONFIG_NOT_FOUND_MSG);
 
@@ -254,7 +246,7 @@ public class MapConfigServiceController
         createNewAttachmentResource(configId, id, docBytes, contentType, type, resource);
     }
     
-    private static void createNewAttachmentResource(String configId, String id, byte[] docBytes, String contentType, String type, MapConfiguration resource) throws SAXException, IOException, ParserConfigurationException, ZipException, FactoryException, TransformException
+    private void createNewAttachmentResource(String configId, String id, byte[] docBytes, String contentType, String type, MapConfiguration resource) throws SAXException, IOException, ParserConfigurationException, ZipException, FactoryException, TransformException
     {
         // convert resource to geojson if it's a vector type
         if(type.equals(KML)) { type = VECTOR; docBytes = DocumentConverterFactory.convertDocument(docBytes, DocumentType.KML); contentType = DEFAULT_CONTENT_TYPE; }
@@ -270,14 +262,14 @@ public class MapConfigServiceController
             processVectorAttributes(id, resource, docBytes);
         }
 
-        MapConfiguration updatedResource = couchDAO().getMapConfiguration(configId);
+        MapConfiguration updatedResource = couchDAO.getMapConfiguration(configId);
         resource.setRevision(updatedResource.getRevision());
-        couchDAO().updateResource(resource);
+        couchDAO.updateResource(resource);
 
         logger.debug(SUCCESS);
     }
     
-    private static void processVectorAttributes(String id, MapConfiguration resource, byte[] docBytes) throws IOException
+    private void processVectorAttributes(String id, MapConfiguration resource, byte[] docBytes) throws IOException
     {
         Vector layer = (Vector)resource.getLayerByID(id);
         
@@ -319,24 +311,24 @@ public class MapConfigServiceController
         }
     }
     
-    public static void deleteAttachment(String id, String attachmentId) throws SMKException
+    public void deleteAttachment(String id, String attachmentId) throws SMKException
     {
         logger.debug("    Deleting a Map Configuration Attachment...");
-        MapConfiguration resource = couchDAO().getMapConfiguration(id);
+        MapConfiguration resource = couchDAO.getMapConfiguration(id);
 
         if(resource == null) throw new SMKException(MAP_CONFIG_NOT_FOUND_MSG);
         if(attachmentId == null || attachmentId.length() == 0) throw new SMKException("Invalid Attachment ID");
         if(!resource.getAttachments().containsKey(attachmentId)) throw new SMKException("Attachment ID not found.");   
 
-        couchDAO().deleteAttachment(resource, attachmentId);
+        couchDAO.deleteAttachment(resource, attachmentId);
         logger.debug(SUCCESS);
     }
     
-    public static List<String> getAllAttachmentSnippets(String configId) throws SMKException
+    public List<String> getAllAttachmentSnippets(String configId) throws SMKException
     {
         logger.debug("    Fetching all Attachments...");
 
-        MapConfiguration resource = couchDAO().getMapConfiguration(configId);
+        MapConfiguration resource = couchDAO.getMapConfiguration(configId);
 
         if(resource == null) throw new SMKException(MAP_CONFIG_NOT_FOUND_MSG);
 
@@ -352,23 +344,23 @@ public class MapConfigServiceController
         return attachments;
     }
     
-    public static void updateAttachment(String configId, String attachmentId, byte[] request, String contentType) throws SMKException
+    public void updateAttachment(String configId, String attachmentId, byte[] request, String contentType) throws SMKException
     {
         logger.debug("    Updating Attachment " + attachmentId + "...");
 
-        MapConfiguration resource = couchDAO().getMapConfiguration(configId);
+        MapConfiguration resource = couchDAO.getMapConfiguration(configId);
 
         if(resource == null) throw new SMKException(MAP_CONFIG_NOT_FOUND_MSG);
         
-        couchDAO().deleteAttachment(resource, attachmentId);
+        couchDAO.deleteAttachment(resource, attachmentId);
 
         // fetch the updated resource, so we're not out of date
-        resource = couchDAO().getMapConfiguration(configId);
+        resource = couchDAO.getMapConfiguration(configId);
 
         Attachment attachment = new Attachment(attachmentId, Base64.encodeBase64String(request), contentType);
         resource.addInlineAttachment(attachment);
 
-        couchDAO().updateResource(resource);
+        couchDAO.updateResource(resource);
 
         logger.debug(SUCCESS);
     }

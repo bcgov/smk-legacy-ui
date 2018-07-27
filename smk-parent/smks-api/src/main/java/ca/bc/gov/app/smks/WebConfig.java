@@ -20,6 +20,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import ca.bc.gov.app.smks.dao.CouchDAO;
 import ca.bc.gov.app.smks.dao.LayerCatalogDAO;
+import ca.bc.gov.app.smks.service.controller.MapConfigServiceController;
+import ca.bc.gov.app.smks.service.controller.PublishedMapConfigServiceController;
+import ca.bc.gov.app.smks.service.controller.SharedMapConfigController;
 
 @Configuration
 @EnableWebMvc
@@ -67,6 +70,24 @@ public class WebConfig extends WebMvcConfigurerAdapter
 	    
 	    return mapper;
 	}
+	
+    @Bean
+    public SharedMapConfigController sharedMapConfigController()
+    {
+        return new SharedMapConfigController();
+    }
+    
+	@Bean
+    public PublishedMapConfigServiceController publishedMapConfigServiceController()
+    {
+        return new PublishedMapConfigServiceController();
+    }
+	
+	@Bean
+    public MapConfigServiceController mapConfigServiceController()
+    {
+        return new MapConfigServiceController();
+    }
 	
 	@Override
 	public void addCorsMappings(CorsRegistry registry)
