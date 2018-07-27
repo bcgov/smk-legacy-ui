@@ -1,12 +1,16 @@
 package ca.bc.gov.app.smks.model;
 
+import java.io.Serializable;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 @JsonInclude(Include.NON_NULL)
-public class Attribute
+public class Attribute implements Serializable 
 {
-	private String id;
+    private static final long serialVersionUID = -2443327276106143204L;
+    
+    private String id;
 	private String name;
 	private String title;
 	private Boolean visible;

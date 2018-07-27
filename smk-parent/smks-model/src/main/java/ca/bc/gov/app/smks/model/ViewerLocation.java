@@ -1,7 +1,11 @@
 package ca.bc.gov.app.smks.model;
 
-public class ViewerLocation
+import java.io.Serializable;
+
+public class ViewerLocation implements Serializable 
 {
+    private static final long serialVersionUID = 1029985545555331272L;
+    
     private Double[] extent = {-139.1782, 47.6039, -110.3533, 60.5939};
     private Double[] center = {-139.1782, 47.6039};
     private Double zoom = 5.0;

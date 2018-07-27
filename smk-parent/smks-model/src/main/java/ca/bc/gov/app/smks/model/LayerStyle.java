@@ -1,12 +1,16 @@
 package ca.bc.gov.app.smks.model;
 
+import java.io.Serializable;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 @JsonInclude(Include.NON_NULL)
-public class LayerStyle
+public class LayerStyle implements Serializable 
 {
-	private Double strokeWidth;
+    private static final long serialVersionUID = 970684874006436208L;
+    
+    private Double strokeWidth;
 	private String strokeStyle;
 	private String strokeColor;
 	private Double strokeOpacity;

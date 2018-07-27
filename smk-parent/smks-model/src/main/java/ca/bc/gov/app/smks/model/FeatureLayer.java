@@ -16,7 +16,7 @@ public class FeatureLayer extends Layer
     private List<Attribute> attributes;
 	private String geometryAttribute;
     private String titleAttribute;
-    private Object queries;
+    private transient Object queries;
     
 	public FeatureLayer()
 	{
