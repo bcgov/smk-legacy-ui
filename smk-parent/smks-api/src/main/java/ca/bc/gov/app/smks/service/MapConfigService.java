@@ -7,12 +7,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ektorp.Attachment;
 import org.ektorp.AttachmentInputStream;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.operation.TransformException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
@@ -32,6 +36,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import org.xml.sax.SAXException;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonParser.Feature;
@@ -48,25 +53,27 @@ import ca.bc.gov.app.smks.model.Layer;
 import ca.bc.gov.app.smks.model.MapConfigInfo;
 import ca.bc.gov.app.smks.model.MapConfiguration;
 import ca.bc.gov.app.smks.model.layer.Vector;
+import net.lingala.zip4j.exception.ZipException;
 
 @CrossOrigin
 @RestController
 @RequestMapping("/MapConfigurations")
 @PropertySource("classpath:application.properties")
-public class MapConfigController
+public class MapConfigService
 {
-	private static Log logger = LogFactory.getLog(MapConfigController.class);
+	private static Log logger = LogFactory.getLog(MapConfigService.class);
 
 	@Autowired
     private ObjectMapper jsonObjectMapper;
 	
+	private static final String MAP_CONFIG_NOT_FOUND_MSG = "Map Configuration ID not found.";
 	private static final String SUCCESS = "    Success!";
-	private static final String ERR_MESSAGE = "{ \"status\": \"ERROR\", \"message\": \"";
 	private static final String SUCCESS_MESSAGE = "{ \"status\": \"Success!\" }";
 	private static final String SHAPE = "shape";
 	private static final String KML = "kml";
 	private static final String KMZ = "kmz";
 	private static final String VECTOR = "vector"; 
+	private static final String DEFAULT_CONTENT_TYPE = "application/octet-stream";
 	
 	@Autowired
 	private CouchDAO couchDAO;
@@ -130,28 +137,7 @@ public class MapConfigController
 			Map<String, String> resourceIds = couchDAO.getAllConfigs();
 			logger.debug("    Success, found " + resourceIds.size() + " valid results");
 
-			ArrayList<MapConfigInfo> configSnippets = new ArrayList<MapConfigInfo>();
-			for(String configId : resourceIds.keySet())
-			{
-			    try
-			    {
-			        MapConfiguration config = couchDAO.getMapConfiguration(resourceIds.get(configId));
-				    configSnippets.add(new MapConfigInfo(config));
-			    }
-			    catch(Exception e)
-			    {
-			        logger.debug("Map Configuration " + configId + " could not be loaded because it was invalid");
-			        
-			        // Add an empty config snippet
-			        MapConfigInfo config = new MapConfigInfo();
-			        config.setId(configId);
-			        config.setName(resourceIds.get(configId));
-			        config.setRevision(0);
-			        config.setValid(false);
-			        
-			        configSnippets.add(config);
-			    }
-			}
+			ArrayList<MapConfigInfo> configSnippets = getMapConfigSnippets(resourceIds);
 
 			result = new ResponseEntity<JsonNode>(jsonObjectMapper.convertValue(configSnippets, JsonNode.class), HttpStatus.OK);
 		}
@@ -166,6 +152,37 @@ public class MapConfigController
 		return result;
 	}
 
+	private ArrayList<MapConfigInfo> getMapConfigSnippets(Map<String, String> resourceIds)
+	{
+        ArrayList<MapConfigInfo> configSnippets = new ArrayList<MapConfigInfo>();
+        for(Map.Entry<String, String> entry : resourceIds.entrySet())
+        {
+            String key = entry.getKey();
+            String value = entry.getValue();
+            
+            try
+            {
+                MapConfiguration config = couchDAO.getMapConfiguration(value);
+                configSnippets.add(new MapConfigInfo(config));
+            }
+            catch(Exception e)
+            {
+                logger.debug("Map Configuration " + key + " could not be loaded because it was invalid");
+                
+                // Add an empty config snippet
+                MapConfigInfo config = new MapConfigInfo();
+                config.setId(key);
+                config.setName(value);
+                config.setRevision(0);
+                config.setValid(false);
+                
+                configSnippets.add(config);
+            }
+        }
+        
+        return configSnippets;
+	}
+	
 	@GetMapping(value = "/{id}")
 	@ResponseBody
 	public ResponseEntity<JsonNode> getMapConfig(@PathVariable String id, @RequestParam(value="version", required=false) String version) throws JsonParseException, JsonMappingException, IOException
@@ -286,17 +303,19 @@ public class MapConfigController
                 if(originalLayer.getType().equals(VECTOR))
                 {
                     boolean exists = false;
+                    
                     for(Layer layer : request.getLayers())
                     {
-                        if(layer.getType().equals(VECTOR) && layer.getId().equals(originalLayer.getId()))
+                        if(layer.getId().equals(originalLayer.getId()))
                         {
                             exists = true;
+                            break;
                         }
                     }
                     
                     if(!exists)
                     {
-                        // remove attachment for this layer.
+                        // remove attachment for this layer, it doesn't exist anymore.
                         deleteAttachment(id, originalLayer.getId());
                         layerRemoved = true;
                     }
@@ -350,81 +369,18 @@ public class MapConfigController
 
 				MapConfiguration resource = couchDAO.getMapConfiguration(configId);
 
-				if(resource != null)
-				{
-					// convert resource to geojson if it's a vector type
-					byte[] docBytes = request.getBytes();
-					
-					String contentType = request.getContentType();
-					
-					if(contentType.equals("application/vnd.google-earth.kml+xml")) type = KML;
-					if(contentType.equals("application/vnd.google-earth.kmz")) type = KMZ;
-					if(contentType.equals("application/zip")) type = SHAPE;
-					if(contentType.equals("application/x-zip-compressed")) type = SHAPE;
-					
-					if(type.equals(KML)) { type = VECTOR; docBytes = DocumentConverterFactory.convertDocument(request.getBytes(), DocumentType.KML); contentType = "application/octet-stream"; }
-					if(type.equals(KMZ)) { type = VECTOR; docBytes = DocumentConverterFactory.convertDocument(request.getBytes(), DocumentType.KMZ); contentType = "application/octet-stream"; }
-					else if(type.equals(SHAPE)) { type = VECTOR; docBytes = DocumentConverterFactory.convertDocument(request.getBytes(), DocumentType.SHAPE); contentType = "application/octet-stream"; }
-					
-					Attachment attachment = new Attachment(id, Base64.encodeBase64String(docBytes), contentType);
-				    resource.addInlineAttachment(attachment);
+				if(resource == null) throw new SMKException(MAP_CONFIG_NOT_FOUND_MSG);
+				
+		        byte[] docBytes = request.getBytes();
+		        String contentType = request.getContentType();
 
-				    if(type.equals("image") && id.equals("surroundImage"))
-				    {
-				        resource.getSurround().setImageSrc("@surroundImage");
-				    }
-
-				    // if this is a geojson blob, make sure we have verified the properties set
-				    if(type.equals(VECTOR))
-				    {
-				        Vector layer = (Vector)resource.getLayerByID(id);
-				        
-    				    ObjectMapper objectMapper = new ObjectMapper();
-    				    objectMapper.configure(Feature.ALLOW_UNQUOTED_CONTROL_CHARS, true);
-    				    
-    				    JsonNode node = objectMapper.readValue(docBytes, JsonNode.class);
-
-    				    List<String> fieldNames = new ArrayList<String>();
-    				    
-				        for (final JsonNode featureNode : node.get("features")) 
-				        {
-				            JsonNode properties = featureNode.get("properties");
-
-				            for (Iterator<String> iter = properties.fieldNames(); iter.hasNext(); ) 
-				            {
-				                String fieldName = iter.next();
-				                
-				                if(!fieldName.equals("description") && !fieldNames.contains(fieldName))
-				                {
-				                    fieldNames.add(fieldName);
-				                }
-				            }
-				        }
-    				    
-    				    //clear the attribute list
-				        layer.getAttributes().clear();
-				        
-				        // add the new list
-				        for(String field : fieldNames)
-				        {
-				            Attribute attr = new Attribute();
-				            attr.setId(field);
-				            attr.setName(field);
-				            attr.setTitle(field.replace("-", " "));
-				            attr.setVisible(true);
-				            
-				            layer.getAttributes().add(attr);
-				        }
-				    }
-
-				    MapConfiguration updatedResource = couchDAO.getMapConfiguration(configId);
-				    resource.setRevision(updatedResource.getRevision());
-				    couchDAO.updateResource(resource);
-
-				    logger.debug(SUCCESS);
-				    result = new ResponseEntity<JsonNode>(jsonObjectMapper.readValue(SUCCESS_MESSAGE, JsonNode.class), HttpStatus.OK);
-				}
-				else throw new SMKException("Map Configuration ID not found.");
+		        if(contentType.equals("application/vnd.google-earth.kml+xml")) type = KML;
+		        else if(contentType.equals("application/vnd.google-earth.kmz")) type = KMZ;
+		        else if(contentType.equals("application/zip") || contentType.equals("application/x-zip-compressed")) type = SHAPE;
+		        
+			    createNewAttachment(configId, id, docBytes, contentType, type, resource);
+			    
+			    result = new ResponseEntity<JsonNode>(jsonObjectMapper.readValue(SUCCESS_MESSAGE, JsonNode.class), HttpStatus.OK);
 			}
 			catch (Exception e)
 			{
@@ -439,6 +395,71 @@ public class MapConfigController
 		return result;
 	}
 
+	private void createNewAttachment(String configId, String id, byte[] docBytes, String contentType, String type, MapConfiguration resource) throws SAXException, IOException, ParserConfigurationException, ZipException, FactoryException, TransformException
+	{
+	    // convert resource to geojson if it's a vector type
+        if(type.equals(KML)) { type = VECTOR; docBytes = DocumentConverterFactory.convertDocument(docBytes, DocumentType.KML); contentType = DEFAULT_CONTENT_TYPE; }
+        else if(type.equals(KMZ)) { type = VECTOR; docBytes = DocumentConverterFactory.convertDocument(docBytes, DocumentType.KMZ); contentType = DEFAULT_CONTENT_TYPE; }
+        else if(type.equals(SHAPE)) { type = VECTOR; docBytes = DocumentConverterFactory.convertDocument(docBytes, DocumentType.SHAPE); contentType = DEFAULT_CONTENT_TYPE; }
+        
+        Attachment attachment = new Attachment(id, Base64.encodeBase64String(docBytes), contentType);
+        resource.addInlineAttachment(attachment);
+        
+        // if this is a geojson blob, make sure we have verified the properties set
+        if(type.equals(VECTOR))
+        {
+            processVectorAttributes(id, resource, docBytes);
+        }
+
+        MapConfiguration updatedResource = couchDAO.getMapConfiguration(configId);
+        resource.setRevision(updatedResource.getRevision());
+        couchDAO.updateResource(resource);
+
+        logger.debug(SUCCESS);
+	}
+	
+	public void processVectorAttributes(String id, MapConfiguration resource, byte[] docBytes) throws IOException
+	{
+	    Vector layer = (Vector)resource.getLayerByID(id);
+        
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.configure(Feature.ALLOW_UNQUOTED_CONTROL_CHARS, true);
+        
+        JsonNode node = objectMapper.readValue(docBytes, JsonNode.class);
+
+        List<String> fieldNames = new ArrayList<String>();
+        
+        for (final JsonNode featureNode : node.get("features")) 
+        {
+            JsonNode properties = featureNode.get("properties");
+
+            for (Iterator<String> iter = properties.fieldNames(); iter.hasNext(); ) 
+            {
+                String fieldName = iter.next();
+                
+                if(!fieldName.equals("description") && !fieldNames.contains(fieldName))
+                {
+                    fieldNames.add(fieldName);
+                }
+            }
+        }
+        
+        //clear the attribute list
+        layer.getAttributes().clear();
+        
+        // add the new list
+        for(String field : fieldNames)
+        {
+            Attribute attr = new Attribute();
+            attr.setId(field);
+            attr.setName(field);
+            attr.setTitle(field.replace("-", " "));
+            attr.setVisible(true);
+            
+            layer.getAttributes().add(attr);
+        }
+	}
+	
 	@GetMapping(value = "/{configId}/Attachments")
 	@ResponseBody
 	public ResponseEntity<JsonNode> getAllAttachments(@PathVariable String configId) throws JsonParseException, JsonMappingException, IOException
@@ -465,7 +486,7 @@ public class MapConfigController
 				logger.debug(SUCCESS);
 				result = new ResponseEntity<JsonNode>(jsonObjectMapper.convertValue(attachments, JsonNode.class), HttpStatus.OK);
 			}
-			else throw new SMKException("Map Configuration ID not found.");
+			else throw new SMKException(MAP_CONFIG_NOT_FOUND_MSG);
 		}
 		catch (Exception e)
 		{
@@ -480,7 +501,7 @@ public class MapConfigController
 
 	@GetMapping(value = "/{configId}/Attachments/{attachmentId}")
 	@ResponseBody
-	public ResponseEntity<byte[]> getAttachment(@PathVariable String configId, @PathVariable String attachmentId)
+	public ResponseEntity<byte[]> getAttachment(@PathVariable String configId, @PathVariable String attachmentId) throws IOException
 	{
 		logger.debug(" >> getAttachment()");
 		ResponseEntity<byte[]> result = null;
@@ -510,12 +531,12 @@ public class MapConfigController
 				logger.debug(SUCCESS);
 				result = new ResponseEntity<byte[]>(media, httpHeaders, HttpStatus.OK);
 			}
-			else throw new SMKException("Map Configuration ID not found.");
+			else throw new SMKException(MAP_CONFIG_NOT_FOUND_MSG);
 		}
 		catch (Exception e)
 		{
 			logger.error("    ## Error fetching attachment resource: " + e.getMessage());
-			result = new ResponseEntity<byte[]>(((ERR_MESSAGE + e.getMessage() + "\" }").replaceAll("\\r\\n|\\r|\\n", " ")).getBytes(), HttpStatus.BAD_REQUEST);
+			result = new ResponseEntity<byte[]>(getErrorMessageAsJson(e).toString().getBytes(), HttpStatus.BAD_REQUEST);
 		}
 
 		logger.info("    Get Attachment completed. Response: " + result.getStatusCode().name());
@@ -545,7 +566,7 @@ public class MapConfigController
 				}
 				else throw new SMKException("Attachment ID not found.");
 			}
-			else throw new SMKException("Map Configuration ID not found.");
+			else throw new SMKException(MAP_CONFIG_NOT_FOUND_MSG);
 		}
 		catch (Exception e)
 		{
@@ -588,7 +609,7 @@ public class MapConfigController
 				    logger.debug(SUCCESS);
 				    result = new ResponseEntity<JsonNode>(jsonObjectMapper.readValue("{ status: \"Success!\" }", JsonNode.class), HttpStatus.OK);
 				}
-				else throw new SMKException("Map Configuration ID not found.");
+				else throw new SMKException(MAP_CONFIG_NOT_FOUND_MSG);
 			}
 			catch (Exception e)
 			{

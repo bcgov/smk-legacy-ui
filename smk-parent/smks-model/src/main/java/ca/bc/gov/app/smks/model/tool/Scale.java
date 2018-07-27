@@ -47,6 +47,11 @@ public class Scale extends Tool
         return super.equals(other);
     }
     
+    @Override
+    public int hashCode() {
+        return getType().hashCode();
+    }
+    
 	public boolean getShowFactor() { return showFactor; }
 	public void setShowFactor(boolean showFactor) { this.showFactor = showFactor; }
 

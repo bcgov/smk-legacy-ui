@@ -20,8 +20,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -36,15 +34,14 @@ import ca.bc.gov.app.smks.model.WMSInfoLayer;
 @RestController
 @RequestMapping("/LayerLibrary")
 @PropertySource("classpath:application.properties")
-public class LayerCatalogController 
+public class LayerCatalogService 
 {
-	private static Log logger = LogFactory.getLog(LayerCatalogController.class);	
+	private static Log logger = LogFactory.getLog(LayerCatalogService.class);	
 
 	@Autowired
     private ObjectMapper jsonObjectMapper;
 	
     private static final String SUCCESS = "    Success!";
-    private static final String ERR_MESSAGE = "{ \"status\": \"ERROR\", \"message\": \"";
     
 	@Autowired
 	private LayerCatalogDAO layerCatalogDao;

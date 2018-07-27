@@ -42,6 +42,11 @@ public class Identify extends Tool
         return super.equals(other);
     }
     
+    @Override
+    public int hashCode() {
+        return getType().hashCode();
+    }
+    
 	public LayerStyle getStyle()
 	{
 		if ( style == null ) style = new LayerStyle();

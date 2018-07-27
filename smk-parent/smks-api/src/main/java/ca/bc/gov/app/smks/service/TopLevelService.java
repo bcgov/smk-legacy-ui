@@ -15,8 +15,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -25,9 +23,9 @@ import ca.bc.gov.app.smks.dao.CouchDAO;
 @CrossOrigin
 @RestController
 @RequestMapping("/")
-public class ServiceController 
+public class TopLevelService 
 {
-	private static Log logger = LogFactory.getLog(LayerCatalogController.class);
+	private static Log logger = LogFactory.getLog(LayerCatalogService.class);
 	
 	@Autowired
 	private ObjectMapper jsonObjectMapper;
@@ -37,7 +35,7 @@ public class ServiceController
 	
 	@GetMapping(value = "/")
 	@ResponseBody
-	public ResponseEntity<JsonNode> topLevel() throws JsonParseException, JsonMappingException, IOException 
+	public ResponseEntity<JsonNode> topLevel() throws IOException 
 	{
 		logger.debug(" >> topLevel()");
 		ResponseEntity<JsonNode> result = null;
@@ -64,7 +62,7 @@ public class ServiceController
 	
 	@GetMapping(value = "/Health")
 	@ResponseBody
-	public ResponseEntity<JsonNode> healthCheck() throws JsonParseException, JsonMappingException, IOException 
+	public ResponseEntity<JsonNode> healthCheck() throws IOException 
 	{
 		logger.debug(" >> healthCheck()");
 		ResponseEntity<JsonNode> result = null;
@@ -91,7 +89,7 @@ public class ServiceController
 		return result;
 	}
 	
-	private JsonNode getErrorMessageAsJson(Exception e) throws JsonParseException, JsonMappingException, IOException
+	private JsonNode getErrorMessageAsJson(Exception e) throws IOException
 	{
 	    return jsonObjectMapper.readValue(("{ \"status\": \"ERROR\", \"message\": \"" + e.getMessage() + "\" }").replaceAll("\\r\\n|\\r|\\n", " "), JsonNode.class);
 	}

@@ -46,6 +46,11 @@ public class BaseMaps extends Tool
         return super.equals(other);
     }
     
+    @Override
+    public int hashCode() {
+        return getType().hashCode();
+    }
+    
 	public String[] getChoices() {
 		return choices;
 	}

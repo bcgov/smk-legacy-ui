@@ -44,6 +44,11 @@ public class About extends Tool
         return super.equals(other);
     }
     
+    @Override
+    public int hashCode() {
+        return getType().hashCode();
+    }
+    
     public String getContent() {
 		return content;
 	}
