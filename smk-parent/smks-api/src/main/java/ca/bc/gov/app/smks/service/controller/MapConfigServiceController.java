@@ -38,13 +38,13 @@ public class MapConfigServiceController
 {
     private Log logger = LogFactory.getLog(MapConfigServiceController.class);
 
-    private final String MAP_CONFIG_NOT_FOUND_MSG = "Map Configuration ID not found.";
-    private final String SUCCESS = "    Success!";
-    private final String SHAPE = "shape";
-    private final String KML = "kml";
-    private final String KMZ = "kmz";
-    private final String VECTOR = "vector"; 
-    private final String DEFAULT_CONTENT_TYPE = "application/octet-stream";
+    private static final String MAP_CONFIG_NOT_FOUND_MSG = "Map Configuration ID not found.";
+    private static final String SUCCESS = "    Success!";
+    private static final String SHAPE = "shape";
+    private static final String KML = "kml";
+    private static final String KMZ = "kmz";
+    private static final String VECTOR = "vector"; 
+    private static final String DEFAULT_CONTENT_TYPE = "application/octet-stream";
     
     public MapConfigServiceController()
     {

@@ -36,7 +36,7 @@ public class WebConfig extends WebMvcConfigurerAdapter
 	private Environment env;
 
 	@Bean
-	public CouchDAO couchDAO() throws SMKException, MalformedURLException
+	public CouchDAO couchDAO() throws MalformedURLException
 	{
 		String name = env.getProperty("couchdb.name");
 		logger.debug(" >> WebConfig.couchDAO() : Initialize Couch DAO Bean " + name );

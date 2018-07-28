@@ -19,6 +19,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import ca.bc.gov.app.smks.dao.CouchDAO;
+import ca.bc.gov.app.smks.service.controller.SharedMapConfigController;
 
 @CrossOrigin
 @RestController
@@ -32,6 +33,9 @@ public class TopLevelService
 	
 	@Autowired
 	private CouchDAO couchDAO;
+	
+	@Autowired
+    private SharedMapConfigController sharedMapConfigController;
 	
 	@GetMapping(value = "/")
 	@ResponseBody
@@ -52,7 +56,7 @@ public class TopLevelService
 		catch(Exception e)
 		{
 			logger.error("    ## Error generating top level: " + e.getMessage());
-			result = handleError(e);
+			result = sharedMapConfigController.handleError(e);
 		}
 		
 		logger.info("    Top Level request complete. Response: " + result.getStatusCode().name());
@@ -81,21 +85,11 @@ public class TopLevelService
 		catch(Exception e)
 		{
 			logger.error("    ## Error generating health status: " + e.getMessage());
-			result = handleError(e);
+			result = sharedMapConfigController.handleError(e);
 		}
 		
 		logger.info("    Health check completed. Response: " + result.getStatusCode().name());
 		logger.debug(" << healthCheck()");
 		return result;
-	}
-	
-	private ResponseEntity<JsonNode> handleError(Exception e) throws IOException
-    {
-        return new ResponseEntity<JsonNode>(getErrorMessageAsJson(e), HttpStatus.BAD_REQUEST);
-    }
-	
-	private JsonNode getErrorMessageAsJson(Exception e) throws IOException
-	{
-	    return jsonObjectMapper.readValue(("{ \"status\": \"ERROR\", \"message\": \"" + e.getMessage() + "\" }").replaceAll("\\r\\n|\\r|\\n", " "), JsonNode.class);
 	}
 }
