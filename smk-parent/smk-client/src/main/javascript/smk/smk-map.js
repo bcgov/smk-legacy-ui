@@ -169,9 +169,7 @@ include.module( 'smk-map', [ 'jquery', 'util' ], function () {
                 return mergeCollection( base, merge, 'display', {
                     findFn: function ( merge ) {
                         return function ( base ) {
-                            if ( base.layerId ) return merge.layerId == base.layerId
-                            if ( base.folderId ) return merge.folderId == base.folderId
-                            if ( base.groupId ) return merge.groupId == base.groupId
+                            return merge.id == base.id
                         }
                     },
                     mergeFn: function ( base, merge ) {

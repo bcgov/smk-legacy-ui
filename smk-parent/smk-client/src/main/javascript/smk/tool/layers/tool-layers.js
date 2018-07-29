@@ -93,7 +93,7 @@ include.module( 'tool-layers', [ 'tool', 'widgets', 'tool-layers.panel-layers-ht
             },
 
             'set-all-layers-visible': function ( ev ) {
-                smk.$viewer.layerDisplayContext.setItemVisible( smk.$viewer.layerDisplayContext.root.folderId, ev.visible, ev.deep )
+                smk.$viewer.layerDisplayContext.setItemVisible( smk.$viewer.layerDisplayContext.root.id, ev.visible, ev.deep )
                 smk.$viewer.updateLayersVisible()
             },
 
@@ -109,7 +109,7 @@ include.module( 'tool-layers', [ 'tool', 'widgets', 'tool-layers.panel-layers-ht
 
 
         smk.$viewer.changedLayerVisibility( function () {
-            self.allVisible = smk.$viewer.layerDisplayContext.isItemVisible( smk.$viewer.layerDisplayContext.root.folderId )
+            self.allVisible = smk.$viewer.layerDisplayContext.isItemVisible( smk.$viewer.layerDisplayContext.root.id )
         } )
 
         smk.$viewer.startedLoading( function ( ev ) {

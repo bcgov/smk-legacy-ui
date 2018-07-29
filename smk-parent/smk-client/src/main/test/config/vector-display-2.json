@@ -3,59 +3,64 @@
         {
             "type": "layers",
             "display": [
-                { "layerId": "bar" },
+                { "id": "bar" },
                 { 
-                    "layerId": "1-multipolygon-hole",
+                    "id": "1-multipolygon-hole",
                     "title": "#2 Multi-polygon Hole",
                     "opacity": 0.3,
                     "isVisible": true
                 },
                 { 
-                    "folderId": "folder1",
+                    "id": "folder1",
+                    "type": "folder",
                     "title": "folder 1",
                     "opacity": 0.7,
                     "isVisible": true,
                     "isExpanded": true,
                     "items": [                
-                        { "layerId": "1-multipolygon" },
-                        { "layerId": "3-linestrings" }
+                        { "id": "1-multipolygon" },
+                        { "id": "3-linestrings" }
                     ]
                 },
                 { 
-                    "groupId": "group1",
+                    "id": "group1",
+                    "type": "group",
                     "title": "#2 group 1",
                     "opacity": 0.7,
                     "isVisible": true,
                     "items": [                
-                        { "layerId": "3-polygons" },
-                        { "layerId": "4-points-marker" }
+                        { "id": "3-polygons" },
+                        { "id": "4-points-marker" }
                     ]
                 },
                 { 
-                    "folderId": "folder2",
+                    "id": "folder2",
+                    "type": "folder",
                     "title": "#2 folder 2",
                     "isVisible": false,
                     "isExpanded": false,
                     "items": [                
-                        { "layerId": "4-points" },
+                        { "id": "4-points" },
                         { 
-                            "groupId": "group2",
+                            "id": "group2",
+                            "type": "group",
                             "title": "#2 group 2",
                             "isVisible": true,
                             "items": [                
-                                { "layerId": "multipoint" },
-                                { "layerId": "point-polygon" }
+                                { "id": "multipoint" },
+                                { "id": "point-polygon" }
                             ]
                         },
                         { 
-                            "folderId": "folder1",
+                            "id": "folder1",
+                            "type": "folder",
                             "title": "folder 1",
                             "isVisible": true,
                             "isExpanded": true,
                             "items": [                
-                                { "layerId": "polygon-polyline-point" },
-                                { "layerId": "polyline-polygon" },
-                                { "layerId": "polyline" }
+                                { "id": "polygon-polyline-point" },
+                                { "id": "polyline-polygon" },
+                                { "id": "polyline" }
                             ]
                         }
                     ]

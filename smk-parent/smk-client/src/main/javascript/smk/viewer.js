@@ -191,11 +191,12 @@ include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', '
                     var list = ly.childLayerConfigs().map( function ( childConfig ) {
                         var cly = createLayer( childConfig )
                         registerLayer( cly )
-                        return { layerId: cly.id }
+                        return { id: cly.id }
                     } )
 
                     return {
-                        folderId: ly.id,
+                        id: ly.id,
+                        type: 'folder',
                         title: ly.config.title,
                         isVisible: ly.config.isVisible,
                         isExpanded: false,
@@ -206,7 +207,7 @@ include.module( 'viewer', [ 'jquery', 'util', 'event', 'layer', 'feature-set', '
                     registerLayer( ly )
 
                     return {
-                        layerId: ly.id
+                        id: ly.id
                     }
                 }
             } )
