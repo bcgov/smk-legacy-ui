@@ -13,7 +13,7 @@ include.module( 'layer.layer-js', [ 'jquery', 'util', 'event' ], function () {
 
         $.extend( this, {
             config: config,
-            visible: false,
+            // visible: false,
         } )
 
         var loading = false
@@ -30,9 +30,9 @@ include.module( 'layer.layer-js', [ 'jquery', 'util', 'event' ], function () {
             }
         } )
 
-        // Object.defineProperty( this, 'id', {
-        //     get: function () { return config.id }
-        // } )
+        Object.defineProperty( this, 'id', {
+            get: function () { return config.id }
+        } )
     }
 
     $.extend( Layer.prototype, LayerEvent.prototype )
@@ -40,12 +40,12 @@ include.module( 'layer.layer-js', [ 'jquery', 'util', 'event' ], function () {
     SMK.TYPE.Layer = Layer
     // _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     //
-    Layer.prototype.initialize = function ( id, index, parentId ) {
+    Layer.prototype.initialize = function ( id ) {
         var self = this
 
-        this.id = id
-        this.parentId = parentId
-        this.index = index
+        // this.id = id
+        // this.parentId = parentId
+        // this.index = index
 
         if ( this.config.attributes ) {
             this.attribute = {}
