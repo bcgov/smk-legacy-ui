@@ -1,7 +1,7 @@
 <div class="smk-feature-popup" v-if="layer">
     <component class="smk-feature"
         v-bind:key="layer.id"
-        v-bind:is="attributeComponent"
+        v-bind:is="attributeView == 'default' ? attributeComponent : attributeView"
         v-bind="{
             layer:   layer,
             feature: feature,
@@ -23,6 +23,17 @@
             v-if="tool.directions"
             v-on:click="startDirections()"
         >Directions to here</span>
+
+        <select class="smk-command"
+            v-if="tool.attributeView"
+            v-model="attributeView"
+        >
+            <option value="default">Default View</option>        
+            <option v-bind:value="'feature-template-' + layer.id">Template View</option>        
+            <option value="feature-description">Description View</option>        
+            <option value="feature-attributes">Attributes View</option>        
+            <option value="feature-properties">Properties View</option>        
+        </select>
 
         <span class="smk-navigator"
             v-bind:class="{ 'smk-hidden': !hasMultiple }"

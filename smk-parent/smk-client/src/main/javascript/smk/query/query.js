@@ -94,7 +94,7 @@ include.module( 'query.query-js', [ 'jquery', 'util', 'event' ], function () {
                 .then( function ( values ) {
                     Vue.set( self.prop, 'choices', values
                         .map( function ( v ) { return { value: v } } )
-                        .sort( function ( a, b ) { return a.title > b.title ? 1 : -1 } )
+                        .sort( function ( a, b ) { return a.value > b.value ? 1 : -1 } )
                     )
                 } )
                 .catch( function ( e ) {

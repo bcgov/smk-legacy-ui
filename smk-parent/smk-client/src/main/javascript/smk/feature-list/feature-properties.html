@@ -5,13 +5,13 @@
     </div>
 
     <div class="smk-attributes"
-        v-if="feature.properties && Object.keys( feature.properties ) > 0"
+        v-if="feature.properties"
     >
         <div class="smk-attribute"
-            v-for="(val, attr) in feature.properties"
+            v-for="(attr) in sortedProperties"
         >
             <span class="smk-title" v-html="insertWordBreaks( attr )"></span>
-            <span class="smk-value" v-html="formatValue( val )"></span>
+            <span class="smk-value" v-html="formatValue( feature.properties[ attr ] )"></span>
         </div>
     </div>
 </div>
