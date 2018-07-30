@@ -45,6 +45,12 @@ include.module( 'feature-list', [ 'tool', 'widgets',
     Vue.component( 'feature-properties', {
         extends: featurePopup,
         template: inc[ 'feature-list.feature-properties-html' ],
+        computed: {
+            sortedProperties: function () {
+                if ( !this.feature || !this.feature.properties ) return []
+                return Object.keys( this.feature.properties ).sort()
+            }
+        }
     } )
 
     Vue.component( 'feature-description', {
@@ -60,6 +66,7 @@ include.module( 'feature-list', [ 'tool', 'widgets',
         this.makePropPanel( 'statusMessage', null )
 
         SMK.TYPE.Tool.prototype.constructor.call( this, $.extend( {
+            debugView: false
         }, option ) )
     }
 
@@ -170,7 +177,8 @@ include.module( 'feature-list', [ 'tool', 'widgets',
             attributeComponent: null,
             tool: {},
             hasMultiple: false,
-            position: null
+            position: null,
+            attributeView: 'default',
         }
 
         this.popupFeatureIds = null
@@ -181,6 +189,9 @@ include.module( 'feature-list', [ 'tool', 'widgets',
 
         if ( smk.$tool.zoom )
             this.popupModel.tool.zoom = true
+
+        if ( this.debugView )
+            this.popupModel.tool.attributeView = true
 
         this.popupVm = new Vue( {
             el: smk.addToContainer( inc[ 'feature-list.popup-feature-html' ] ),
@@ -229,7 +240,7 @@ include.module( 'feature-list', [ 'tool', 'widgets',
                     self.popupCurrentIndex = ( self.popupCurrentIndex + 1 ) % l
                     this.position = ( self.popupCurrentIndex + 1 ) + ' / ' + l
                     self.featureSet.pick( self.popupFeatureIds[ self.popupCurrentIndex ] )
-                },
+                }
             },
             updated: function () {
                 if ( self.active && this.feature )

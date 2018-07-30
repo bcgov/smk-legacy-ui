@@ -19,7 +19,7 @@
 
 .smk-popup-list {
     z-index: 5;
-    position: absolute;
+    /* position: absolute; */
     top: 20px;
     border: 1px solid gray;
     box-shadow: 0 1px 5px rgba(0, 0, 0, 0.65);
