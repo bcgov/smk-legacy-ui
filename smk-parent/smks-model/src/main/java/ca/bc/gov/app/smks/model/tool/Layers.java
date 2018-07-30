@@ -1,35 +1,48 @@
 package ca.bc.gov.app.smks.model.tool;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonRawValue;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.JsonNode;
 
 import ca.bc.gov.app.smks.model.Tool;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @JsonInclude(Include.NON_NULL)
 public class Layers extends Tool
 {
-	public Layers() {}
+    private static final long serialVersionUID = -4283508441394064225L;
 
-	protected Layers( Layers about ) {
-		super( about );
+    private transient Object display;
+    
+    public Layers() 
+    {
+        this.setTitle("Layers Panel");
+        this.setDescription("Layers Panel");
+        this.setType(Tool.Type.LAYERS.toString());
+    }
+
+    public Layers( Layers layers ) {
+		super( layers );
 	}
+	
+    @JsonRawValue
+    public JsonNode getDisplay() 
+    {
+        return (JsonNode)display;
+    }
 
-	public String getType() {
-		return Tool.Type.layers.toString();
-	}
-
-	public String getTitle() {
-		return "Layers Panel";
-	}
-
-	public Layers clone()
-	{
-		Layers clone = new Layers( this );
-
-		return clone;
-	}
-
+    public void setDisplay(JsonNode node) 
+    {
+        this.display = node;
+    }
+    
+    @Override
+    public boolean equals( Object other ) {
+        return super.equals(other);
+    }
+    
+    @Override
+    public int hashCode() {
+        return getType().hashCode();
+    }
 }

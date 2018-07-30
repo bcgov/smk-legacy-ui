@@ -5,30 +5,32 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 import ca.bc.gov.app.smks.model.Tool;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 @JsonInclude(Include.NON_NULL)
 public class Search extends Tool
 {
-	public Search() {}
+    private static final long serialVersionUID = -4453998961283799235L;
 
-	protected Search( Search about ) {
-		super( about );
-	}
+    public Search() 
+    {
+        this.setTitle("Search Panel");
+        this.setDescription("Search Panel");
+        this.setType(Tool.Type.SEARCH.toString());
+    }
 
-	public String getType() {
-		return Tool.Type.search.toString();
-	}
-
-	public String getTitle() {
-		return "Search Panel";
-	}
-
-	public Search clone()
+	public Search( Search search ) 
 	{
-		Search clone = new Search( this );
-
-		return clone;
+		super( search );
 	}
 
+    @Override
+    public boolean equals( Object other ) 
+    {
+        return super.equals(other);
+    }
+    
+    @Override
+    public int hashCode() 
+    {
+        return getType().hashCode();
+    }
 }

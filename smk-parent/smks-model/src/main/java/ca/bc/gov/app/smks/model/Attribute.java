@@ -1,17 +1,32 @@
 package ca.bc.gov.app.smks.model;
 
+import java.io.Serializable;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 @JsonInclude(Include.NON_NULL)
-public class Attribute implements Cloneable
+public class Attribute implements Serializable 
 {
-	private String id;
+    private static final long serialVersionUID = -2443327276106143204L;
+    
+    private String id;
 	private String name;
 	private String title;
 	private Boolean visible;
 
-	public Attribute() { }
+	public Attribute() 
+	{
+	    // empty constructor
+	}
+	
+	public Attribute(Attribute clone)
+	{
+	    this.setId(clone.getId());
+        this.setTitle(clone.getTitle());
+        this.setName(clone.getName());
+        this.setVisible(clone.getVisible());
+	}
 
 	public String getId() {
 		return id;
@@ -43,17 +58,5 @@ public class Attribute implements Cloneable
 
 	public void setVisible(Boolean visible) {
 		this.visible = visible;
-	}
-
-	public Attribute clone()
-	{
-		Attribute clone = new Attribute();
-
-		clone.setId(id);
-		clone.setTitle(title);
-		clone.setName(name);
-		clone.setVisible(visible);
-
-		return clone;
 	}
 }

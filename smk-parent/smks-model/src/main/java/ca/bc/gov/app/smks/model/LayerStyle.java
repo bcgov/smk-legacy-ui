@@ -1,29 +1,37 @@
 package ca.bc.gov.app.smks.model;
 
+import java.io.Serializable;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 @JsonInclude(Include.NON_NULL)
-public class LayerStyle implements Cloneable
+public class LayerStyle implements Serializable 
 {
-	private Double strokeWidth;
+    private static final long serialVersionUID = 970684874006436208L;
+    
+    private Double strokeWidth;
 	private String strokeStyle;
 	private String strokeColor;
 	private Double strokeOpacity;
 	private String fillColor;
 	private Double fillOpacity;
-	private String markerSymbolPath;
-
+	private String markerUrl;
+	private Integer[] markerSize = {20, 20};
+	private Integer[] markerOffset = {10, 0};
+    		
 	public LayerStyle() { }
 
-	protected LayerStyle( LayerStyle layerStyle ) {
+	public LayerStyle( LayerStyle layerStyle ) {
 		this.setStrokeWidth(layerStyle.getStrokeWidth());
 		this.setStrokeStyle(layerStyle.getStrokeStyle());
 		this.setStrokeColor(layerStyle.getStrokeColor());
 		this.setStrokeOpacity(layerStyle.getStrokeOpacity());
 		this.setFillColor(layerStyle.getFillColor());
 		this.setFillOpacity(layerStyle.getFillOpacity());
-		this.setMarkerSymbolPath(layerStyle.getMarkerSymbolPath());
+		this.setMarkerUrl(layerStyle.getMarkerUrl());
+		this.setMarkerSize(layerStyle.getMarkerSize());
+		this.setMarkerOffset(layerStyle.getMarkerOffset());
 	}
 
 	public Double getStrokeWidth() { return strokeWidth; }
@@ -44,14 +52,18 @@ public class LayerStyle implements Cloneable
 	public Double getFillOpacity() { return fillOpacity; }
 	public void setFillOpacity(Double fillOpacity) { this.fillOpacity = fillOpacity; }
 
-	public String getMarkerSymbolPath() { return markerSymbolPath; }
-	public void setMarkerSymbolPath(String markerSymbolPath) { this.markerSymbolPath = markerSymbolPath; }
+	public String getMarkerUrl() { return markerUrl; }
+	public void setMarkerUrl(String markerUrl) { this.markerUrl = markerUrl; }
 
-	public LayerStyle clone()
-	{
-		LayerStyle clone = new LayerStyle( this );
-
-		return clone;
+	public Integer[] getMarkerSize() {
+		if ( markerSize == null ) markerSize = new Integer[2];
+		return markerSize;
 	}
-
+	public void setMarkerSize(Integer[] markerSize) { this.markerSize = markerSize; }
+	
+	public Integer[] getMarkerOffset() {
+		if ( markerOffset == null ) markerOffset = new Integer[4];
+		return markerOffset;
+	}
+	public void setMarkerOffset(Integer[] markerOffset) { this.markerOffset = markerOffset; }
 }

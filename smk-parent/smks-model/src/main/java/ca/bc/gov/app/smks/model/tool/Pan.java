@@ -2,34 +2,32 @@ package ca.bc.gov.app.smks.model.tool;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import ca.bc.gov.app.smks.model.Tool;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @JsonInclude(Include.NON_NULL)
 public class Pan extends Tool
 {
-	public Pan() {}
+    private static final long serialVersionUID = 2596068091296209558L;
 
-	protected Pan( Pan about ) {
-		super( about );
+    public Pan() 
+    {
+        this.setTitle("Panning");
+        this.setDescription("Panning Tool");
+        this.setType(Tool.Type.PAN.toString());
+    }
+
+    public Pan( Pan pan ) {
+		super( pan );
 	}
-
-	public String getType() {
-		return Tool.Type.pan.toString();
-	}
-
-	public String getTitle() {
-		return "Panning";
-	}
-
-	public Pan clone()
-	{
-		Pan clone = new Pan( this );
-
-		return clone;
-	}
-
+	
+    @Override
+    public boolean equals( Object other ) {
+        return super.equals(other);
+    }
+    
+    @Override
+    public int hashCode() {
+        return getType().hashCode();
+    }
 }

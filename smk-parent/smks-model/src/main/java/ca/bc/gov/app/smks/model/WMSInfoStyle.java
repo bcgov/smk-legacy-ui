@@ -1,18 +1,23 @@
 package ca.bc.gov.app.smks.model;
 
+import java.io.Serializable;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 @JsonInclude(Include.NON_NULL)
-public class WMSInfoStyle
+public class WMSInfoStyle implements Serializable 
 {
-	private String name;
+    private static final long serialVersionUID = -6116193534952619649L;
+    
+    private String name;
 	private String title;
 	private String format;
 	private String legendUrl;
 
-	public WMSInfoStyle()
-	{
+	public WMSInfoStyle() 
+	{ 
+	    //empty constructor
 	}
 
 	public String getName()

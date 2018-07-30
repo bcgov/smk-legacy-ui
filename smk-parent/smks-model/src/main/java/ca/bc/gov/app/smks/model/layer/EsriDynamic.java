@@ -12,14 +12,16 @@ import ca.bc.gov.app.smks.model.Layer;
 @JsonInclude(Include.NON_NULL)
 public class EsriDynamic extends FeatureLayer
 {
-	private Integer mpcmId;
+    private static final long serialVersionUID = -8358281999117673990L;
+ 
+    private Integer mpcmId;
 	private String mpcmWorkspace;
 	private String serviceUrl;
 	private List<String> dynamicLayers;
 
 	public EsriDynamic() { }
 
-	protected EsriDynamic( EsriDynamic layer ) {
+	public EsriDynamic( EsriDynamic layer ) {
 		super( layer );
 
 		this.setMpcmId(layer.getMpcmId());
@@ -32,9 +34,10 @@ public class EsriDynamic extends FeatureLayer
 		}
 	}
 
+	@Override
 	public String getType()
 	{
-		return Layer.Type.EsriDynamic.getJsonType();
+		return Layer.Type.ESRI_DYNAMIC.getJsonType();
 	}
 
 	public Integer getMpcmId()
@@ -76,12 +79,5 @@ public class EsriDynamic extends FeatureLayer
 	public void setDynamicLayers(List<String> dynamicLayers)
 	{
 		this.dynamicLayers = dynamicLayers;
-	}
-
-	public EsriDynamic clone()
-	{
-		EsriDynamic clone = new EsriDynamic( this );
-
-		return clone;
 	}
 }

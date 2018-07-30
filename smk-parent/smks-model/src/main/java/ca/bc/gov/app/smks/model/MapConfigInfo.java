@@ -1,15 +1,20 @@
 package ca.bc.gov.app.smks.model;
 
+import java.io.Serializable;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 @JsonInclude(Include.NON_NULL)
-public class MapConfigInfo 
+public class MapConfigInfo implements Serializable 
 {
-	private String name;
+    private static final long serialVersionUID = 1L;
+
+    private String name;
 	private String id;
 	private int revision;
 	private String creator;
+	private boolean valid;
 	
 	public MapConfigInfo() { }
 
@@ -19,6 +24,7 @@ public class MapConfigInfo
 		this.id = config.getLmfId();
 		this.revision = config.getLmfRevision();
 		this.creator = config.getCreatedBy();
+		this.valid = true;
 	}
 	
 	public String getName() 
@@ -59,5 +65,15 @@ public class MapConfigInfo
 	public void setCreator(String creator) 
 	{
 		this.creator = creator;
+	}
+	
+	public boolean getValid()
+	{
+	    return this.valid;
+	}
+	
+	public void setValid(boolean valid)
+	{
+	    this.valid = valid;
 	}
 }

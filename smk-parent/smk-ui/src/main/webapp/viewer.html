@@ -1,60 +1,59 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Simple Map Kit</title>
-        <!-- STATIC -->
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-        <script src="https://cdn.rawgit.com/harvesthq/chosen/gh-pages/chosen.jquery.min.js"></script>
-        <link href="https://cdn.rawgit.com/harvesthq/chosen/gh-pages/chosen.min.css" rel="stylesheet"/>
-        <!-- DYNAMIC LOADED -->
+        <title></title>
+        <!-- SMK BOOTSTRAP - - - - - - - -->
+        <script src="../smk-client/smk.js"
+            smk-container-sel="#smk-map-frame"
+            smk-title-sel="#header-title, head title"
+            smk-service-url="../smks-api"
+            smk-config="?"
+        ></script>
+        <!-- - - - - - - - - - - - - - - -->
+        <style>
+            #header {
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 70px;
+                border-bottom:      2px solid #fcba19;
+                background-color: #036;
+                font-family:        Helvetica,Arial,sans-serif;
+                display:            flex;
+                justify-content:    flex-start;
+                align-items:        center;
+            }
+            #header img {
+                margin-left:    10px;
+                margin-bottom:  10px;
+            }
+            #header-title {
+                color:          white;
+                margin-left:    20px;
+                display:        flex;
+                flex-direction: column;
+                justify-content:center;
+                align-items:    flex-start;
+                font-size:      30px;
+            }
+            #smk-map-frame {
+                position: absolute;
+                top: 72px;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                margin: 0;
+                padding: 0;
+            }
+        </style>
     </head>
-    <body >
-        <div id="smk-map-frame"></div>
-        <script>
-        	(window.onpopstate = function () 
-        	{
-            	var match = "";
-                var pl = /\+/g;  // Regex for replacing addition symbol with a space
-                var search = /([^&=]+)=?([^&]*)/g;
-                var decode = function (s) { return decodeURIComponent(s.replace(pl, " ")); };
-                var query  = window.location.search.substring(1);
 
-            	var urlParams = {};
-            	
-                while (match = search.exec(query))
-                    urlParams[decode(match[1])] = decode(match[2]);
-                
-                // get the query string ID and version, pass a call to the api.
-                
-                if(urlParams.hasOwnProperty("id") && urlParams.hasOwnProperty("type"))
-                {
-                	var service = "../smks-api/MapConfigurations/";
-	                
-	                if(urlParams.type == "published")
-                	{
-	                	service = service + "Published/";
-                	}
-	                
-	                service = service + urlParams.id + "/";
-	                
-	                if(urlParams.hasOwnProperty("version"))
-                	{
-                        service = service + "?version=" + urlParams.version;
-	                }
-	                
-	                var script = document.createElement( "script" )
-	                script.setAttribute( "src", "../smk-client/smk-bootstrap.js" )
-	                script.setAttribute( "smk-disconnected", false )
-	                script.setAttribute( "smk-standalone", true )
-	                script.setAttribute( "smk-config", service )
-	                
-	                document.getElementsByTagName( 'head' )[ 0 ].appendChild( script );
-                }
-                else
-               	{
-                	alert("Specify a type (edit or published) and a config ID!");
-               	}
-        	})();
-        </script>
+    <body>
+        <div id="header">
+            <img src="../smk-ui/resources/images/bc_gov_logo_transparent.png" alt="SMK Application Logo">
+            <div id="header-title"></div>
+        </div>
+        <div id="smk-map-frame"></div>
     </body>
 </html>

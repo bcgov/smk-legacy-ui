@@ -1,12 +1,16 @@
 package ca.bc.gov.app.smks.model;
 
+import java.io.Serializable;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 @JsonInclude(Include.NON_NULL)
-public class MapSurround implements Cloneable
+public class MapSurround implements Serializable 
 {
-	private String type;
+    private static final long serialVersionUID = 4179616701339603291L;
+    
+    private String type;
 	private String title;
 	private String imageSrc;
 
@@ -17,6 +21,7 @@ public class MapSurround implements Cloneable
 	protected MapSurround( MapSurround mapSurround ) {
 		this.setType(mapSurround.getType());
 		this.setTitle(mapSurround.getTitle());
+		this.setImageSrc(mapSurround.getImageSrc());
 	}
 
 	public String getType() { return type; }
@@ -27,11 +32,4 @@ public class MapSurround implements Cloneable
 
 	public String getImageSrc() { return imageSrc; }
 	public void setImageSrc(String imageSrc) { this.imageSrc = imageSrc; }
-
-	public MapSurround clone()
-	{
-		MapSurround clone = new MapSurround( this );
-
-		return clone;
-	}
 }

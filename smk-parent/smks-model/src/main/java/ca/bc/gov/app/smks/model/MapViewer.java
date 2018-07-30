@@ -1,40 +1,68 @@
 package ca.bc.gov.app.smks.model;
 
+import java.io.Serializable;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 @JsonInclude(Include.NON_NULL)
-public class MapViewer implements Cloneable
+public class MapViewer implements Serializable 
 {
-	private String type;
-	private Double[] initialExtent = {-139.1782, 47.6039, -110.3533, 60.5939};
+    private static final long serialVersionUID = -5151996772459032477L;
+    
+    private String type;
+	private ViewerLocation location;
 	private String baseMap;
-
-	public MapViewer() {
+	private String activeTool;
+	private boolean clusterOption;
+	
+	public MapViewer() 
+	{
+	    clusterOption = false;
 	}
 
-	protected MapViewer( MapViewer mapViewer ) {
+	protected MapViewer( MapViewer mapViewer ) 
+	{
 		this.setType(mapViewer.getType());
-		this.setInitialExtent(mapViewer.getInitialExtent().clone());
 		this.setBaseMap(mapViewer.getBaseMap());
+		this.setActiveTool(mapViewer.getActiveTool());
+		this.setLocation(new ViewerLocation(mapViewer.getLocation()));
+		this.setClusterOption(mapViewer.getClusterOption());
 	}
 
 	public String getType() { return type; }
 	public void setType(String type) { this.type = type; }
 
-	public Double[] getInitialExtent() {
-		if ( initialExtent == null ) initialExtent = new Double[4];
-		return initialExtent;
+	public boolean getClusterOption()
+	{
+	    return this.clusterOption;
 	}
-	public void setInitialExtent(Double[] initialExtent) { this.initialExtent = initialExtent; }
-
+	
+	public void setClusterOption(boolean clusterOption)
+	{
+	    this.clusterOption = clusterOption;
+	}
+	
+	public ViewerLocation getLocation()
+	{
+	    return this.location;
+	}
+	
+	public void setLocation(ViewerLocation location)
+	{
+	    this.location = location;
+	}
+	
+	public String getActiveTool()
+	{
+	    return this.activeTool;
+	}
+	
+	public void setActiveTool(String activeTool)
+	{
+	    this.activeTool = activeTool;
+	}
+	
 	public String getBaseMap() { return baseMap; }
 	public void setBaseMap(String baseMap) { this.baseMap = baseMap; }
-
-	public MapViewer clone()
-	{
-		MapViewer clone = new MapViewer( this );
-
-		return clone;
-	}
 }

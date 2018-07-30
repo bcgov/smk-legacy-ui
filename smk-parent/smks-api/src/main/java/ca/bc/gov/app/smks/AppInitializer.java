@@ -6,13 +6,13 @@ import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatche
 
 public class AppInitializer extends AbstractAnnotationConfigDispatcherServletInitializer 
 {
-	private static Log logger = LogFactory.getLog(AppInitializer.class);
+	private static Log localLogger = LogFactory.getLog(AppInitializer.class);
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	protected Class[] getRootConfigClasses()
 	{
-		logger.debug(" >> Initializer.getRootConfigClasses()");
+	    localLogger.debug(" >> Initializer.getRootConfigClasses()");
 		return new Class[] { WebConfig.class };
 	}
 
@@ -20,14 +20,14 @@ public class AppInitializer extends AbstractAnnotationConfigDispatcherServletIni
 	@Override
 	protected Class[] getServletConfigClasses() 
 	{
-		logger.debug(" >> Initializer.getServletConfigClasses()");
-		return null;
+	    localLogger.debug(" >> Initializer.getServletConfigClasses()");
+		return new Class[]{};
 	}
 
 	@Override
 	protected String[] getServletMappings() 
 	{
-		logger.debug(" >> Initializer.getServletMappings()");
+	    localLogger.debug(" >> Initializer.getServletMappings()");
 		return new String[] { "/" };
 	}
 }

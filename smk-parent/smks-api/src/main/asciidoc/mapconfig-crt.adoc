@@ -1,6 +1,6 @@
-== {POST} MapConfiguration - Create a new LMF Map Configuration (not for publishing)
+== {POST} MapConfiguration - Create a new SMK Map Configuration (not for publishing)
 
-Executing a POST at the MapConfiguration endpoint with a body containing the required Map Configuration json will create a new, unpublished Map Configuration that can be used for editing. All newly created documents will have their LMF Version set to '1'
+Executing a POST at the MapConfiguration endpoint with a body containing the required Map Configuration json will create a new, unpublished Map Configuration that can be used for editing. All newly created documents will have their SMK Version set to '1'
 
 Example of curl command:
 
@@ -28,7 +28,7 @@ To create a new configuration, the following model must be adhered to:
 |`lmfId`
 |`String`
 |`True`
-|The LMF identifer for the Map Configuration
+|The SMK identifer for the Map Configuration
 
 |`lmfRevision`
 |`Integer`
@@ -38,7 +38,7 @@ To create a new configuration, the following model must be adhered to:
 |`name`
 |`String`
 |`True`
-|The name of an LMF application. This name is used for labels and display purposes 
+|The name of an SMK application. This name is used for labels and display purposes 
 
 |`project`
 |`String`
@@ -47,53 +47,58 @@ To create a new configuration, the following model must be adhered to:
 
 |`createdBy`
 |`String`
-|`True`
+|`False`
 |The name of the user (BCeID or IDIR) that created this Map Configuration
 
-|`viewerType`
-|`String`
+|`published`
+|`boolean`
 |`True`
-|The type of viewer that will be used when displaying this Map Configuration to the user (leaflet, esri2d, esri3d)
+|Indicats if this project is a published version. if False, this is an editable version
 
-|`showHeader`
-|`Boolean`
-|`True`
-|An indicator that will either hide or show the header within the viewer
-
-|`headerImage`
+|`surround.type`
 |`String`
 |`False`
-|The attachment ID for the header image, or the URL if the header image is not stored as an attachment with the Map Configuration	
-	
-|`aboutPage`
+|The type of surround header to use currently only 'default' is enabled
+
+|`surround.title`
 |`String`
 |`False`
-|The HTML content that will be displayed in the viewer `about` section
-	
-|`defaultBasemap`
+|The title of the configuration, displayed in the header
+
+|`surround.imageSrc`
+|`String`
+|`False`
+|A banner image to display in the header
+
+|`viewer.type`
 |`String`
 |`True`
-|The basemap to use with the Map Configuration, by default
-	
-|`bbox`
+|The viewer type to use. This is currently either 'leaflet' or 'esri3d'
+
+|`viewer.baseMap`
+|`String`
+|`True`
+|The name of the default basemap to display from SMK's basemap options
+
+|`viewer.location.extent`
 |`Array[Double]`
 |`False`
-|The default bounding box where the Map Configuration will be initially zoomed to
+|The default extent at which the map will be displayed. This will override center and zoom settings.
 
-|`allowMouseWheelZoom`
-|`Boolean`
-|`True`
-|An indicator that will allow or prevent using the mouse wheel to trigger a zoom operation when the mouse pointer is in the viewer map pane
+|`viewer.location.center`
+|`Array[Double]`
+|`False`
+|The center point to pan the map to when the application starts. This requires a zoom level set, and this will be overriden by setting an extent value.
 
-|`isPublished`
-|`Boolean`
-|`True`
-|An indicator for identifying if a Map Configuration is published, and therefore publicly accessible to view
+|`viewer.location.zoom`
+|`Double`
+|`False`
+|The zoom level to set the map display to when the application starts. This requires a center point value.
 
 |`tools`
-|`Array[String]`
+|`Array[Tool]`
 |`True`
-|The list of tools this Map Configuration will activate (Pan, Zoom, Directions, Markup, Measure, Print)
+|The list of tools this Map Configuration will activate
 
 |`layers`
 |`Array[Layer]`
@@ -121,10 +126,10 @@ Layers have many different types. Each type is an extension of the root 'Layer' 
 |`True`
 |The identifer for a Layer
 
-|`label`
+|`title`
 |`String`
 |`True`
-|The Layers label, used for display in the viewer
+|The Layers title, used for display in the viewer
 
 |`isVisible`
 |`Boolean`
@@ -136,40 +141,45 @@ Layers have many different types. Each type is an extension of the root 'Layer' 
 |`True`
 |Copyright details and attribution to be displayed in the map viewer container
 
-|`serviceUrl`
+|`metadataUrl`
 |`String`
 |`True`
-|The URL used for ArcGIS Dynamic Service and Feature layers, WMS services, or attachment layers
-
-|`format`
-|`String`
-|`True`
-|The default image format used for the layer (PNG, JPG)
+|The URL used for linking to a metadat source
 
 |`opacity`
 |`Double`
 |`True`
 |The default opacity the layer is displayed at. This will not override existing WMS congigured values, and may result in very hard to see layers
 
-|`isTransparent`
-|`Boolean`
-|`True`
-|Indicates if the layers background is transparent. Defaults to TRUE
-
 |`minScale`
 |`Double`
-|`True`
+|`False`
 |The minimum visible scale for the layer
 
 |`maxScale`
 |`Double`
-|`True`
+|`False`
 |The maximum visible scale for the layer
+
+|`geometryAttribute`
+|`String`
+|`False`
+|The default geometry attribute, if attributes are set
+
+|`titleAttribute`
+|`String`
+|`False`
+|The default title attribute, if attributes are set
+
+|`queries`
+|`Array[Query]`
+|`False`
+|A list of query objects used for executing custom query actions
 
 |`attributes`
 |`Array[Attribute]`
-|`True`
-|An array of attribute values. Used to override what is displayed with Dynamic, Feature, and WMS layers.
+|`False`
+|An array of attribute values. Used to override what is displayed with Dynamic, Vector, and WMS layers.
 	
 |===
 
@@ -212,27 +222,15 @@ One of the following models is required for each layer
 |`True`
 |The workspace used for this layer in the DataBC Layer Catalog
 
-|`metadataUrl`
+|`serviceUrl`
 |`String`
 |`True`
-|The DataBC Catalog metadata URL
+|The URL for the DataBC Layer Catalog
 
 |`dynamicLayers`
 |`Array[String]`
 |`True`
 |A listing of dynamic layer configurations. This will typically only contain one dynamic feature, which can be derived from the MPCM Layer Catalog
-
-|===
-	
-=== Feature Layer Model:
-
-|===
-|Path|Type|Required|Description
-
-|`layers`
-|`Array[String]`
-|`True`
-|A listing of feature layer configuration ID's. These ID's are found in the feature layer Map Service endpoint. 
 
 |===
 
@@ -241,103 +239,333 @@ One of the following models is required for each layer
 |===
 |Path|Type|Required|Description
 
-|`wmsVersion`
+|`version`
 |`String`
 |`True`
 |The WMS version used for get map,  get feature info and get capabilities wms requests
 
-|`wmsStyleId`
-|`String`
-|`True`
-|The ID of the style to use when making get map requests for the WMS layer 
-
-|`wmsStyleName`
+|`styleName`
 |`String`
 |`True`
 |The name of the style to use when making get map requests for the WMS layer 
 
-|`wmsLegendUrl`
+|`layerName`
 |`String`
 |`True`
-|The URL for the WMS layer legend icons
+|The name of the layer to use when making get map requests for the WMS layer 
 
-|`metadataUrl`
+|`serviceUrl`
 |`String`
-|`False`
-|The DataBC Catalog metadata URL (if available)
-
-|`layers`
-|`Array[String]`
-|`False`
-|A listing of layer ids to display with this WMS Layer 
+|`True`
+|The URL for the WMS service
 	
 |===
 
-=== KML/JSON Vector Layer Model:
+=== Vector Layer Model:
 
 |===
 |Path|Type|Required|Description
+
+|`dataUrl`
+|`String`
+|`False`
+|A URL for an external GeoJSON file
+
+|`useRaw`
+|`Boolean`
+|`False`
+|Indicates if the layer should be displayed in its native form, with no heatmapping or clustering. Only relevant for point vectors
 
 |`useClustering`
 |`Boolean`
-|`false`
-|Indicates if the layer should also include point clustering
+|`False`
+|Indicates if the layer should also include point clustering. Only relevant for point vectors
 
-|`useHeatmapping`
+|`useHeatmap`
 |`Boolean`
-|`false`
-|Indicates if the layer should also include heatmap clustering
+|`False`
+|Indicates if the layer should also include heatmap clustering. Only relevant for point vectors
 
-|`strokeWidth`
+|`style.strokeWidth`
 |`Double`
-|`false`
+|`False`
 |Width of a line or polygon outline
 
-|`strokeStyle`
+|`style.strokeStyle`
 |`String`
-|`false`
+|`False`
 |Display style for a line or polygon outline (solid, dashed, dotted)
 
-|`strokeColor`
+|`style.strokeColor`
 |`String`
-|`false`
+|`False`
 |The RGB color code for the line or polygon outline
 
-|`strokeOpacity`
+|`style.strokeOpacity`
 |`Double`
-|`false`
+|`False`
 |The opacity of the line or polygon outline
 
-|`fillColor`
+|`style.fillColor`
 |`String`
-|`false`
+|`False`
 |The RGB color code for the polygon fill
 
-|`fillOpacity`
+|`style.fillOpacity`
 |`String`
-|`false`
+|`False`
 |The opacity for the polygon fill
 
-|`markerSymbolPath`
+|`style.markerUrl`
 |`String`
-|`false`
+|`False`
 |The URL or attachment ID to use for custom point marker symbols
 
+|`style.markerSize`
+|`Array[Integer]`
+|`False`
+|the x and y sizes to use for a custom marker symbol
+
+|`style.markerOffset`
+|`Array[Integer]`
+|`False`
+|A default offset for drawing the custom marker symbol in relation to the real point location
 |===
 
-It is possible to create layer collections, via a Folder or a Group. 
-A Folder allows the viewer to interact with each object contained within it (including other folders). Individual layers can be displayed.
-Group layers cannot contain folders, and are only collections of layers. When in a group, all layers are controlled by the single group layer. 
-
-=== Folder/Group Layer Model:
+=== Tools Model:
 
 |===
 |Path|Type|Required|Description
 
-|`sublayers`
-|`Array[Layer]`
-|`true`
-|A listing of layers stored within this folder 
+|`enabled`
+|`Boolean`
+|`False`
+|Indicates if this tool is enabled or disabled by default. Disabled tools will not function in an applicaiton and will be removed from the UI
+
+|`title`
+|`String`
+|`False`
+|The Title to use for a tool. All tools contain defaults, and will be overriden if title is supplied
+
+|`icon`
+|`String`
+|`False`
+|The default icon to use for a tool. All tools contain defaults, and will be overriden if an icon name is supplied. Icons are derived from the Google Material Icons library
+
+|`order`
+|`Integer`
+|`False`
+|The Uorder in which the tool will be displayed in the toolbars
+
+|`instance`
+|`String`
+|`False`
+|The name of related tool instances to display with this tool. Currently, this is only used for query definitions
+
+|`position`
+|`String`
+|`False`
+|The location where the tool and icon will be displayed from. 'Dropdown' requires the dropdown tool to be activated. By default tools are placed in the menu, but they can also be moved to the toolbar
+
+|`showPanel`
+|`Boolean`
+|`False`
+|Indicates if the tool should be displayed with a panel. All tools default to True, except for the identify tool. This should only be set to False with the identify panel, as many other tools will have unknown behaviour if their required panels are hidden
 
 |===
 
+Some tools have specialized configurations in addition to the default tool configuration above. These are listed below:
+
+=== About Tool Model:
+
+|===
+|Path|Type|Required|Description
+
+|`content`
+|`String`
+|`False`
+|HTML content to be displayed in the about panel
+
+|===
+
+=== Basemaps Tool Model:
+
+|===
+|Path|Type|Required|Description
+
+|`choices`
+|`Array[String]`
+|`False`
+|A listing of available basemap ID's to offer in this map configuration
+
+|===
+
+=== Identify Tool Model:
+
+|===
+|Path|Type|Required|Description
+
+|`styleOpacity`
+|`Double`
+|`False`
+|The opacity of the identify tool feature highlighting
+
+|`style.strokeWidth`
+|`Double`
+|`False`
+|Width of a line or polygon outline
+
+|`style.strokeStyle`
+|`String`
+|`False`
+|Display style for a line or polygon outline (solid, dashed, dotted)
+
+|`style.strokeColor`
+|`String`
+|`False`
+|The RGB color code for the line or polygon outline
+
+|`style.strokeOpacity`
+|`Double`
+|`False`
+|The opacity of the line or polygon outline
+
+|`style.fillColor`
+|`String`
+|`False`
+|The RGB color code for the polygon fill
+
+|`style.fillOpacity`
+|`String`
+|`False`
+|The opacity for the polygon fill
+
+|`style.markerUrl`
+|`String`
+|`False`
+|The URL or attachment ID to use for custom point marker symbols
+
+|`style.markerSize`
+|`Array[Integer]`
+|`False`
+|the x and y sizes to use for a custom marker symbol
+
+|`style.markerOffset`
+|`Array[Integer]`
+|`False`
+|A default offset for drawing the custom marker symbol in relation to the real point location
+
+|===
+
+=== Mini Map Tool Model:
+
+|===
+|Path|Type|Required|Description
+
+|`baseMap`
+|`String`
+|`True`
+|The basemap ID for display in the Mini Map
+
+|===
+
+=== Scale Tool Model:
+
+|===
+|Path|Type|Required|Description
+
+|`showFactor`
+|`Boolean`
+|`True`
+|Display the scale as a factor
+
+|`showBar`
+|`Boolean`
+|`True`
+|Display the scale in a scale bar
+
+|===
+
+=== Select Tool Model:
+
+|===
+|Path|Type|Required|Description
+
+|`styleOpacity`
+|`Double`
+|`False`
+|The opacity of the Select tool feature highlighting
+
+|`style.strokeWidth`
+|`Double`
+|`False`
+|Width of a line or polygon outline
+
+|`style.strokeStyle`
+|`String`
+|`False`
+|Display style for a line or polygon outline (solid, dashed, dotted)
+
+|`style.strokeColor`
+|`String`
+|`False`
+|The RGB color code for the line or polygon outline
+
+|`style.strokeOpacity`
+|`Double`
+|`False`
+|The opacity of the line or polygon outline
+
+|`style.fillColor`
+|`String`
+|`False`
+|The RGB color code for the polygon fill
+
+|`style.fillOpacity`
+|`String`
+|`False`
+|The opacity for the polygon fill
+
+|`style.markerUrl`
+|`String`
+|`False`
+|The URL or attachment ID to use for custom point marker symbols
+
+|`style.markerSize`
+|`Array[Integer]`
+|`False`
+|the x and y sizes to use for a custom marker symbol
+
+|`style.markerOffset`
+|`Array[Integer]`
+|`False`
+|A default offset for drawing the custom marker symbol in relation to the real point location
+
+|===
+
+=== Zoom Tool Model:
+
+|===
+|Path|Type|Required|Description
+
+|`mouseWheel`
+|`Boolean`
+|`False`
+|Allow zooming with the mouse wheel
+
+|`doubleClick`
+|`Boolean`
+|`False`
+|Allow zooming with a mouse 'double-click'
+
+|`box`
+|`Boolean`
+|`False`
+|Allow zooming by clicking and dragging a box
+
+|`control`
+|`Boolean`
+|`False`
+|Allow zooming by holding control, clicking, and dragging a box
+
+|===

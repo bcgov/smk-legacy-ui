@@ -1,4 +1,8 @@
-== Retrieve generated API documents
+== {DELETE} MapConfiguration/{config_id}/Attachments/{attachment_id} - Delete an Attachment for a Map Configuration
+
+Executing a DELETE at the MapConfiguration/{config_id}/Attachments/{attachment_id} endpoint will attempt to delete the attachment. Ensure you have updated any links in layer configurations to this attachment, if necessary.
+
+NOTE: Deleting a layer with attached vector information will automatically trigger an attachment delete.
 
 Example of curl command:
 
@@ -6,7 +10,7 @@ include::{snippets}/mapconfig-attch-del/curl-request.adoc[]
 
 Example of http request:
 
-include::{snippets}/mapconfig--attchdel/http-request.adoc[]
+include::{snippets}/mapconfig-attch-del/http-request.adoc[]
 
 Example of http response:
 

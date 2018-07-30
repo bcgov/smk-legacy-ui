@@ -1,4 +1,6 @@
-== Retrieve generated API documents
+== {GET} MapConfiguration/{id}/Attachments/ - Retrieve All Attachments for a Map Configuration
+
+Executing a GET at the MapConfiguration/{id}/Attachments/ endpoint will return a listing of all attachments this map configuration currently has.
 
 Example of curl command:
 
@@ -15,3 +17,22 @@ include::{snippets}/mapconfig-attch-all/http-response.adoc[]
 Response body:
 
 include::{snippets}/mapconfig-attch-all/response-body.adoc[]
+
+Resulting fields:
+
+|===
+|Path|Type|Description
+
+|`id`
+|`String`
+|The ID of the attachment
+
+|`content-type`
+|`String`
+|The content-type of the attachment
+
+|`content-length`
+|`String`
+|The size of the attachment in bytes
+
+|===

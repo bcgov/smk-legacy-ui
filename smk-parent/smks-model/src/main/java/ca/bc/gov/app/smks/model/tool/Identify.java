@@ -2,34 +2,71 @@ package ca.bc.gov.app.smks.model.tool;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import ca.bc.gov.app.smks.model.LayerStyle;
 import ca.bc.gov.app.smks.model.Tool;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @JsonInclude(Include.NON_NULL)
 public class Identify extends Tool
 {
-	public Identify() {}
+    private static final long serialVersionUID = 4091129321421088691L;
 
-	protected Identify( Identify about ) {
-		super( about );
-	}
-
-	public String getType() {
-		return Tool.Type.identify.toString();
-	}
-
-	public String getTitle() {
-		return "Identify Panel";
-	}
-
-	public Identify clone()
+    private LayerStyle style;
+	private Double styleOpacity;
+	private Integer tolerance = 5;
+	
+	public Identify() 
 	{
-		Identify clone = new Identify( this );
-
-		return clone;
+	    this.setTitle("Identify Panel");
+	    this.setDescription("Identify Panel");
+	    this.setType(Tool.Type.IDENTIFY.toString());
 	}
 
+	public Identify( Identify identify ) {
+		super( identify );
+		this.tolerance = identify.getTolerance();
+		this.styleOpacity = identify.getStyleOpacity();
+		this.style = new LayerStyle(identify.getStyle());
+	}
+
+    @Override
+    public boolean equals( Object other ) {
+        return super.equals(other);
+    }
+    
+    @Override
+    public int hashCode() {
+        return getType().hashCode();
+    }
+    
+	public LayerStyle getStyle()
+	{
+		if ( style == null ) style = new LayerStyle();
+		return style;
+	}
+
+	public void setStyle(LayerStyle style)
+	{
+		this.style = style;
+	}
+	
+	public Double getStyleOpacity()
+	{
+		return styleOpacity;
+	}
+	
+	public void setStyleOpacity(Double styleOpacity)
+	{
+		this.styleOpacity = styleOpacity;
+	}
+	
+	public Integer getTolerance()
+	{
+	    return this.tolerance;
+	}
+	
+	public void setTolerance(Integer tolerance)
+	{
+	    this.tolerance = tolerance;
+	}
 }

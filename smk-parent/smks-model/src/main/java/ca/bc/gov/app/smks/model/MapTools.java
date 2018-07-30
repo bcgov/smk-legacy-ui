@@ -3,6 +3,7 @@ package ca.bc.gov.app.smks.model;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
@@ -13,13 +14,14 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 import ca.bc.gov.app.smks.model.tool.About;
 import ca.bc.gov.app.smks.model.tool.Scale;
-import ca.bc.gov.app.smks.model.tool.Sidebar;
 import ca.bc.gov.app.smks.model.tool.Zoom;
 
 @JsonInclude(Include.NON_NULL)
-public class MapTools implements Cloneable
+public class MapTools implements Serializable 
 {
-	public enum Tool { measure };
+    private static final long serialVersionUID = -6479452094517424523L;
+
+    public enum Tool { MEASURE }
 	
     private boolean measure;
     private Scale scale;
@@ -30,7 +32,6 @@ public class MapTools implements Cloneable
     private boolean pan;
     private boolean attribution;
     private Zoom zoom;
-    private Sidebar sidebar;
     private About about;
     private boolean baseMaps;
     private boolean layers;
@@ -41,16 +42,15 @@ public class MapTools implements Cloneable
 
 	protected MapTools( MapTools mapTools ) {
 		this.setMeasure(mapTools.getMeasure());
-		this.setScale(mapTools.getScale().clone());
+		this.setScale(new Scale(mapTools.getScale()));
 		this.setCoordinate(mapTools.getCoordinate());
 		this.setMinimap(mapTools.getMinimap());
 		this.setMarkup(mapTools.getMarkup());
 		this.setDirections(mapTools.getDirections());
 		this.setPan(mapTools.getPan());
 		this.setAttribution(mapTools.getAttribution());
-		this.setZoom(mapTools.getZoom().clone());
-		this.setSidebar(mapTools.getSidebar().clone());
-		this.setAbout(mapTools.getAbout().clone());
+		this.setZoom(new Zoom(mapTools.getZoom()));
+		this.setAbout(new About(mapTools.getAbout()));
 		this.setBaseMaps(mapTools.getBaseMaps());
 		this.setLayers(mapTools.getLayers());
 		this.setIdentify(mapTools.getIdentify());
@@ -90,12 +90,6 @@ public class MapTools implements Cloneable
 	}
 	public void setZoom(Zoom zoom) { this.zoom = zoom; }
 
-	public Sidebar getSidebar() {
-		if ( sidebar == null ) sidebar = new Sidebar();
-		return sidebar;
-	}
-	public void setSidebar(Sidebar sidebar) { this.sidebar = sidebar; }
-
 	public About getAbout() {
 		if ( about == null ) about = new About();
 		return about;
@@ -113,13 +107,6 @@ public class MapTools implements Cloneable
 
 	public boolean getSelect() { return select; }
 	public void setSelect(boolean select) { this.select = select; }
-
-	public MapTools clone()
-	{
-		MapTools clone = new MapTools( this );
-
-		return clone;
-	}
 
 	public Map<String, Object> allTools() {
 		try {

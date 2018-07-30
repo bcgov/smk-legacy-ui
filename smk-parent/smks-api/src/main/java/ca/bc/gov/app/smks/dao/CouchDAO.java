@@ -1,7 +1,10 @@
 package ca.bc.gov.app.smks.dao;
 
+import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -26,25 +29,22 @@ import ca.bc.gov.app.smks.model.MapConfiguration;
 public class CouchDAO
 {
 	private static Log logger = LogFactory.getLog(CouchDAO.class);
-
-	private String couchDBurl;
-	private String couchDBUser;
-	private String couchDBPassword;
+	
 	private CouchDbInstance db;
 	private CouchDbConnector dbc;
 	private SMKSResourceDAO resourceDAO;
 
-	public CouchDAO(String couchUrl, String databaseName, String user, String password) throws Exception
+	private static final String FETCH_CONFIGS = "_design/fetch-configs";
+	private static final String FETCH_ALL_CONFIGS = "fetch-all-configs";
+	private static final String FETCH_PUBLISHED_CONFIGS = "fetch-published-configs";
+	
+	public CouchDAO(String couchUrl, String databaseName, String user, String password) throws MalformedURLException
 	{
 		logger.info("Initializing CouchDB DAO with the following settings:");
 		logger.info(" - Couch URL: " + couchUrl);
 		logger.info(" - User: " + user);
 
 		HttpClient httpClient = new StdHttpClient.Builder().url(couchUrl).username(user).password(password).build();
-
-		couchDBurl = couchUrl;
-		couchDBUser = user;
-		couchDBPassword = password;
 
 		db = new StdCouchDbInstance(httpClient);
 		dbc = new StdCouchDbConnector(databaseName, db);
@@ -61,7 +61,7 @@ public class CouchDAO
 		logger.info("Initialization of CouchDB DAO complete.");
 	}
 
-	private void createSMKDB() throws Exception
+	private void createSMKDB()
 	{
 		// create the database
 		logger.info("     Build Database...");
@@ -71,15 +71,15 @@ public class CouchDAO
 		// create the design doc
 		logger.info("     Build Design Doc and Views...");
 
-		DesignDocument doc = new DesignDocument("_design/fetch-configs");
+		DesignDocument doc = new DesignDocument(FETCH_CONFIGS);
 
 		String fetchAllString = "function ( doc ) { emit( doc.lmfId, doc.lmfRevision ) }";
 		DesignDocument.View fetchAll = new DesignDocument.View(fetchAllString);
-		doc.addView("fetch-all-configs", fetchAll);
+		doc.addView(FETCH_ALL_CONFIGS, fetchAll);
 
 		String fetchPubString = "function ( doc ) { if( doc.published ) { emit( doc.lmfId, doc.lmfRevision ) } }";
 		DesignDocument.View fetchPub = new DesignDocument.View(fetchPubString);
-		doc.addView("fetch-published-configs", fetchPub);
+		doc.addView(FETCH_PUBLISHED_CONFIGS, fetchPub);
 
 		dbc.create(doc);
 
@@ -101,8 +101,8 @@ public class CouchDAO
 		MapConfiguration result = null;
 
 		ViewQuery query = new ViewQuery()
-							  .designDocId("_design/fetch-configs")
-						      .viewName("fetch-published-configs")
+							  .designDocId(FETCH_CONFIGS)
+						      .viewName(FETCH_PUBLISHED_CONFIGS)
 						      .key(lmfId);
 
 		ViewResult queryRslt = dbc.queryView(query);
@@ -125,8 +125,8 @@ public class CouchDAO
 		List<MapConfiguration> results = new ArrayList<MapConfiguration>();
 
 		ViewQuery query = new ViewQuery()
-						      .designDocId("_design/fetch-configs")
-						      .viewName("fetch-published-configs");
+						      .designDocId(FETCH_CONFIGS)
+						      .viewName(FETCH_PUBLISHED_CONFIGS);
 		ViewResult queryRslt = dbc.queryView(query);
 
 		List<Row> rowsToParse = minimizeViewResults(queryRslt);
@@ -140,13 +140,13 @@ public class CouchDAO
 		return results;
 	}
 
-	public List<MapConfiguration> getAllConfigs()
+	public Map<String, String> getAllConfigs()
 	{
-		List<MapConfiguration> results = new ArrayList<MapConfiguration>();
+	    Map<String, String> results = new HashMap<String, String>();
 
 		ViewQuery query = new ViewQuery()
-			      .designDocId("_design/fetch-configs")
-			      .viewName("fetch-all-configs");
+			      .designDocId(FETCH_CONFIGS)
+			      .viewName(FETCH_ALL_CONFIGS);
 		ViewResult queryRslt = dbc.queryView(query);
 
 		List<Row> rowsToParse = minimizeViewResults(queryRslt);
@@ -154,7 +154,7 @@ public class CouchDAO
 		// parse the remaining results into MapConfiguration documents
 		for(Row row : rowsToParse)
 		{
-			results.add(getResourceByDocId(row.getId()));
+		    results.put(row.getId(), row.getKey());
 		}
 
 		return results;
@@ -163,8 +163,8 @@ public class CouchDAO
 	public List<MapConfiguration> getAllMapConfigurationVersions(String lmfId)
 	{
 		ViewQuery query = new ViewQuery()
-			      .designDocId("_design/fetch-configs")
-			      .viewName("fetch-all-configs")
+			      .designDocId(FETCH_CONFIGS)
+			      .viewName(FETCH_ALL_CONFIGS)
 			      .key(lmfId);
 
 		ViewResult queryRslt = dbc.queryView(query);
@@ -186,8 +186,8 @@ public class CouchDAO
 		MapConfiguration result = null;
 
 		ViewQuery query = new ViewQuery()
-			      .designDocId("_design/fetch-configs")
-			      .viewName("fetch-all-configs")
+			      .designDocId(FETCH_CONFIGS)
+			      .viewName(FETCH_ALL_CONFIGS)
 			      .key(lmfId);
 
 		ViewResult queryRslt = dbc.queryView(query);
@@ -210,8 +210,8 @@ public class CouchDAO
 		MapConfiguration result = null;
 
 		ViewQuery query = new ViewQuery()
-			      .designDocId("_design/fetch-configs")
-			      .viewName("fetch-all-configs")
+			      .designDocId(FETCH_CONFIGS)
+			      .viewName(FETCH_ALL_CONFIGS)
 			      .key(lmfId);
 
 		ViewResult queryRslt = dbc.queryView(query);
@@ -234,42 +234,47 @@ public class CouchDAO
 	private List<Row> minimizeViewResults(ViewResult queryRslt)
 	{
 		List<Row> rowsToParse = new ArrayList<Row>();
+		
 		for(Row row : queryRslt.getRows())
 		{
-			String id = row.getKey();
-			int revision = row.getValueAsInt();
-
-			boolean addedConfig = false;
-			Row rowToExclude = null;
-			for(Row addedRow : rowsToParse)
-			{
-				String addedRowId = addedRow.getKey();
-				int addedRowRevision = addedRow.getValueAsInt();
-
-				if(addedRowId.equals(id))
-				{
-					if(addedRowRevision > revision)
-					{
-						addedConfig = true;
-						rowToExclude = null;
-						break;
-					}
-					else if(addedRowRevision < revision)
-					{
-						addedConfig = false;
-						rowToExclude = addedRow;
-						break;
-					}
-				}
-			}
-
-			if(!addedConfig) rowsToParse.add(row);
-			if(rowToExclude != null) rowsToParse.remove(rowToExclude);
+		    processViewRows(row, rowsToParse);
 		}
 
 		return rowsToParse;
 	}
 
+	private void processViewRows(Row row, List<Row> rowsToParse)
+	{
+	    String id = row.getKey();
+        int revision = row.getValueAsInt();
+
+        boolean addedConfig = false;
+        Row rowToExclude = null;
+        
+        for(Row addedRow : rowsToParse)
+        {
+            String addedRowId = addedRow.getKey();
+            int addedRowRevision = addedRow.getValueAsInt();
+
+            if(addedRowId.equals(id) && addedRowRevision != revision)
+            {
+                if(addedRowRevision > revision)
+                {
+                    addedConfig = true;
+                }
+                else
+                {
+                    rowToExclude = addedRow;
+                }
+                
+                break;
+            }
+        }
+
+        if(!addedConfig) rowsToParse.add(row);
+        if(rowToExclude != null) rowsToParse.remove(rowToExclude);
+	}
+	
 	public void deleteAttachment(MapConfiguration resource, Layer documentLayer)
 	{
 		deleteAttachment(resource, documentLayer.getTitle());

@@ -5,55 +5,44 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 import ca.bc.gov.app.smks.model.Tool;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 @JsonInclude(Include.NON_NULL)
 public class About extends Tool
 {
-	private static Log logger = LogFactory.getLog(About.class);
+    private static final long serialVersionUID = 8108413477451380277L;
 
     private String content;
 
-	public About() {}
+	public About() 
+	{
+	    this.setTitle("About Panel");
+	    this.setDescription("Provide the contents of about panel.");
+	    this.setType(Tool.Type.ABOUT.toString());
+	}
 
-	protected About( About about ) {
+	public About( About about ) {
 		super( about );
 		this.setContent( about.getContent());
 	}
-
-	public String getType() {
-		return Tool.Type.about.toString();
-	}
-
-	public String getTitle() {
-		return "About Panel";
-	}
-
-    public String getDescription() {
-        return "Provide the contents of about panel.";
+	
+    @Override
+    public boolean equals( Object other ) {
+        return super.equals(other);
     }
-
+    
+    @Override
+    public int hashCode() {
+        return getType().hashCode();
+    }
+    
+	@Override
     public boolean isConfigured() {
         return true;
     }
-
-	public String getContent() {
-		// logger.debug( "get " + content );
+    
+    public String getContent() {
 		return content;
 	}
 	public void setContent(String content) {
-		// logger.debug( "set " + content );
 		this.content = content;
 	}
-
-	public About clone()
-	{
-		About clone = new About( this );
-
-		return clone;
-	}
-
 }

@@ -5,43 +5,40 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 import ca.bc.gov.app.smks.model.Tool;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 @JsonInclude(Include.NON_NULL)
 public class Minimap extends Tool
 {
+    private static final long serialVersionUID = -6174751714538415677L;
+
     private String baseMap;
 
-	public Minimap() {}
-
-	protected Minimap( Minimap about ) {
-		super( about );
+	public Minimap() 
+	{
+	    this.setTitle("Mini Map");
+	    this.setDescription("Select the base map for the mini map.");
+	    this.setType(Tool.Type.MINIMAP.toString());
 	}
 
-	public String getType() {
-		return Tool.Type.minimap.toString();
+	public Minimap( Minimap minimap ) {
+		super( minimap );
+		this.baseMap = minimap.getBaseMap();
 	}
-
-	public String getTitle() {
-		return "Mini Map";
-	}
-
-    public String getDescription() {
-        return "Select the base map for the mini map.";
-    }
-
+	
+    @Override
     public boolean isConfigured() {
         return true;
     }
 
+    @Override
+    public boolean equals( Object other ) {
+        return super.equals(other);
+    }
+    
+    @Override
+    public int hashCode() {
+        return getType().hashCode();
+    }
+    
 	public String getBaseMap() { return baseMap; }
 	public void setBaseMap( String baseMap ) { this.baseMap = baseMap; }
-
-	public Minimap clone()
-	{
-		Minimap clone = new Minimap( this );
-
-		return clone;
-	}
-
 }

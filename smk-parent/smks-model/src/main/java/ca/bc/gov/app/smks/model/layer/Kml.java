@@ -10,7 +10,9 @@ import ca.bc.gov.app.smks.model.LayerStyle;
 @JsonInclude(Include.NON_NULL)
 public class Kml extends FeatureLayer
 {
-	private String dataUrl;
+    private static final long serialVersionUID = -2417856900087987082L;
+
+    private String dataUrl;
 	private boolean useClustering;
 	private boolean useHeatmapping;
 	private LayerStyle style;
@@ -23,12 +25,13 @@ public class Kml extends FeatureLayer
 		this.setDataUrl(layer.getDataUrl());
 		this.setUseClustering(layer.getUseClustering());
 		this.setUseHeatmapping(layer.getUseHeatmapping());
-		this.setStyle(layer.getStyle().clone());
+		this.setStyle(new LayerStyle(layer.getStyle()));
 	}
 
+	@Override
 	public String getType()
 	{
-		return Layer.Type.Kml.getJsonType();
+		return Layer.Type.KML.getJsonType();
 	}
 
 	public String getDataUrl()
@@ -70,12 +73,5 @@ public class Kml extends FeatureLayer
 	public void setStyle(LayerStyle style)
 	{
 		this.style = style;
-	}
-
-	public Kml clone()
-	{
-		Kml clone = new Kml( this );
-
-		return clone;
 	}
 }

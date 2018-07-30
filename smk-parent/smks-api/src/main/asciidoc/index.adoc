@@ -1,4 +1,4 @@
-= Lightweight Mapping Framework Map Config Service
+= Simple Map Kit Map Configuration and Creation Service
   Vivid Solutions Inc;
   :doctype: book
   :icons: font
@@ -10,8 +10,8 @@
   [introduction]
   = Introduction
 
-  Blah blah blah. Blah, blah blah ...
-
+ The Simple Map Kit Map Configuration and Creation Service (SMKS-API) is a RESULTful service for assisting with the creation and management of map configuration resources used by the SMK Client javascript application.
+ 
   [[overview]]
   = Overview
 
@@ -27,9 +27,6 @@
 
   | `POST`
   | Used to create a new resource
-
-  | `PATCH`
-  | Used to update an existing resource, including partial updates
 
   | `PUT`
   | Used to update an existing resource, full updates only

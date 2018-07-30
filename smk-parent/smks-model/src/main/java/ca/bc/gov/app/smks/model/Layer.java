@@ -5,17 +5,17 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
+import java.io.Serializable;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import ca.bc.gov.app.smks.model.layer.EsriDynamic;
 import ca.bc.gov.app.smks.model.layer.Folder;
-import ca.bc.gov.app.smks.model.layer.Geojson;
+import ca.bc.gov.app.smks.model.layer.Vector;
 import ca.bc.gov.app.smks.model.layer.Group;
 import ca.bc.gov.app.smks.model.layer.Kml;
 import ca.bc.gov.app.smks.model.layer.Wms;
-
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @JsonTypeInfo(
 	use = JsonTypeInfo.Id.NAME,
@@ -28,18 +28,20 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 	@Type( name = "group",        value = Group.class ),
 	@Type( name = "wms",          value = Wms.class ),
 	@Type( name = "kml",          value = Kml.class ),
-	@Type( name = "geojson",      value = Geojson.class )
+	@Type( name = "vector",      value = Vector.class )
 } )
 @JsonInclude(Include.NON_NULL)
-public class Layer implements Cloneable
+public class Layer implements Serializable 
 {
-	public enum Type {
-		EsriDynamic( "esri-dynamic" ),
-		Folder( "folder" ),
-		Group( "group" ),
-		Wms( "wms" ),
-		Kml( "kml" ),
-		Geojson( "geojson" );
+    private static final long serialVersionUID = -4522391129982811968L;
+
+    public enum Type {
+		ESRI_DYNAMIC( "esri-dynamic" ),
+		FOLDER( "folder" ),
+		GROUP( "group" ),
+		WMS( "wms" ),
+		KML( "kml" ),
+		VECTOR( "vector" );
 
 		private String jsonType;
 
@@ -59,6 +61,7 @@ public class Layer implements Cloneable
 	private Double minScale;
 	private Double maxScale;
 	private boolean isQueryable;
+	private String popupTemplate;
 	
 	public Layer()
 	{
@@ -74,6 +77,8 @@ public class Layer implements Cloneable
 		this.setMaxScale(layer.getMaxScale());
 		this.setMinScale(layer.getMinScale());
 		this.setOpacity(layer.getOpacity());
+		this.setPopupTemplate(layer.getPopupTemplate());
+		this.setIsQueryable(layer.isQueryable);
 	}
 
 	public String getId()
@@ -172,17 +177,19 @@ public class Layer implements Cloneable
 		return isQueryable;
 	}
 	
+	public String getPopupTemplate()
+	{
+	    return this.popupTemplate;
+	}
+	
+	public void setPopupTemplate(String popupTemplate)
+	{
+	    this.popupTemplate = popupTemplate;
+	}
+	
 	@Override
 	public String toString()
 	{
 		return this.getTitle();
 	}
-
-	public Layer clone()
-	{
-		Layer clone = new Layer( this );
-
-		return clone;
-	}
-
 }

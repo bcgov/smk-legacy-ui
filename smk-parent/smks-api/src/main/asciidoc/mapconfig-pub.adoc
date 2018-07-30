@@ -1,0 +1,21 @@
+== {POST} MapConfiguration/Publish/{id} - Publish a Map Configuration
+
+Executing a POST at the MapConfiguration/Publish endpoint with a Map Configuration id will create a published version of the map configuration.
+
+A published map configuration is no longer editable, and considered stable for exporting and viewing. Any edits made will be on a new version of the map configuration document. A published map configuration cannot be altered in any way.
+
+Example of curl command:
+
+include::{snippets}/mapconfig-pub/curl-request.adoc[]
+
+Example of http request:
+
+include::{snippets}/mapconfig-pub/http-request.adoc[]
+
+Example of http response:
+
+include::{snippets}/mapconfig-pub/http-response.adoc[]
+
+Response body:
+
+include::{snippets}/mapconfig-pub/response-body.adoc[]

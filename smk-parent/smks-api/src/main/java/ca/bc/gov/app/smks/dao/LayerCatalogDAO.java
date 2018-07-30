@@ -1,7 +1,6 @@
 package ca.bc.gov.app.smks.dao;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -12,13 +11,16 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import ca.bc.gov.app.smks.SMKException;
 import ca.bc.gov.app.smks.model.Attribute;
 import ca.bc.gov.app.smks.model.MPCMInfoLayer;
 import ca.bc.gov.app.smks.model.WMSInfoLayer;
@@ -33,6 +35,19 @@ public class LayerCatalogDAO
 	private String arcgisUri;
 	private String wmsUri;
 
+	private static final String PARSING_FROM_MSG = "Parsing XML result from ";
+	private static final String FOLDERS = "folders";
+	private static final String LAYERS = "layers";
+    private static final String LAYER_DISPLAY_NAME = "layerDisplayName";
+	
+    private static final String NAME_UC = "Name";
+    private static final String NAME_LC = "name";
+    private static final String TITLE = "Title";
+    private static final String FORMAT = "Format";
+    private static final String LEGENDURL = "LegendURL";
+    private static final String ONLINERESOURCE = "OnlineResource";
+    private static final String XLINK_HREF = "xlink:href";
+    
 	public LayerCatalogDAO(String mpcmUri, String arcgisUri, String wmsUri)
 	{
 		logger.info("Initializing Layer Catalog DAO with the following settings:");
@@ -45,21 +60,21 @@ public class LayerCatalogDAO
 		this.wmsUri = wmsUri;
 	}
 
-	public ArrayList<MPCMInfoLayer> createMpcmLayers() throws Exception
+	public List<MPCMInfoLayer> createMpcmLayers() throws SAXException, IOException, ParserConfigurationException
 	{
 		logger.debug(" >> createMpcmLayers()");
-		ArrayList<MPCMInfoLayer> catalogNodes = new ArrayList<MPCMInfoLayer>();
+		List<MPCMInfoLayer> catalogNodes = new ArrayList<MPCMInfoLayer>();
 
 		URL mpcmUrl = new URL(mpcmUri);
 
-		logger.debug("Parsing XML result from " + mpcmUri);
+		logger.debug(PARSING_FROM_MSG + mpcmUri);
 	    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         factory.setNamespaceAware(true);
         Document doc = factory.newDocumentBuilder().parse(mpcmUrl.openStream());
 
         logger.debug("Successfully parsed xml doc. Looping through nodes...");
         //loop through each root node folder.
-        Element foldersElement = (Element)doc.getElementsByTagName("folders").item(0);
+        Element foldersElement = (Element)doc.getElementsByTagName(FOLDERS).item(0);
         NodeList foldersNodes = foldersElement.getChildNodes();
 
         int itemId = 1;
@@ -85,7 +100,7 @@ public class LayerCatalogDAO
                 // Each root node folder may have layer and/or folders within
                 // we'll need to add each of them here.
 
-                Element subfolderElement = (Element)folder.getElementsByTagName("folders").item(0);
+                Element subfolderElement = (Element)folder.getElementsByTagName(FOLDERS).item(0);
 
                 if(subfolderElement != null)
                 {
@@ -93,7 +108,7 @@ public class LayerCatalogDAO
                 	itemId = processFolders(subfoldersNodes, rootLayer, itemId);
                 }
 
-                Element sublayerElement = (Element)folder.getElementsByTagName("layers").item(0);
+                Element sublayerElement = (Element)folder.getElementsByTagName(LAYERS).item(0);
 
                 if(sublayerElement != null)
                 {
@@ -111,7 +126,7 @@ public class LayerCatalogDAO
         return catalogNodes;
 	}
 
-	private int processFolders(NodeList folders, MPCMInfoLayer parent, int id) throws DOMException, SAXException, IOException, ParserConfigurationException
+	private int processFolders(NodeList folders, MPCMInfoLayer parent, int id) throws SAXException, IOException, ParserConfigurationException
 	{
 		if (folders != null)
 	    {
@@ -136,7 +151,7 @@ public class LayerCatalogDAO
 	                // Each root node folder may have layer and/or folders within
 	                // we'll need to add each of them here.
 	
-	                Element subfolderElement = (Element)folder.getElementsByTagName("folders").item(0);
+	                Element subfolderElement = (Element)folder.getElementsByTagName(FOLDERS).item(0);
 	
 	                if(subfolderElement != null)
 	                {
@@ -144,7 +159,7 @@ public class LayerCatalogDAO
 	                	id = processFolders(subfoldersNodes, layer, id);
 	                }
 	
-	                Element sublayerElement = (Element)folder.getElementsByTagName("layers").item(0);
+	                Element sublayerElement = (Element)folder.getElementsByTagName(LAYERS).item(0);
 	
 	                if(sublayerElement != null)
 	                {
@@ -158,7 +173,7 @@ public class LayerCatalogDAO
 		return id;
 	}
 
-	private int processLayers(NodeList layers, MPCMInfoLayer parent, int id) throws DOMException, SAXException, IOException, ParserConfigurationException
+	private int processLayers(NodeList layers, MPCMInfoLayer parent, int id)
 	{
 		if (layers != null)
 	    {
@@ -170,13 +185,13 @@ public class LayerCatalogDAO
 
             	// trim anything flagged as internal access.
             	// temporary solution until MPCM rest service returns workspace properly
-            	String layerName = layerElement.getElementsByTagName("layerDisplayName").item(0).getTextContent();
+            	String layerName = layerElement.getElementsByTagName(LAYER_DISPLAY_NAME).item(0).getTextContent();
             	if(!layerName.toLowerCase().contains("(internal access)") && !layerName.toLowerCase().contains(" - internal"))
             	{
 	                // populate the rootLayer object with the folder details.
 	                layer.setId(id);
 	                layer.setMpcmId(new Integer(layerElement.getElementsByTagName("layerId").item(0).getTextContent()));
-	                layer.setLabel(layerElement.getElementsByTagName("layerDisplayName").item(0).getTextContent());
+	                layer.setLabel(layerElement.getElementsByTagName(LAYER_DISPLAY_NAME).item(0).getTextContent());
 	                layer.setLayerUrl(mpcmUri + layer.getMpcmId());
 	
 	                // finally, add the node and increment the itemId
@@ -189,13 +204,13 @@ public class LayerCatalogDAO
 		return id;
 	}
 
-	public EsriDynamic createCatalogLayer(String id) throws Exception
+	public EsriDynamic createCatalogLayer(String id) throws SMKException, SAXException, IOException, ParserConfigurationException
 	{
 		logger.debug(" >> createCatalogLayer()");
 		EsriDynamic layer = new EsriDynamic();
         URL mpcmUrl = new URL(mpcmUri + id);
 
-        logger.debug("Parsing XML result from " + mpcmUri + id);
+        logger.debug(PARSING_FROM_MSG + mpcmUri + id);
 
 	    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         factory.setNamespaceAware(true);
@@ -204,9 +219,9 @@ public class LayerCatalogDAO
         logger.debug("Successfully parsed XML. Creating Catalog Layer...");
 
         layer.setMpcmWorkspace(doc.getElementsByTagName("workspaceName").item(0).getTextContent());
-        layer.setId(id);
+        layer.setId(doc.getElementsByTagName(LAYER_DISPLAY_NAME).item(0).getTextContent().toLowerCase().replaceAll(" ", "-").replaceAll("[^A-Za-z0-9]", "-"));
         layer.setMpcmId(new Integer(doc.getElementsByTagName("layerId").item(0).getTextContent()));
-        layer.setTitle(doc.getElementsByTagName("layerDisplayName").item(0).getTextContent());
+        layer.setTitle(doc.getElementsByTagName(LAYER_DISPLAY_NAME).item(0).getTextContent());
 
         // append the dynamic layer details
         layer.setServiceUrl(arcgisUri); // databc arcgis address
@@ -223,27 +238,7 @@ public class LayerCatalogDAO
 	    {
 	        for (int p = 0; p < propertiesNodes.getLength(); p++)
 	        {
-	        	if (propertiesNodes.item(p).getNodeType() == Node.ELEMENT_NODE )
-	            {
-	                Element el = (Element) propertiesNodes.item(p);
-	                String type = el.getElementsByTagName("key").item(0).getTextContent();
-	                String value = el.getElementsByTagName("value").item(0).getTextContent();
-
-	                layer.setOpacity(0.65);
-
-	                if(type.equals("metadata.url"))
-	                {
-	                	layer.setMetadataUrl(value);
-	                }
-	                //else if(type.equals("extractable"))
-	                //{
-	                //	layer.setIsExportable(new Boolean(value));
-	                //}
-	                else if(type.equals("visible"))
-	                {
-	                	layer.setIsVisible(new Boolean(value));
-	                }
-	            }
+	            processPropertiesNode(propertiesNodes.item(p), layer);
 	        }
 	    }
 
@@ -254,29 +249,14 @@ public class LayerCatalogDAO
 	    {
 	        for (int i = 0; i < fieldNodes.getLength(); i++)
 	        {
-	            if (fieldNodes.item(i).getNodeType() == Node.ELEMENT_NODE)
-	            {
-	                Element el = (Element) fieldNodes.item(i);
-
-	                Attribute attribute = new Attribute();
-
-	                attribute.setName(el.getElementsByTagName("fieldName").item(0).getTextContent());
-	                attribute.setTitle(el.getElementsByTagName("fieldAlias").item(0).getTextContent());
-	                attribute.setVisible(Boolean.parseBoolean(el.getElementsByTagName("visible").item(0).getTextContent()));
-	                attribute.setId(convertNameToId(attribute.getName()));
-	                
-	                if(attribute.getVisible())
-	                {
-	                	layer.getAttributes().add(attribute);
-	                }
-	            }
+	            processFolderNode(fieldNodes.item(i), layer);
 	        }
 	    }
 
-	    if(!layer.getMpcmWorkspace().toUpperCase().equals("MPCM_ALL_PUB"))
+	    if(!layer.getMpcmWorkspace().equalsIgnoreCase("MPCM_ALL_PUB"))
 	    {
 	    	logger.debug(layer.getTitle() + " is not a public layer. Cancelling process...");
-	    	throw new Exception(layer.getTitle() + " is not a public layer. Cancelling process...");
+	    	throw new SMKException(layer.getTitle() + " is not a public layer. Cancelling process...");
 	    }
 	    
 	    logger.debug("Successfully created layer " + layer.getTitle());
@@ -284,7 +264,49 @@ public class LayerCatalogDAO
 	    return layer;
 	}
 
-	public static String convertNameToId( String name ) {
+	private void processPropertiesNode(Node propertyNode, EsriDynamic layer)
+	{
+	    if (propertyNode.getNodeType() == Node.ELEMENT_NODE )
+        {
+            Element el = (Element) propertyNode;
+            String type = el.getElementsByTagName("key").item(0).getTextContent();
+            String value = el.getElementsByTagName("value").item(0).getTextContent();
+
+            layer.setOpacity(0.65);
+
+            if(type.equals("metadata.url"))
+            {
+                layer.setMetadataUrl(value);
+            }
+            else if(type.equals("visible"))
+            {
+                layer.setIsVisible(new Boolean(value));
+            }
+        }
+	}
+	
+	private void processFolderNode(Node folderNode, EsriDynamic layer)
+	{
+	    if (folderNode.getNodeType() == Node.ELEMENT_NODE)
+        {
+            Element el = (Element) folderNode;
+
+            Attribute attribute = new Attribute();
+
+            attribute.setName(el.getElementsByTagName("fieldName").item(0).getTextContent());
+            attribute.setTitle(el.getElementsByTagName("fieldAlias").item(0).getTextContent());
+            attribute.setVisible(Boolean.parseBoolean(el.getElementsByTagName("visible").item(0).getTextContent()));
+            attribute.setId(convertNameToId(attribute.getName()));
+            
+            if(attribute.getVisible())
+            {
+                layer.getAttributes().add(attribute);
+            }
+        }
+	}
+	
+	public static String convertNameToId( String name ) 
+	{
 		return name.toLowerCase().replaceAll("[^0-9a-z]+", "-").replaceAll("^[-]+", "").replaceAll("[-]+$", "");
     }
 	
@@ -296,7 +318,7 @@ public class LayerCatalogDAO
 		
 		URL wmsUrl = new URL(url);
 
-		logger.debug("Parsing XML result from " + wmsUrl);
+		logger.debug(PARSING_FROM_MSG + wmsUrl);
 	    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         factory.setNamespaceAware(true);
         Document doc = factory.newDocumentBuilder().parse(wmsUrl.openStream());
@@ -307,70 +329,12 @@ public class LayerCatalogDAO
 
 	    if (layerNodes != null)
 	    {
-	        int length = layerNodes.getLength();
 	        // ignore the first reference. This is the parent layer, not the sublayer details that we want
-	        for (int i = 1; i < length; i++)
+	        for (int i = 1; i < layerNodes.getLength(); i++)
 	        {
 	            if (layerNodes.item(i).getNodeType() == Node.ELEMENT_NODE)
 	            {
-	                Element layerElement = (Element) layerNodes.item(i);
-
-	                String title = layerElement.getElementsByTagName("Title").item(0).getTextContent();
-	                String name = layerElement.getElementsByTagName("Name").item(0).getTextContent();
-
-	                WMSInfoLayer layer = new WMSInfoLayer();
-					layer.setTitle( title);
-					layer.setName( name);
-
-					serviceLayers.add(layer);
-
-	                NodeList layerStyles = layerElement.getElementsByTagName("Style");
-
-					List<WMSInfoStyle> styles = layer.getStyles();
-	                if (layerStyles != null)
-	    		    {
-	    		        for (int styleIndex = 0; styleIndex < layerStyles.getLength(); styleIndex++)
-	    		        {
-	    		        	Element styleElement = (Element) layerStyles.item(styleIndex);
-
-							WMSInfoStyle style = new WMSInfoStyle();
-							style.setName( styleElement.getElementsByTagName("Name").item(0).getTextContent());
-							style.setTitle( styleElement.getElementsByTagName("Title").item(0).getTextContent().replace("_", " "));
-
-							if ( !styles.contains( style ) )
-	    		        		styles.add(style);
-	    		        }
-
-	    		        if(styles.size() > 0)
-	    		        {
-							int titleIndex = 0;
-							String styleTitle = styles.get( 0 ).getTitle();
-							if ( styles.size() > 1 ) {
-								OUTER: while ( true ) {
-									if ( titleIndex >= styleTitle.length() ) break OUTER;
-	
-									char c0 = styleTitle.charAt( titleIndex );
-									for ( int idx = 1; idx < styles.size(); idx++ ) {
-										String n = styles.get( idx ).getTitle();
-										if ( titleIndex >= n.length() ) break OUTER;
-	
-										if ( c0 != n.charAt( titleIndex ) ) break OUTER;
-									}
-	
-									titleIndex += 1;
-								}
-							}
-							
-							// logger.debug( s0 + ", " + p );
-							if ( titleIndex > 0 )
-								for ( int j = 0; j < styles.size(); j++ ) {
-									WMSInfoStyle s = styles.get( j );
-									if ( titleIndex < ( s.getTitle().length() - 1 ) )
-										s.setTitle( "..." + s.getTitle().substring( titleIndex ) );
-									// logger.debug( s.getTitle() );
-								}
-	    		        }
-	    		    }
+	                processWmsLayerNode((Element)layerNodes.item(i), serviceLayers, url);
 	            }
 	        }
 	    }
@@ -378,6 +342,69 @@ public class LayerCatalogDAO
 		logger.debug(" << createWmsLayers()");
 		
 		return serviceLayers;
+	}
+	
+	private void processWmsLayerNode(Element layerElement, List<WMSInfoLayer> serviceLayers, String url)
+	{
+        String title = layerElement.getElementsByTagName(TITLE).item(0).getTextContent();
+        String name = layerElement.getElementsByTagName(NAME_UC).item(0).getTextContent();
+
+        WMSInfoLayer layer = new WMSInfoLayer();
+        layer.setTitle(title);
+        layer.setName(name);
+
+        serviceLayers.add(layer);
+
+        NodeList layerStyles = layerElement.getElementsByTagName("Style");
+
+        List<WMSInfoStyle> styles = layer.getStyles();
+        if (layerStyles != null)
+        {
+            for (int styleIndex = 0; styleIndex < layerStyles.getLength(); styleIndex++)
+            {
+                Element styleElement = (Element) layerStyles.item(styleIndex);
+
+                WMSInfoStyle style = new WMSInfoStyle();
+                style.setName( styleElement.getElementsByTagName(NAME_UC).item(0).getTextContent());
+                style.setTitle( styleElement.getElementsByTagName(TITLE).item(0).getTextContent().replace("_", " "));
+
+                if (!styles.contains(style)) styles.add(style);
+            }
+        }
+        
+        // see if we can get the attribute list
+        // https://openmaps.gov.bc.ca/geo/pub/wms?service=WFS&version=1.1.0&request=DescribeFeatureType&typename=WHSE_LEGAL_ADMIN_BOUNDARIES.OATS_ALR_POLYS&outputformat=application%2Fjson
+        try
+        {
+            String wfsUrl = url.split("\\?")[0] + "?service=WFS&version=1.1.0&request=DescribeFeatureType&typename=" + name + "&outputformat=application%2Fjson";
+            
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode node = objectMapper.readValue(new URL(wfsUrl), JsonNode.class);
+            
+            JsonNode properties = node.get("featureTypes").get(0).get("properties");
+            for(int propertyIndex = 0; propertyIndex < properties.size(); propertyIndex++)
+            {
+                JsonNode property = properties.get(propertyIndex);
+                
+                if(!property.get("localType").asText().equals("Geometry"))
+                {
+                    Attribute attr = new Attribute();
+                    
+                    attr.setId(property.get(NAME_LC).asText());
+                    attr.setName(property.get(NAME_LC).asText());
+                    attr.setTitle(property.get(NAME_LC).asText());
+                    attr.setVisible(true);
+                    
+                    layer.getAttributes().add(attr);
+                }
+            }
+        }
+        catch(Exception e)
+        {
+            logger.debug("WFS Attributes could not be found for " + name);
+            // we can't add attributes, but may as well at least load up the layer
+            // so don't fail hard here
+        }
 	}
 	
 	public WMSInfoLayer createWmsLayer(String id) throws SAXException, IOException, ParserConfigurationException
@@ -404,74 +431,12 @@ public class LayerCatalogDAO
 
         if (layerNodes != null)
 	    {
-	        int length = layerNodes.getLength();
 	        // ignore the first reference. This is the parent layer, not the sublayer details that we want
-	        for (int i = 1; i < length; i++)
+	        for (int i = 1; i < layerNodes.getLength(); i++)
 	        {
 	            if (layerNodes.item(i).getNodeType() == Node.ELEMENT_NODE)
 	            {
-	                Element layerElement = (Element) layerNodes.item(i);
-
-	                String title = layerElement.getElementsByTagName("Title").item(0).getTextContent();
-	                String name = layerElement.getElementsByTagName("Name").item(0).getTextContent();
-
-	                layer.setName(name);
-	                layer.setTitle(title);
-
-	                Node metadata = layerElement.getElementsByTagName("MetadataURL").item(0);
-
-	                if (metadata != null && metadata.getChildNodes() != null)
-	    		    {
-	    		        for (int s = 0; s < metadata.getChildNodes().getLength(); s++)
-	    		        {
-	    		        	if (metadata.getChildNodes().item(s).getNodeType() == Node.ELEMENT_NODE)
-	    		        	{
-		    		        	Element metadataElement = (Element) metadata.getChildNodes().item(s);
-		    		        	if(metadataElement.getNodeName().equals("OnlineResource"))
-		    		        	{
-		    		        		layer.setMetadataUrl(metadataElement.getAttributes().getNamedItem("xlink:href").getNodeValue());
-		    		        		break;
-		    		        	}
-	    		        	}
-	    		        }
-	    		    }
-
-	                NodeList layerStyles = layerElement.getElementsByTagName("Style");
-
-	                if (layerStyles != null)
-	    		    {
-	    		        for (int s = 0; s < layerStyles.getLength(); s++)
-	    		        {
-	    		        	Element styleElement = (Element) layerStyles.item(s);
-
-	    		        	String styleName = styleElement.getElementsByTagName("Name").item(0).getTextContent();
-	    		        	String styleTitle = styleElement.getElementsByTagName("Title").item(0).getTextContent();
-
-	    		        	WMSInfoStyle style = new WMSInfoStyle();
-	    		        	style.setName(styleName);
-	    		        	style.setTitle(styleTitle);
-
-	    		        	layer.getStyles().add(style);
-
-	    		        	NodeList styleNodes = styleElement.getElementsByTagName("LegendURL").item(0).getChildNodes();
-
-	    		        	for (int sn = 0; sn < styleNodes.getLength(); sn++)
-			    		    {
-		    		        	Node styleNodeElement = styleNodes.item(sn);
-
-		    		        	if(styleNodeElement.getNodeName().equals("Format"))
-		    		        	{
-		    		        		String format = styleNodeElement.getNodeValue();
-		    		        		style.setFormat(format);
-		    		        	}
-		    		        	else if(styleNodeElement.getNodeName().equals("OnlineResource"))
-		    		        	{
-		    		        		String url = styleNodeElement.getAttributes().getNamedItem("xlink:href").getNodeValue();
-		    		        		style.setLegendUrl(url);
-		    		        	}
-		    		        }
-	    		        }
-	    		    }
+	                processWmsLayerNode((Element) layerNodes.item(i), layer);
 	            }
 	        }
 	    }
@@ -479,5 +444,74 @@ public class LayerCatalogDAO
         logger.debug("Successfully created layer " + layer.getTitle());
         logger.debug(" << createWmsLayer()");
         return layer;
+	}
+	
+	private void processWmsLayerNode(Element layerElement, WMSInfoLayer layer)
+	{
+        String title = layerElement.getElementsByTagName(TITLE).item(0).getTextContent();
+        String name = layerElement.getElementsByTagName(NAME_UC).item(0).getTextContent();
+
+        layer.setName(name);
+        layer.setTitle(title);
+
+        Node metadata = layerElement.getElementsByTagName("MetadataURL").item(0);
+
+        if (metadata != null && metadata.getChildNodes() != null)
+        {
+            processWmsMetadata(metadata, layer);
+        }
+
+        NodeList layerStyles = layerElement.getElementsByTagName("Style");
+
+        if (layerStyles != null)
+        {
+            for (int s = 0; s < layerStyles.getLength(); s++)
+            {
+                Element styleElement = (Element) layerStyles.item(s);
+
+                String styleName = styleElement.getElementsByTagName(NAME_UC).item(0).getTextContent();
+                String styleTitle = styleElement.getElementsByTagName(TITLE).item(0).getTextContent();
+
+                WMSInfoStyle style = new WMSInfoStyle();
+                style.setName(styleName);
+                style.setTitle(styleTitle);
+
+                layer.getStyles().add(style);
+
+                NodeList styleNodes = styleElement.getElementsByTagName(LEGENDURL).item(0).getChildNodes();
+
+                for (int sn = 0; sn < styleNodes.getLength(); sn++)
+                {
+                    Node styleNodeElement = styleNodes.item(sn);
+
+                    if(styleNodeElement.getNodeName().equals(FORMAT))
+                    {
+                        String format = styleNodeElement.getNodeValue();
+                        style.setFormat(format);
+                    }
+                    else if(styleNodeElement.getNodeName().equals(ONLINERESOURCE))
+                    {
+                        String url = styleNodeElement.getAttributes().getNamedItem(XLINK_HREF).getNodeValue();
+                        style.setLegendUrl(url);
+                    }
+                }
+            }
+        }
+	}
+	
+	private void processWmsMetadata(Node metadata, WMSInfoLayer layer)
+	{
+	    for (int s = 0; s < metadata.getChildNodes().getLength(); s++)
+        {
+            if (metadata.getChildNodes().item(s).getNodeType() == Node.ELEMENT_NODE)
+            {
+                Element metadataElement = (Element) metadata.getChildNodes().item(s);
+                if(metadataElement.getNodeName().equals(ONLINERESOURCE))
+                {
+                    layer.setMetadataUrl(metadataElement.getAttributes().getNamedItem(XLINK_HREF).getNodeValue());
+                    break;
+                }
+            }
+        }
 	}
 }
