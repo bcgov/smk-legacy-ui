@@ -41,7 +41,7 @@ public class LayerCatalogDAO
     private static final String LAYER_DISPLAY_NAME = "layerDisplayName";
 	
     private static final String NAME_UC = "Name";
-    private static final String NAME_LC = "Name";
+    private static final String NAME_LC = "name";
     private static final String TITLE = "Title";
     private static final String FORMAT = "Format";
     private static final String LEGENDURL = "LegendURL";
