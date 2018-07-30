@@ -96,15 +96,16 @@ include.module( 'feature-list', [ 'tool', 'widgets',
             self.active = true
 
             var ly = smk.$viewer.layerId[ ev.layerId ]
+            var index = smk.$viewer.layerDisplayContext.getLayerIndex( ev.layerId )
 
-            if ( !self.layers[ ly.index ] )
-                Vue.set( self.layers, ly.index, {
+            if ( !self.layers[ index ] )
+                Vue.set( self.layers, index, {
                     id:         ly.id,
                     title:      ly.config.title,
                     features:   []
                 } )
 
-            Vue.set( self.layers[ ly.index ], 'features', self.layers[ ly.index ].features.concat( ev.features.map( function ( ft ) {
+            Vue.set( self.layers[ index ], 'features', self.layers[ index ].features.concat( ev.features.map( function ( ft ) {
                 if ( !self.firstId )
                     self.firstId = ft.id
 
@@ -122,8 +123,9 @@ include.module( 'feature-list', [ 'tool', 'widgets',
 
         self.featureSet.removedFeatures( function ( ev ) {
             var ly = smk.$viewer.layerId[ ev.features[ 0 ].layerId ]
+            var index = smk.$viewer.layerDisplayContext.getLayerIndex( ev.features[ 0 ].layerId )
 
-            self.layers[ ly.index ].features = self.layers[ ly.index ].features.filter( function ( ft ) {
+            self.layers[ index ].features = self.layers[ index ].features.filter( function ( ft ) {
                 return ft.id != ev.features[ 0 ].id
             } )
         } )

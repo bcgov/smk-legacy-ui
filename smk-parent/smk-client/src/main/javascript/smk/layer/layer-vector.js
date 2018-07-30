@@ -71,7 +71,7 @@ include.module( 'layer.layer-vector-js', [ 'layer.layer-js' ], function () {
 
         if ( this.config.useClustering )
             configs.push( Object.assign( {}, this.config, {
-                id: 'clustered',
+                id: this.id + '--clustered',
                 dataUrl: '@' + this.config.id,
                 title: 'Clustered',
                 useRaw: false,
@@ -80,7 +80,7 @@ include.module( 'layer.layer-vector-js', [ 'layer.layer-js' ], function () {
 
         if ( this.config.useHeatmap )
             configs.push( Object.assign( {}, this.config, {
-                id: 'heatmap',
+                id: this.id + '--heatmap',
                 dataUrl: '@' + this.config.id,
                 title: 'Heatmap',
                 useRaw: false,
@@ -89,7 +89,7 @@ include.module( 'layer.layer-vector-js', [ 'layer.layer-js' ], function () {
 
         if ( this.config.useRaw )
             configs.push( Object.assign( {}, this.config, {
-                id: 'raw',
+                id: this.id + '--raw',
                 dataUrl: '@' + this.config.id,
                 title: 'Raw',
                 useHeatmap: false,

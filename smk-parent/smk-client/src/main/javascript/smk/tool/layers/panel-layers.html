@@ -6,12 +6,14 @@
 
     <template slot="commands">
         <i class="smk-all-visibility material-icons smk-command smk-icon"
-            title="Toggle visibility of all layers"
-            v-on:click="$$emit( 'set-visible', { ids: allLayerIds(), visible: !isAllVisible() } )"
-            v-bind:class="{ 'smk-some-visible': isAllVisible() == null }"
-        >{{ isAllVisible() !== false ? 'visibility' : 'visibility_off' }}</i>
+            v-bind:title="'Toggle visibility of all layers.\nSHIFT-click to toggle visibility on each layer.'"
+            v-on:click="$$emit( 'set-all-layers-visible', { visible: !allVisible, deep: $event.shiftKey } )"
+        >{{ allVisible ? 'visibility' : 'visibility_off' }}</i>
 
-        <input class="smk-filter" placeholder="Filter layers" v-model="filter">
+        <input class="smk-filter" placeholder="Filter layers" 
+            v-model="filter" 
+            v-on:input="$$emit( 'config', getConfigState() )"
+        >
 
         <label class="smk-command"
         ><input type="checkbox"
@@ -20,37 +22,12 @@
         >Legend</label>
     </template>
 
-    <template slot="status" v-if="!layers || layers.length == 0">
+    <template slot="status" v-if="!items || items.length == 0">
         <status-message message="No layers are configured" status="warning">
     </template>
-
-    <div class="smk-layer smk-item"
-        v-for="layer in layers"
-        v-bind:class="{
-            'smk-layer-visible': layer.visible,
-            'smk-layer-expanded': layer.expanded
-        }"
-        v-bind:style="{ 'margin-left':( 10 * layer.indent ) + 'px' }"
-        v-show="matchesFilter( layer )"
-    >
-        <div class="smk-layer-title">
-            <i class="smk-layer-visibility material-icons smk-command smk-icon"
-                v-bind:title="'Toggle visibility of ' + layer.title"
-                v-on:click="$$emit( 'set-visible', { ids: [ layer.id ], visible: !layer.visible } )"
-                v-bind:class="{ 'smk-some-visible': layer.isContainer && isChildrenVisible( layer.id ) !== true }"
-            >{{ layer.visible ? 'visibility' : 'visibility_off' }}</i>
-
-            <span v-bind:class="[ layer.class ]">{{ layer.title }}</span>
-        </div>
-
-        <div class="smk-layer-info" v-if="legend && layer.hasLegend">
-            <div class="smk-legend">
-                <span v-if="layer.legends == 'waiting'">Requesting</span>
-                <div v-for="legend in layer.legends">
-                    <img v-bind:src="legend.url">
-                    <span>{{ legend.title }}</span>
-                </div>
-            </div>
-        </div>
-    </div>
+    
+    <layer-display 
+        v-bind:items="items"
+        id="layers"
+    ></layer-display>
 </side-panel>
