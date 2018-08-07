@@ -1432,13 +1432,6 @@ function finishLayerEdits(save)
 			selectedLayerNode.data.attribution = $("#wmsAttribution").val();
 			selectedLayerNode.data.opacity = $("#wmsOpacity").val();
 			selectedLayerNode.title = $("#wmsName").val();
-
-			if(selectedLayerNode.data.attributes == null) selectedLayerNode.data.attributes = [];
-			selectedLayerNode.data.attributes.forEach(function (attribute)
-			{
-				attribute.visible = $("#" + attribute.id + "_visible").is(":checked");
-				attribute.title = $("#" + attribute.id + "_label").val();
-			});
 		}
 		else if(selectedLayerNode.data.type == "esri-dynamic")
 		{
@@ -1457,12 +1450,6 @@ function finishLayerEdits(save)
 				dynamicJson.definitionExpression = $("#dbcDefinitionExpression").val();
 				selectedLayerNode.data.dynamicLayers[0] = JSON.stringify(dynamicJson);
 			}
-
-			selectedLayerNode.data.attributes.forEach(function (attribute)
-			{
-				attribute.visible = $("#" + attribute.id + "_visible").is(":checked");
-				attribute.title = $("#" + attribute.id + "_label").val();
-			});
 		}
 		else // vector
 		{
@@ -1508,6 +1495,13 @@ function finishLayerEdits(save)
 			document.getElementById("layersForm").reset();
 		}
 
+		if(selectedLayerNode.data.attributes == null) selectedLayerNode.data.attributes = [];
+		selectedLayerNode.data.attributes.forEach(function (attribute)
+		{
+			attribute.visible = $("#" + attribute.id + "_visible").is(":checked");
+			attribute.title = $("#" + attribute.id + "_label").val();
+		});
+		
 		var root = $("#layer-tree").fancytree('getTree').getRootNode().children;
 		var tree = $("#layer-tree").fancytree('getTree');
 		tree.reload(root);
