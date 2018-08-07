@@ -1453,7 +1453,7 @@ function finishLayerEdits(save)
 		}
 		else // vector
 		{
-			selectedLayerNode.data.type = "vector";
+			selectedLayerNode.data.type = "vector";			
 			selectedLayerNode.data.isVisible = $("#vectorVisible").is(":checked");
 			selectedLayerNode.data.isQueryable = $("#vectorQueryable").is(":checked");
 			selectedLayerNode.data.title = $("#vectorName").val().replace('.', '-');
@@ -1584,28 +1584,6 @@ function editSelectedLayer()
 				$("#wmsName").val(node.data.title);
 				$("#wmsAttribution").val(node.data.attribution);
 				$("#wmsOpacity").val(node.data.opacity);
-	
-				if(node.data.attributes == null) node.data.attributes = [];
-				$("#attributePanel").empty();
-				
-				node.data.attributes.forEach(function (attribute)
-				{
-					$("#attributePanel").append('<div class="row"><div class="col s2"><p><input type="checkbox" id="' + attribute.id + '_visible" /><label class="black-text" for="' + attribute.id + '_visible">Visible</label></p></div><div class="col s2"><p><input name="titleGroup" type="radio" id="' + attribute.id + '_title" onclick="setTitleAttribute(\'' + attribute.name + '\')" /><label for="' + attribute.id + '_title"></label></p></div><div class="col s8 input-field"><input id="' + attribute.id + '_label" type="text"><label for="' + attribute.id + '_label">' + attribute.name + '</label></div></div>');
-					$("#" + attribute.id + "_visible").prop('checked', attribute.visible);
-					$("#" + attribute.id + "_label").val(attribute.title);
-					
-					if(node.data.hasOwnProperty("titleAttribute") && node.data.titleAttribute == attribute.name)
-					{
-						$("#" + attribute.id + "_title").prop('checked', true);
-					}
-					else
-					{
-						$("#" + attribute.id + "_title").prop('checked', false);
-					}
-				});
-				
-				if(node.data.queries == null) node.data.queries = [];
-				$("#queriesTable tr").remove();
 			}
 			else if(node.data.type == "esri-dynamic")
 			{
@@ -1627,28 +1605,6 @@ function editSelectedLayer()
 						$("#dbcDefinitionExpression").val(dynamicJson.definitionExpression);
 					}
 				}
-				
-				if(node.data.attributes == null) node.data.attributes = [];
-				$("#attributePanel").empty();
-				
-				node.data.attributes.forEach(function (attribute)
-				{
-					$("#attributePanel").append('<div class="row"><div class="col s2"><p><input type="checkbox" id="' + attribute.id + '_visible" /><label class="black-text" for="' + attribute.id + '_visible">Visible</label></p></div><div class="col s2"><p><input name="titleGroup" type="radio" id="' + attribute.id + '_title" /><label for="' + attribute.id + '_title" onclick="setTitleAttribute(\'' + attribute.name + '\')"></label></p></div><div class="col s8 input-field"><input id="' + attribute.id + '_label" type="text"><label for="' + attribute.id + '_label">' + attribute.name + '</label></div></div>');
-					$("#" + attribute.id + "_visible").prop('checked', attribute.visible);
-					$("#" + attribute.id + "_label").val(attribute.title);
-					
-					if(node.data.hasOwnProperty("titleAttribute") && node.data.titleAttribute == attribute.name)
-					{
-						$("#" + attribute.id + "_title").prop('checked', true);
-					}
-					else
-					{
-						$("#" + attribute.id + "_title").prop('checked', false);
-					}
-				}); 
-				
-				if(node.data.queries == null) node.data.queries = [];
-				$("#queriesTable tr").remove();
 			}
 			else
 			{
@@ -1671,30 +1627,30 @@ function editSelectedLayer()
 			    $("#vectorMarkerSizeY").val(node.data.style.markerSize[1]);
 			    $("#vectorMarkerOffsetX").val(node.data.style.markerOffset[0]);
 			    $("#vectorMarkerOffsetY").val(node.data.style.markerOffset[1]);
-			    
-			    if(node.data.attributes == null) node.data.attributes = [];
-			    $("#attributePanel").empty();
-
-			    node.data.attributes.forEach(function (attribute)
-				{
-					$("#attributePanel").append('<div class="row"><div class="col s2"><p><input type="checkbox" id="' + attribute.id + '_visible" /><label class="black-text" for="' + attribute.id + '_visible">Visible</label></p></div><div class="col s2"><p><input name="titleGroup" type="radio" id="' + attribute.id + '_title" /><label for="' + attribute.id + '_title" onclick="setTitleAttribute(\'' + attribute.name + '\')"></label></p></div><div class="col s8 input-field"><input id="' + attribute.id + '_label" type="text"><label for="' + attribute.id + '_label">' + attribute.name + '</label></div></div>');
-					$("#" + attribute.id + "_visible").prop('checked', attribute.visible);
-					$("#" + attribute.id + "_label").val(attribute.title);
-					
-					if(node.data.hasOwnProperty("titleAttribute") && node.data.titleAttribute == attribute.name)
-					{
-						$("#" + attribute.id + "_title").prop('checked', true);
-					}
-					else
-					{
-						$("#" + attribute.id + "_title").prop('checked', false);
-					}
-				}); 
-			    
-			    if(node.data.queries == null) node.data.queries = [];
-			    $("#queriesTable tr").remove();
 			}
 	
+			if(node.data.attributes == null) node.data.attributes = [];
+			$("#attributePanel").empty();
+			
+			node.data.attributes.forEach(function (attribute)
+			{
+				$("#attributePanel").append('<div class="row"><div class="col s2"><p><input type="checkbox" id="' + attribute.id + '_visible" /><label class="black-text" for="' + attribute.id + '_visible">Visible</label></p></div><div class="col s2"><p><input name="titleGroup" type="radio" id="' + attribute.id + '_title" /><label for="' + attribute.id + '_title" onclick="setTitleAttribute(\'' + attribute.name + '\')"></label></p></div><div class="col s8 input-field"><input id="' + attribute.id + '_label" type="text"><label for="' + attribute.id + '_label">' + attribute.name + '</label></div></div>');
+				$("#" + attribute.id + "_visible").prop('checked', attribute.visible);
+				$("#" + attribute.id + "_label").val(attribute.title);
+				
+				if(node.data.hasOwnProperty("titleAttribute") && node.data.titleAttribute == attribute.name)
+				{
+					$("#" + attribute.id + "_title").prop('checked', true);
+				}
+				else
+				{
+					$("#" + attribute.id + "_title").prop('checked', false);
+				}
+			}); 
+			
+			if(node.data.queries == null) node.data.queries = [];
+			$("#queriesTable tr").remove();
+			
 			Materialize.updateTextFields();
    		}
    	});
