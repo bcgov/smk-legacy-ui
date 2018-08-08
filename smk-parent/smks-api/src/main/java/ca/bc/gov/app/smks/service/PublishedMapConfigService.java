@@ -89,7 +89,7 @@ public class PublishedMapConfigService
 		try
 		{
 			publishedMapConfigServiceController.publishMapConfiguration(id);
-			result = new ResponseEntity<JsonNode>(jsonObjectMapper.readValue("{ \"status:\" \"Success\", \"id\": \"" + id + "\" }", JsonNode.class), HttpStatus.CREATED);
+			result = new ResponseEntity<JsonNode>(jsonObjectMapper.readValue("{ \"status\": \"Success\", \"id\": \"" + id + "\" }", JsonNode.class), HttpStatus.CREATED);
 		}
 		catch (Exception e)
 		{
