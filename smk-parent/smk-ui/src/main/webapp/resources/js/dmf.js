@@ -1432,13 +1432,6 @@ function finishLayerEdits(save)
 			selectedLayerNode.data.attribution = $("#wmsAttribution").val();
 			selectedLayerNode.data.opacity = $("#wmsOpacity").val();
 			selectedLayerNode.title = $("#wmsName").val();
-
-			if(selectedLayerNode.data.attributes == null) selectedLayerNode.data.attributes = [];
-			selectedLayerNode.data.attributes.forEach(function (attribute)
-			{
-				attribute.visible = $("#" + attribute.id + "_visible").is(":checked");
-				attribute.title = $("#" + attribute.id + "_label").val();
-			});
 		}
 		else if(selectedLayerNode.data.type == "esri-dynamic")
 		{
@@ -1457,25 +1450,10 @@ function finishLayerEdits(save)
 				dynamicJson.definitionExpression = $("#dbcDefinitionExpression").val();
 				selectedLayerNode.data.dynamicLayers[0] = JSON.stringify(dynamicJson);
 			}
-
-			selectedLayerNode.data.attributes.forEach(function (attribute)
-			{
-				attribute.visible = $("#" + attribute.id + "_visible").is(":checked");
-				attribute.title = $("#" + attribute.id + "_label").val();
-			});
 		}
 		else // vector
 		{
-			// if user activated clustering, change vector type
-			if(selectedLayerNode.data.type == "vector" && $("#vectorClustering").is(":checked")) 
-			{
-				selectedLayerNode.data.type = "clustered";
-			}
-			if(selectedLayerNode.data.type == "clustered" && !$("#vectorClustering").is(":checked")) 
-			{
-				selectedLayerNode.data.type = "vector";
-			}
-			
+			selectedLayerNode.data.type = "vector";			
 			selectedLayerNode.data.isVisible = $("#vectorVisible").is(":checked");
 			selectedLayerNode.data.isQueryable = $("#vectorQueryable").is(":checked");
 			selectedLayerNode.data.title = $("#vectorName").val().replace('.', '-');
@@ -1517,6 +1495,13 @@ function finishLayerEdits(save)
 			document.getElementById("layersForm").reset();
 		}
 
+		if(selectedLayerNode.data.attributes == null) selectedLayerNode.data.attributes = [];
+		selectedLayerNode.data.attributes.forEach(function (attribute)
+		{
+			attribute.visible = $("#" + attribute.id + "_visible").is(":checked");
+			attribute.title = $("#" + attribute.id + "_label").val();
+		});
+		
 		var root = $("#layer-tree").fancytree('getTree').getRootNode().children;
 		var tree = $("#layer-tree").fancytree('getTree');
 		tree.reload(root);
@@ -1599,28 +1584,6 @@ function editSelectedLayer()
 				$("#wmsName").val(node.data.title);
 				$("#wmsAttribution").val(node.data.attribution);
 				$("#wmsOpacity").val(node.data.opacity);
-	
-				if(node.data.attributes == null) node.data.attributes = [];
-				$("#attributePanel").empty();
-				
-				node.data.attributes.forEach(function (attribute)
-				{
-					$("#attributePanel").append('<div class="row"><div class="col s2"><p><input type="checkbox" id="' + attribute.id + '_visible" /><label class="black-text" for="' + attribute.id + '_visible">Visible</label></p></div><div class="col s2"><p><input name="titleGroup" type="radio" id="' + attribute.id + '_title" onclick="setTitleAttribute(\'' + attribute.name + '\')" /><label for="' + attribute.id + '_title"></label></p></div><div class="col s8 input-field"><input id="' + attribute.id + '_label" type="text"><label for="' + attribute.id + '_label">' + attribute.name + '</label></div></div>');
-					$("#" + attribute.id + "_visible").prop('checked', attribute.visible);
-					$("#" + attribute.id + "_label").val(attribute.title);
-					
-					if(node.data.hasOwnProperty("titleAttribute") && node.data.titleAttribute == attribute.name)
-					{
-						$("#" + attribute.id + "_title").prop('checked', true);
-					}
-					else
-					{
-						$("#" + attribute.id + "_title").prop('checked', false);
-					}
-				});
-				
-				if(node.data.queries == null) node.data.queries = [];
-				$("#queriesTable tr").remove();
 			}
 			else if(node.data.type == "esri-dynamic")
 			{
@@ -1642,28 +1605,6 @@ function editSelectedLayer()
 						$("#dbcDefinitionExpression").val(dynamicJson.definitionExpression);
 					}
 				}
-				
-				if(node.data.attributes == null) node.data.attributes = [];
-				$("#attributePanel").empty();
-				
-				node.data.attributes.forEach(function (attribute)
-				{
-					$("#attributePanel").append('<div class="row"><div class="col s2"><p><input type="checkbox" id="' + attribute.id + '_visible" /><label class="black-text" for="' + attribute.id + '_visible">Visible</label></p></div><div class="col s2"><p><input name="titleGroup" type="radio" id="' + attribute.id + '_title" /><label for="' + attribute.id + '_title" onclick="setTitleAttribute(\'' + attribute.name + '\')"></label></p></div><div class="col s8 input-field"><input id="' + attribute.id + '_label" type="text"><label for="' + attribute.id + '_label">' + attribute.name + '</label></div></div>');
-					$("#" + attribute.id + "_visible").prop('checked', attribute.visible);
-					$("#" + attribute.id + "_label").val(attribute.title);
-					
-					if(node.data.hasOwnProperty("titleAttribute") && node.data.titleAttribute == attribute.name)
-					{
-						$("#" + attribute.id + "_title").prop('checked', true);
-					}
-					else
-					{
-						$("#" + attribute.id + "_title").prop('checked', false);
-					}
-				}); 
-				
-				if(node.data.queries == null) node.data.queries = [];
-				$("#queriesTable tr").remove();
 			}
 			else
 			{
@@ -1686,30 +1627,30 @@ function editSelectedLayer()
 			    $("#vectorMarkerSizeY").val(node.data.style.markerSize[1]);
 			    $("#vectorMarkerOffsetX").val(node.data.style.markerOffset[0]);
 			    $("#vectorMarkerOffsetY").val(node.data.style.markerOffset[1]);
-			    
-			    if(node.data.attributes == null) node.data.attributes = [];
-			    $("#attributePanel").empty();
-
-			    node.data.attributes.forEach(function (attribute)
-				{
-					$("#attributePanel").append('<div class="row"><div class="col s2"><p><input type="checkbox" id="' + attribute.id + '_visible" /><label class="black-text" for="' + attribute.id + '_visible">Visible</label></p></div><div class="col s2"><p><input name="titleGroup" type="radio" id="' + attribute.id + '_title" /><label for="' + attribute.id + '_title" onclick="setTitleAttribute(\'' + attribute.name + '\')"></label></p></div><div class="col s8 input-field"><input id="' + attribute.id + '_label" type="text"><label for="' + attribute.id + '_label">' + attribute.name + '</label></div></div>');
-					$("#" + attribute.id + "_visible").prop('checked', attribute.visible);
-					$("#" + attribute.id + "_label").val(attribute.title);
-					
-					if(node.data.hasOwnProperty("titleAttribute") && node.data.titleAttribute == attribute.name)
-					{
-						$("#" + attribute.id + "_title").prop('checked', true);
-					}
-					else
-					{
-						$("#" + attribute.id + "_title").prop('checked', false);
-					}
-				}); 
-			    
-			    if(node.data.queries == null) node.data.queries = [];
-			    $("#queriesTable tr").remove();
 			}
 	
+			if(node.data.attributes == null) node.data.attributes = [];
+			$("#attributePanel").empty();
+			
+			node.data.attributes.forEach(function (attribute)
+			{
+				$("#attributePanel").append('<div class="row"><div class="col s2"><p><input type="checkbox" id="' + attribute.id + '_visible" /><label class="black-text" for="' + attribute.id + '_visible">Visible</label></p></div><div class="col s2"><p><input name="titleGroup" type="radio" id="' + attribute.id + '_title" /><label for="' + attribute.id + '_title" onclick="setTitleAttribute(\'' + attribute.name + '\')"></label></p></div><div class="col s8 input-field"><input id="' + attribute.id + '_label" type="text"><label for="' + attribute.id + '_label">' + attribute.name + '</label></div></div>');
+				$("#" + attribute.id + "_visible").prop('checked', attribute.visible);
+				$("#" + attribute.id + "_label").val(attribute.title);
+				
+				if(node.data.hasOwnProperty("titleAttribute") && node.data.titleAttribute == attribute.name)
+				{
+					$("#" + attribute.id + "_title").prop('checked', true);
+				}
+				else
+				{
+					$("#" + attribute.id + "_title").prop('checked', false);
+				}
+			}); 
+			
+			if(node.data.queries == null) node.data.queries = [];
+			$("#queriesTable tr").remove();
+			
 			Materialize.updateTextFields();
    		}
    	});
@@ -1881,7 +1822,7 @@ function editQuery(id)
 				queryArgumentCount++;
 				argumentIds.push(queryArgumentCount);
 				
-				$("#queryArguments").append('<div class="row" id="' + queryArgumentCount + '_queryArg"><div class="col s4"><label>Attribute</label><select id="' + queryArgumentCount + '_queryAttributes" class="browser-default"><option value="" disabled selected>-----</option></select></div><div class="col s2"><label>Operator optionality</label><select id="' + queryArgumentCount + '_queryOptionality" class="browser-default"><option value="is" selected>Is</option><option value="not">Is Not</option></select></div><div class="col s2"><label>Operator</label><select id="' + queryArgumentCount + '_queryOperator" class="browser-default"><option value="equals" selected>Equals</option><option value="contains">Contains</option><option value="less-than">Less Than</option><option value="greater-than">Greater Than</option><option value="starts-with">Starts With</option><option value="ends-with">Ends With</option></select></div><div id="' + queryArgumentCount + '_inputTypeBox" class="col s2"><label>Input Type</label><select id="' + queryArgumentCount + '_queryInputType" class="browser-default" onchange="toggleDropdownOptionsButton(' + queryArgumentCount + ');"><option value="input" selected>Textbox</option><option value="select">Dropdown</option></select></div><div class="col s1" id="' + queryArgumentCount + '_dropdownEditButton" style="display: none;"><a class="btn-floating btn-large waves-effect waves-light nrpp-blue-dark" onclick="editQueryDropdownOptions(' + queryArgumentCount + ');"><i class="material-icons left">mode_edit</i></a></div><div class="col s1" id="' + queryArgumentCount + '_removeArgumentButton"><a class="btn-floating btn-large waves-effect waves-light nrpp-blue-dark" onclick="removeQueryArgument(' + queryArgumentCount + ');"><i class="material-icons left">delete_forever</i></a></div>');
+				$("#queryArguments").append('<div class="row" id="' + queryArgumentCount + '_queryArg"><div class="col s4"><label>Attribute</label><select id="' + queryArgumentCount + '_queryAttributes" class="browser-default"><option value="" disabled selected>-----</option></select></div><div class="col s2"><label>Operator optionality</label><select id="' + queryArgumentCount + '_queryOptionality" class="browser-default"><option value="is" selected>Is</option><option value="not">Is Not</option></select></div><div class="col s2"><label>Operator</label><select id="' + queryArgumentCount + '_queryOperator" class="browser-default"><option value="equals" selected>Equals</option><option value="contains">Contains</option><option value="less-than">Less Than</option><option value="greater-than">Greater Than</option><option value="starts-with">Starts With</option><option value="ends-with">Ends With</option></select></div><div id="' + queryArgumentCount + '_inputTypeBox" class="col s2"><label>Input Type</label><select id="' + queryArgumentCount + '_queryInputType" class="browser-default" onchange="toggleDropdownOptionsButton(' + queryArgumentCount + ');"><option value="input" selected>Textbox</option><option value="select">Dropdown</option><option value="select-unique">Autofill Dropdown</option></select></div><div class="col s1" id="' + queryArgumentCount + '_dropdownEditButton" style="display: none;"><a class="btn-floating btn-large waves-effect waves-light nrpp-blue-dark" onclick="editQueryDropdownOptions(' + queryArgumentCount + ');"><i class="material-icons left">mode_edit</i></a></div><div class="col s1" id="' + queryArgumentCount + '_removeArgumentButton"><a class="btn-floating btn-large waves-effect waves-light nrpp-blue-dark" onclick="removeQueryArgument(' + queryArgumentCount + ');"><i class="material-icons left">delete_forever</i></a></div>');
 				
 				if(queryArgs.operator == "not")
 				{
@@ -1911,7 +1852,7 @@ function editQuery(id)
 					{
 						$("#" + queryArgumentCount + "_inputTypeBox option[value=" + parameter.type + "]").attr('selected','selected');
 						
-						if(parameter.type == "select")
+						if(parameter.type == "select" || parameter.type == "select-unique")
 						{
 							$("#" + queryArgumentCount + "_dropdownEditButton").show();
 							dropdownOptions[queryArgumentCount] = parameter.choices;
@@ -1949,7 +1890,7 @@ function addNewQueryArgument()
 {
 	queryArgumentCount++;
 	
-	$("#queryArguments").append('<div class="row" id="' + queryArgumentCount + '_queryArg"><div class="col s4"><label>Attribute</label><select id="' + queryArgumentCount + '_queryAttributes" class="browser-default"><option value="" disabled selected>-----</option></select></div><div class="col s2"><label>Operator optionality</label><select id="' + queryArgumentCount + '_queryOptionality" class="browser-default"><option value="is" selected>Is</option><option value="not">Is Not</option></select></div><div class="col s2"><label>Operator</label><select id="' + queryArgumentCount + '_queryOperator" class="browser-default"><option value="equals" selected>Equals</option><option value="contains">Contains</option><option value="less-than">Less Than</option><option value="greater-than">Greater Than</option><option value="starts-with">Starts With</option><option value="ends-with">Ends With</option></select></div><div id="' + queryArgumentCount + '_inputTypeBox" class="col s2"><label>Input Type</label><select id="' + queryArgumentCount + '_queryInputType" class="browser-default" onchange="toggleDropdownOptionsButton(' + queryArgumentCount + ');"><option value="input" selected>Textbox</option><option value="select">Dropdown</option></select></div><div class="col s1" id="' + queryArgumentCount + '_dropdownEditButton" style="display: none;"><a class="btn-floating btn-large waves-effect waves-light nrpp-blue-dark" onclick="editQueryDropdownOptions(' + queryArgumentCount + ');"><i class="material-icons left">mode_edit</i></a></div><div class="col s1" id="' + queryArgumentCount + '_removeArgumentButton"><a class="btn-floating btn-large waves-effect waves-light nrpp-blue-dark" onclick="removeQueryArgument(' + queryArgumentCount + ');"><i class="material-icons left">delete_forever</i></a></div>');
+	$("#queryArguments").append('<div class="row" id="' + queryArgumentCount + '_queryArg"><div class="col s4"><label>Attribute</label><select id="' + queryArgumentCount + '_queryAttributes" class="browser-default"><option value="" disabled selected>-----</option></select></div><div class="col s2"><label>Operator optionality</label><select id="' + queryArgumentCount + '_queryOptionality" class="browser-default"><option value="is" selected>Is</option><option value="not">Is Not</option></select></div><div class="col s2"><label>Operator</label><select id="' + queryArgumentCount + '_queryOperator" class="browser-default"><option value="equals" selected>Equals</option><option value="contains">Contains</option><option value="less-than">Less Than</option><option value="greater-than">Greater Than</option><option value="starts-with">Starts With</option><option value="ends-with">Ends With</option></select></div><div id="' + queryArgumentCount + '_inputTypeBox" class="col s2"><label>Input Type</label><select id="' + queryArgumentCount + '_queryInputType" class="browser-default" onchange="toggleDropdownOptionsButton(' + queryArgumentCount + ');"><option value="input" selected>Textbox</option><option value="select">Dropdown</option><option value="select-unique">Autofill Dropdown</option></select></div><div class="col s1" id="' + queryArgumentCount + '_dropdownEditButton" style="display: none;"><a class="btn-floating btn-large waves-effect waves-light nrpp-blue-dark" onclick="editQueryDropdownOptions(' + queryArgumentCount + ');"><i class="material-icons left">mode_edit</i></a></div><div class="col s1" id="' + queryArgumentCount + '_removeArgumentButton"><a class="btn-floating btn-large waves-effect waves-light nrpp-blue-dark" onclick="removeQueryArgument(' + queryArgumentCount + ');"><i class="material-icons left">delete_forever</i></a></div>');
 	
 	// add query attributes to selection
 	
@@ -1968,7 +1909,7 @@ function addNewQueryArgument()
 
 function toggleDropdownOptionsButton(id)
 {
-	if($("#" + id + "_queryInputType").val() == "select")
+	if($("#" + id + "_queryInputType").val() == "select" || $("#" + id + "_queryInputType").val() == "select-unique")
 	{
 		$("#" + id + "_dropdownEditButton").show();
 	}
@@ -2037,9 +1978,15 @@ function saveQuery()
             value: null
         };
 		
-		if(param.type == "select")
+		if(param.type == "select" || param.type == "select-unique")
 		{
 			param.choices = dropdownOptions[argId];
+			
+			// if a select with autofill, set the uniqueAttribute to the attribute name
+			if(param.type == "select-unique")
+			{
+				param.uniqueAttribute = $("#" + argId + "_queryAttributes").val();
+			}
 		}
 		
 		selectedQuery.parameters.push(param);
