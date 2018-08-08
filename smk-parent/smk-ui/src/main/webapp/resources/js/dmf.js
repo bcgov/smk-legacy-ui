@@ -1975,7 +1975,7 @@ function saveQuery()
             id: "param" + argId,
             type: $("#" + argId + "_queryInputType").val(),
             title: paramTitle,
-            value: null
+            value: ""
         };
 		
 		if(param.type == "select" || param.type == "select-unique")
