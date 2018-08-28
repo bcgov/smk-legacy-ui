@@ -1,7 +1,4 @@
 # SMK Admin UI User Guide - Tools Tab
-[Back to the Config Editor Page](SMK-Admin-UI-User-Guide%3A-Configuration-Editor)
-
-[Back to ToC](SMK-Admin-UI-User-Guide)
 
 The Tools tab is where you'll be able to add and modify tools for your site. Tools include all interface and interactable components of your site. The following tools are available for modification:
 

@@ -1,9 +1,11 @@
+# SMK Service REST API
+
 The Simple Map Kit Map Configuration and Creation Service (SMKS-API) is a RESULTful service for assisting with the creation and management of map configuration resources used by the SMK Client javascript application.
 
 The Service API is used by the SMK Admin UI, and the client in standalone mode. 
 When a Map Configuration is exported, the service is no longer needed and your application will not connect back to it.
 
-# HTTP verbs
+## HTTP verbs
 
 The SMK API Service tries to adhere as closely as possible to standard
 HTTP and REST conventions in its use of HTTP verbs.
@@ -15,7 +17,7 @@ HTTP and REST conventions in its use of HTTP verbs.
 | `PUT`    | Used to update an existing resource              |
 | `DELETE` | Used to delete an existing resource              |
 
-# HTTP status codes
+## HTTP status codes
 
 The SMK API service tries to adhere as closely as possible to standard
 HTTP and REST conventions in its use of HTTP status
@@ -29,7 +31,7 @@ codes.
 | `400 Bad Request` | The server cannot or will not process the request due to something that is perceived to be a client error (e.g., malformed request syntax, invalid request message framing, or deceptive request routing).                                                                                                           |
 | `404 Not Found`   | The requested resource could not be found but may be available again in the future. Subsequent requests by the client are permissible.                                                                                                                                                                               |
 
-# Map Configuration Endpoints
+## Map Configuration Endpoints
 
 | Request | Description |
 | ---------------------- | ----------- |
@@ -39,7 +41,7 @@ codes.
 | [PUT /MapConfigurations/{id}](api/Update-a-Map-Configuration) | Update an editable (unpublished) map configuration document                                                                                         |
 | [DELETE /MapConfigurations/{id}](api/Delete-a-Map-Configuration-and-all-related-documents) | Delete an editable (unpublished) map configuration document                                                                                         |
 
-# Published Map Configuration Endpoints
+## Published Map Configuration Endpoints
 
 | Request | Description |
 | ---------------------- | ----------- |
@@ -48,7 +50,7 @@ codes.
 | [GET /MapConfigurations/Published/{id}](api/Get-a-published-map-configuration) | Fetch a published map configuration document by ID. This will return the current published version of a configuration. This will not return an edited config |
 | [DELETE /MapConfiguration/Published/{id}](api/Un-Publish-a-published-Map-Configuration)  | Un-publish a published map configuration. This will not delete the existing editable configuration                                                           |
 
-# Map Configuration Attachments Endpoints
+## Map Configuration Attachments Endpoints
 
 | Request | Description |
 | ---------------------- | ----------- |

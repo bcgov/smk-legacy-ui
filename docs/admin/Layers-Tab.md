@@ -1,7 +1,4 @@
 # SMK Admin UI User Guide - Layers Tab
-[Back to the Config Editor Page](SMK-Admin-UI-User-Guide%3A-Configuration-Editor)
-
-[Back to ToC](SMK-Admin-UI-User-Guide)
 
 The layers tab is where you'll be able to add and modify layers for your site, as well as add and modify layer queries.
 

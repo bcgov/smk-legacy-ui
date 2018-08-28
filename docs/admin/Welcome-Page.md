@@ -1,5 +1,4 @@
 # SMK Admin UI User Guide - Welcome Page
-[Back to ToC](SMK-Admin-UI-User-Guide)
 
 When you first log in to the SMK Admin UI, you'll be presented with an application listing:
 

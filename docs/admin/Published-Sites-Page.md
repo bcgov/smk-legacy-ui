@@ -1,5 +1,4 @@
 # SMK Admin UI User Guide - Published Sites
-[Back to ToC](SMK-Admin-UI-User-Guide)
 
 When a site is published successfully, it will be displayed in the listing of published sites. Published sites behave the same as sites viewed from the welcome page, but they can no longer be edited.
 ***

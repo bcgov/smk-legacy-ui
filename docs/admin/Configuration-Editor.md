@@ -1,5 +1,4 @@
 # SMK Admin UI User Guide - Configuration Editor
-[Back to ToC](SMK-Admin-UI-User-Guide)
 
 When you click "Create" or "Edit" from the welcome screen, you'll be presented with the Map Configuration editor. The Map Configuration editor allows you to make many modifications to your configuration, including updating the name and ID, adding or removing layers, and changing tool behaviour.
 ***

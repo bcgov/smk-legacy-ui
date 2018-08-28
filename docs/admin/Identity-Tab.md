@@ -1,7 +1,4 @@
 # SMK Admin UI User Guide - Identity Tab
-[Back to the Config Editor Page](SMK-Admin-UI-User-Guide%3A-Configuration-Editor)
-
-[Back to ToC](SMK-Admin-UI-User-Guide)
 
 The Identity tab allows you to modify the Name, Title, and Viewer type for your site map configuration.
 

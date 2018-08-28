@@ -1,7 +1,4 @@
 # SMK Admin UI User Guide - Basemap Tab
-[Back to the Config Editor Page](SMK-Admin-UI-User-Guide%3A-Configuration-Editor)
-
-[Back to ToC](SMK-Admin-UI-User-Guide)
 
 The Basemap tab allows you to set the default base map to use for your site. Additionally, you can use the map to set your default extent.
 

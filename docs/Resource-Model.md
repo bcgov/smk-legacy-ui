@@ -1,4 +1,4 @@
-# Map Configuration Model:
+# SMK Map Configuration Model
 
 | Path                     | Type            | Required | Description                                                                                                                                            |
 | ------------------------ | --------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -19,13 +19,13 @@
 | `tools`                  | `Array[Tool]`   | `True`   | The list of tools this Map Configuration will activate                                                                                                 |
 | `layers`                 | `Array[Layer]`  | `True`   | The list of configured Layers that will be displayed in the viewer                                                                                     |
 
-# Layer Configurations:
+## Layer Configurations
 
 Layers have many different types. Each type is an extension of the root
 *Layer*
 type.
 
-## Layer Model:
+### Layer Model
 
 | Path                | Type               | Required | Description                                                                                                                                     |
 | ------------------- | ------------------ | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -43,7 +43,7 @@ type.
 | `queries`           | `Array[Query]`     | `False`  | A list of query objects used for executing custom query actions                                                                                 |
 | `attributes`        | `Array[Attribute]` | `False`  | An array of attribute values. Used to override what is displayed with Dynamic, Vector, and WMS layers.                                          |
 
-## Attribute fields:
+### Attribute fields
 
 | Path      | Type      | Required | Description                                      |
 | --------- | --------- | -------- | ------------------------------------------------ |
@@ -54,7 +54,7 @@ type.
 One of the following models is required for each
 layer
 
-## Dynamic Service Layer Model:
+### Dynamic Service Layer Model
 
 | Path            | Type            | Required | Description                                                                                                                                       |
 | --------------- | --------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -63,7 +63,7 @@ layer
 | `serviceUrl`    | `String`        | `True`   | The URL for the DataBC Layer Catalog                                                                                                              |
 | `dynamicLayers` | `Array[String]` | `True`   | A listing of dynamic layer configurations. This will typically only contain one dynamic feature, which can be derived from the MPCM Layer Catalog |
 
-## WMS Layer Model:
+### WMS Layer Model
 
 | Path         | Type     | Required | Description                                                                          |
 | ------------ | -------- | -------- | ------------------------------------------------------------------------------------ |
@@ -72,7 +72,7 @@ layer
 | `layerName`  | `String` | `True`   | The name of the layer to use when making get map requests for the WMS layer          |
 | `serviceUrl` | `String` | `True`   | The URL for the WMS service                                                          |
 
-## Vector Layer Model:
+### Vector Layer Model
 
 | Path                  | Type             | Required | Description                                                                                                                       |
 | --------------------- | ---------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------- |
@@ -90,7 +90,7 @@ layer
 | `style.markerSize`    | `Array[Integer]` | `False`  | the x and y sizes to use for a custom marker symbol                                                                               |
 | `style.markerOffset`  | `Array[Integer]` | `False`  | A default offset for drawing the custom marker symbol in relation to the real point location                                      |
 
-## Tools Model:
+## Tools Model
 
 | Path        | Type      | Required | Description                                                                                                                                                                                                                                                    |
 | ----------- | --------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -106,19 +106,19 @@ Some tools have specialized configurations in addition to the default
 tool configuration above. These are listed
 below:
 
-## About Tool Model:
+### About Tool Model
 
 | Path      | Type     | Required | Description                                     |
 | --------- | -------- | -------- | ----------------------------------------------- |
 | `content` | `String` | `False`  | HTML content to be displayed in the about panel |
 
-## Basemaps Tool Model:
+### Basemaps Tool Model
 
 | Path      | Type            | Required | Description                                                            |
 | --------- | --------------- | -------- | ---------------------------------------------------------------------- |
 | `choices` | `Array[String]` | `False`  | A listing of available basemap ID’s to offer in this map configuration |
 
-## Identify Tool Model:
+### Identify Tool Model
 
 | Path                  | Type             | Required | Description                                                                                  |
 | --------------------- | ---------------- | -------- | -------------------------------------------------------------------------------------------- |
@@ -133,20 +133,20 @@ below:
 | `style.markerSize`    | `Array[Integer]` | `False`  | the x and y sizes to use for a custom marker symbol                                          |
 | `style.markerOffset`  | `Array[Integer]` | `False`  | A default offset for drawing the custom marker symbol in relation to the real point location |
 
-## Mini Map Tool Model:
+### Mini Map Tool Model
 
 | Path      | Type     | Required | Description                                |
 | --------- | -------- | -------- | ------------------------------------------ |
 | `baseMap` | `String` | `True`   | The basemap ID for display in the Mini Map |
 
-## Scale Tool Model:
+### Scale Tool Model
 
 | Path         | Type      | Required | Description                      |
 | ------------ | --------- | -------- | -------------------------------- |
 | `showFactor` | `Boolean` | `True`   | Display the scale as a factor    |
 | `showBar`    | `Boolean` | `True`   | Display the scale in a scale bar |
 
-## Select Tool Model:
+### Select Tool Model
 
 | Path                  | Type             | Required | Description                                                                                  |
 | --------------------- | ---------------- | -------- | -------------------------------------------------------------------------------------------- |
@@ -161,7 +161,7 @@ below:
 | `style.markerSize`    | `Array[Integer]` | `False`  | the x and y sizes to use for a custom marker symbol                                          |
 | `style.markerOffset`  | `Array[Integer]` | `False`  | A default offset for drawing the custom marker symbol in relation to the real point location |
 
-## Zoom Tool Model:
+### Zoom Tool Model
 
 | Path          | Type      | Required | Description                                                    |
 | ------------- | --------- | -------- | -------------------------------------------------------------- |
@@ -170,7 +170,7 @@ below:
 | `box`         | `Boolean` | `False`  | Allow zooming by clicking and dragging a box                   |
 | `control`     | `Boolean` | `False`  | Allow zooming by holding control, clicking, and dragging a box |
 
-# Query Configuration Model:
+## Query Configuration Model
 
 | Path                             | Type                              | Required | Description                                                                                                        |
 | -------------------------------- | --------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------ |
