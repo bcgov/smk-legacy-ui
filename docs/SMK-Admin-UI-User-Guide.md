@@ -10,5 +10,5 @@ The Admin UI works directly with the SMK Service API, and is currently not used 
 4. [Config Editor - Identity Tab](SMK-Admin-UI-User-Guide-Identity-Tab)
 5. [Config Editor - Basemap Tab](SMK-Admin-UI-User-Guide-Basemap-Tab)
 6. [Config Editor - Layers Tab](SMK-Admin-UI-User-Guide-Layers-Tab)
-7. [Config Editor - Tools Tab](SMK-Admin-UI-User-Guide%3A-Tools-Tab)
+7. [Config Editor - Tools Tab](SMK-Admin-UI-User-Guide-Tools-Tab)
 8. [Config Editor - Styles & Themes Tab](SMK-Admin-UI-User-Guide-Styles-and-Themes-Tab)
