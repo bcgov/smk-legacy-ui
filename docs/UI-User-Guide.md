@@ -4,7 +4,6 @@ This application is not required to modify a stand-alone or exported application
 
 The Admin UI works directly with the SMK Service API, and is currently not used for updating or modifying Map Configurations via JSON alone.
 
-## Table of Contents:
 - [Welcome Page](admin/Welcome-Page)
 - [Published Sites Page](admin/Published-Sites-Page)
 - [Configuration Editor](admin/Configuration-Editor)

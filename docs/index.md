@@ -2,11 +2,12 @@
 title: SMK Service Documentation
 ---
 
-# smk
+# Simple Mapping Kit (SMK)
 
 SMK is the abbreviation for Simple Map Kit, an Open Source mapping product dev kit whose development is sponsored by the DataBC (Government of British Columbia, Canada).
 
 - [Admin UI](UI-User-Guide)
+
 - [REST API](REST-API)
     - [Create a map configuration](api/Create-a-map-configuration)
     - [Create an attachment for a map configuration](api/Create-an-attachment-for-a-map-configuration)
@@ -22,9 +23,9 @@ SMK is the abbreviation for Simple Map Kit, an Open Source mapping product dev k
     - [Get a published map configuration](api/Get-a-published-map-configuration)
     - [Get all map configuration attachments](api/Get-all-map-configuration-attachments)
     - [Publish a Map Configuration](api/Publish-a-Map-Configuration)
+    
 - [API Resource Model](Resource-Model)
 
-## SMK API
 
 
 
