@@ -31,32 +31,32 @@ codes.
 
 # Map Configuration Endpoints
 
-| Method       | Path | Description |
-| ---------- | ------------ | ----------- |
-| `POST`   | [/MapConfigurations](api/Create-a-map-configuration)    | Create a new Map Configuration                                                                                                                      |
-| `GET`    | [/MapConfigurations](api/Get-a-list-of-map-configurations) | Fetch a listing of all existing edit version map configurations. Published configurations will not be returned                                      |
-| `GET`    | [/MapConfigurations/{id}](api/Get-a-map-configuration-by-ID) | Fetch a map configuration document by ID. This will return the current editable version of a configuration. This will not return a published config |
-| `PUT`    | [/MapConfigurations/{id}](api/Update-a-Map-Configuration) | Update an editable (unpublished) map configuration document                                                                                         |
-| `DELETE` | [/MapConfigurations/{ID`](api/Delete-a-Map-Configuration-and-all-related-documents) | Delete an editable (unpublished) map configuration document                                                                                         |
+| Request | Description |
+| ---------------------- | ----------- |
+| [POST /MapConfigurations](api/Create-a-map-configuration)    | Create a new Map Configuration                                                                                                                      |
+| [GET /MapConfigurations](api/Get-a-list-of-map-configurations) | Fetch a listing of all existing edit version map configurations. Published configurations will not be returned                                      |
+| [GET /MapConfigurations/{id}](api/Get-a-map-configuration-by-ID) | Fetch a map configuration document by ID. This will return the current editable version of a configuration. This will not return a published config |
+| [PUT /MapConfigurations/{id}](api/Update-a-Map-Configuration) | Update an editable (unpublished) map configuration document                                                                                         |
+| [DELETE /MapConfigurations/{id}](api/Delete-a-Map-Configuration-and-all-related-documents) | Delete an editable (unpublished) map configuration document                                                                                         |
 
 # Published Map Configuration Endpoints
 
-| Method       | Path | Description |
-| ---------- | ------------ | ----------- |
-| `POST`   | [/MapConfigurations/Publish/{id}](api/Publish-a-Map-Configuration)      | Publish a Map Configuration                                                                                                                                  |
-| `GET`    | [/MapConfigurations/Published`](api/Get-all-published-map-configurations) | Fetch a listing of all existing published map configurations. Editable configurations will not be returned                                                   |
-| `GET`    | [/MapConfigurations/Published/{id`](api/Get-a-published-map-configuration) | Fetch a published map configuration document by ID. This will return the current published version of a configuration. This will not return an edited config |
-| `DELETE` |  [/MapConfiguration/Published/{id`](api/Un-Publish-a-published-Map-Configuration)  | Un-publish a published map configuration. This will not delete the existing editable configuration                                                           |
+| Request | Description |
+| ---------------------- | ----------- |
+| [POST /MapConfigurations/Publish/{id}](api/Publish-a-Map-Configuration)      | Publish a Map Configuration                                                                                                                                  |
+| [GET /MapConfigurations/Published](api/Get-all-published-map-configurations) | Fetch a listing of all existing published map configurations. Editable configurations will not be returned                                                   |
+| [GET /MapConfigurations/Published/{id}](api/Get-a-published-map-configuration) | Fetch a published map configuration document by ID. This will return the current published version of a configuration. This will not return an edited config |
+| [DELETE /MapConfiguration/Published/{id}](api/Un-Publish-a-published-Map-Configuration)  | Un-publish a published map configuration. This will not delete the existing editable configuration                                                           |
 
 # Map Configuration Attachments Endpoints
 
-| Method       | Path | Description |
-| ---------- | ------------ | ----------- |
-| `POST`   | [/MapConfigurations/{id}/Attachments`](api/Create-an-attachment-for-a-map-configuration) | Create a new attachment for a map configuration                                                                          |
-| `POST`   |[/MapConfigurations/{id}/Attachments/{ATTACHMENT_ID`](api/Update-a-Map-Configurations-attachment) | Replace an existing attachment with a new attachment document                                                            |
-| `GET`    | [/MapConfigurations/{id}/Attachments`](api/Get-all-map-configuration-attachments) | Fetch a listing of all existing map configuration attachments, including vector layers, custom markers, and header image |
-| `GET`    |[/MapConfiguration/{id}/Attachments/{attachment_id`](api/Get-a-specific-map-configurations-attachment)| Fetch a map configuration attachment by ATTACHMENT ID                                                                    |
-| `DELETE` |[/MapConfiguration/{id}/Attachments/{attachment_id`](api/Delete-a-map-configurations-attachment)| Permenantly delete a map configurations attachment                                                                       |
+| Request | Description |
+| ---------------------- | ----------- |
+|  [POST /MapConfigurations/{id}/Attachments](api/Create-an-attachment-for-a-map-configuration) | Create a new attachment for a map configuration                                                                          |
+| [POST /MapConfigurations/{id}/Attachments/{attachment_id}](api/Update-a-Map-Configurations-attachment) | Replace an existing attachment with a new attachment document                                                            |
+| [GET /MapConfigurations/{id}/Attachments](api/Get-all-map-configuration-attachments) | Fetch a listing of all existing map configuration attachments, including vector layers, custom markers, and header image |
+| [GET /MapConfiguration/{id}/Attachments/{attachment_id}](api/Get-a-specific-map-configurations-attachment)| Fetch a map configuration attachment by ATTACHMENT ID                                                                    |
+|[DELETE /MapConfiguration/{id}/Attachments/{attachment_id}](api/Delete-a-map-configurations-attachment)| Permenantly delete a map configurations attachment                                                                       |
 
 > **Note**
 > 
