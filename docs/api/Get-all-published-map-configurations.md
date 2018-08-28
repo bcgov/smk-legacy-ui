@@ -1,5 +1,5 @@
-# `GET` /MapConfigurations/Published/ - Fetch all published Map Configurations
-
+# Fetch all published Map Configurations
+## `GET /MapConfigurations/Published/`
 Executing a GET at the MapConfiguration/Published endpoint will return a listing of all published SMK Map Configurations.
 
 Example of curl command:

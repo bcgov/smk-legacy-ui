@@ -1,5 +1,5 @@
-# `PUT` /MapConfigurations/{id} - Update a SMK Map Configuration (not for published configurations)
-
+# Update a SMK Map Configuration (not for published configurations)
+## `PUT /MapConfigurations/{id}`
 > **Note**
 > The document must include the correct "_rev" and "_id" system values. 
 > If these are missing, the update will fail. 

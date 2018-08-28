@@ -1,5 +1,5 @@
-# `DELETE` /MapConfiguration/{id}/Attachments/{attachment_id} - Delete an Attachment for a Map Configuration
-
+# Delete an Attachment for a Map Configuration
+## `DELETE /MapConfiguration/{id}/Attachments/{attachment_id}`
 Executing a DELETE at the /MapConfiguration/{id}/Attachments/{attachment_id} endpoint will attempt to delete the attachment. 
 Ensure you have updated any links in layer configurations to this attachment, if necessary.
 

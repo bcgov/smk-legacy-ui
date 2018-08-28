@@ -1,4 +1,5 @@
-# `POST` MapConfigurations/Publish/{id} - Publish a Map Configuration
+# Publish a Map Configuration
+## `POST /MapConfigurations/Publish/{id}`
 
 Executing a POST at the MapConfiguration/Publish endpoint with a Map Configuration id will create a published version of the map configuration.
 
@@ -24,9 +25,8 @@ $ http POST 'http://localhost:8080/MapConfigurations/Published/my-application' \
 
 Request Parameters:
 
-|           |                              |
-| --------- | ---------------------------- |
 | Parameter | Description                  |
+| --------- | ---------------------------- |
 | `id`      | The SMK Map Configuration ID |
 
 Example of http request:

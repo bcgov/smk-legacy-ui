@@ -1,5 +1,5 @@
-# `DELETE` /MapConfigurations/{ID} - Delete a Map Configuration
-
+# Delete a Map Configuration
+## `DELETE /MapConfigurations/{ID}`
 Executing a DELETE at the /MapConfigurations/{ID} endpoint will permenantly delete the Map Configuration, including all attachments.
 
 > **Note**

@@ -1,4 +1,5 @@
-# `GET` /MapConfigurations/{id} - Retrieve the latest versions of a SMK Map Configurations (non-published only)
+# Retrieve the latest versions of a SMK Map Configurations (non-published only)
+## `GET /MapConfigurations/{id}`
 
 Executing a GET at the /MapConfigurations/{id} endpoint with the SMK id will return the related Map Configuration document
 

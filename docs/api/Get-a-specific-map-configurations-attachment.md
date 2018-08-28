@@ -1,4 +1,5 @@
-# `GET` /MapConfiguration/{id}/Attachments/{attachment_id} - Retrieve an Attachment for a Map Configuration
+# Retrieve an Attachment for a Map Configuration
+## `GET /MapConfiguration/{id}/Attachments/{attachment_id}`
 
 Executing a GET at the MapConfiguration/{id}/Attachments/{attachment_id} endpoint will return the attachment document, in whatever content type is indicated by the attachment.
  

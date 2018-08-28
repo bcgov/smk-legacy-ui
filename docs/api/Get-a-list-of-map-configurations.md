@@ -1,7 +1,6 @@
-# `GET` /MapConfigurations/{id}/Attachments/ - Retrieve All Attachments for a Map Configuration
-
-Executing a GET at the /MapConfiguration/{id}/Attachments/ endpoint will return a listing of all attachments this map configuration currently has.
- 
+# Retrieve the latest versions of all SMK Map Configurations (non-published only)
+## `GET /MapConfigurations`
+Executing a GET at the /MapConfigurations/ endpoint will return a listing of all non published SMK Map Configurations
 
 Example of curl command:
 
@@ -10,7 +9,7 @@ $ curl 'http://localhost:8080/MapConfigurations/' -i \
     -H 'Accept: application/json'
 ```
 
-Example of HTTPie command:
+Example HTTPie command:
 
 ``` bash
 $ http GET 'http://localhost:8080/MapConfigurations/' \
@@ -42,7 +41,7 @@ body:
 [{"name":"test","id":"test","revision":1,"creator":"Test","valid":true},{"name":"dylans map","id":"dylans-map","revision":4,"creator":"Test","valid":true}]
 ```
 
-Resulting
+Response
 fields:
 
 |               |           |                                                                                      |

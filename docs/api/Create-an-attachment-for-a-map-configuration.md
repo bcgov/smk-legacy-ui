@@ -1,18 +1,22 @@
-# {POST} /MapConfigurations/{id}/Attachments/ - Create a new attachment for a Map Configuration
+# Create a new attachment for a Map Configuration
+## `POST /MapConfigurations/{id}/Attachments/`
 
 Executing a POST at the MapConfiguration/{config_id}/Attachments endpoint with a formdata multipart file containing the desired attachment binary will create a new attachment document for this configuration.
 
 Additional request parameters are: 
 
-- Attachment ID {id='my-attachment'}
-- Attachment Type {type='kml|kmz|shape|vector|image'}
+- Attachment ID `id='my-attachment'`
+- Attachment Type `type='kml|kmz|shape|vector|image'`
 
 If the type is excluded, the SMK service will attempt to determine the attachment type. 
 If the attachment type is:
 
-- application/vnd.google-earth.kml+xml - SMK will attempt to convert KML to geojson
-- application/vnd.google-earth.kmz - SMK will attempt to unzip the KMZ, and convert contained KML to geojson
-- application/zip - SMK will attempt to unzip the zip file, and convert contained shapefile to geojson
+- `application/vnd.google-earth.kml+xml`  
+  SMK will attempt to convert KML to geojson
+- `application/vnd.google-earth.kmz`  
+  SMK will attempt to unzip the KMZ, and convert contained KML to geojson
+- `application/zip`  
+  SMK will attempt to unzip the zip file, and convert contained shapefile to geojson
 
 All other types will be stored directly as standard attachments with no conversion.
 

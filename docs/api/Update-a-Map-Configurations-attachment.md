@@ -1,5 +1,5 @@
-# `POST` /MapConfigurations/{id}/Attachments/{ATTACHMENT_ID} - Replace an existing attachment for a Map Configuration
-
+# Replace an existing attachment for a Map Configuration
+## `POST /MapConfigurations/{id}/Attachments/{ATTACHMENT_ID}`
 Executing a PUT at the MapConfiguration/{config_id}/Attachments endpoint with a formdata multipart file containing the desired attachment binary will replace the existing attachment document for this configuration.
 
 
