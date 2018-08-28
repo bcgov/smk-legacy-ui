@@ -1,11 +1,11 @@
 # SMK Admin UI User Guide - Layers Tab
-[Back to the Config Editor Page](https://github.com/bcgov/smk/wiki/SMK-Admin-UI-User-Guide%3A-Configuration-Editor)
+[Back to the Config Editor Page](SMK-Admin-UI-User-Guide%3A-Configuration-Editor)
 
-[Back to ToC](https://github.com/bcgov/smk/wiki/SMK-Admin-UI-User-Guide)
+[Back to ToC](SMK-Admin-UI-User-Guide)
 
 The layers tab is where you'll be able to add and modify layers for your site, as well as add and modify layer queries.
 
-![Layers Tab](https://github.com/dhlevi/smk/blob/master/smk-parent/smk-ui/docs/smk_admin_editor_layers.jpg)
+![Layers Tab](images/smk_admin_editor_layers.jpg)
 
 You can add layers from three different source types
 
@@ -16,7 +16,7 @@ You can add layers from three different source types
 Layer creation options are found on the left of the Layers tab. Your configurations active layers are found on the right.
 
 ## Adding a DataBC Catalog Layer
-![DataBC Layers](https://github.com/dhlevi/smk/blob/master/smk-parent/smk-ui/docs/smk_admin_editor_layers_dbc.jpg)
+![DataBC Layers](images/smk_admin_editor_layers_dbc.jpg)
 
 When you launch the configuration editor, the DataBC Layer Catalog will automatically be queried and the list box populated with available public layers in the layer catalog. Currently the Admin UI configuration editor can only be used with public layers, but it is possible to add any secure layers to your configuration manually (be aware you will need to ensure siteminder login for IDIR credentials when you host your site, or secure layers will not function, even if added manually)
 
@@ -27,40 +27,40 @@ The Layer Catalog contains a large number of layers (increasing daily!), so to a
 ### How to find and add layers with from the Catalog
 First, it's recommended to use a filter. There are a lot of layers and searching manually will be painful. To use the filter, type the name (or a keyword) for the desired layer in the filter text box.
 
-![Filter Layers](https://github.com/dhlevi/smk/blob/master/smk-parent/smk-ui/docs/smk_admin_editor_layers_dbc_filter.jpg)
+![Filter Layers](images/smk_admin_editor_layers_dbc_filter.jpg)
 
 As you type, a filter will be automatically executed, and your list view will begin to remove any layers/folders that do not contain a matching text string. If you need to clear the filter, click the clear button beside the filter text box.
 
 Once you've located your layer, click once on the check box beside the layer name. Ensure the check box is highlighted.
 
-![Select Layer](https://github.com/dhlevi/smk/blob/master/smk-parent/smk-ui/docs/smk_admin_editor_layers_dbc_select.jpg)
+![Select Layer](images/smk_admin_editor_layers_dbc_select.jpg)
 
 Note that you can select multiple layers at once, or select whole folders if desired (If you do that, be aware it may take a minute to create the config information, so be patient while it loads).
 
 Once you've selected your layers and you're ready to add them to your configuration, click the add arrow to the right of the layer selection list.
 
-![Adding Layers](https://github.com/dhlevi/smk/blob/master/smk-parent/smk-ui/docs/smk_admin_editor_layers_addlayer.jpg)
+![Adding Layers](images/smk_admin_editor_layers_addlayer.jpg)
 (It's probably obvious, but the button below will remove a layer from the Active Layers List)
 
 Your layer will be added to your application.
 
-![Active Layers](https://github.com/dhlevi/smk/blob/master/smk-parent/smk-ui/docs/smk_admin_editor_layers_activelayers.jpg)
+![Active Layers](images/smk_admin_editor_layers_activelayers.jpg)
 
 ## Adding a WMS Layer
-![WMS Layers](https://github.com/dhlevi/smk/blob/master/smk-parent/smk-ui/docs/smk_admin_editor_layers_wms.jpg)
+![WMS Layers](images/smk_admin_editor_layers_wms.jpg)
 
 Adding WMS Layers works in the same way as adding DataBC layers, except you must provide a source for the WMS service first. The DataBC WMS catalog is added by default, but this service is extremely large and it's highly recommended that you provide a direct link to a catalog layer instead. For example, to access the BEC layers in the DataBC WMS Catalog, you can provide a URL like this: https://openmaps.gov.bc.ca/geo/pub/WHSE_FOREST_VEGETATION.BEC_BIOGEOCLIMATIC_POLY/ows
 
 Note: The Admin UI automatically includes the service and request type for GetCapabilities. You do not need to include this info.
 
-![WMS URL](https://github.com/dhlevi/smk/blob/master/smk-parent/smk-ui/docs/smk_admin_editor_layers_wms_url.jpg)
+![WMS URL](images/smk_admin_editor_layers_wms_url.jpg)
 
 Once you have supplied a URL to a WMS service, click the "load" button to the right of the URL textbox, and available layers will be listed in a list box below. This list box behaves exactly the same as the DataBC Catalog box, and includes a filter for larger services.
 
-![WMS URL](https://github.com/dhlevi/smk/blob/master/smk-parent/smk-ui/docs/smk_admin_editor_layers_wms_list.jpg)
+![WMS URL](images/smk_admin_editor_layers_wms_list.jpg)
 
 ## Adding a Vector Layer
-![DataBC Layers](https://github.com/dhlevi/smk/blob/master/smk-parent/smk-ui/docs/smk_admin_editor_layers_vector.jpg)
+![DataBC Layers](images/smk_admin_editor_layers_vector.jpg)
 
 SMK supports vector data in GeoJSON format. All vector data you add will be converted into GeoJSON. Currently SMK supports converting the following formats to GeoJSON:
 
@@ -90,11 +90,11 @@ KML/KMZ placemarks often contain a "Description" attribute. If a description is 
 SMK supports importing shapefiles. A shapefile must be submitted in a Zip file, with the shapefile at the root of the zip (no folders). If you do not include a projection file, it will be assumed that your shapefile is in WGS84, and no projection will occur. If you include a db file, the generated GeoJSON will include all attribute data in the json properties.
 
 ### Vector Upload Options
-![DataBC Layers](https://github.com/dhlevi/smk/blob/master/smk-parent/smk-ui/docs/smk_admin_editor_layers_vector_opts.jpg)
+![DataBC Layers](images/smk_admin_editor_layers_vector_opts.jpg)
 
 All vector formats have the same options. Some options are only relevant if you have polygon, line or point data, and can be ignored.
 
-![DataBC Layers](https://github.com/dhlevi/smk/blob/master/smk-parent/smk-ui/docs/smk_admin_editor_layers_vector_file.jpg)
+![DataBC Layers](images/smk_admin_editor_layers_vector_file.jpg)
 
 The first block of options involves the location of your vector file. If you have a GeoJSON file, you can import it, or you can link to it externally. For KML, KMZ and shapefiles, you must upload the file.
 
@@ -106,7 +106,7 @@ You can embedd an external URL to any GeoJSON file source (but no other vector t
 
 Once you've got a source file in place, you can specify the naming and rendering options.
 
-![DataBC Layers](https://github.com/dhlevi/smk/blob/master/smk-parent/smk-ui/docs/smk_admin_editor_layers_vector_settings.jpg)
+![DataBC Layers](images/smk_admin_editor_layers_vector_settings.jpg)
 
 ### Name
 Enter the name you want for your layer in the "Name" text box. Any string is acceptable, but because this name is used for ID's to linked attachments (source json, markers, etc) special characters are not supported. Alpha-Numeric only.
@@ -123,7 +123,7 @@ The "Display as Cluster" checkbox determines if any available point data will be
 ### Display as Heatmap
 The "Display as Heatmap" checkbox determines if any available point data will generate a heatmap layer. Heatmap layers are not interactable, but show a visual representation of feature density.
 
-![DataBC Layers](https://github.com/dhlevi/smk/blob/master/smk-parent/smk-ui/docs/heatmap_example.jpg)
+![DataBC Layers](images/heatmap_example.jpg)
 
 ### Layer Opacity
 The "Layer Opacity" textbox accepts decimal values representing the opacity of the whole layer. Acceptable values are 0.0 to 1.0, where 0.0 is totally transparent, and 1.0 is completely visible. Any number higher than 1.0 will be defaulted to 1.0. 
@@ -147,7 +147,7 @@ Note: If you do not supply a marker image for point data, a buffered polygon wil
 
 Finally, if you are supplying a custom marker for point data, you can specify the marker settings:
 
-![DataBC Layers](https://github.com/dhlevi/smk/blob/master/smk-parent/smk-ui/docs/smk_admin_editor_layers_vector_marker.jpg)
+![DataBC Layers](images/smk_admin_editor_layers_vector_marker.jpg)
 
 ### Upload a Marker
 To upload a custom marker, click the "Custom Point Marker" button to open the file picker dialog, and select your marker icon. These must be in a PNG format.
@@ -161,13 +161,13 @@ Because custom markers may not draw exactly where the real point is, you can use
 
 Once you've added a new layer, many of the options will be set to defaults, including attribute names and visibility settings. You can change these by editing a layer. To edit a layer, first select it in the active layers list.
 
-![DataBC Layers](https://github.com/dhlevi/smk/blob/master/smk-parent/smk-ui/docs/smk_admin_editor_layers_edit_sel.jpg)
+![DataBC Layers](images/smk_admin_editor_layers_edit_sel.jpg)
 
 Note: If you have multiple layers selected, the first layer selected in the list will be edited only.
 
 Once you have selected a layer, click the "Edit" button found below the active layers list. This will open the layer edit panel.
 
-![Layer Edit Panel](https://github.com/dhlevi/smk/blob/master/smk-parent/smk-ui/docs/smk_admin_editor_layers_edit_pan.jpg)
+![Layer Edit Panel](images/smk_admin_editor_layers_edit_pan.jpg)
 
 The edit panel will be different depending on the type of layer you're editing. While DataBC Catalog layers and WMS layers share the same editable components, vector layers contain all editable attributes used when uploading them initially.
 
@@ -175,7 +175,7 @@ To review the components for vector layers, please visit the section above descr
 
 For DataBC and WMS layers, the options will appear as below:
 
-![Layer Edit Options](https://github.com/dhlevi/smk/blob/master/smk-parent/smk-ui/docs/smk_admin_editor_layers_edit_pan_opts.jpg)
+![Layer Edit Options](images/smk_admin_editor_layers_edit_pan_opts.jpg)
 
 ### Visible
 the "Visible" checkbox determines if the layer will be shown when your application is started. If it is checked off, the layer will remain hidden until the user turns it on manually.
@@ -199,13 +199,13 @@ The "Filter Expression" textbox allows you to provide a SQL syntax definition ex
 
 All layers contain options for editing any available attributes, creating and editing queries, or altering the popup that displays when an Identify is executed on the layer.
 
-![Layer Edit Buttons](https://github.com/dhlevi/smk/blob/master/smk-parent/smk-ui/docs/smk_admin_editor_layers_edit_pan_btns.jpg)
+![Layer Edit Buttons](images/smk_admin_editor_layers_edit_pan_btns.jpg)
 
 ## Attributes
 
 If you click on the "Attributes" button, you will be presented with the attribute edit popup.
 
-![Layer Edit Buttons](https://github.com/dhlevi/smk/blob/master/smk-parent/smk-ui/docs/smk_admin_editor_layers_edit_attr.jpg)
+![Layer Edit Buttons](images/smk_admin_editor_layers_edit_attr.jpg)
 
 The attribute edit popup does not let you create new attributes. 
 You can update attribute visibility by checking or un-checking the "Visibility" check boxes on the left-hand side of the panel.
@@ -217,13 +217,13 @@ All layers and layer types can support queries, as long as the layer contains at
 
 When you click on the query button from the Edit Layer panel, the Query Editor popup will be displayed.
 
-![Query Popup](https://github.com/dhlevi/smk/blob/master/smk-parent/smk-ui/docs/smk_admin_editor_layers_query.jpg)
+![Query Popup](images/smk_admin_editor_layers_query.jpg)
 
 From this popup you can choose to create a new query, edit any existing queries, or delete any existing queries.
 
 Click "edit" or "Create" to begin modifying your query arguments:
 
-![Query Popup](https://github.com/dhlevi/smk/blob/master/smk-parent/smk-ui/docs/smk_admin_editor_layers_query_args.jpg)
+![Query Popup](images/smk_admin_editor_layers_query_args.jpg)
 
 ### Name and Description
 From this popop, you can edit the queries display name and a description of what your query will do. This description will be displayed to the user in the query menu.
@@ -255,11 +255,11 @@ The Input Type combo box contains two values:
 
 If you select "Textbox", the query panel will display a textbox for the user to enter any desired value. If you select "Dropdown", the query panel will display a dropdown combobox of predefined values. When you select dropdown in the Input Type combobox, an additional button will display:
 
-![Layer Edit Buttons](https://github.com/dhlevi/smk/blob/master/smk-parent/smk-ui/docs/smk_admin_editor_layers_query_args_dd.jpg)
+![Layer Edit Buttons](images/smk_admin_editor_layers_query_args_dd.jpg)
 
 Click this button to open the dropdown selection editor:
 
-![Layer Edit Buttons](https://github.com/dhlevi/smk/blob/master/smk-parent/smk-ui/docs/smk_admin_editor_layers_query_args_ddp.jpg)
+![Layer Edit Buttons](images/smk_admin_editor_layers_query_args_ddp.jpg)
 
 In the dropdown selection editor, you must supply a value in the "Value" text box. This value is used as a key/id, and is not displayed. Because it is an ID value, special characters are not supported.
 
@@ -276,7 +276,7 @@ Once you're done making changes to your query, click the "Save Query" button. Yo
 
 You can add any HTML elements you need to customize your layers popup. You can use [Vue](https://vuejs.org/) syntax to develop highly complicated popup templates. To reference the layer, use double moustaches with the variable "layer" ex: {{ layer.title }} To reference the feature, use double moustaches with the variable "feature" ex: {{ feature.title }} or {{ feature.properties['attribute_name'] }}
 
-![Layer Edit Buttons](https://github.com/dhlevi/smk/blob/master/smk-parent/smk-ui/docs/smk_admin_editor_layers_edit_pop.jpg)
+![Layer Edit Buttons](images/smk_admin_editor_layers_edit_pop.jpg)
 
 There are 3 templates built into SMK:
 

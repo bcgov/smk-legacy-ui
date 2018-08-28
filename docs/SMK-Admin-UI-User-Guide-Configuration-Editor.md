@@ -1,14 +1,14 @@
 # SMK Admin UI User Guide - Configuration Editor
-[Back to ToC](https://github.com/bcgov/smk/wiki/SMK-Admin-UI-User-Guide)
+[Back to ToC](SMK-Admin-UI-User-Guide)
 
 When you click "Create" or "Edit" from the welcome screen, you'll be presented with the Map Configuration editor. The Map Configuration editor allows you to make many modifications to your configuration, including updating the name and ID, adding or removing layers, and changing tool behaviour.
 ***
 ## The Editor Screen Tabs
 The editor screen, after clicking "Create":
-![Config Editor Screen](https://github.com/dhlevi/smk/blob/master/smk-parent/smk-ui/docs/smk_admin_editor_identify.jpg)
+![Config Editor Screen](images/smk_admin_editor_identify.jpg)
 
 The screen is made up of a number of different tabs which contain the configuration options:
-![Config Editor Tabs](https://github.com/dhlevi/smk/blob/master/smk-parent/smk-ui/docs/smk_admin_editor_tabs.jpg)
+![Config Editor Tabs](images/smk_admin_editor_tabs.jpg)
 
 The configuration tabs are:
 * **Identity:** Modify the Name, ID, and Viewer type
@@ -19,15 +19,15 @@ The configuration tabs are:
 
 For more information, click the links below
 
-1. [Identity](https://github.com/bcgov/smk/wiki/SMK-Admin-UI-User-Guide:-Identity-Tab)
-2. [Basemap](https://github.com/bcgov/smk/wiki/SMK-Admin-UI-User-Guide:-Basemap-Tab)
-3. [Layers](https://github.com/bcgov/smk/wiki/SMK-Admin-UI-User-Guide:-Layers-Tab)
-4. [Tools](https://github.com/bcgov/smk/wiki/SMK-Admin-UI-User-Guide:-Tools-Tab)
-5. [Style](https://github.com/bcgov/smk/wiki/SMK-Admin-UI-User-Guide:-Styles-and-Themes-Tab)
+1. [Identity](SMK-Admin-UI-User-Guide:-Identity-Tab)
+2. [Basemap](SMK-Admin-UI-User-Guide:-Basemap-Tab)
+3. [Layers](SMK-Admin-UI-User-Guide:-Layers-Tab)
+4. [Tools](SMK-Admin-UI-User-Guide:-Tools-Tab)
+5. [Style](SMK-Admin-UI-User-Guide:-Styles-and-Themes-Tab)
 
 ## The button bar
 At the bottom of the editor, there is a button bar that contains basic controls:
-![Editor buttons](https://github.com/dhlevi/smk/blob/master/smk-parent/smk-ui/docs/smk_admin_editor_buttons.jpg)
+![Editor buttons](images/smk_admin_editor_buttons.jpg)
 
 Available buttons are:
 * Save

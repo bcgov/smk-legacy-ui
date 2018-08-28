@@ -52,23 +52,23 @@ The SMK API service tries to adhere as closely as possible to standard HTTP and 
 | Type | Link | Description
 
 |`{POST}` 
-|https://github.com/bcgov/smk/wiki/SMK-API---Create-a-map-configuration[/MapConfigurations/]
+|SMK-API---Create-a-map-configuration[/MapConfigurations/]
 |Create a new Map Configuration
 
 |`{GET}` 
-|https://github.com/bcgov/smk/wiki/SMK-API-Get-a-list-of-map-configurations[/MapConfigurations/]
+|SMK-API-Get-a-list-of-map-configurations[/MapConfigurations/]
 |Fetch a listing of all existing edit version map configurations. Published configurations will not be returned
 
 |`{GET}` 
-|https://github.com/bcgov/smk/wiki/SMK-API-Get-a-map-configuration-by-ID[/MapConfigurations/{ID}]
+|SMK-API-Get-a-map-configuration-by-ID[/MapConfigurations/{ID}]
 |Fetch a map configuration document by ID. This will return the current editable version of a configuration. This will not return a published config
 
 |`{PUT}` 
-|https://github.com/bcgov/smk/wiki/SMK-API---Update-a-Map-Configuration[/MapConfigurations/{ID}]
+|SMK-API---Update-a-Map-Configuration[/MapConfigurations/{ID}]
 |Update an editable (unpublished) map configuration document
 
 |`{DELETE}` 
-|https://github.com/bcgov/smk/wiki/SMK-API---Delete-a-Map-Configuration-and-all-related-documents[/MapConfigurations/{ID}]
+|SMK-API---Delete-a-Map-Configuration-and-all-related-documents[/MapConfigurations/{ID}]
 |Delete an editable (unpublished) map configuration document
 
 |===
@@ -79,19 +79,19 @@ The SMK API service tries to adhere as closely as possible to standard HTTP and 
 | Type | Link | Description
 
 |`{POST}` 
-|https://github.com/bcgov/smk/wiki/SMK-API-Publish-a-Map-Configuration[/MapConfigurations/Published/]
+|SMK-API-Publish-a-Map-Configuration[/MapConfigurations/Published/]
 |Publish a Map Configuration
 
 |`{GET}` 
-|https://github.com/bcgov/smk/wiki/SMK-API---Get-all-published-map-configurations[/MapConfigurations/Published/]
+|SMK-API---Get-all-published-map-configurations[/MapConfigurations/Published/]
 |Fetch a listing of all existing published map configurations. Editable configurations will not be returned
 
 |`{GET}` 
-|https://github.com/bcgov/smk/wiki/SMK-API-Get-a-published-map-configuration[/MapConfigurations/Published/{ID}]
+|SMK-API-Get-a-published-map-configuration[/MapConfigurations/Published/{ID}]
 |Fetch a published map configuration document by ID. This will return the current published version of a configuration. This will not return an edited config
 
 |`{DELETE}` 
-|https://github.com/bcgov/smk/wiki/SMK-API---Un-Publish-a-published-Map-Configuration[/MapConfigurations/Published/{ID}]
+|SMK-API---Un-Publish-a-published-Map-Configuration[/MapConfigurations/Published/{ID}]
 |Un-publish a published map configuration. This will not delete the existing editable configuration
 
 |===
@@ -102,23 +102,23 @@ The SMK API service tries to adhere as closely as possible to standard HTTP and 
 | Type | Link | Description
 
 |`{POST}` 
-|https://github.com/bcgov/smk/wiki/SMK-API---Create-an-attachment-for-a-map-configuration[/MapConfigurations/{ID}/Attachments/]
+|SMK-API---Create-an-attachment-for-a-map-configuration[/MapConfigurations/{ID}/Attachments/]
 |Create a new attachment for a map configuration
 
 |`{POST}` 
-|https://github.com/bcgov/smk/wiki/SMK-API---Update-a-Map-Configurations-attachment[/MapConfigurations/{ID}/Attachments/{ATTACHMENT_ID}]
+|SMK-API---Update-a-Map-Configurations-attachment[/MapConfigurations/{ID}/Attachments/{ATTACHMENT_ID}]
 |Replace an existing attachment with a new attachment document
 
 |`{GET}` 
-|https://github.com/bcgov/smk/wiki/SMK-API-Get-all-map-configuration-attachments[/MapConfigurations/{ID}/Attachments/]
+|SMK-API-Get-all-map-configuration-attachments[/MapConfigurations/{ID}/Attachments/]
 |Fetch a listing of all existing map configuration attachments, including vector layers, custom markers, and header image
 
 |`{GET}` 
-|https://github.com/bcgov/smk/wiki/SMK-API---Get-a-specific-map-configurations-attachment[/MapConfigurations/{ID}/Attachments/{ATTACHMENT_ID}]
+|SMK-API---Get-a-specific-map-configurations-attachment[/MapConfigurations/{ID}/Attachments/{ATTACHMENT_ID}]
 |Fetch a map configuration attachment by ATTACHMENT ID
 
 |`{DELETE}` 
-|https://github.com/bcgov/smk/wiki/SMK-API---Delete-a-map-configurations-attachment[/MapConfigurations/{ID}/Attachments/{ATTACHMENT_ID}]
+|SMK-API---Delete-a-map-configurations-attachment[/MapConfigurations/{ID}/Attachments/{ATTACHMENT_ID}]
 |Permenantly delete a map configurations attachment
 
 |===
@@ -127,4 +127,4 @@ NOTE: published documents also include Attachment endpoints, but only the GET me
 
 = Resources
 
-Complete resource model details https://github.com/bcgov/smk/wiki/SMK-API-Resource-Model[can be found here]
+Complete resource model details SMK-API-Resource-Model[can be found here]

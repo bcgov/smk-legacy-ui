@@ -1,20 +1,20 @@
 # SMK Admin UI User Guide - Identity Tab
-[Back to the Config Editor Page](https://github.com/bcgov/smk/wiki/SMK-Admin-UI-User-Guide%3A-Configuration-Editor)
+[Back to the Config Editor Page](SMK-Admin-UI-User-Guide%3A-Configuration-Editor)
 
-[Back to ToC](https://github.com/bcgov/smk/wiki/SMK-Admin-UI-User-Guide)
+[Back to ToC](SMK-Admin-UI-User-Guide)
 
 The Identity tab allows you to modify the Name, Title, and Viewer type for your site map configuration.
 
-![Config Editor Screen](https://github.com/dhlevi/smk/blob/master/smk-parent/smk-ui/docs/smk_admin_editor_identify.jpg)
+![Config Editor Screen](images/smk_admin_editor_identify.jpg)
 
 ## Modify your Name & Title
-![Config Editor Screen](https://github.com/dhlevi/smk/blob/master/smk-parent/smk-ui/docs/smk_admin_editor_identify_title.jpg)
+![Config Editor Screen](images/smk_admin_editor_identify_title.jpg)
 To modify your applications Name/ID, simply type your desired name in the text box provided. This Name field is not used for display, but as a unique identifier for your config, so it must be unique. Special characters are not allowed. When you save your configuration, the Name/ID will be parsed. Some special characters will be removed, and spaces will be replaced with dashes. If you do not add a Name/ID value, your Title will be converted into an ID automatically.
 
 The Title field allows you to set what you want to display as your sites Title. This Title will display in your browsers tab header, as well as on the header of the SMK application when in stand-alone mode.
 
 ## Select your viewer
-![Config Editor Screen](https://github.com/dhlevi/smk/blob/master/smk-parent/smk-ui/docs/smk_admin_editor_identify_viewer.jpg)
+![Config Editor Screen](images/smk_admin_editor_identify_viewer.jpg)
 
 To select a viewer, click one of the radio buttons provided. Currently there are two viewer options; Leaflet and ESRI 3D. Each viewer has unique capabilities and some may not be suitable for your needs.
 
