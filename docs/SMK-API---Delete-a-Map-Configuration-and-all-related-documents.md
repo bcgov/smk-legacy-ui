@@ -1,6 +1,11 @@
-# 
+# `DELETE` /MapConfigurations/{ID} - Delete a Map Configuration
+
+Executing a DELETE at the /MapConfigurations/{ID} endpoint will permenantly delete the Map Configuration, including all attachments.
 
 > **Note**
+>
+> If your Map Configuration has been published, you will not be able to delete. 
+> If you want to completely remove your configuration, you must unpublish first (see {DELETE} /MapConfiguration/Published/{ID})
 
 > **Warning**
 > 
@@ -23,9 +28,8 @@ $ http DELETE 'http://localhost:8080/MapConfigurations/my-application' \
 
 Path Parameters:
 
-|           |                              |
-| --------- | ---------------------------- |
 | Parameter | Description                  |
+| --------- | ---------------------------- |
 | `id`      | The SMK Map Configuration ID |
 
 Example of http request:

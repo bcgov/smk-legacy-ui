@@ -1,8 +1,7 @@
 # Map Configuration Model:
 
-|                          |                 |          |                                                                                                                                                        |
-| ------------------------ | --------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Path                     | Type            | Required | Description                                                                                                                                            |
+| ------------------------ | --------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `lmfId`                  | `String`        | `True`   | The SMK identifer for the Map Configuration                                                                                                            |
 | `lmfRevision`            | `Integer`       | `True`   | The current version of the Map Configuration. This will increment when a version is published and a new edit version created                           |
 | `name`                   | `String`        | `True`   | The name of an SMK application. This name is used for labels and display purposes                                                                      |
@@ -28,9 +27,8 @@ type.
 
 ## Layer Model:
 
-|                     |                    |          |                                                                                                                                                 |
-| ------------------- | ------------------ | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
 | Path                | Type               | Required | Description                                                                                                                                     |
+| ------------------- | ------------------ | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
 | `type`              | `String`           | `True`   | Identifies which type of layer this is. Must be one of dynamicServiceLayer, wmsLayer, kmlLayer, jsonLayer, groupLayer, folder, or featureLayer  |
 | `id`                | `Integer`          | `True`   | The identifer for a Layer                                                                                                                       |
 | `title`             | `String`           | `True`   | The Layers title, used for display in the viewer                                                                                                |
@@ -47,9 +45,8 @@ type.
 
 ## Attribute fields:
 
-|           |           |          |                                                  |
-| --------- | --------- | -------- | ------------------------------------------------ |
 | Path      | Type      | Required | Description                                      |
+| --------- | --------- | -------- | ------------------------------------------------ |
 | `name`    | `String`  | `True`   | The database name of the attribute               |
 | `alias`   | `String`  | `True`   | The label alias of the attribute                 |
 | `visible` | `Boolean` | `True`   | Indicates if the attribute is visible by default |
@@ -59,9 +56,8 @@ layer
 
 ## Dynamic Service Layer Model:
 
-|                 |                 |          |                                                                                                                                                   |
-| --------------- | --------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Path            | Type            | Required | Description                                                                                                                                       |
+| --------------- | --------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `mpcmId`        | `Integer`       | `True`   | The ID used for this layer in the DataBC Layer Catalog                                                                                            |
 | `mpcmWorkspace` | `String`        | `True`   | The workspace used for this layer in the DataBC Layer Catalog                                                                                     |
 | `serviceUrl`    | `String`        | `True`   | The URL for the DataBC Layer Catalog                                                                                                              |
@@ -69,9 +65,8 @@ layer
 
 ## WMS Layer Model:
 
-|              |          |          |                                                                                      |
-| ------------ | -------- | -------- | ------------------------------------------------------------------------------------ |
 | Path         | Type     | Required | Description                                                                          |
+| ------------ | -------- | -------- | ------------------------------------------------------------------------------------ |
 | `version`    | `String` | `True`   | The WMS version used for get map, get feature info and get capabilities wms requests |
 | `styleName`  | `String` | `True`   | The name of the style to use when making get map requests for the WMS layer          |
 | `layerName`  | `String` | `True`   | The name of the layer to use when making get map requests for the WMS layer          |
@@ -79,9 +74,8 @@ layer
 
 ## Vector Layer Model:
 
-|                       |                  |          |                                                                                                                                   |
-| --------------------- | ---------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------- |
 | Path                  | Type             | Required | Description                                                                                                                       |
+| --------------------- | ---------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------- |
 | `dataUrl`             | `String`         | `False`  | A URL for an external GeoJSON file                                                                                                |
 | `useRaw`              | `Boolean`        | `False`  | Indicates if the layer should be displayed in its native form, with no heatmapping or clustering. Only relevant for point vectors |
 | `useClustering`       | `Boolean`        | `False`  | Indicates if the layer should also include point clustering. Only relevant for point vectors                                      |
@@ -98,9 +92,8 @@ layer
 
 ## Tools Model:
 
-|             |           |          |                                                                                                                                                                                                                                                                |
-| ----------- | --------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Path        | Type      | Required | Description                                                                                                                                                                                                                                                    |
+| ----------- | --------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `enabled`   | `Boolean` | `False`  | Indicates if this tool is enabled or disabled by default. Disabled tools will not function in an applicaiton and will be removed from the UI                                                                                                                   |
 | `title`     | `String`  | `False`  | The Title to use for a tool. All tools contain defaults, and will be overriden if title is supplied                                                                                                                                                            |
 | `icon`      | `String`  | `False`  | The default icon to use for a tool. All tools contain defaults, and will be overriden if an icon name is supplied. Icons are derived from the Google Material Icons library                                                                                    |
@@ -115,23 +108,20 @@ below:
 
 ## About Tool Model:
 
-|           |          |          |                                                 |
-| --------- | -------- | -------- | ----------------------------------------------- |
 | Path      | Type     | Required | Description                                     |
+| --------- | -------- | -------- | ----------------------------------------------- |
 | `content` | `String` | `False`  | HTML content to be displayed in the about panel |
 
 ## Basemaps Tool Model:
 
-|           |                 |          |                                                                        |
-| --------- | --------------- | -------- | ---------------------------------------------------------------------- |
 | Path      | Type            | Required | Description                                                            |
+| --------- | --------------- | -------- | ---------------------------------------------------------------------- |
 | `choices` | `Array[String]` | `False`  | A listing of available basemap ID’s to offer in this map configuration |
 
 ## Identify Tool Model:
 
-|                       |                  |          |                                                                                              |
-| --------------------- | ---------------- | -------- | -------------------------------------------------------------------------------------------- |
 | Path                  | Type             | Required | Description                                                                                  |
+| --------------------- | ---------------- | -------- | -------------------------------------------------------------------------------------------- |
 | `styleOpacity`        | `Double`         | `False`  | The opacity of the identify tool feature highlighting                                        |
 | `style.strokeWidth`   | `Double`         | `False`  | Width of a line or polygon outline                                                           |
 | `style.strokeStyle`   | `String`         | `False`  | Display style for a line or polygon outline (solid, dashed, dotted)                          |
@@ -145,24 +135,21 @@ below:
 
 ## Mini Map Tool Model:
 
-|           |          |          |                                            |
-| --------- | -------- | -------- | ------------------------------------------ |
 | Path      | Type     | Required | Description                                |
+| --------- | -------- | -------- | ------------------------------------------ |
 | `baseMap` | `String` | `True`   | The basemap ID for display in the Mini Map |
 
 ## Scale Tool Model:
 
-|              |           |          |                                  |
-| ------------ | --------- | -------- | -------------------------------- |
 | Path         | Type      | Required | Description                      |
+| ------------ | --------- | -------- | -------------------------------- |
 | `showFactor` | `Boolean` | `True`   | Display the scale as a factor    |
 | `showBar`    | `Boolean` | `True`   | Display the scale in a scale bar |
 
 ## Select Tool Model:
 
-|                       |                  |          |                                                                                              |
-| --------------------- | ---------------- | -------- | -------------------------------------------------------------------------------------------- |
 | Path                  | Type             | Required | Description                                                                                  |
+| --------------------- | ---------------- | -------- | -------------------------------------------------------------------------------------------- |
 | `styleOpacity`        | `Double`         | `False`  | The opacity of the Select tool feature highlighting                                          |
 | `style.strokeWidth`   | `Double`         | `False`  | Width of a line or polygon outline                                                           |
 | `style.strokeStyle`   | `String`         | `False`  | Display style for a line or polygon outline (solid, dashed, dotted)                          |
@@ -176,9 +163,8 @@ below:
 
 ## Zoom Tool Model:
 
-|               |           |          |                                                                |
-| ------------- | --------- | -------- | -------------------------------------------------------------- |
 | Path          | Type      | Required | Description                                                    |
+| ------------- | --------- | -------- | -------------------------------------------------------------- |
 | `mouseWheel`  | `Boolean` | `False`  | Allow zooming with the mouse wheel                             |
 | `doubleClick` | `Boolean` | `False`  | Allow zooming with a mouse *double-click*                      |
 | `box`         | `Boolean` | `False`  | Allow zooming by clicking and dragging a box                   |
@@ -186,9 +172,8 @@ below:
 
 # Query Configuration Model:
 
-|                                  |                                   |          |                                                                                                                    |
-| -------------------------------- | --------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------ |
 | Path                             | Type                              | Required | Description                                                                                                        |
+| -------------------------------- | --------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------ |
 | `id`                             | `String`                          | `True`   | The Query ID                                                                                                       |
 | `title`                          | `String`                          | `True`   | The Query display title                                                                                            |
 | `description`                    | `String`                          | `True`   | The Query display description                                                                                      |

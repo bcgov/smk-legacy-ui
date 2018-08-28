@@ -1,4 +1,7 @@
-# 
+# `GET` /MapConfigurations/{id}/Attachments/ - Retrieve All Attachments for a Map Configuration
+
+Executing a GET at the /MapConfiguration/{id}/Attachments/ endpoint will return a listing of all attachments this map configuration currently has.
+ 
 
 Example of curl command:
 

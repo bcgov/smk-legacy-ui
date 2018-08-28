@@ -1,7 +1,6 @@
-# 
+# `GET` MapConfigurations - Retrieve the latest versions of all SMK Map Configurations (non-published only)
 
-Executing a GET at the /MapConfigurations/ endpoint will return a
-listing of all non published SMK Map Configurations
+Executing a GET at the /MapConfigurations/ endpoint will return a listing of all non published SMK Map Configurations
 
 Example of curl command:
 

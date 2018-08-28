@@ -1,9 +1,7 @@
-# 
+# `POST` MapConfigurations - Create a new SMK Map Configuration
 
-Executing a POST at the /MapConfigurations/ endpoint with a body
-containing the required Map Configuration json will create a new,
-unpublished Map Configuration that can be used for editing. All newly
-created documents will have their SMK Version set to *1*
+Executing a POST at the /MapConfigurations/ endpoint with a body containing the required Map Configuration json will create a new, unpublished Map Configuration that can be used for editing.
+All newly created documents will have their SMK Version set to *1*.
 
 Example of curl command:
 

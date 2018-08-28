@@ -1,4 +1,7 @@
-# 
+# `GET` /MapConfiguration/{id}/Attachments/{attachment_id} - Retrieve an Attachment for a Map Configuration
+
+Executing a GET at the MapConfiguration/{id}/Attachments/{attachment_id} endpoint will return the attachment document, in whatever content type is indicated by the attachment.
+ 
 
 Example of curl
 command:
@@ -19,9 +22,8 @@ $ http GET 'http://localhost:8080/MapConfigurations/my-application/Attachments/m
 Path
 Parameters:
 
-|                 |                                                       |
-| --------------- | ----------------------------------------------------- |
 | Parameter       | Description                                           |
+| --------------- | ----------------------------------------------------- |
 | `config_id`     | The SMK Map Configuration ID                          |
 | `attachment_id` | The attachment ID for a map configurations attachment |
 

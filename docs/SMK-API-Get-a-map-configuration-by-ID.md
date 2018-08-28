@@ -1,13 +1,16 @@
-# 
+# `GET` /MapConfigurations/{id} - Retrieve the latest versions of a SMK Map Configurations (non-published only)
+
+Executing a GET at the /MapConfigurations/{id} endpoint with the SMK id will return the related Map Configuration document
 
 > **Note**
 > 
-> The document returned will be the latest version, not the published
-> version. To get the published version, you must call the /Published/
-> endpoints NOTE: It is possible to fetch previous version from this
-> endpoint by including a query parameter of *version* with the desired
-> version number. This is not the preferred method of getting the
-> current published configuration.
+> The document returned will be the latest version, not the published version. 
+> To get the published version, you must call the /Published/ endpoints.
+
+> **Note**
+> 
+> It is possible to fetch previous version from this endpoint by including a query parameter of *version* with the desired version number. 
+> This is not the preferred method of getting the current published configuration.
 
 Example of curl command:
 
@@ -25,9 +28,8 @@ $ http GET 'http://localhost:8080/MapConfigurations/my-application' \
 
 Path Parameters:
 
-|           |                              |
-| --------- | ---------------------------- |
 | Parameter | Description                  |
+| --------- | ---------------------------- |
 | `id`      | The SMK Map Configuration ID |
 
 Example of http request:

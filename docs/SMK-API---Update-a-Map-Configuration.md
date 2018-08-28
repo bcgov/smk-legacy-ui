@@ -1,11 +1,14 @@
-# 
+# `PUT` /MapConfigurations/{id} - Update a SMK Map Configuration (not for published configurations)
 
 > **Note**
+> The document must include the correct "_rev" and "_id" system values. 
+> If these are missing, the update will fail. 
+> You can get the latest values by fetching the current resource from {GET} /MapConfigurations/{id} prior to updating
 
 > **Warning**
 > 
-> It is not possible to set the "Published" flag to true via this
-> endpoint. Attempting to do so will throw an exception.
+> It is not possible to set the "Published" flag to true via this endpoint. 
+> Attempting to do so will throw an exception.
 
 Example of curl
 command:
@@ -28,9 +31,8 @@ $ echo '{"lmfId":"my-application","lmfRevision":1,"name":"My Application Edited"
 
 Path Parameters:
 
-|           |                              |
-| --------- | ---------------------------- |
 | Parameter | Description                  |
+| --------- | ---------------------------- |
 | `id`      | The SMK Map Configuration ID |
 
 Example of http request:

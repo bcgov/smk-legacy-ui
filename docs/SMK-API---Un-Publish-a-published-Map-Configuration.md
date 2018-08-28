@@ -1,4 +1,6 @@
-# 
+# `DELETE` /MapConfiguration/Published/{id} - Un-Publish a published Map Configuration
+
+Executing a DELETE at the /MapConfiguration/Published/{ID} enpoint with a published map configuration ID will un-publish the configuration, removing it from availability in the published listing.
 
 This will not delete the configuration.
 

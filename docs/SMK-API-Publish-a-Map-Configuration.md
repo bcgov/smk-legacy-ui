@@ -1,13 +1,10 @@
-# 
+# `POST` MapConfigurations/Publish/{id} - Publish a Map Configuration
 
-Executing a POST at the MapConfiguration/Publish endpoint with a Map
-Configuration id will create a published version of the map
-configuration.
+Executing a POST at the MapConfiguration/Publish endpoint with a Map Configuration id will create a published version of the map configuration.
 
-A published map configuration is no longer editable, and considered
-stable for exporting and viewing. Any edits made will be on a new
-version of the map configuration document. A published map configuration
-cannot be altered in any way.
+A published map configuration is no longer editable, and considered stable for exporting and viewing. 
+Any edits made will be on a new version of the map configuration document. 
+A published map configuration cannot be altered in any way.
 
 Example of curl
 command:

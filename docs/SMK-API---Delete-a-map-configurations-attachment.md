@@ -1,4 +1,7 @@
-# 
+# `DELETE` /MapConfiguration/{id}/Attachments/{attachment_id} - Delete an Attachment for a Map Configuration
+
+Executing a DELETE at the /MapConfiguration/{id}/Attachments/{attachment_id} endpoint will attempt to delete the attachment. 
+Ensure you have updated any links in layer configurations to this attachment, if necessary.
 
 > **Note**
 > 
@@ -24,9 +27,8 @@ $ http DELETE 'http://localhost:8080/MapConfigurations/my-application/Attachment
 Path
 Parameters:
 
-|                 |                                                       |
-| --------------- | ----------------------------------------------------- |
 | Parameter       | Description                                           |
+| --------------- | ----------------------------------------------------- |
 | `config_id`     | The SMK Map Configuration ID                          |
 | `attachment_id` | The attachment ID for a map configurations attachment |
 

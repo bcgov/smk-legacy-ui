@@ -1,4 +1,7 @@
-# 
+# `POST` /MapConfigurations/{id}/Attachments/{ATTACHMENT_ID} - Replace an existing attachment for a Map Configuration
+
+Executing a PUT at the MapConfiguration/{config_id}/Attachments endpoint with a formdata multipart file containing the desired attachment binary will replace the existing attachment document for this configuration.
+
 
 Example of curl
 command:
@@ -19,17 +22,15 @@ $ http POST'http://localhost:8080/MapConfigurations/my-application/Attachments/m
 
 Path Parameters:
 
-|             |                              |
-| ----------- | ---------------------------- |
 | Parameter   | Description                  |
+| ----------- | ---------------------------- |
 | `config_id` | The SMK Map Configuration ID |
 
 Request
 Parameters:
 
-|           |                                                                                     |
-| --------- | ----------------------------------------------------------------------------------- |
 | Parameter | Description                                                                         |
+| --------- | ----------------------------------------------------------------------------------- |
 | file      | A multipart formdata object containing the file information (kml, zip, image, etc.) |
 
 Example of http

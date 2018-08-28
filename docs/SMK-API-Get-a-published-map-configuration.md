@@ -1,4 +1,6 @@
-# 
+# `GET` /MapConfigurations/Published/{id} - Fetch a published Map Configuration
+
+Executing a GET at the /MapConfiguration/Published/{ID} enpoint with a published map configuration ID will return the configuration details.
 
 Example of curl
 command:
