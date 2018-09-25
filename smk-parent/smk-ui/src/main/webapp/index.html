@@ -247,6 +247,16 @@
 								  </p>
 								</div>
 							</div>
+							<div class="row">
+								<div class="col s6 input-field">
+									<input id="createdDateField" type="text" disabled="true" v-model="createdDate">
+	          						<label for="createdDateField">Created Date</label>
+								</div>
+								<div class="col s6 input-field">
+									<input id="updatedDateField" type="text" disabled="true" v-model="modifiedDate">
+	          						<label for="updatedDateField">Updated Date</label>
+								</div>
+							</div>
 						</form>
 					</div>
 					<div class="card-action">
@@ -866,6 +876,14 @@
 										      <div class="collapsible-header"><em class="material-icons">home</em>About Panel Options</div>
 										      <div class="collapsible-body">
 										      	<div class="row" >
+										      		<input type="checkbox" id="aboutActiveTool" onclick="toggleActiveAboutTool()"/>
+													<label class="black-text" for="aboutActiveTool">Active On Startup</label>
+										      	</div>
+										      	<div class="row input-field" >
+										      		<input id="aboutPanelHeader" type="text">
+					          						<label for="aboutPanelHeader">Title</label>
+										      	</div>
+										      	<div class="row" >
 										      		<div id="about-content" style="height: 75%"></div>
 										      	</div>
 											  </div>
@@ -953,6 +971,14 @@
 										    <li id="basemapPanelOptions" style="display: none;">
 										      <div class="collapsible-header"><em class="material-icons">map</em>Base Maps Panel Options</div>
 										      <div class="collapsible-body">
+										      		<div class="row" >
+											      		<input type="checkbox" id="basemapsActiveTool" onclick="toggleActiveBasemapsTool()"/>
+														<label class="black-text" for="basemapsActiveTool">Active On Startup</label>
+											      	</div>
+											      	<div class="row input-field" >
+											      		<input id="basemapPanelHeader" type="text">
+						          						<label for="basemapPanelHeader">Title</label>
+											      	</div>
 										      		<p>
 										      			Select which basemaps to make available in the Basemap selector
 										      		</p>
@@ -993,6 +1019,10 @@
 										    <li id="identifyOptions" style="display: none;">
 										      <div class="collapsible-header"><em class="material-icons">search</em>Identify Options</div>
 										      <div class="collapsible-body">
+										      	<div class="row input-field" >
+										      		<input id="identifyPanelHeader" type="text">
+					          						<label for="identifyPanelHeader">Title</label>
+										      	</div>
 												<div class="row" >
 													<div class="col s4 input-field">
 														<input id="identifyStyleOpacity" type="text">
@@ -1029,6 +1059,10 @@
 								      			</div>
 								      			<div class="row" >
 								      				<div class="col s4 input-field">
+								      					<input type="checkbox" id="showConvexHulls" onclick="toggleConvexHullsTool()" />
+														<label class="black-text" for="showConvexHulls">Show Cluster Hulls</label>
+								      				</div>
+								      				<div class="col s4 input-field">
 								      					<input type="checkbox" id="identifyPanelVisible" />
 														<label class="black-text" for="identifyPanelVisible">Show in Panel</label>
 								      				</div>
@@ -1043,6 +1077,10 @@
 										      <div class="collapsible-header"><em class="material-icons">select_all</em>Select Options</div>
 										      <div class="collapsible-body">
 												<div class="row" >
+													<div class="row input-field" >
+											      		<input id="selectPanelHeader" type="text">
+						          						<label for="selectPanelHeader">Title</label>
+											      	</div>
 													<div class="col s4 input-field">
 														<input id="selectStyleOpacity" type="text">
 						          						<label for="selectStyleOpacity">Opacity</label>
@@ -1077,6 +1115,37 @@
 													</div>
 													<div style="height: 100px;"></div>
 								      			</div>
+											  </div>
+										    </li>
+										    <!-- New Panels for header/Active toggles -->
+										    <li id="directionsOptions" style="display: none;">
+										      <div class="collapsible-header"><em class="material-icons">directions_car</em>Directions Tool</div>
+										      <div class="collapsible-body">
+										      		<div class="row" >
+											      		<input type="checkbox" id="directionsActiveTool" onclick="toggleActiveDirectionsTool()"/>
+														<label class="black-text" for="directionsActiveTool">Active On Startup</label>
+											      	</div>
+											      	<div class="row input-field" >
+											      		<input id="directionsPanelHeader" type="text">
+						          						<label for="directionsPanelHeader">Title</label>
+											      	</div>
+											      	<div class="row input-field" >
+											      		<input id="directionsToolKey" type="text">
+						          						<label for="directionsToolKey">API Key</label>
+											      	</div>
+											  </div>
+										    </li>
+										    <li id="layersOptions" style="display: none;">
+										      <div class="collapsible-header"><em class="material-icons">layers</em>Layers Panel</div>
+										      <div class="collapsible-body">
+										      		<div class="row" >
+											      		<input type="checkbox" id="layersActiveTool" onclick="toggleActiveLayersTool()"/>
+														<label class="black-text" for="layersActiveTool">Active On Startup</label>
+											      	</div>
+											      	<div class="row input-field" >
+											      		<input id="layersPanelHeader" type="text">
+						          						<label for="layersPanelHeader">Title</label>
+											      	</div>
 											  </div>
 										    </li>
 										  </ul>

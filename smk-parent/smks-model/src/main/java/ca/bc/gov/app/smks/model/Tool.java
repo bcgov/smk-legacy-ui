@@ -108,14 +108,12 @@ public class Tool implements Serializable
     protected int order;
     protected String instance;
     protected String position;
-    protected boolean showPanel; 
     
     public Tool() {
-    	title = "Unknown"; 
+    	title = ""; 
     	description = "";
     	type = Type.UNKNOWN.toString();
         enabled = true;
-        showPanel = true;
     }
 
     protected Tool( Tool tool ) 
@@ -128,7 +126,6 @@ public class Tool implements Serializable
     	order = tool.order;
     	instance = tool.instance;
     	position = tool.position;
-    	showPanel = tool.showPanel;
     }
 
     public String getIcon() 
@@ -212,16 +209,6 @@ public class Tool implements Serializable
     
     public String getPosition() {
         return this.position;
-    }
-    
-    public boolean getShowPanel()
-    {
-        return this.showPanel;
-    }
-    
-    public void setShowPanel(boolean showPanel)
-    {
-        this.showPanel = showPanel;
     }
 
     @Override

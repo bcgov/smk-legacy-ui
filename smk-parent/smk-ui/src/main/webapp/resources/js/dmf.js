@@ -35,6 +35,9 @@ var data = {
 	    lmfRevision: 1,
 	    name: "",
 	    createdBy: "",
+	    createdDate: "",
+	    modifiedBy: "",
+	    modifiedDate: "",
 	    version: "",
 	    published: false,
 	    surround: {
@@ -459,13 +462,14 @@ function setToolActivation(toolType)
 	    	else if(tool.type == "about" && tool.enabled == true)
     		{
 	    		$("#aboutPanelOptions").show();
+	    		$("#aboutPanelHeader").val(tool.title);
 	    		setupQuillEditor(tool);
     		}
 	    	else if(tool.type == "about" && tool.enabled == false) $("#aboutPanelOptions").hide();
 	    	else if(tool.type == "identify" && tool.enabled == true)
     		{
 	    		$("#identifyOptions").show();
-	    		
+	    		$("#identifyPanelHeader").val(tool.title);
 	    		$("#identifyStyleOpacity").val(tool.styleOpacity);
     			$("#identifyStyleStrokeOpacity").val(tool.style.strokeOpacity);
     			$("#identifyStyleFillOpacity").val(tool.style.fillOpacity);
@@ -480,7 +484,7 @@ function setToolActivation(toolType)
 	    	else if(tool.type == "select" && tool.enabled == true)
     		{
 	    		$("#selectionOptions").show();
-	    		
+	    		$("#selectPanelHeader").val(tool.title);
 	    		$("#selectStyleOpacity").val(tool.styleOpacity);
     			$("#selectStyleStrokeOpacity").val(tool.style.strokeOpacity);
     			$("#selectStyleFillOpacity").val(tool.style.fillOpacity);
@@ -492,6 +496,7 @@ function setToolActivation(toolType)
 	    	else if(tool.type == "select" && tool.enabled == false) $("#selectionOptions").hide();
 	    	else if(tool.type == "baseMaps" && tool.enabled == true)
     		{
+	    		$("#basemapPanelHeader").val(tool.title);
 	    		$("#basemapPanelOptions").show();
 	    		if(tool.choices == null) tool.choices = [];
 	    		tool.choices.forEach(function(choice)
@@ -507,6 +512,18 @@ function setToolActivation(toolType)
 	           	});
     		}
 	    	else if(tool.type == "baseMaps" && tool.enabled == false) $("#basemapPanelOptions").hide();
+	    	else if(tool.type == "layers" && tool.enabled == true)
+    		{
+	    		$("#layersPanelHeader").val(tool.title);
+	    		$("#layersOptions").show();
+    		}
+	    	else if(tool.type == "layers" && tool.enabled == false) $("#layersOptions").hide();
+	    	else if(tool.type == "directions" && tool.enabled == true)
+    		{
+	    		$("#directionsPanelHeader").val(tool.title);
+	    		$("#directionsOptions").show();
+    		}
+	    	else if(tool.type == "directions" && tool.enabled == false) $("#directionsOptions").hide();
 
 			//if(tool.enabled == true) Materialize.toast('Activated ' + tool.type + " tool!", 4000);
 			//else Materialize.toast('Deactivated ' + tool.type + " tool!", 4000);
@@ -577,6 +594,47 @@ function toggleScaleOption(scaleOption)
    	});
 }
 
+function toggleConvexHullsTool()
+{
+	data.viewer.clusterOption = !data.viewer.clusterOption;
+}
+
+function toggleActiveAboutTool()
+{
+	data.viewer.activeTool = data.viewer.activeTool == "about" ? "" : "about";
+
+	$("#basemapsActiveTool").prop('checked', false);
+	$("#layersActiveTool").prop('checked', false);
+	$("#directionsActiveTool").prop('checked', false);
+}
+
+function toggleActiveBasemapsTool()
+{
+	data.viewer.activeTool = data.viewer.activeTool == "baseMaps" ? "" : "baseMaps";
+	
+	$("#aboutActiveTool").prop('checked', false);
+	$("#layersActiveTool").prop('checked', false);
+	$("#directionsActiveTool").prop('checked', false);
+}
+
+function toggleActiveLayersTool()
+{
+	data.viewer.activeTool = data.viewer.activeTool == "layers" ? "" : "layers";
+	
+	$("#aboutActiveTool").prop('checked', false);
+	$("#basemapsActiveTool").prop('checked', false);
+	$("#directionsActiveTool").prop('checked', false);
+}
+
+function toggleActiveDirectionsTool()
+{
+	data.viewer.activeTool = data.viewer.activeTool == "layers" ? "" : "layers";
+	
+	$("#aboutActiveTool").prop('checked', false);
+	$("#basemapsActiveTool").prop('checked', false);
+	$("#layersActiveTool").prop('checked', false);
+}
+
 function toggleZoomOption(zoomOption)
 {
 	data.tools.forEach(function(tool)
@@ -637,7 +695,11 @@ function editMapConfig(mapConfigId)
 					data.lmfId = loadedConfig.lmfId;
 					data.name = loadedConfig.name;
 					data.lmfRevision = loadedConfig.lmfRevision;
+					data.version = loadedConfig.version;
 					data.createdBy = loadedConfig.createdBy;
+					data.modifiedBy = loadedConfig.modifiedBy;
+					data.createdDate = loadedConfig.createdDate;
+					data.modifiedDate = loadedConfig.modifiedDate;
 					data.published = loadedConfig.published;
 					data.surround = loadedConfig.surround;
 				    data.viewer = loadedConfig.viewer;
@@ -698,12 +760,21 @@ function editMapConfig(mapConfigId)
 
 function setupMapConfigToolsUI()
 {
+	// set active tool toggle
+	$("#aboutActiveTool").prop('checked', data.viewer.activeTool == "about");
+	$("#basemapsActiveTool").prop('checked', data.viewer.activeTool == "baseMaps");
+	$("#layersActiveTool").prop('checked', data.viewer.activeTool == "layers");
+	$("#directionsActiveTool").prop('checked', data.viewer.activeTool == "directions");
 	//set tool activations
     data.tools.forEach(function(tool)
 	{
     	if(tool.type == "coordinate") $("#coordinates").prop('checked', tool.enabled);
     	else if(tool.type == "attribution") $("#attribution").prop('checked', tool.enabled);
-    	else if(tool.type == "layers") $("#layerPanel").prop('checked', tool.enabled);
+    	else if(tool.type == "layers") 
+		{
+    		$("#layersPanelHeader").val(tool.title);
+    		$("#layerPanel").prop('checked', tool.enabled);
+		}
     	else if(tool.type == "pan") $("#panning").prop('checked', tool.enabled);
     	else if(tool.type == "zoom")
 		{
@@ -747,6 +818,8 @@ function setupMapConfigToolsUI()
 		}
     	else if(tool.type == "about")
 		{
+    		$("#aboutPanelHeader").val(tool.title);
+    		
     		$("#aboutPanel").prop('checked', tool.enabled);
     		if(tool.enabled)
 			{
@@ -756,6 +829,8 @@ function setupMapConfigToolsUI()
 		}
     	else if(tool.type == "baseMaps")
 		{
+    		$("#basemapPanelHeader").val(tool.title);
+    		
     		$("#basemapPanel").prop('checked', tool.enabled);
     		if(tool.enabled)
 			{
@@ -776,6 +851,8 @@ function setupMapConfigToolsUI()
 		}
     	else if(tool.type == "select") 
 		{
+    		$("#selectPanelHeader").val(tool.title);
+    		
     		$("#selectionPanel").prop('checked', tool.enabled);
     		if(tool.enabled)
 			{
@@ -792,6 +869,8 @@ function setupMapConfigToolsUI()
 		}
     	else if(tool.type == "identify") 
 		{
+    		$("#showConvexHulls").prop('checked', data.viewer.clusterOption);
+    		$("#identifyPanelHeader").val(tool.title);
     		$("#identifyPanel").prop('checked', tool.enabled);
     		if(tool.enabled)
 			{
@@ -810,7 +889,11 @@ function setupMapConfigToolsUI()
 		}
     	else if(tool.type == "search") $("#searchPanel").prop('checked', tool.enabled);
     	else if(tool.type == "location") $("#location").prop('checked', tool.enabled);
-    	else if(tool.type == "directions") $("#directions").prop('checked', tool.enabled);
+    	else if(tool.type == "directions")
+		{
+    		$("#directions").prop('checked', tool.enabled);
+    		$("#directionsPanelHeader").val(tool.title);
+		}
     	else if(tool.type == "dropdown") $("#dropdown").prop('checked', tool.enabled);
     	else if(tool.type == "menu") $("#menu").prop('checked', tool.enabled);
 	});
@@ -842,6 +925,7 @@ function finishToolEdits()
 			tool.style.fillColor = $("#identifyStyleFillColor").val();
 			tool.tolerance = $("#identifyClickRadius").val();
 			tool.showPanel = $("#identifyPanelVisible").is(":checked");
+			tool.title = $("#identifyPanelHeader").val();
 		}
 		else if(tool.type == "select") 
 		{
@@ -852,6 +936,23 @@ function finishToolEdits()
 			tool.style.strokeStyle = $("#selectStyleStrokeStyle").val();
 			tool.style.strokeColor = $("#selectStyleStrokeColor").val();
 			tool.style.fillColor = $("#selectStyleFillColor").val();
+			tool.title = $("#selectPanelHeader").val();
+		}
+		else if(tool.type == "about")
+		{
+			tool.title = $("#aboutPanelHeader").val();
+		}
+		else if(tool.type == "baseMaps")
+		{
+			tool.title = $("#basemapPanelHeader").val();
+		}
+		else if(tool.type == "directions")
+		{
+			tool.title = $("#directionsPanelHeader").val();
+		}
+		else if(tool.type == "layers")
+		{
+			tool.title = $("#layersPanelHeader").val();
 		}
 		/*else if(tool.type == "dropdown" && tool.enabled == false)
 		{
@@ -942,7 +1043,7 @@ function addNewMapConfig()
 			    },
 			    {
 			      "type": "directions",
-			      "enabled": true
+			      "enabled": false
 			    },
 			    {
 			      "type": "about",

@@ -10,6 +10,7 @@ import java.util.UUID;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang.time.FastDateFormat;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ektorp.Attachment;
@@ -68,6 +69,7 @@ public class MapConfigServiceController
         
         request.setLmfRevision(1);
         request.setVersion(env.getProperty("smk.version"));
+        request.setCreatedDate(FastDateFormat.getInstance("dd-MM-yyyy HH:mm:ss").format(System.currentTimeMillis()));
 
         // validate the ID, in case it's already in use.
         MapConfiguration existingDocID = couchDAO.getMapConfiguration(request.getLmfId());
@@ -226,6 +228,7 @@ public class MapConfigServiceController
         resource.setTools(request.getTools());
         resource.setViewer(request.getViewer());
         resource.setVersion(request.getVersion());
+        resource.setModifiedDate(FastDateFormat.getInstance("dd-MM-yyyy HH:mm:ss").format(System.currentTimeMillis()));
 
         // Update!
         couchDAO.updateResource(resource);

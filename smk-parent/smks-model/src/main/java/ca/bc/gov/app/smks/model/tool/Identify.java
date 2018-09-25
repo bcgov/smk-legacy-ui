@@ -14,6 +14,7 @@ public class Identify extends Tool
     private LayerStyle style;
 	private Double styleOpacity;
 	private Integer tolerance = 5;
+	private boolean showPanel;
 	
 	public Identify() 
 	{
@@ -27,6 +28,7 @@ public class Identify extends Tool
 		this.tolerance = identify.getTolerance();
 		this.styleOpacity = identify.getStyleOpacity();
 		this.style = new LayerStyle(identify.getStyle());
+		this.showPanel = identify.getShowPanel();
 	}
 
     @Override
@@ -69,4 +71,14 @@ public class Identify extends Tool
 	{
 	    this.tolerance = tolerance;
 	}
+	
+	public boolean getShowPanel()
+    {
+        return this.showPanel;
+    }
+    
+    public void setShowPanel(boolean showPanel)
+    {
+        this.showPanel = showPanel;
+    }
 }
