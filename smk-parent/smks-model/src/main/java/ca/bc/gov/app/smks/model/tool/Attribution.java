@@ -12,7 +12,6 @@ public class Attribution extends Tool
 
     public Attribution() 
     {
-        this.setTitle("Attribution");
         this.setDescription("Attribution");
         this.setType(Tool.Type.ATTRIBUTION.toString());
     }

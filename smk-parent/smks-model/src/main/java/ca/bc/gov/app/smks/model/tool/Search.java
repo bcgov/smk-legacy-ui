@@ -12,7 +12,6 @@ public class Search extends Tool
 
     public Search() 
     {
-        this.setTitle("Search Panel");
         this.setDescription("Search Panel");
         this.setType(Tool.Type.SEARCH.toString());
     }

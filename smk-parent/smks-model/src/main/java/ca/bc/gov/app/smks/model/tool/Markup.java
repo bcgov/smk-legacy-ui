@@ -12,7 +12,6 @@ public class Markup extends Tool
 
     public Markup() 
 	{
-	    setTitle("Markup");
 	    this.setDescription("Markup Tools");
 	    this.setType(Tool.Type.MARKUP.toString());
 	}

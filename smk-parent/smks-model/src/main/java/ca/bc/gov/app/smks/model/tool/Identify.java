@@ -18,7 +18,6 @@ public class Identify extends Tool
 	
 	public Identify() 
 	{
-	    this.setTitle("Identify Panel");
 	    this.setDescription("Identify Panel");
 	    this.setType(Tool.Type.IDENTIFY.toString());
 	}

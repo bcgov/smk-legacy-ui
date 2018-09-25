@@ -12,7 +12,6 @@ public class Dropdown extends Tool
 
     public Dropdown() 
 	{
-	    this.setTitle("Dropdown");
 	    this.setDescription("Dropdown menu");
 	    this.setType(Tool.Type.DROPDOWN.toString());
 	}

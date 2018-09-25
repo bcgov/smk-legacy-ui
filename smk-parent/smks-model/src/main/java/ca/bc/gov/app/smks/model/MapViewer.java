@@ -14,11 +14,11 @@ public class MapViewer implements Serializable
 	private ViewerLocation location;
 	private String baseMap;
 	private String activeTool;
-	private boolean clusterOption;
+	private ClusterOption clusterOption;
 	
 	public MapViewer() 
 	{
-	    clusterOption = false;
+	    clusterOption = new ClusterOption();
 	}
 
 	protected MapViewer( MapViewer mapViewer ) 
@@ -33,12 +33,12 @@ public class MapViewer implements Serializable
 	public String getType() { return type; }
 	public void setType(String type) { this.type = type; }
 
-	public boolean getClusterOption()
+	public ClusterOption getClusterOption()
 	{
 	    return this.clusterOption;
 	}
 	
-	public void setClusterOption(boolean clusterOption)
+	public void setClusterOption(ClusterOption clusterOption)
 	{
 	    this.clusterOption = clusterOption;
 	}

@@ -12,7 +12,6 @@ public class Directions extends Tool
 
     public Directions() 
     {
-        this.setTitle("Directions");
         this.setDescription("Directions tool");
         this.setType(Tool.Type.DIRECTIONS.toString());
     }

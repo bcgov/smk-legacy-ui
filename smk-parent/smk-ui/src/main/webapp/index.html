@@ -772,6 +772,7 @@
 						      			</div>
 						      			<div class="row" style="padding: 10px;">
 						      				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="editSelectedLayer();" style="width: 170px;"><em style="position: absolute; top: 14px; left: 14px;" class="material-icons left">mode_edit</em>Edit</a>
+						      				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="editLayerDisplayOrder();" style="width: 170px;"><em style="position: absolute; top: 14px; left: 14px;" class="material-icons left">reorder</em>Display Order</a>
 						      			</div>
 									</div>
 								</div>
@@ -1334,6 +1335,30 @@
         <a id="kmlUploadButton" style="display: none;" href="#!" class="modal-action modal-close waves-effect waves-red btn-flat">Close</a>
       </div>
     </div>
+    
+    <div id="layerOrderModal" class="modal modal-fixed-footer">
+      <div class="modal-content">
+		<div class="row">
+			<h5>Layer Display Order</h5>
+		</div>
+		<div class="row">
+			<p>From this dialog you can set the layer display order, or create folders and groups for layers.</p>
+			<p>Folders will collect all child layers together, but allow you to interact with each layer independently. Groups will merge your layers together, and this grouping will behave a single layer, with no options for the individual children.</p>
+		</div>
+		<div id="layerDisplayOrderContent" class="row">
+			<div id="layer-display-tree" class="layer-container" style="height: 100%;"></div>
+		</div>
+		<div class="row">
+			<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="addNewDisplayFolder();" style="width: 170px;"><em style="position: absolute; top: 14px; left: 14px;" class="material-icons left">create_new_folder</em>Add Folder</a>
+			<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="addNewDisplayGroup();" style="width: 170px;"><em style="position: absolute; top: 14px; left: 14px;" class="material-icons left">group_work</em>Add Group</a>
+			<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="removeSelectedDisplayLayer();" style="width: 170px;"><em style="position: absolute; top: 14px; left: 14px;" class="material-icons left">delete_forever</em>Remove Selected</a>
+		</div>
+      </div>
+      <div class="modal-footer">
+      	<a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat">Close</a>
+      </div>
+    </div>
+    
 	<script type="text/javascript">
 	</script>
   </body>

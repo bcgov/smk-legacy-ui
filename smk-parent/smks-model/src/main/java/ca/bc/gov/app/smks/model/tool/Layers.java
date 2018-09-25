@@ -16,7 +16,6 @@ public class Layers extends Tool
     
     public Layers() 
     {
-        this.setTitle("Layers Panel");
         this.setDescription("Layers Panel");
         this.setType(Tool.Type.LAYERS.toString());
     }

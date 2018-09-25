@@ -14,7 +14,6 @@ public class BaseMaps extends Tool
 
 	public BaseMaps() 
 	{
-	    this.setTitle("Base Maps Panel");
 	    this.setDescription("Select the base maps available as choices.");
 	    this.setType(Tool.Type.BASEMAPS.toString());
 	}

@@ -12,7 +12,6 @@ public class Query extends Tool
 
     public Query() 
     {
-        this.setTitle("Query");
         this.setDescription("Query Tool");
         this.setType(Tool.Type.QUERY.toString());
     }

@@ -156,6 +156,24 @@ function convertKmlToLayers(fileContents)
 	        		tree.reload(layerSource);
     			}
         		
+        		// create layer display object
+        		for(var tool in data.tools)
+        		{
+        			tool = data.tools[tool];
+        			if(tool.type == "layers")
+        			{
+        				if(tool.display == null) tool.display = [];
+        				
+        				tool.display.push(
+        				{
+        					id: generatedID,
+        				    type: "layer",
+        				    title: generatedID,
+        				    isVisible: true
+        				});
+        			}
+        		}
+        		
         		// create blob from geojson
 				var blob = new Blob([ JSON.stringify(sourceLayer.geojson) ], {encoding:"UTF-8",type:"application/json"});
         		
@@ -596,7 +614,7 @@ function toggleScaleOption(scaleOption)
 
 function toggleConvexHullsTool()
 {
-	data.viewer.clusterOption = !data.viewer.clusterOption;
+	data.viewer.clusterOption.showCoverageOnHover = !data.viewer.clusterOption.showCoverageOnHover;
 }
 
 function toggleActiveAboutTool()
@@ -774,6 +792,10 @@ function setupMapConfigToolsUI()
 		{
     		$("#layersPanelHeader").val(tool.title);
     		$("#layerPanel").prop('checked', tool.enabled);
+    		if(tool.enabled)
+			{
+    			$("#layerOptions").show();
+			}
 		}
     	else if(tool.type == "pan") $("#panning").prop('checked', tool.enabled);
     	else if(tool.type == "zoom")
@@ -869,7 +891,8 @@ function setupMapConfigToolsUI()
 		}
     	else if(tool.type == "identify") 
 		{
-    		$("#showConvexHulls").prop('checked', data.viewer.clusterOption);
+    		$("#showConvexHulls").prop('checked', data.viewer.clusterOption != null && data.viewer.clusterOption.showCoverageOnHover);
+    		
     		$("#identifyPanelHeader").val(tool.title);
     		$("#identifyPanel").prop('checked', tool.enabled);
     		if(tool.enabled)
@@ -893,6 +916,9 @@ function setupMapConfigToolsUI()
 		{
     		$("#directions").prop('checked', tool.enabled);
     		$("#directionsPanelHeader").val(tool.title);
+    		{
+    			$("#directionsOptions").show();
+			}
 		}
     	else if(tool.type == "dropdown") $("#dropdown").prop('checked', tool.enabled);
     	else if(tool.type == "menu") $("#menu").prop('checked', tool.enabled);
@@ -1644,6 +1670,314 @@ function finishLayerEdits(save)
 	fileContents = null;
 }
 
+function rebuildDisplayLayers()
+{
+	// TODO
+	// get layers tool
+	for(var tool in data.tools)
+	{
+		tool = data.tools[tool];
+		if(tool.type == "layers")
+		{
+			// turf existing display order
+			tool.display = [];
+			
+			// get updated nodes
+			var sourceData = $("#layer-display-tree").fancytree('getTree').getSelectedNodes();
+
+			// for each item, create a new display object
+			for(var item in sourceData)
+			{
+				// create displayLayers in tool.display
+			}
+		}
+	}
+}
+
+function processDisplayLayer(displayLayer)
+{
+	var item = 
+	{
+		title: displayLayer.title,
+		folder: displayLayer.type == "folder" || displayLayer.type == "group",
+		expanded: false,
+		data: displayLayer,
+		children: []
+	};
+	
+	if(item.folder)
+	{
+		for(var subLayer in displayLayer.items)
+		{
+			item.children.push(processDisplayLayer(subLayer));
+		}
+	}
+	
+	return item;
+}
+
+function addNewDisplayFolder()
+{
+	// set new item id to random guid?
+	var node = $("#layer-display-tree").fancytree("getActiveNode");
+	
+	var item = 
+	{
+		title: "New Folder",
+		folder: true,
+		expanded: false,
+		data: 
+		{
+			id: uuid(),
+		    type: "folder",
+		    title: "New Folder",
+		    isVisible: true,
+		    isExpanded: false,
+		    items: []
+		},
+		children: []
+	};
+	
+	if(node == null)
+	{
+		// put a folder at the root
+		$("#layer-display-tree").fancytree("getRootNode").addChildren(item);
+	}
+	else
+	{
+		// if the node is a folder, create a new folder within
+		// if the node is a layer, create a folder at the root and move the layer into it
+		// if the node is a group, cancel event
+		if(node.data.type == "folder") node.appendSibling(item);
+		else if(node.data.type == "layer")
+		{
+			node.parent.addChildren(item);
+			node.moveTo(item, "child");
+		}
+		if(node.data.type == "group")
+		{
+			// show error message
+		}
+	}
+}
+
+function addNewDisplayGroup()
+{
+	// set new item id to random guid?
+	var node = $("#layer-display-tree").fancytree("getActiveNode");
+	
+	var item = 
+	{
+		title: "New Group",
+		folder: true,
+		expanded: false,
+		data: 
+		{
+			id: uuid(),
+		    type: "group",
+		    title: "New Group",
+		    isVisible: true,
+		    isExpanded: false,
+		    items: []
+		},
+		children: []
+	};
+	
+	if(node == null)
+	{
+		// put a folder at the root
+		$("#layer-display-tree").fancytree("getRootNode").addChildren(item);
+	}
+	else
+	{
+		// if the node is a folder, create a new folder within
+		// if the node is a layer, create a folder at the root and move the layer into it
+		// if the node is a group, cancel event
+		if(node.data.type == "folder") node.appendSibling(item);
+		else if(node.data.type == "layer")
+		{
+			node.parent.addChildren(item);
+			node.moveTo(item, "child");
+		}
+		if(node.data.type == "group")
+		{
+			// show error message
+		}
+	}
+}
+
+function removeSelectedDisplayLayer()
+{
+	var tree = $("#layer-display-tree").fancytree("getTree"),
+    selNodes = tree.getSelectedNodes();
+
+	selNodes.forEach(function(node) 
+	{
+		while( node.hasChildren() ) 
+		{
+			node.getFirstChild().moveTo(node.parent, "child");
+		}
+		node.remove();
+	});
+}
+
+function editLayerDisplayOrder()
+{
+	var sourceData = [];
+	
+	for(var tool in data.tools)
+	{
+		tool = data.tools[tool];
+		if(tool.type == "layers")
+		{
+			for(var displayLayer in tool.display)
+			{
+				displayLayer = tool.display[displayLayer];
+				var item = processDisplayLayer(displayLayer);
+				sourceData.push(item);
+			}
+		}
+	}
+
+	// setup the tree view
+	$("#layer-display-tree").fancytree({
+		extensions: ["childcounter", "edit", "dnd5"],
+	    checkbox: false,
+	    selectMode: 1,
+	    source: sourceData,
+	    activate: function(event, data)
+	    {
+	    },
+	    select: function(event, data)
+	    {
+	    },
+	    childcounter: 
+	    {
+	        deep: true,
+	        hideZeros: true,
+	        hideExpanded: true
+	    },
+	    dnd5: 
+	    {
+	        preventForeignNodes: false,
+	        preventNonNodes: false,
+	        preventRecursiveMoves: true, // Prevent dropping nodes on own descendants
+	        preventVoidMoves: true, // Prevent dropping nodes 'before self', etc.
+	        scroll: true,
+	        scrollSpeed: 7,
+	        scrollSensitivity: 10,
+	        dragStart: function(node, data) 
+	        {
+	          /* This function MUST be defined to enable dragging for the tree.
+	           *
+	           * Return false to cancel dragging of node.
+	           * data.dataTransfer.setData() and .setDragImage() is available
+	           * here.
+	           */
+	          return true;
+	        },
+	        dragDrag: function(node, data) 
+	        {
+	          data.dataTransfer.dropEffect = "move";
+	        },
+	        dragEnd: function(node, data) 
+	        {
+	        },
+	        dragEnter: function(node, data)
+	        {
+	          // node.debug("dragEnter", data);
+	          data.dataTransfer.dropEffect = "move";
+	          // data.dataTransfer.effectAllowed = "copy";
+	          return true;
+	        },
+	        dragOver: function(node, data) 
+	        {
+	        	if(node.data.type != "layer")
+        		{
+	        		data.dataTransfer.dropEffect = "move";
+	        	}
+	        },
+	        dragLeave: function(node, data) 
+	        {
+	        },
+	        dragDrop: function(node, data) 
+	        {
+	        	if(node.data.type != "layer")
+        		{
+	        		/* This function MUST be defined to enable dropping of items on
+	  	           * the tree.
+	  	           */
+	  	          var transfer = data.dataTransfer;
+
+	  	          node.debug("drop", data);
+
+	  	          // alert("Drop on " + node + ":\n"
+	  	          //   + "source:" + JSON.stringify(data.otherNodeData) + "\n"
+	  	          //   + "hitMode:" + data.hitMode
+	  	          //   + ", dropEffect:" + transfer.dropEffect
+	  	          //   + ", effectAllowed:" + transfer.effectAllowed);
+
+	  	          if( data.otherNode ) 
+	  	          {
+	  	            // Drop another Fancytree node from same frame
+	  	            // (maybe from another tree however)
+	  	            var sameTree = (data.otherNode.tree === data.tree);
+
+	  	            data.otherNode.moveTo(node, data.hitMode);
+	  	          } 
+	  	          else if( data.otherNodeData ) 
+	  	          {
+	  	            // Drop Fancytree node from different frame or window, so we only have
+	  	            // JSON representation available
+	  	            node.addChild(data.otherNodeData, data.hitMode);
+	  	          } 
+	  	          else 
+	  	          {
+	  	            // Drop a non-node
+	  	            node.addNode({ title: transfer.getData("text") }, data.hitMode);
+	  	          }
+	  	          node.setExpanded();
+	        	}
+	        }
+	    },
+	    edit: 
+	    {
+	        triggerStart: ["clickActive", "dblclick", "f2", "mac+enter", "shift+click"],
+	        beforeEdit: function(event, data)
+	        {
+	          // Return false to prevent edit mode
+	        },
+	        edit: function(event, data)
+	        {
+	          // Editor was opened (available as data.input)
+	        },
+	        beforeClose: function(event, data)
+	        {
+	          // Return false to prevent cancel/save (data.input is available)
+	        },
+	        save: function(event, data)
+	        {
+	          return true;
+	        },
+	        close: function(event, data)
+	        {
+	          // Editor was removed
+	          if( data.save ) 
+	          {
+	        	  data.node.data.title = data.node.title;
+	              // Since we started an async request, mark the node as preliminary
+	              $(data.node.span).addClass("pending");
+	          }
+	        }
+	    },
+	    activate: function(event, data) 
+	    {
+	    }    
+	  });
+	
+	$('#layerOrderModal').modal('open');
+}
+
 function editSelectedLayer()
 {
 	var nodes = $("#layer-tree").fancytree('getTree').getSelectedNodes();
@@ -1791,7 +2125,57 @@ function removeSelectedLayer()
       	});
 		
 		if(index == nodesToRemoveCount) tree.reload(layerSource);
+		
+		// remove display object
+		for(var tool in data.tools)
+		{
+			tool = data.tools[tool];
+			if(tool.type == "layers")
+			{
+				// remove matching layer from display layers
+				if(tool.display == null) tool.display = [];
+			
+				var i = tool.display.length;
+				while (i--) 
+				{
+					var displayLayer = tool.display[i];
+					removeDisplayLayer(tool.display, lyr, displayLayer, tool.display); 
+				}
+			}
+		}
    	});
+}
+
+function removeDisplayLayer(subArray, lyr, displayLayer, rootArray)
+{
+	if(displayLayer.id == lyr.id)
+	{
+		//remove
+		var index = subArray.indexOf(displayLayer);
+		if (index > -1) subArray.splice(index, 1);
+		
+		// if we have children (should be impossible here) move them to the root
+		if(displayLayer.items != null && displayLayer.items.length > 0)
+		{
+			for(var child in displayLayer.items) rootArray.push(child);
+		}
+	}
+	else(displayLayer.items != null && displayLayer.items.length > 0)
+	{
+		//scan for matching ID, and remove
+		var i = displayLayer.items.length;
+		while (i--) 
+		{
+			var subLayer = displayLayer.items[i];
+			removeDisplayLayer(displayLayer.items, lyr, subLayer, rootArray); 
+		}
+		
+		if(displayLayer.items.length == 0)
+		{
+			var index = subArray.indexOf(displayLayer);
+			if (index > -1) subArray.splice(index, 1);
+		}
+	}
 }
 
 function openQueryEditor()
@@ -2384,6 +2768,24 @@ function addVectorLayerToLayerList()
 		}
 	}
 	
+	// create layer display object
+	for(var tool in data.tools)
+	{
+		tool = data.tools[tool];
+		if(tool.type == "layers")
+		{
+			if(tool.display == null) tool.display = [];
+			
+			tool.display.push(
+			{
+				id: layer.id,
+			    type: "layer",
+			    title: layer.title,
+			    isVisible: true
+			});
+		}
+	}
+	
 	return layer;
 }
 
@@ -2459,6 +2861,24 @@ function addSelectedWmsLayer()
 			var layerSource = tree.getRootNode().children;
 			layerSource.push(lyrNode);
 			tree.reload(layerSource);
+			
+			// create layer display object
+    		for(var tool in data.tools)
+    		{
+    			tool = data.tools[tool];
+    			if(tool.type == "layers")
+    			{
+    				if(tool.display == null) tool.display = [];
+    				
+    				tool.display.push(
+    				{
+    					id: wmsItem.id,
+    				    type: "layer",
+    				    title: wmsItem.title,
+    				    isVisible: true
+    				});
+    			}
+    		}
 		}
    	});
 }
@@ -2516,6 +2936,24 @@ function getCompleteCatalogItem(mpcmId)
 	            	var layerSource = tree.getRootNode().children;
 	            	layerSource.push(lyrNode);
 	        		tree.reload(layerSource);
+	        		
+	        		// create layer display object
+	        		for(var tool in data.tools)
+	        		{
+	        			tool = data.tools[tool];
+	        			if(tool.type == "layers")
+	        			{
+	        				if(tool.display == null) tool.display = [];
+	        				
+	        				tool.display.push(
+	        				{
+	        					id: mpcmId,
+	        				    type: "layer",
+	        				    title: catalogCompleteItem.title,
+	        				    isVisible: true
+	        				});
+	        			}
+	        		}
         		}
             	else
         		{
@@ -3016,6 +3454,11 @@ $(document).ready(function()
 	    }
 	});
 	$('#layerPopupTemplateModal').modal({ dismissible: false });
+	$('#layerOrderModal').modal(
+	{ 
+		dismissible: false,
+		complete: rebuildDisplayLayers()
+	});
 
 });
 

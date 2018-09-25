@@ -14,7 +14,6 @@ public class Minimap extends Tool
 
 	public Minimap() 
 	{
-	    this.setTitle("Mini Map");
 	    this.setDescription("Select the base map for the mini map.");
 	    this.setType(Tool.Type.MINIMAP.toString());
 	}

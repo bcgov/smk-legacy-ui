@@ -16,7 +16,6 @@ public class Select extends Tool
 	
 	public Select() 
 	{
-	    this.setTitle("Selection Panel");
 	    this.setDescription("Select Panel");
 	    this.setType(Tool.Type.SELECT.toString());
 	}

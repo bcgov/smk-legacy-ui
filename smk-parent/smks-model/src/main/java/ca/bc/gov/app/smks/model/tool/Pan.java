@@ -12,7 +12,6 @@ public class Pan extends Tool
 
     public Pan() 
     {
-        this.setTitle("Panning");
         this.setDescription("Panning Tool");
         this.setType(Tool.Type.PAN.toString());
     }

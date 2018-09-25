@@ -12,7 +12,6 @@ public class Menu extends Tool
 
     public Menu() 
     {
-        this.setTitle("Menu");
         this.setDescription("Menu");
         this.setType(Tool.Type.MENU.toString());
     }
