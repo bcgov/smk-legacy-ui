@@ -1654,6 +1654,27 @@ function finishLayerEdits(save)
 				}
 			}
       	});
+		
+		// update the display layer
+		for(var tool in data.tools)
+		{
+			tool = data.tools[tool];
+			if(tool.type == "layers")
+			{
+				for(var displayLayer in tool.display)
+				{
+					displayLayer = tool.display[displayLayer];
+					if(displayLayer.id == selectedLayerNode.data.id)
+					{
+						displayLayer.title = selectedLayerNode.data.title;
+					
+						break;
+					}
+				}
+				
+				break;
+			}
+		}
 	}
 
 	$("#attributePanel").empty();
@@ -1898,7 +1919,7 @@ function editLayerDisplayOrder()
 	        scroll: true,
 	        scrollSpeed: 7,
 	        scrollSensitivity: 10,
-	        dragStart: function(node, data) 
+	        dragStart: function(node, nodeData) 
 	        {
 	          /* This function MUST be defined to enable dragging for the tree.
 	           *
@@ -1908,40 +1929,40 @@ function editLayerDisplayOrder()
 	           */
 	          return true;
 	        },
-	        dragDrag: function(node, data) 
+	        dragDrag: function(node, nodeData) 
 	        {
-	          data.dataTransfer.dropEffect = "move";
+	        	nodeData.dataTransfer.dropEffect = "move";
 	        },
-	        dragEnd: function(node, data) 
+	        dragEnd: function(node, nodeData) 
 	        {
 	        },
-	        dragEnter: function(node, data)
+	        dragEnter: function(node, nodeData)
 	        {
 	          // node.debug("dragEnter", data);
-	          data.dataTransfer.dropEffect = "move";
+	        	nodeData.dataTransfer.dropEffect = "move";
 	          // data.dataTransfer.effectAllowed = "copy";
 	          return true;
 	        },
-	        dragOver: function(node, data) 
+	        dragOver: function(node, nodeData) 
 	        {
 	        	if(node.data.type != "layer")
         		{
-	        		data.dataTransfer.dropEffect = "move";
+	        		nodeData.dataTransfer.dropEffect = "move";
 	        	}
 	        },
-	        dragLeave: function(node, data) 
+	        dragLeave: function(node, nodeData) 
 	        {
 	        },
-	        dragDrop: function(node, data) 
+	        dragDrop: function(node, nodeData) 
 	        {
 	        	if(node.data.type != "layer")
         		{
 	        		/* This function MUST be defined to enable dropping of items on
 	  	           * the tree.
 	  	           */
-	  	          var transfer = data.dataTransfer;
+	  	          var transfer = nodeData.dataTransfer;
 
-	  	          node.debug("drop", data);
+	  	          node.debug("drop", nodeData);
 
 	  	          // alert("Drop on " + node + ":\n"
 	  	          //   + "source:" + JSON.stringify(data.otherNodeData) + "\n"
@@ -1949,64 +1970,86 @@ function editLayerDisplayOrder()
 	  	          //   + ", dropEffect:" + transfer.dropEffect
 	  	          //   + ", effectAllowed:" + transfer.effectAllowed);
 
-	  	          if( data.otherNode ) 
+	  	          if( nodeData.otherNode ) 
 	  	          {
 	  	            // Drop another Fancytree node from same frame
 	  	            // (maybe from another tree however)
-	  	            var sameTree = (data.otherNode.tree === data.tree);
+	  	            var sameTree = (nodeData.otherNode.tree === nodeData.tree);
 
-	  	            data.otherNode.moveTo(node, data.hitMode);
+	  	          nodeData.otherNode.moveTo(node, nodeData.hitMode);
 	  	          } 
-	  	          else if( data.otherNodeData ) 
+	  	          else if( nodeData.otherNodeData ) 
 	  	          {
 	  	            // Drop Fancytree node from different frame or window, so we only have
 	  	            // JSON representation available
-	  	            node.addChild(data.otherNodeData, data.hitMode);
+	  	            node.addChild(nodeData.otherNodeData, nodeData.hitMode);
 	  	          } 
 	  	          else 
 	  	          {
 	  	            // Drop a non-node
-	  	            node.addNode({ title: transfer.getData("text") }, data.hitMode);
+	  	            node.addNode({ title: transfer.getData("text") }, nodeData.hitMode);
 	  	          }
 	  	          node.setExpanded();
 	        	}
-	        	else
-        		{
-	        		// if it's a layer object, they swap positions? Or the dropped item is added below the target
-        		}
 	        }
 	    },
 	    edit: 
 	    {
 	        triggerStart: ["clickActive", "dblclick", "f2", "mac+enter", "shift+click"],
-	        beforeEdit: function(event, data)
+	        beforeEdit: function(event, nodeData)
 	        {
 	          // Return false to prevent edit mode
 	        },
-	        edit: function(event, data)
+	        edit: function(event, nodeData)
 	        {
 	          // Editor was opened (available as data.input)
 	        },
-	        beforeClose: function(event, data)
+	        beforeClose: function(event, nodeData)
 	        {
 	          // Return false to prevent cancel/save (data.input is available)
 	        },
-	        save: function(event, data)
+	        save: function(event, nodeData)
 	        {
 	          return true;
 	        },
-	        close: function(event, data)
+	        close: function(event, nodeData)
 	        {
 	          // Editor was removed
-	          if( data.save ) 
+	          if( nodeData.save ) 
 	          {
-	        	  data.node.data.title = data.node.title;
+	        	  // update the node data
+	        	  nodeData.node.data.title = nodeData.node.title;
+	        	  
+	        	  // update the source layer, if this is a layer node, so we stay consistent
+	        	  // note that theoretically you don't have to keep these in sync, detail view
+	        	  // overrides layer name.
+	        	  if(nodeData.node.data.type == "layer")
+	        	  {
+	        		  var tree = $('#layer-tree').fancytree('getTree');
+    			      var layerSource = tree.getRootNode().children;
+    			      
+	        		  for(var layerNode in layerSource)
+	        		  {
+    			    	  layerNode = layerSource[layerNode];
+    			    	  if(layerNode.data.id== nodeData.node.data.id)
+			    		  {
+    			    		  layerNode.data.title = nodeData.node.title;
+    			    		  layerNode.title = nodeData.node.title;
+    			    		  
+    			    		  // update the layer tree
+    			    		  tree.reload(layerSource);
+    			    		  
+    			    		  break;
+    			    	  }
+	        		  }
+	        	  }
+	        	  
 	              // Since we started an async request, mark the node as preliminary
-	              $(data.node.span).addClass("pending");
+	              $(nodeData.node.span).addClass("pending");
 	          }
 	        }
 	    },
-	    activate: function(event, data) 
+	    activate: function(event, nodeData) 
 	    {
 	    }    
 	  });
@@ -2983,7 +3026,7 @@ function getCompleteCatalogItem(mpcmId)
 	        				
 	        				tool.display.push(
 	        				{
-	        					id: mpcmId,
+	        					id: catalogCompleteItem.id,
 	        				    type: "layer",
 	        				    title: catalogCompleteItem.title,
 	        				    isVisible: true

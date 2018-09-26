@@ -15,6 +15,8 @@ public class MapViewer implements Serializable
 	private String baseMap;
 	private String activeTool;
 	private ClusterOption clusterOption;
+	private String device;
+	private String themes;
 	
 	public MapViewer() 
 	{
@@ -62,7 +64,27 @@ public class MapViewer implements Serializable
 	{
 	    this.activeTool = activeTool;
 	}
-	
-	public String getBaseMap() { return baseMap; }
+
+	public String getDevice()
+    {
+        return device;
+    }
+
+    public void setDevice(String device)
+    {
+        this.device = device;
+    }
+
+    public String getThemes()
+    {
+        return themes;
+    }
+
+    public void setThemes(String themes)
+    {
+        this.themes = themes;
+    }
+
+    public String getBaseMap() { return baseMap; }
 	public void setBaseMap(String baseMap) { this.baseMap = baseMap; }
 }
