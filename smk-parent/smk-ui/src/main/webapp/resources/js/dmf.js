@@ -1670,9 +1670,35 @@ function finishLayerEdits(save)
 	fileContents = null;
 }
 
+function createDisplayLayersFromNodes(node)
+{
+	var item = 
+	{ 
+		id: node.data.id,
+		type: node.data.type,
+		title: node.data.title,
+		isVisible: true
+	};
+	
+	if(node.data.type == "folder" || node.data.type == "group")
+	{
+		if(node.data.type == "folder") item.isExpanded = node.isExpanded;
+		
+		item.items = [];
+		for(var child in node.children)
+		{
+			child = node.children[child];
+			var subItem = createDisplayLayersFromNodes(child);
+			
+			item.items.push(subItem);
+		}
+	}
+	
+	return item;
+}
+
 function rebuildDisplayLayers()
 {
-	// TODO
 	// get layers tool
 	for(var tool in data.tools)
 	{
@@ -1682,13 +1708,15 @@ function rebuildDisplayLayers()
 			// turf existing display order
 			tool.display = [];
 			
-			// get updated nodes
-			var sourceData = $("#layer-display-tree").fancytree('getTree').getSelectedNodes();
-
+			// get nodes
+			var nodes = $("#layer-display-tree").fancytree('getTree').rootNode.children;
+			
 			// for each item, create a new display object
-			for(var item in sourceData)
+			for(var item in nodes)
 			{
-				// create displayLayers in tool.display
+				item = nodes[item];
+				var displayLayer = createDisplayLayersFromNodes(item);
+				tool.display.push(displayLayer);
 			}
 		}
 	}
@@ -1709,6 +1737,7 @@ function processDisplayLayer(displayLayer)
 	{
 		for(var subLayer in displayLayer.items)
 		{
+			subLayer = displayLayer.items[subLayer];
 			item.children.push(processDisplayLayer(subLayer));
 		}
 	}
@@ -1751,8 +1780,8 @@ function addNewDisplayFolder()
 		if(node.data.type == "folder") node.appendSibling(item);
 		else if(node.data.type == "layer")
 		{
-			node.parent.addChildren(item);
-			node.moveTo(item, "child");
+			var child = node.parent.addChildren(item);
+			node.moveTo(child, "child");
 		}
 		if(node.data.type == "group")
 		{
@@ -1796,8 +1825,8 @@ function addNewDisplayGroup()
 		if(node.data.type == "folder") node.appendSibling(item);
 		else if(node.data.type == "layer")
 		{
-			node.parent.addChildren(item);
-			node.moveTo(item, "child");
+			var child = node.parent.addChildren(item);
+			node.moveTo(child, "child");
 		}
 		if(node.data.type == "group")
 		{
@@ -1808,17 +1837,17 @@ function addNewDisplayGroup()
 
 function removeSelectedDisplayLayer()
 {
-	var tree = $("#layer-display-tree").fancytree("getTree"),
-    selNodes = tree.getSelectedNodes();
-
-	selNodes.forEach(function(node) 
+	var node = $("#layer-display-tree").fancytree("getActiveNode");
+	
+	if(node != null && node.data.type != "layer")
 	{
 		while( node.hasChildren() ) 
 		{
 			node.getFirstChild().moveTo(node.parent, "child");
 		}
+			
 		node.remove();
-	});
+	}
 }
 
 function editLayerDisplayOrder()
@@ -1839,6 +1868,9 @@ function editLayerDisplayOrder()
 		}
 	}
 
+	$("#layerDisplayOrderContent").empty();
+	$("#layerDisplayOrderContent").append('<div id="layer-display-tree" class="display-order-container" style="height: calc(100vh - 677px);"></div>');
+	
 	// setup the tree view
 	$("#layer-display-tree").fancytree({
 		extensions: ["childcounter", "edit", "dnd5"],
@@ -1938,6 +1970,10 @@ function editLayerDisplayOrder()
 	  	          }
 	  	          node.setExpanded();
 	        	}
+	        	else
+        		{
+	        		// if it's a layer object, they swap positions? Or the dropped item is added below the target
+        		}
 	        }
 	    },
 	    edit: 
@@ -2120,29 +2156,29 @@ function removeSelectedLayer()
 				{
 					var index = data.layers.indexOf(lyr);
 					if (index !== -1) data.layers.splice(index, 1);
+					
+					// remove display object
+					for(var tool in data.tools)
+					{
+						tool = data.tools[tool];
+						if(tool.type == "layers")
+						{
+							// remove matching layer from display layers
+							if(tool.display == null) tool.display = [];
+						
+							var i = tool.display.length;
+							while (i--) 
+							{
+								var displayLayer = tool.display[i];
+								removeDisplayLayer(tool.display, lyr, displayLayer, tool.display); 
+							}
+						}
+					}
 				}
 			}
       	});
 		
 		if(index == nodesToRemoveCount) tree.reload(layerSource);
-		
-		// remove display object
-		for(var tool in data.tools)
-		{
-			tool = data.tools[tool];
-			if(tool.type == "layers")
-			{
-				// remove matching layer from display layers
-				if(tool.display == null) tool.display = [];
-			
-				var i = tool.display.length;
-				while (i--) 
-				{
-					var displayLayer = tool.display[i];
-					removeDisplayLayer(tool.display, lyr, displayLayer, tool.display); 
-				}
-			}
-		}
    	});
 }
 
@@ -2155,15 +2191,15 @@ function removeDisplayLayer(subArray, lyr, displayLayer, rootArray)
 		if (index > -1) subArray.splice(index, 1);
 		
 		// if we have children (should be impossible here) move them to the root
-		if(displayLayer.items != null && displayLayer.items.length > 0)
+		if(displayLayer.hasOwnProperty('items') && displayLayer.items != null && displayLayer.items.length > 0)
 		{
 			for(var child in displayLayer.items) rootArray.push(child);
 		}
 	}
-	else(displayLayer.items != null && displayLayer.items.length > 0)
+	else if(displayLayer.hasOwnProperty('items') && displayLayer.items != null && displayLayer.items.length > 0)
 	{
 		//scan for matching ID, and remove
-		var i = displayLayer.items.length;
+		var i = displayLayer.items.length
 		while (i--) 
 		{
 			var subLayer = displayLayer.items[i];
@@ -3457,7 +3493,10 @@ $(document).ready(function()
 	$('#layerOrderModal').modal(
 	{ 
 		dismissible: false,
-		complete: rebuildDisplayLayers()
+		complete: function()
+		{
+			rebuildDisplayLayers();
+		}
 	});
 
 });
