@@ -15,7 +15,6 @@ public class Scale extends Tool
 
 	public Scale()
 	{
-	    this.setTitle("Scale");
 	    this.setDescription("Scale options for the map.");
 	    this.setType(Tool.Type.SCALE.toString());
 	}

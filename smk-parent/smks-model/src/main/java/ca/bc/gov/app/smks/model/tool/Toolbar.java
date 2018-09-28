@@ -6,19 +6,19 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import ca.bc.gov.app.smks.model.Tool;
 
 @JsonInclude(Include.NON_NULL)
-public class Dropdown extends Tool
+public class Toolbar extends Tool
 {
-    private static final long serialVersionUID = -5375300580602552422L;
+    private static final long serialVersionUID = 6029976604620602622L;
 
-    public Dropdown() 
-	{
-	    this.setDescription("Dropdown menu");
-	    this.setType(Tool.Type.DROPDOWN.toString());
-	}
+    public Toolbar() 
+    {
+        this.setDescription("Toolbar");
+        this.setType(Tool.Type.TOOLBAR.toString());
+    }
 
-    public Dropdown( Dropdown dropdown ) {
-		super( dropdown );
-	}
+    public Toolbar( Toolbar toolbar ) {
+        super( toolbar );
+    }
 
     @Override
     public boolean equals( Object other ) {

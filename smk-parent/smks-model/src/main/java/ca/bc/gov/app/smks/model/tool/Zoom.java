@@ -17,7 +17,6 @@ public class Zoom extends Tool
 
 	public Zoom() 
 	{
-	    setTitle("Zooming");
 	    setDescription("Zooming options for the viewer.");
 	    setType(Tool.Type.ZOOM.toString());
 	}

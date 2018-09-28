@@ -12,7 +12,6 @@ public class Coordinate extends Tool
 
     public Coordinate() 
     {
-        this.setTitle("Coordinate");
         this.setDescription("Coordinate Tool");
         this.setType(Tool.Type.COORDINATE.toString());
     }

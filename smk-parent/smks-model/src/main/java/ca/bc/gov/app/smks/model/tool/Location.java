@@ -12,7 +12,6 @@ public class Location extends Tool
 
     public Location() 
     {
-        this.setTitle("Location");
         this.setDescription("Location tools");
         this.setType(Tool.Type.LOCATION.toString());
     }

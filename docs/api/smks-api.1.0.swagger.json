@@ -1,0 +1,1493 @@
+{
+  "openapi" : "3.0.1",
+  "info" : {
+    "title" : "SMK Service API",
+    "description" : "The SMK Service API is used by the SMK Admin utility for assisting with the development of SMK applicatiojn JSON configurations.",
+    "version" : "1.0"
+  },
+  "servers" : [ {
+    "url" : "http://smks-api.pathfinder.gov.bc.ca"
+  } ],
+  "components" : {
+    "schemas" : {
+      "mapConfiguration" : {
+        "type" : "object",
+        "properties" : {
+          "_id" : {
+            "type" : "string"
+          },
+          "_rev" : {
+            "type" : "string"
+          },
+          "_attachments" : {
+            "type" : "array",
+            "items" : {
+              "type" : "object",
+              "properties" : {
+                "attachmentName" : {
+                  "type" : "object",
+                  "properties" : {
+                    "stub" : {
+                      "type" : "string"
+                    },
+                    "revpos" : {
+                      "type" : "integer"
+                    },
+                    "digest" : {
+                      "type" : "string"
+                    },
+                    "content_type" : {
+                      "type" : "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "imfId" : {
+            "type" : "string"
+          },
+          "lmfRevision" : {
+            "type" : "string"
+          },
+          "version" : {
+            "type" : "string"
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "createdBy" : {
+            "type" : "string"
+          },
+          "surround" : {
+            "type" : "object",
+            "properties" : {
+              "type" : {
+                "type" : "string"
+              },
+              "title" : {
+                "type" : "string"
+              }
+            }
+          },
+          "viewer" : {
+            "type" : "object",
+            "properties" : {
+              "type" : {
+                "type" : "string"
+              },
+              "activeTool" : {
+                "type" : "string"
+              },
+              "location" : {
+                "type" : "object",
+                "properties" : {
+                  "extent" : {
+                    "type" : "array",
+                    "items" : {
+                      "type" : "number"
+                    }
+                  },
+                  "center" : {
+                    "type" : "array",
+                    "items" : {
+                      "type" : "number"
+                    }
+                  },
+                  "zoom" : {
+                    "type" : "integer"
+                  }
+                }
+              },
+              "baseMap" : {
+                "type" : "string",
+                "enum" : [ "Topographic", "Streets", "Imagery", "Oceans", "NationalGeographic", "ShadedRelief", "DarkGray", "Gray" ]
+              },
+              "clusterOption" : {
+                "type" : "boolean"
+              }
+            }
+          },
+          "tools" : {
+            "type" : "array",
+            "items" : {
+              "type" : "object",
+              "properties" : {
+                "type" : {
+                  "type" : "string",
+                  "enum" : [ "about", "baseMaps", "coordinate", "directions", "dropdown", "identify", "layers", "location", "markup", "measure", "menu", "minimap", "pan", "query", "scale", "search", "select", "version", "zoom" ]
+                },
+                "enabled" : {
+                  "type" : "boolean"
+                },
+                "title" : {
+                  "type" : "string"
+                },
+                "showPanel" : {
+                  "type" : "boolean"
+                },
+                "position" : {
+                  "type" : "string"
+                },
+                "order" : {
+                  "type" : "integer"
+                },
+                "icon" : {
+                  "type" : "string"
+                },
+                "mouseWheel" : {
+                  "type" : "boolean"
+                },
+                "doubleClick" : {
+                  "type" : "boolean"
+                },
+                "box" : {
+                  "type" : "boolean"
+                },
+                "control" : {
+                  "type" : "boolean"
+                },
+                "showFactor" : {
+                  "type" : "boolean"
+                },
+                "showBar" : {
+                  "type" : "boolean"
+                },
+                "baseMap" : {
+                  "type" : "string"
+                },
+                "content" : {
+                  "type" : "string"
+                },
+                "instance" : {
+                  "type" : "string"
+                },
+                "onActivate" : {
+                  "type" : "string"
+                },
+                "apiKey" : {
+                  "type" : "string"
+                },
+                "choices" : {
+                  "type" : "array",
+                  "items" : {
+                    "type" : "string",
+                    "enum" : [ "Topographic", "Streets", "Imagery", "Oceans", "NationalGeographic", "ShadedRelief", "DarkGray", "Gray" ]
+                  }
+                },
+                "display" : {
+                  "type" : "array",
+                  "items" : {
+                    "type" : "object",
+                    "properties" : {
+                      "id" : {
+                        "type" : "string"
+                      },
+                      "type" : {
+                        "type" : "string"
+                      },
+                      "title" : {
+                        "type" : "string"
+                      },
+                      "isVisible" : {
+                        "type" : "boolean"
+                      },
+                      "isExpanded" : {
+                        "type" : "boolean"
+                      },
+                      "items" : {
+                        "type" : "array",
+                        "items" : {
+                          "type" : "object",
+                          "properties" : {
+                            "id" : {
+                              "type" : "string"
+                            },
+                            "type" : {
+                              "type" : "string"
+                            },
+                            "title" : {
+                              "type" : "string"
+                            },
+                            "isVisible" : {
+                              "type" : "boolean"
+                            },
+                            "isExpanded" : {
+                              "type" : "boolean"
+                            },
+                            "items" : {
+                              "type" : "array",
+                              "items" : {
+                                "type" : "object"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "style" : {
+                  "type" : "object",
+                  "properties" : {
+                    "strokeWidth" : {
+                      "type" : "number"
+                    },
+                    "strokeStyle" : {
+                      "type" : "string"
+                    },
+                    "strokeColor" : {
+                      "type" : "string"
+                    },
+                    "strokeOpacity" : {
+                      "type" : "number"
+                    },
+                    "fillColor" : {
+                      "type" : "string"
+                    },
+                    "fillOpacity" : {
+                      "type" : "number"
+                    },
+                    "markerSize" : {
+                      "type" : "array",
+                      "items" : {
+                        "type" : "integer"
+                      }
+                    },
+                    "markerOffset" : {
+                      "type" : "array",
+                      "items" : {
+                        "type" : "integer"
+                      }
+                    }
+                  }
+                },
+                "styleOpacity" : {
+                  "type" : "number"
+                },
+                "tolderance" : {
+                  "type" : "number"
+                }
+              }
+            }
+          },
+          "layers" : {
+            "type" : "array",
+            "items" : {
+              "type" : "object",
+              "properties" : {
+                "type" : {
+                  "type" : "string",
+                  "enum" : [ "esri-dynamic", "wms", "vector" ]
+                },
+                "id" : {
+                  "type" : "string"
+                },
+                "title" : {
+                  "type" : "string"
+                },
+                "isVisible" : {
+                  "type" : "boolean"
+                },
+                "attribution" : {
+                  "type" : "string"
+                },
+                "metadataUrl" : {
+                  "type" : "string"
+                },
+                "opacity" : {
+                  "type" : "number"
+                },
+                "minScale" : {
+                  "type" : "number"
+                },
+                "maxScale" : {
+                  "type" : "number"
+                },
+                "isQueryable" : {
+                  "type" : "boolean"
+                },
+                "popupTemplate" : {
+                  "type" : "string"
+                },
+                "mpcmId" : {
+                  "type" : "integer"
+                },
+                "mpcmWorkspace" : {
+                  "type" : "string"
+                },
+                "serviceUrl" : {
+                  "type" : "string"
+                },
+                "layerName" : {
+                  "type" : "string"
+                },
+                "styleName" : {
+                  "type" : "string"
+                },
+                "dataUrl" : {
+                  "type" : "string"
+                },
+                "useRaw" : {
+                  "type" : "boolean"
+                },
+                "useClustering" : {
+                  "type" : "boolean"
+                },
+                "useHeatmap" : {
+                  "type" : "boolean"
+                },
+                "geometryAttribute" : {
+                  "type" : "string"
+                },
+                "titleAttribute" : {
+                  "type" : "string"
+                },
+                "queries" : {
+                  "type" : "array",
+                  "items" : {
+                    "type" : "object",
+                    "properties" : {
+                      "id" : {
+                        "type" : "string"
+                      },
+                      "title" : {
+                        "type" : "string"
+                      },
+                      "description" : {
+                        "type" : "string"
+                      },
+                      "uniqueAttribute" : {
+                        "type" : "string"
+                      },
+                      "parameters" : {
+                        "type" : "array",
+                        "items" : {
+                          "type" : "object",
+                          "properties" : {
+                            "id" : {
+                              "type" : "string"
+                            },
+                            "title" : {
+                              "type" : "string"
+                            },
+                            "type" : {
+                              "type" : "string"
+                            },
+                            "value" : {
+                              "type" : "string"
+                            },
+                            "choices" : {
+                              "type" : "array",
+                              "items" : {
+                                "type" : "object",
+                                "properties" : {
+                                  "title" : {
+                                    "type" : "string"
+                                  },
+                                  "value" : {
+                                    "type" : "string"
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "predicate" : {
+                        "type" : "object",
+                        "properties" : {
+                          "operator" : {
+                            "type" : "string",
+                            "enum" : [ "and", "or", "not", "equals", "less-than", "greater-than", "contains", "starts-with", "ends-with" ]
+                          },
+                          "arguments" : {
+                            "type" : "array",
+                            "items" : {
+                              "type" : "object",
+                              "properties" : {
+                                "operand" : {
+                                  "type" : "string"
+                                },
+                                "name" : {
+                                  "type" : "string"
+                                },
+                                "id" : {
+                                  "type" : "string"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "dynamicLayers" : {
+                  "type" : "array",
+                  "items" : {
+                    "type" : "string"
+                  }
+                },
+                "attributes" : {
+                  "type" : "array",
+                  "items" : {
+                    "type" : "object",
+                    "properties" : {
+                      "id" : {
+                        "type" : "string"
+                      },
+                      "name" : {
+                        "type" : "string"
+                      },
+                      "title" : {
+                        "type" : "string"
+                      },
+                      "visible" : {
+                        "type" : "boolean"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "wmsLayer" : {
+        "type" : "object",
+        "properties" : {
+          "title" : {
+            "type" : "string"
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "serviceUrl" : {
+            "type" : "string"
+          },
+          "wmsVersion" : {
+            "type" : "string"
+          },
+          "metadataUrl" : {
+            "type" : "string"
+          },
+          "styles" : {
+            "type" : "array",
+            "items" : {
+              "type" : "object",
+              "properties" : {
+                "name" : {
+                  "type" : "string"
+                },
+                "title" : {
+                  "type" : "string"
+                },
+                "legendUrl" : {
+                  "type" : "string"
+                }
+              }
+            }
+          },
+          "attributes" : {
+            "type" : "array",
+            "items" : {
+              "type" : "object",
+              "properties" : {
+                "id" : {
+                  "type" : "string"
+                },
+                "name" : {
+                  "type" : "string"
+                },
+                "title" : {
+                  "type" : "string"
+                },
+                "visible" : {
+                  "type" : "boolean"
+                }
+              }
+            }
+          }
+        }
+      },
+      "mpcmLayer" : {
+        "type" : "object",
+        "properties" : {
+          "type" : {
+            "type" : "string"
+          },
+          "id" : {
+            "type" : "string"
+          },
+          "title" : {
+            "type" : "string"
+          },
+          "isVisible" : {
+            "type" : "boolean"
+          },
+          "attribution" : {
+            "type" : "string"
+          },
+          "metadataUrl" : {
+            "type" : "string"
+          },
+          "opacity" : {
+            "type" : "number"
+          },
+          "minScale" : {
+            "type" : "number"
+          },
+          "maxScale" : {
+            "type" : "number"
+          },
+          "isQueryable" : {
+            "type" : "boolean"
+          },
+          "mpcmId" : {
+            "type" : "integer"
+          },
+          "mpcmWorkspace" : {
+            "type" : "string"
+          },
+          "serviceUrl" : {
+            "type" : "string"
+          },
+          "dynamicLayers" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "attributes" : {
+            "type" : "array",
+            "items" : {
+              "type" : "object",
+              "properties" : {
+                "id" : {
+                  "type" : "string"
+                },
+                "name" : {
+                  "type" : "string"
+                },
+                "title" : {
+                  "type" : "string"
+                },
+                "visible" : {
+                  "type" : "boolean"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "paths" : {
+    "/smks-api/" : {
+      "get" : {
+        "description" : "The Top Level endpoint for the SMK Service.",
+        "responses" : {
+          "200" : {
+            "description" : "Top level details, including version number.",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "version" : {
+                      "type" : "string"
+                    },
+                    "description" : {
+                      "type" : "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/smks-api/Health/" : {
+      "get" : {
+        "description" : "Get the current health of the SMK service and database",
+        "responses" : {
+          "200" : {
+            "description" : "The result of the health check",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "serviceStatus" : {
+                      "type" : "string"
+                    },
+                    "couchDBStatus" : {
+                      "type" : "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/smks-api/MapConfigurations/" : {
+      "post" : {
+        "description" : "Create a new SMK application. Note that when creating a new configuration, it is unecessary to include the _id, _rev as these wqill be generated by the CouchDB automatically. Adding _rev will throw an error. Do not include anything in _attachments, as this is handled by CouchDB entirely and anything manually added or altered to this array will be ignored.",
+        "requestBody" : {
+          "description" : "The SMK applciation configuration json",
+          "required" : true,
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/mapConfiguration"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "201" : {
+            "description" : "The result of the create operation",
+            "content" : {
+              "application/json;charset=UTF-8" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "status" : {
+                      "type" : "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "get" : {
+        "description" : "Get a listing of all available SMK applications.",
+        "responses" : {
+          "200" : {
+            "description" : "A listing of SMK applications",
+            "content" : {
+              "application/json;charset=UTF-8" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "type" : "object",
+                    "properties" : {
+                      "name" : {
+                        "type" : "string"
+                      },
+                      "id" : {
+                        "type" : "string"
+                      },
+                      "revision" : {
+                        "type" : "integer"
+                      },
+                      "creator" : {
+                        "type" : "string"
+                      },
+                      "valid" : {
+                        "type" : "boolean"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/smks-api/MapConfigurations/{id}" : {
+      "put" : {
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "description" : "The SMK application ID"
+        } ],
+        "description" : "Update an SMK application configuration with the supplied json",
+        "requestBody" : {
+          "description" : "The updated SMK application json",
+          "required" : true,
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/mapConfiguration"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "The result of the update operation",
+            "content" : {
+              "application/json;charset=UTF-8" : {
+                "schema" : {
+                  "type" : "object"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete" : {
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "description" : "The SMK application ID"
+        }, {
+          "in" : "query",
+          "name" : "version",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          },
+          "description" : "The SMK application version"
+        } ],
+        "description" : "Delete an SMK application, and all archived versions, by ID. Optionally, include a version number to only delete a specific archived version",
+        "responses" : {
+          "200" : {
+            "description" : "The result of the delete operation",
+            "content" : {
+              "application/json;charset=UTF-8" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "status" : {
+                      "type" : "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "get" : {
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "description" : "The SMK application ID"
+        } ],
+        "description" : "Get the configuation json for an SMK application",
+        "responses" : {
+          "200" : {
+            "description" : "The SMK application configuration json",
+            "content" : {
+              "application/json;charset=UTF-8" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/mapConfiguration"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/smks-api/MapConfigurations/{config_id}/Attachments/" : {
+      "post" : {
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "config_id",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "description" : "The SMK application ID"
+        }, {
+          "in" : "query",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "description" : "The attachment ID to create with the attachment"
+        }, {
+          "in" : "query",
+          "name" : "type",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          },
+          "description" : "The attachment type (vector, kml, kmz, shape)"
+        } ],
+        "description" : "Create a new attachment for an SMK application",
+        "requestBody" : {
+          "description" : "The attachment data as multipart/form data. Source may be GetJson, KML, KMZ or zipped shapefile.",
+          "content" : {
+            "multipart/form-data" : {
+              "schema" : {
+                "properties" : {
+                  "orderId" : {
+                    "type" : "integer"
+                  },
+                  "userId" : {
+                    "type" : "integer"
+                  },
+                  "fileName" : {
+                    "type" : "string",
+                    "format" : "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "201" : {
+            "description" : "A message indicating if the creation was successful",
+            "content" : {
+              "application/json;charset=UTF-8" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "status" : {
+                      "type" : "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "get" : {
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "config_id",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "description" : "The SMK application ID"
+        } ],
+        "description" : "Get a listing of all attachments for an SMK application.",
+        "responses" : {
+          "200" : {
+            "description" : "The listing of attachments",
+            "content" : {
+              "application/json;charset=UTF-8" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "id" : {
+                      "type" : "string"
+                    },
+                    "content-type" : {
+                      "type" : "string"
+                    },
+                    "content-length" : {
+                      "type" : "integer"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/smks-api/MapConfigurations/{id}/Attachments/{attachment_id}" : {
+      "delete" : {
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "description" : "The SMK application ID"
+        }, {
+          "in" : "path",
+          "name" : "attachment_id",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "description" : "The attachment ID"
+        } ],
+        "description" : "Delete an SMK application attachment",
+        "responses" : {
+          "200" : {
+            "description" : "Result of the delete operation",
+            "content" : {
+              "application/json;charset=UTF-8" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "status" : {
+                      "type" : "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put" : {
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "description" : "The SMK application ID"
+        }, {
+          "in" : "path",
+          "name" : "attachment_id",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "description" : "The attachment ID"
+        } ],
+        "description" : "Update an existing SMK application attachment. Typically, an attachment is deleted and re-added, but updating is possible.",
+        "requestBody" : {
+          "description" : "The attachment to update. This can be json, an image, a zip containing a shape file, KML and KMZ.",
+          "required" : true,
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "type" : "object"
+              }
+            },
+            "image/*" : {
+              "schema" : {
+                "type" : "string",
+                "format" : "binary"
+              }
+            },
+            "application/zip" : {
+              "schema" : {
+                "type" : "string",
+                "format" : "binary"
+              }
+            },
+            "application/vnd.google-earth.kml+xml" : {
+              "schema" : {
+                "type" : "object"
+              }
+            },
+            "application/vnd.google-earth.kmz" : {
+              "schema" : {
+                "type" : "string",
+                "format" : "binary"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "The result of the update operation",
+            "content" : {
+              "application/json;charset=UTF-8" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "status" : {
+                      "type" : "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "get" : {
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "description" : "The SMK application ID"
+        }, {
+          "in" : "path",
+          "name" : "attachment_id",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "description" : "The attachment ID"
+        } ],
+        "description" : "Get an SMK application attachment",
+        "responses" : {
+          "200" : {
+            "description" : "The application attachment. May be json (all vector data is converted to GeoJSON) or an image.",
+            "content" : {
+              "application/json;charset=UTF-8" : {
+                "schema" : {
+                  "type" : "object"
+                }
+              },
+              "image/*" : {
+                "schema" : {
+                  "type" : "string",
+                  "format" : "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/smks-api/MapConfigurations/Published/" : {
+      "get" : {
+        "description" : "Get the listing of all published SMK applications",
+        "responses" : {
+          "200" : {
+            "description" : "The list of all published SMK applications",
+            "content" : {
+              "application/json;charset=UTF-8" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "name" : {
+                      "type" : "string"
+                    },
+                    "id" : {
+                      "type" : "string"
+                    },
+                    "revision" : {
+                      "type" : "integer"
+                    },
+                    "creator" : {
+                      "type" : "string"
+                    },
+                    "valid" : {
+                      "type" : "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/smks-api/MapConfigurations/Published/{id}" : {
+      "get" : {
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "description" : "The SMK application ID"
+        } ],
+        "description" : "Get the SMK Published application configuration",
+        "responses" : {
+          "200" : {
+            "description" : "The SMK published application configuration json",
+            "content" : {
+              "application/json;charset=UTF-8" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/mapConfiguration"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete" : {
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "description" : "The SMK application ID"
+        } ],
+        "description" : "Deletes a published application, without deleting it's source SMK application",
+        "responses" : {
+          "200" : {
+            "description" : "Result of the delete operation",
+            "content" : {
+              "application/json;charset=UTF-8" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "status" : {
+                      "type" : "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post" : {
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "description" : "The SMK application ID"
+        } ],
+        "description" : "Publish an unpublished SMK application. If the application has already been published, this will fail.",
+        "responses" : {
+          "200" : {
+            "description" : "Result of the publish operation",
+            "content" : {
+              "application/json;charset=UTF-8" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "status" : {
+                      "type" : "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/smks-api/MapConfigurations/Published/{id}/Attachments/" : {
+      "get" : {
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "description" : "The SMK application ID"
+        } ],
+        "description" : "Get a listing of all available attachments for a given SMK application",
+        "responses" : {
+          "200" : {
+            "description" : "A list of application attachments",
+            "content" : {
+              "application/json;charset=UTF-8" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "id" : {
+                      "type" : "string"
+                    },
+                    "content-type" : {
+                      "type" : "string"
+                    },
+                    "content-length" : {
+                      "type" : "integer"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/smks-api/MapConfigurations/Published/{id}/Attachments/{attachment_id}" : {
+      "get" : {
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "description" : "The SMK application ID"
+        }, {
+          "in" : "path",
+          "name" : "attachment_id",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "description" : "The attachment ID"
+        } ],
+        "description" : "Get the published SMK applications attachment, by ID",
+        "responses" : {
+          "200" : {
+            "description" : "The resulting attachment object. May be json or an image",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object"
+                }
+              },
+              "image/*" : {
+                "schema" : {
+                  "type" : "string",
+                  "format" : "binary"
+                }
+              },
+              "application/zip" : {
+                "schema" : {
+                  "type" : "string",
+                  "format" : "binary"
+                }
+              },
+              "application/vnd.google-earth.kml+xml" : {
+                "schema" : {
+                  "type" : "object"
+                }
+              },
+              "application/vnd.google-earth.kmz" : {
+                "schema" : {
+                  "type" : "string",
+                  "format" : "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/smks-api/MapConfigurations/Published/{id}/Export/" : {
+      "get" : {
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "description" : "The SMK application ID"
+        } ],
+        "description" : "Generate and download the SMK application export in a zip file.",
+        "responses" : {
+          "200" : {
+            "description" : "A zip file containing the export code.",
+            "content" : {
+              "application/zip" : {
+                "schema" : {
+                  "type" : "string",
+                  "format" : "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/smks-api/LayerLibrary/" : {
+      "get" : {
+        "description" : "Admin UI helper proxy. Get the complete DataBC MPCM layer catalog listing.",
+        "responses" : {
+          "200" : {
+            "description" : "The MPCM layer catalog listing",
+            "content" : {
+              "application/json;charset=UTF-8" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "type" : "object",
+                    "properties" : {
+                      "id" : {
+                        "type" : "integer"
+                      },
+                      "mpcmId" : {
+                        "type" : "string"
+                      },
+                      "label" : {
+                        "type" : "string"
+                      },
+                      "sublayers" : {
+                        "type" : "array",
+                        "items" : {
+                          "type" : "object",
+                          "properties" : {
+                            "id" : {
+                              "type" : "integer"
+                            },
+                            "mpcmId" : {
+                              "type" : "string"
+                            },
+                            "label" : {
+                              "type" : "string"
+                            },
+                            "layerUrl" : {
+                              "type" : "string"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/smks-api/LayerLibrary/{id}" : {
+      "get" : {
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "minimum" : 1
+          },
+          "description" : "The DataBC Catalog layer ID"
+        } ],
+        "description" : "Admin UI helper proxy. Get the SMK layer configuration for a layer from the DataBC MPCM Layer Catalog.",
+        "responses" : {
+          "200" : {
+            "description" : "The Layer configuration snippet",
+            "content" : {
+              "application/json;charset=UTF-8" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/mpcmLayer"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/smks-api/LayerLibrary/wms/" : {
+      "get" : {
+        "description" : "Admin UI helper proxy. Get a listing of WMS configurations from a supplied WMS URL",
+        "parameters" : [ {
+          "name" : "url",
+          "in" : "query",
+          "description" : "The URL for a WMS service",
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "https%3A%2F%2Fopenmaps.gov.bc.ca%2Fgeo%2Fpub%2FWHSE_ADMIN_BOUNDARIES.FADM_TFL_ALL_SP%2Fows%3Fservice%3DWMS%26request%3DGetCapabilities"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "The resulting listing of WMS results",
+            "content" : {
+              "application/json;charset=UTF-8" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/wmsLayer"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/smks-api/LayerLibrary/wms/{layerId}" : {
+      "get" : {
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "layerId",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "WHSE_ADMIN_BOUNDARIES.FADM_TFL_ALL_SP.URL",
+          "description" : "The DataBC Catalog wms layer ID"
+        } ],
+        "description" : "Admin UI helper proxy. Get a SMK layer configuration for a single WMS layer from a WMS service",
+        "responses" : {
+          "200" : {
+            "description" : "The resulting layer configuration snippet",
+            "content" : {
+              "application/json;charset=UTF-8" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/wmsLayer"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/smks-api/LayerLibrary/ImageToBase64/" : {
+      "get" : {
+        "parameters" : [ {
+          "in" : "query",
+          "name" : "url",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "description" : "The url of an image to convert to a base64 string"
+        } ],
+        "description" : "Admin UI helper proxy. Convert an image to base64 from a provided URL. This is used primarily for handling icons provided in KML/KMZ files.",
+        "responses" : {
+          "200" : {
+            "description" : "The resulting base64 string",
+            "content" : {
+              "application/json;charset=UTF-8" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "image" : {
+                      "type" : "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/smks-api/LayerLibrary/ProcessKML/" : {
+      "post" : {
+        "description" : "Admin UI helper proxy. Convert a provided KML or KMZ file into GeoJSON.",
+        "requestBody" : {
+          "content" : {
+            "multipart/form-data" : {
+              "schema" : {
+                "properties" : {
+                  "orderId" : {
+                    "type" : "integer"
+                  },
+                  "userId" : {
+                    "type" : "integer"
+                  },
+                  "fileName" : {
+                    "type" : "string",
+                    "format" : "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "The resulting GeoJSON conversion",
+            "content" : {
+              "application/json;charset=UTF-8" : {
+                "schema" : {
+                  "type" : "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

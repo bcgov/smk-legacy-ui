@@ -14,11 +14,14 @@ public class MapViewer implements Serializable
 	private ViewerLocation location;
 	private String baseMap;
 	private String activeTool;
-	private boolean clusterOption;
+	private ClusterOption clusterOption;
+	private String device;
+	private String[] themes;
+	private int deviceAutoBreakpoint;
 	
 	public MapViewer() 
 	{
-	    clusterOption = false;
+	    clusterOption = new ClusterOption();
 	}
 
 	protected MapViewer( MapViewer mapViewer ) 
@@ -33,12 +36,12 @@ public class MapViewer implements Serializable
 	public String getType() { return type; }
 	public void setType(String type) { this.type = type; }
 
-	public boolean getClusterOption()
+	public ClusterOption getClusterOption()
 	{
 	    return this.clusterOption;
 	}
 	
-	public void setClusterOption(boolean clusterOption)
+	public void setClusterOption(ClusterOption clusterOption)
 	{
 	    this.clusterOption = clusterOption;
 	}
@@ -62,7 +65,37 @@ public class MapViewer implements Serializable
 	{
 	    this.activeTool = activeTool;
 	}
-	
-	public String getBaseMap() { return baseMap; }
+
+	public String getDevice()
+    {
+        return device;
+    }
+
+    public void setDevice(String device)
+    {
+        this.device = device;
+    }
+
+    public String[] getThemes()
+    {
+        return themes;
+    }
+
+    public void setThemes(String[] themes)
+    {
+        this.themes = themes;
+    }
+    
+    public int getDeviceAutoBreakpoint()
+    {
+        return deviceAutoBreakpoint;
+    }
+
+    public void setDeviceAutoBreakpoint(int deviceAutoBreakpoint)
+    {
+        this.deviceAutoBreakpoint = deviceAutoBreakpoint;
+    }
+
+    public String getBaseMap() { return baseMap; }
 	public void setBaseMap(String baseMap) { this.baseMap = baseMap; }
 }

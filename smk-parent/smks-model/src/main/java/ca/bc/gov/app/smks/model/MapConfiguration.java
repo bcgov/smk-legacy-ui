@@ -48,6 +48,9 @@ public class MapConfiguration extends CouchDbDocument
 
 	// metadata
 	private String createdBy;
+	private String createdDate;
+	private String modifiedBy;
+	private String modifiedDate;
 	private boolean published; // is published indicator
 
 	// settings
@@ -74,6 +77,10 @@ public class MapConfiguration extends CouchDbDocument
 		this.setProject(mapConfiguration.getProject());
 
 		this.setCreatedBy(mapConfiguration.getCreatedBy());
+		this.setCreatedDate(mapConfiguration.getCreatedDate());
+		this.setModifiedBy(mapConfiguration.getModifiedBy());
+        this.setModifiedDate(mapConfiguration.getModifiedDate());
+		
 		this.setPublished(mapConfiguration.isPublished());
 
 		this.setSurround(new MapSurround(mapConfiguration.getSurround()));
@@ -133,10 +140,6 @@ public class MapConfiguration extends CouchDbDocument
 
 	public String getProject() { return this.project; }
 	public void setProject(String project) { this.project = project; }
-
-
-	public String getCreatedBy() { return this.createdBy; }
-	public void setCreatedBy(String createdBy) { this.createdBy = createdBy; }
 
 	public boolean isPublished() { return this.published; }
 	public void setPublished(boolean published) { this.published = published; }
@@ -212,4 +215,44 @@ public class MapConfiguration extends CouchDbDocument
 	{
 	    return this.version;
 	}
+
+	public String getCreatedBy() 
+	{ 
+	    return this.createdBy; 
+	}
+	
+	public void setCreatedBy(String createdBy) 
+	{ 
+	    this.createdBy = createdBy; 
+	}
+	
+    public String getCreatedDate()
+    {
+        return createdDate;
+    }
+
+    public void setCreatedDate(String createdDate)
+    {
+        this.createdDate = createdDate;
+    }
+
+    public String getModifiedBy()
+    {
+        return modifiedBy;
+    }
+
+    public void setModifiedBy(String modifiedBy)
+    {
+        this.modifiedBy = modifiedBy;
+    }
+
+    public String getModifiedDate()
+    {
+        return modifiedDate;
+    }
+
+    public void setModifiedDate(String modifiedDate)
+    {
+        this.modifiedDate = modifiedDate;
+    }
 }

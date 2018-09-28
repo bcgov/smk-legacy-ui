@@ -12,7 +12,6 @@ public class Measure extends Tool
 
     public Measure() 
 	{
-	    this.setTitle("Measurement");
 	    this.setDescription("Measurement Tools");
 	    this.setType(Tool.Type.MEASURE.toString());
 	}

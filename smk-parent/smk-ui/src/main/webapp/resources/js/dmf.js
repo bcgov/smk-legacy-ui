@@ -35,6 +35,9 @@ var data = {
 	    lmfRevision: 1,
 	    name: "",
 	    createdBy: "",
+	    createdDate: "",
+	    modifiedBy: "",
+	    modifiedDate: "",
 	    version: "",
 	    published: false,
 	    surround: {
@@ -42,14 +45,42 @@ var data = {
 	        title: ""
 	    },
 	    viewer: {
-	        type: "leaflet",
-	        location:{ extent:[]},
-	        baseMap: "Imagery"
+	    	type: "leaflet",
+            device: "auto",
+            deviceAutoBreakpoint: 500,
+            themes: [],
+            location: {
+            	center: [-125, 55],
+            	zoom: 5
+            },
+            baseMap: 'Topographic',
+            clusterOption: {
+                showCoverageOnHover: false
+            }
 	    },
 	    tools: [
-			{ "type": "menu" },
-			{ "type": "dropdown" }
-	    ],
+                { type: 'about',        enabled: false },
+                { type: 'baseMaps',     enabled: false },
+                { type: 'coordinate',   enabled: false },
+                { type: 'directions',   enabled: false },
+                // { type: 'dropdown',     enabled: false }, -- so it won't be enabled by show-tools=all, no tools use it by default
+                { type: 'identify',     enabled: false },
+                { type: 'layers',       enabled: false },
+                { type: 'location',     enabled: false },
+                { type: 'markup',       enabled: false },
+                { type: 'measure',      enabled: false },
+                { type: 'menu',         enabled: false },
+                { type: 'list-menu',         enabled: false },
+                { type: 'minimap',      enabled: true },
+                { type: 'pan',          enabled: true },
+                // { type: 'query',        enabled: false }, -- so it won't be enabled by show-tools=all, as it needs an instance
+                { type: 'scale',        enabled: true },
+                { type: 'search',       enabled: true },
+                { type: 'select',       enabled: false },
+                { type: 'toolbar',      enabled: true },
+                // { type: 'version',      enabled: false }, -- so it won't be enabled by show-tools=all
+                { type: 'zoom',         enabled: true }
+            ],
 	    layers: [],
 	    _id: null,
 	    _rev: null
@@ -152,6 +183,24 @@ function convertKmlToLayers(fileContents)
 	        		layerSource.push(lyrNode);
 	        		tree.reload(layerSource);
     			}
+        		
+        		// create layer display object
+        		for(var tool in data.tools)
+        		{
+        			tool = data.tools[tool];
+        			if(tool.type == "layers")
+        			{
+        				if(tool.display == null) tool.display = [];
+        				
+        				tool.display.push(
+        				{
+        					id: generatedID,
+        				    type: "layer",
+        				    title: generatedID,
+        				    isVisible: true
+        				});
+        			}
+        		}
         		
         		// create blob from geojson
 				var blob = new Blob([ JSON.stringify(sourceLayer.geojson) ], {encoding:"UTF-8",type:"application/json"});
@@ -459,13 +508,14 @@ function setToolActivation(toolType)
 	    	else if(tool.type == "about" && tool.enabled == true)
     		{
 	    		$("#aboutPanelOptions").show();
+	    		$("#aboutPanelHeader").val(tool.title);
 	    		setupQuillEditor(tool);
     		}
 	    	else if(tool.type == "about" && tool.enabled == false) $("#aboutPanelOptions").hide();
 	    	else if(tool.type == "identify" && tool.enabled == true)
     		{
 	    		$("#identifyOptions").show();
-	    		
+	    		$("#identifyPanelHeader").val(tool.title);
 	    		$("#identifyStyleOpacity").val(tool.styleOpacity);
     			$("#identifyStyleStrokeOpacity").val(tool.style.strokeOpacity);
     			$("#identifyStyleFillOpacity").val(tool.style.fillOpacity);
@@ -480,7 +530,7 @@ function setToolActivation(toolType)
 	    	else if(tool.type == "select" && tool.enabled == true)
     		{
 	    		$("#selectionOptions").show();
-	    		
+	    		$("#selectPanelHeader").val(tool.title);
 	    		$("#selectStyleOpacity").val(tool.styleOpacity);
     			$("#selectStyleStrokeOpacity").val(tool.style.strokeOpacity);
     			$("#selectStyleFillOpacity").val(tool.style.fillOpacity);
@@ -492,6 +542,7 @@ function setToolActivation(toolType)
 	    	else if(tool.type == "select" && tool.enabled == false) $("#selectionOptions").hide();
 	    	else if(tool.type == "baseMaps" && tool.enabled == true)
     		{
+	    		$("#basemapPanelHeader").val(tool.title);
 	    		$("#basemapPanelOptions").show();
 	    		if(tool.choices == null) tool.choices = [];
 	    		tool.choices.forEach(function(choice)
@@ -507,6 +558,20 @@ function setToolActivation(toolType)
 	           	});
     		}
 	    	else if(tool.type == "baseMaps" && tool.enabled == false) $("#basemapPanelOptions").hide();
+	    	else if(tool.type == "layers" && tool.enabled == true)
+    		{
+	    		$("#layersPanelHeader").val(tool.title);
+	    		$("#layersOptions").show();
+    		}
+	    	else if(tool.type == "layers" && tool.enabled == false) $("#layersOptions").hide();
+	    	else if(tool.type == "directions" && tool.enabled == true)
+    		{
+	    		$("#directionsPanelHeader").val(tool.title);
+	    		$("#directionsOptions").show();
+    		}
+	    	else if(tool.type == "directions" && tool.enabled == false) $("#directionsOptions").hide();
+	    	else if(tool.type == "measure" && tool.enabled == false) $("#measurementOptions").hide();
+	    	else if(tool.type == "measure" && tool.enabled == true) $("#measurementOptions").show();
 
 			//if(tool.enabled == true) Materialize.toast('Activated ' + tool.type + " tool!", 4000);
 			//else Materialize.toast('Deactivated ' + tool.type + " tool!", 4000);
@@ -577,6 +642,47 @@ function toggleScaleOption(scaleOption)
    	});
 }
 
+function toggleConvexHullsTool()
+{
+	data.viewer.clusterOption.showCoverageOnHover = !data.viewer.clusterOption.showCoverageOnHover;
+}
+
+function toggleActiveAboutTool()
+{
+	data.viewer.activeTool = data.viewer.activeTool == "about" ? "" : "about";
+
+	$("#basemapsActiveTool").prop('checked', false);
+	$("#layersActiveTool").prop('checked', false);
+	$("#directionsActiveTool").prop('checked', false);
+}
+
+function toggleActiveBasemapsTool()
+{
+	data.viewer.activeTool = data.viewer.activeTool == "baseMaps" ? "" : "baseMaps";
+	
+	$("#aboutActiveTool").prop('checked', false);
+	$("#layersActiveTool").prop('checked', false);
+	$("#directionsActiveTool").prop('checked', false);
+}
+
+function toggleActiveLayersTool()
+{
+	data.viewer.activeTool = data.viewer.activeTool == "layers" ? "" : "layers";
+	
+	$("#aboutActiveTool").prop('checked', false);
+	$("#basemapsActiveTool").prop('checked', false);
+	$("#directionsActiveTool").prop('checked', false);
+}
+
+function toggleActiveDirectionsTool()
+{
+	data.viewer.activeTool = data.viewer.activeTool == "layers" ? "" : "layers";
+	
+	$("#aboutActiveTool").prop('checked', false);
+	$("#basemapsActiveTool").prop('checked', false);
+	$("#layersActiveTool").prop('checked', false);
+}
+
 function toggleZoomOption(zoomOption)
 {
 	data.tools.forEach(function(tool)
@@ -587,6 +693,17 @@ function toggleZoomOption(zoomOption)
 			else if(zoomOption == "box") tool.box = !tool.box;
 			else if(zoomOption == "doubleClick") tool.doubleClick = !tool.doubleClick;
 			else if(zoomOption == "mouseWheel") tool.mouseWheel = !tool.mouseWheel;
+		}
+   	});
+}
+
+function setToolPosition(toolName, position)
+{
+	data.tools.forEach(function(tool)
+   	{
+		if(tool.type == toolName)
+		{
+			tool.position = position;
 		}
    	});
 }
@@ -637,7 +754,11 @@ function editMapConfig(mapConfigId)
 					data.lmfId = loadedConfig.lmfId;
 					data.name = loadedConfig.name;
 					data.lmfRevision = loadedConfig.lmfRevision;
+					data.version = loadedConfig.version;
 					data.createdBy = loadedConfig.createdBy;
+					data.modifiedBy = loadedConfig.modifiedBy;
+					data.createdDate = loadedConfig.createdDate;
+					data.modifiedDate = loadedConfig.modifiedDate;
 					data.published = loadedConfig.published;
 					data.surround = loadedConfig.surround;
 				    data.viewer = loadedConfig.viewer;
@@ -698,12 +819,28 @@ function editMapConfig(mapConfigId)
 
 function setupMapConfigToolsUI()
 {
+	// set active tool toggle
+	$("#aboutActiveTool").prop('checked', data.viewer.activeTool == "about");
+	$("#basemapsActiveTool").prop('checked', data.viewer.activeTool == "baseMaps");
+	$("#layersActiveTool").prop('checked', data.viewer.activeTool == "layers");
+	$("#directionsActiveTool").prop('checked', data.viewer.activeTool == "directions");
 	//set tool activations
     data.tools.forEach(function(tool)
 	{
     	if(tool.type == "coordinate") $("#coordinates").prop('checked', tool.enabled);
     	else if(tool.type == "attribution") $("#attribution").prop('checked', tool.enabled);
-    	else if(tool.type == "layers") $("#layerPanel").prop('checked', tool.enabled);
+    	else if(tool.type == "layers") 
+		{
+    		$("#layersPanelHeader").val(tool.title);
+    		$("#layerPanel").prop('checked', tool.enabled);
+    		if(tool.enabled)
+			{
+    			$("#layersOptions").show();
+    			$("#layersMenu").prop('checked', tool.position == "list-menu");
+    			$("#layersToolbar").prop('checked', tool.baseMap == "toolbar");
+    			$("#layersShortcut").prop('checked', tool.baseMap == "shortcut-menu");
+			}
+		}
     	else if(tool.type == "pan") $("#panning").prop('checked', tool.enabled);
     	else if(tool.type == "zoom")
 		{
@@ -717,7 +854,19 @@ function setupMapConfigToolsUI()
 				$("#zoomMouseWheel").prop('checked', tool.mouseWheel);
 			}
 		}
-    	else if(tool.type == "measure") $("#measurement").prop('checked', tool.enabled);
+    	else if(tool.type == "measure") 
+    	{
+    		$("#measurement").prop('checked', tool.enabled);
+    		
+    		$("#measurementMenu").prop('checked', tool.position == "list-menu");
+			$("#measurementToolbar").prop('checked', tool.baseMap == "toolbar");
+			$("#measurementShortcut").prop('checked', tool.baseMap == "shortcut-menu");
+			
+			if(tool.enabled)
+			{
+    			$("#measurementOptions").show();
+			}
+    	}
     	else if(tool.type == "markup") $("#markup").prop('checked', tool.enabled);
     	else if(tool.type == "scale")
 		{
@@ -747,7 +896,13 @@ function setupMapConfigToolsUI()
 		}
     	else if(tool.type == "about")
 		{
+    		$("#aboutPanelHeader").val(tool.title);
     		$("#aboutPanel").prop('checked', tool.enabled);
+    		
+    		$("#aboutMenu").prop('checked', tool.position == "list-menu");
+			$("#aboutToolbar").prop('checked', tool.baseMap == "toolbar");
+			$("#aboutShortcut").prop('checked', tool.baseMap == "shortcut-menu");
+    		
     		if(tool.enabled)
 			{
     			$("#aboutPanelOptions").show();
@@ -756,7 +911,13 @@ function setupMapConfigToolsUI()
 		}
     	else if(tool.type == "baseMaps")
 		{
-    		$("#basemapPanel").prop('checked', tool.enabled);
+    		$("#basemapPanelHeader").val(tool.title);
+    		
+    		$("#basemapMenu").prop('checked', tool.position == "list-menu");
+			$("#basemapToolbar").prop('checked', tool.baseMap == "toolbar");
+			$("#basemapShortcut").prop('checked', tool.baseMap == "shortcut-menu");
+    		
+			$("#basemapPanel").prop('checked', tool.enabled);
     		if(tool.enabled)
 			{
     			$("#basemapPanelOptions").show();
@@ -776,6 +937,12 @@ function setupMapConfigToolsUI()
 		}
     	else if(tool.type == "select") 
 		{
+    		$("#selectPanelHeader").val(tool.title);
+    		
+    		$("#selectMenu").prop('checked', tool.position == "list-menu");
+			$("#selectToolbar").prop('checked', tool.baseMap == "toolbar");
+			$("#selectShortcut").prop('checked', tool.baseMap == "shortcut-menu");
+    		
     		$("#selectionPanel").prop('checked', tool.enabled);
     		if(tool.enabled)
 			{
@@ -792,6 +959,13 @@ function setupMapConfigToolsUI()
 		}
     	else if(tool.type == "identify") 
 		{
+    		$("#showConvexHulls").prop('checked', data.viewer.clusterOption != null && data.viewer.clusterOption.showCoverageOnHover);
+    		
+    		$("#identifyMenu").prop('checked', tool.position == "list-menu");
+			$("#identifyToolbar").prop('checked', tool.baseMap == "toolbar");
+			$("#identifyShortcut").prop('checked', tool.baseMap == "shortcut-menu");
+    		
+    		$("#identifyPanelHeader").val(tool.title);
     		$("#identifyPanel").prop('checked', tool.enabled);
     		if(tool.enabled)
 			{
@@ -810,9 +984,23 @@ function setupMapConfigToolsUI()
 		}
     	else if(tool.type == "search") $("#searchPanel").prop('checked', tool.enabled);
     	else if(tool.type == "location") $("#location").prop('checked', tool.enabled);
-    	else if(tool.type == "directions") $("#directions").prop('checked', tool.enabled);
+    	else if(tool.type == "directions")
+		{
+    		$("#directionsMenu").prop('checked', tool.position == "list-menu");
+			$("#directionsToolbar").prop('checked', tool.baseMap == "toolbar");
+			$("#directionsShortcut").prop('checked', tool.baseMap == "shortcut-menu");
+			
+    		$("#directions").prop('checked', tool.enabled);
+    		$("#directionsPanelHeader").val(tool.title);
+    		if(tool.enabled)
+    		{
+    			$("#directionsOptions").show();
+			}
+		}
     	else if(tool.type == "dropdown") $("#dropdown").prop('checked', tool.enabled);
-    	else if(tool.type == "menu") $("#menu").prop('checked', tool.enabled);
+    	//else if(tool.type == "menu") $("#menu").prop('checked', tool.enabled); // menu removed as default
+    	else if(tool.type == "list-menu") $("#menu").prop('checked', tool.enabled);
+    	else if(tool.type == "shortcut-menu") $("#shortcutMenu").prop('checked', tool.enabled);
 	});
 
     // clear out any layers
@@ -842,6 +1030,7 @@ function finishToolEdits()
 			tool.style.fillColor = $("#identifyStyleFillColor").val();
 			tool.tolerance = $("#identifyClickRadius").val();
 			tool.showPanel = $("#identifyPanelVisible").is(":checked");
+			tool.title = $("#identifyPanelHeader").val();
 		}
 		else if(tool.type == "select") 
 		{
@@ -852,6 +1041,23 @@ function finishToolEdits()
 			tool.style.strokeStyle = $("#selectStyleStrokeStyle").val();
 			tool.style.strokeColor = $("#selectStyleStrokeColor").val();
 			tool.style.fillColor = $("#selectStyleFillColor").val();
+			tool.title = $("#selectPanelHeader").val();
+		}
+		else if(tool.type == "about")
+		{
+			tool.title = $("#aboutPanelHeader").val();
+		}
+		else if(tool.type == "baseMaps")
+		{
+			tool.title = $("#basemapPanelHeader").val();
+		}
+		else if(tool.type == "directions")
+		{
+			tool.title = $("#directionsPanelHeader").val();
+		}
+		else if(tool.type == "layers")
+		{
+			tool.title = $("#layersPanelHeader").val();
 		}
 		/*else if(tool.type == "dropdown" && tool.enabled == false)
 		{
@@ -869,41 +1075,44 @@ function finishToolEdits()
 }
 
 function addNewMapConfig()
-{
+{   
 	data.lmfId = "";
 	data.name = "";
 	data.lmfRevision = 1;
-	data.createdBy = "";
+	data.version = "";
+	data.createdBy = "User";
 	data.published = false;
 	data.surround = { type: "default", title: "" };
     data.viewer = {
-    	    "type": "leaflet",
-    	    "location": {
-    	      "extent": [
-    	        -142.33886718750003,
-    	        61.77312286453146,
-    	        -107.22656250000001,
-    	        45.920587344733654
-    	      ],
-    	      "center": [
-    	        -139.1782,
-    	        47.6039
-    	      ],
-    	      "zoom": 5
-    	    },
-    	    "baseMap": "Streets"
+    		"type": "leaflet",
+            "device": "auto",
+            "deviceAutoBreakpoint": 500,
+            "themes": [],
+            "location": {
+                "center": [ -125, 55 ],
+                "zoom": 5
+            },
+            "baseMap": "Topographic",
+            "clusterOption": {
+                "showCoverageOnHover": false
+            }
     	  };
     data.layers = [];
     data._id = null;
     data._rev = null;
     data.tools = [
+  			    {
+  			      "type": "about",
+  			      "enabled": false,
+  			      "content": ""
+  			    },
 		        {
 			      "type": "coordinate",
-			      "enabled": true
+			      "enabled": false
 			    },
 			    {
 			      "type": "attribution",
-			      "enabled": true
+			      "enabled": false
 			    },
 			    {
 			      "type": "layers",
@@ -923,11 +1132,11 @@ function addNewMapConfig()
 			    },
 			    {
 			      "type": "measure",
-			      "enabled": true
+			      "enabled": false
 			    },
 			    {
 			      "type": "markup",
-			      "enabled": true
+			      "enabled": false
 			    },
 			    {
 			      "type": "scale",
@@ -942,16 +1151,11 @@ function addNewMapConfig()
 			    },
 			    {
 			      "type": "directions",
-			      "enabled": true
-			    },
-			    {
-			      "type": "about",
-			      "enabled": true,
-			      "content": ""
+			      "enabled": false
 			    },
 			    {
 			      "type": "location",
-				  "enabled": true,
+				  "enabled": false,
 			    },
 			    {
 			      "type": "baseMaps",
@@ -968,7 +1172,7 @@ function addNewMapConfig()
 			    },
 			    {
 			        "type": "select",
-			        "enabled": true,
+			        "enabled": false,
 			        "title": "Selection Panel",
 			        "style": {
 			          "strokeWidth": 1,
@@ -990,7 +1194,7 @@ function addNewMapConfig()
 			      },
 			    {
 			        "type": "identify",
-			        "enabled": true,
+			        "enabled": false,
 			        "title": "Identify Panel",
 			        "style": {
 			          "strokeWidth": 1,
@@ -1013,6 +1217,18 @@ function addNewMapConfig()
 			    {
 			      "type": "search",
 			      "enabled": true
+			    },
+			    {
+			      "type": "list-menu",
+			      "enabled": true
+			    },
+			    {
+			      "type": "toolbar",
+			      "enabled": true
+			    },
+			    {
+			      "type": "shortcut-menu",
+			      "enabled": false
 			    }
 		    ];
 
@@ -1527,6 +1743,25 @@ function finishLayerEdits(save)
 				}
 			}
       	});
+		
+		// update the display layer
+		for(var tool in data.tools)
+		{
+			tool = data.tools[tool];
+			if(tool.type == "layers")
+			{
+				for(var displayLayer in tool.display)
+				{
+					displayLayer = tool.display[displayLayer];
+					if(displayLayer.id == selectedLayerNode.data.id)
+					{
+						displayLayer.title = selectedLayerNode.data.title;
+						break;
+					}
+				}
+				break;
+			}
+		}
 	}
 
 	$("#attributePanel").empty();
@@ -1541,6 +1776,375 @@ function finishLayerEdits(save)
 
 	selectedLayerNode = null;
 	fileContents = null;
+}
+
+function createDisplayLayersFromNodes(node)
+{
+	var item = 
+	{ 
+		id: node.data.id,
+		type: node.data.type,
+		title: node.data.title,
+		isVisible: true
+	};
+	
+	if(node.data.type == "folder" || node.data.type == "group")
+	{
+		if(node.data.type == "folder") 
+		{
+			item.isExpanded = false;
+		}
+		
+		item.items = [];
+		for(var child in node.children)
+		{
+			child = node.children[child];
+			var subItem = createDisplayLayersFromNodes(child);
+			
+			item.items.push(subItem);
+		}
+	}
+	
+	return item;
+}
+
+function rebuildDisplayLayers()
+{
+	// get layers tool
+	for(var tool in data.tools)
+	{
+		tool = data.tools[tool];
+		if(tool.type == "layers")
+		{
+			// turf existing display order
+			tool.display = [];
+			
+			// get nodes
+			var nodes = $("#layer-display-tree").fancytree('getTree').rootNode.children;
+			
+			// for each item, create a new display object
+			for(var item in nodes)
+			{
+				item = nodes[item];
+				var displayLayer = createDisplayLayersFromNodes(item);
+				tool.display.push(displayLayer);
+			}
+		}
+	}
+}
+
+function processDisplayLayer(displayLayer)
+{
+	var item = 
+	{
+		title: displayLayer.title,
+		folder: displayLayer.type == "folder" || displayLayer.type == "group",
+		expanded: false,
+		data: displayLayer,
+		children: []
+	};
+	
+	if(item.folder)
+	{
+		for(var subLayer in displayLayer.items)
+		{
+			subLayer = displayLayer.items[subLayer];
+			item.children.push(processDisplayLayer(subLayer));
+		}
+	}
+	
+	return item;
+}
+
+function addNewDisplayFolder()
+{
+	// set new item id to random guid?
+	var node = $("#layer-display-tree").fancytree("getActiveNode");
+	
+	var item = 
+	{
+		title: "New Folder",
+		folder: true,
+		expanded: false,
+		data: 
+		{
+			id: uuid(),
+		    type: "folder",
+		    title: "New Folder",
+		    isVisible: true,
+		    isExpanded: false,
+		    items: []
+		},
+		children: []
+	};
+	
+	if(node == null)
+	{
+		// put a folder at the root
+		$("#layer-display-tree").fancytree("getRootNode").addChildren(item);
+	}
+	else
+	{
+		// if the node is a folder, create a new folder within
+		// if the node is a layer, create a folder at the root and move the layer into it
+		// if the node is a group, cancel event
+		if(node.data.type == "folder") node.appendSibling(item);
+		else if(node.data.type == "layer")
+		{
+			var child = node.parent.addChildren(item);
+			node.moveTo(child, "child");
+		}
+		if(node.data.type == "group")
+		{
+			// show error message
+		}
+	}
+}
+
+function addNewDisplayGroup()
+{
+	// set new item id to random guid?
+	var node = $("#layer-display-tree").fancytree("getActiveNode");
+	
+	var item = 
+	{
+		title: "New Group",
+		folder: true,
+		expanded: false,
+		data: 
+		{
+			id: uuid(),
+		    type: "group",
+		    title: "New Group",
+		    isVisible: true,
+		    isExpanded: false,
+		    items: []
+		},
+		children: []
+	};
+	
+	if(node == null)
+	{
+		// put a folder at the root
+		$("#layer-display-tree").fancytree("getRootNode").addChildren(item);
+	}
+	else
+	{
+		// if the node is a folder, create a new folder within
+		// if the node is a layer, create a folder at the root and move the layer into it
+		// if the node is a group, cancel event
+		if(node.data.type == "folder") node.appendSibling(item);
+		else if(node.data.type == "layer")
+		{
+			var child = node.parent.addChildren(item);
+			node.moveTo(child, "child");
+		}
+		if(node.data.type == "group")
+		{
+			// show error message
+		}
+	}
+}
+
+function removeSelectedDisplayLayer()
+{
+	var node = $("#layer-display-tree").fancytree("getActiveNode");
+	
+	if(node != null && node.data.type != "layer")
+	{
+		while( node.hasChildren() ) 
+		{
+			node.getFirstChild().moveTo(node.parent, "child");
+		}
+			
+		node.remove();
+	}
+}
+
+function editLayerDisplayOrder()
+{
+	var sourceData = [];
+	
+	for(var tool in data.tools)
+	{
+		tool = data.tools[tool];
+		if(tool.type == "layers")
+		{
+			for(var displayLayer in tool.display)
+			{
+				displayLayer = tool.display[displayLayer];
+				var item = processDisplayLayer(displayLayer);
+				sourceData.push(item);
+			}
+		}
+	}
+
+	$("#layerDisplayOrderContent").empty();
+	$("#layerDisplayOrderContent").append('<div id="layer-display-tree" class="display-order-container" style="height: calc(100vh - 677px);"></div>');
+	
+	// setup the tree view
+	$("#layer-display-tree").fancytree({
+		extensions: ["childcounter", "edit", "dnd5"],
+	    checkbox: false,
+	    selectMode: 1,
+	    source: sourceData,
+	    activate: function(event, data)
+	    {
+	    },
+	    select: function(event, data)
+	    {
+	    },
+	    childcounter: 
+	    {
+	        deep: true,
+	        hideZeros: true,
+	        hideExpanded: true
+	    },
+	    dnd5: 
+	    {
+	        preventForeignNodes: false,
+	        preventNonNodes: false,
+	        preventRecursiveMoves: true, // Prevent dropping nodes on own descendants
+	        preventVoidMoves: true, // Prevent dropping nodes 'before self', etc.
+	        scroll: true,
+	        scrollSpeed: 7,
+	        scrollSensitivity: 10,
+	        dragStart: function(node, nodeData) 
+	        {
+	          /* This function MUST be defined to enable dragging for the tree.
+	           *
+	           * Return false to cancel dragging of node.
+	           * data.dataTransfer.setData() and .setDragImage() is available
+	           * here.
+	           */
+	          return true;
+	        },
+	        dragDrag: function(node, nodeData) 
+	        {
+	        	nodeData.dataTransfer.dropEffect = "move";
+	        },
+	        dragEnd: function(node, nodeData) 
+	        {
+	        },
+	        dragEnter: function(node, nodeData)
+	        {
+	          // node.debug("dragEnter", data);
+	        	nodeData.dataTransfer.dropEffect = "move";
+	          // data.dataTransfer.effectAllowed = "copy";
+	          return true;
+	        },
+	        dragOver: function(node, nodeData) 
+	        {
+	        	if(node.data.type != "layer")
+        		{
+	        		nodeData.dataTransfer.dropEffect = "move";
+	        	}
+	        },
+	        dragLeave: function(node, nodeData) 
+	        {
+	        },
+	        dragDrop: function(node, nodeData) 
+	        {
+	        	if(node.data.type != "layer")
+        		{
+	        		/* This function MUST be defined to enable dropping of items on
+	  	           * the tree.
+	  	           */
+	  	          var transfer = nodeData.dataTransfer;
+
+	  	          node.debug("drop", nodeData);
+
+	  	          // alert("Drop on " + node + ":\n"
+	  	          //   + "source:" + JSON.stringify(data.otherNodeData) + "\n"
+	  	          //   + "hitMode:" + data.hitMode
+	  	          //   + ", dropEffect:" + transfer.dropEffect
+	  	          //   + ", effectAllowed:" + transfer.effectAllowed);
+
+	  	          if( nodeData.otherNode ) 
+	  	          {
+	  	            // Drop another Fancytree node from same frame
+	  	            // (maybe from another tree however)
+	  	            var sameTree = (nodeData.otherNode.tree === nodeData.tree);
+
+	  	          nodeData.otherNode.moveTo(node, nodeData.hitMode);
+	  	          } 
+	  	          else if( nodeData.otherNodeData ) 
+	  	          {
+	  	            // Drop Fancytree node from different frame or window, so we only have
+	  	            // JSON representation available
+	  	            node.addChild(nodeData.otherNodeData, nodeData.hitMode);
+	  	          } 
+	  	          else 
+	  	          {
+	  	            // Drop a non-node
+	  	            node.addNode({ title: transfer.getData("text") }, nodeData.hitMode);
+	  	          }
+	  	          node.setExpanded();
+	        	}
+	        }
+	    },
+	    edit: 
+	    {
+	        triggerStart: ["clickActive", "dblclick", "f2", "mac+enter", "shift+click"],
+	        beforeEdit: function(event, nodeData)
+	        {
+	          // Return false to prevent edit mode
+	        },
+	        edit: function(event, nodeData)
+	        {
+	          // Editor was opened (available as data.input)
+	        },
+	        beforeClose: function(event, nodeData)
+	        {
+	          // Return false to prevent cancel/save (data.input is available)
+	        },
+	        save: function(event, nodeData)
+	        {
+	          return true;
+	        },
+	        close: function(event, nodeData)
+	        {
+	          // Editor was removed
+	          if( nodeData.save ) 
+	          {
+	        	  // update the node data
+	        	  nodeData.node.data.title = nodeData.node.title;
+	        	  
+	        	  // update the source layer, if this is a layer node, so we stay consistent
+	        	  // note that theoretically you don't have to keep these in sync, detail view
+	        	  // overrides layer name.
+	        	  if(nodeData.node.data.type == "layer")
+	        	  {
+	        		  var tree = $('#layer-tree').fancytree('getTree');
+    			      var layerSource = tree.getRootNode().children;
+    			      
+	        		  for(var layerNode in layerSource)
+	        		  {
+    			    	  layerNode = layerSource[layerNode];
+    			    	  if(layerNode.data.id== nodeData.node.data.id)
+			    		  {
+    			    		  layerNode.data.title = nodeData.node.title;
+    			    		  layerNode.title = nodeData.node.title;
+    			    		  
+    			    		  // update the layer tree
+    			    		  tree.reload(layerSource);
+    			    		  
+    			    		  break;
+    			    	  }
+	        		  }
+	        	  }
+	        	  
+	              // Since we started an async request, mark the node as preliminary
+	              $(nodeData.node.span).addClass("pending");
+	          }
+	        }
+	    },
+	    activate: function(event, nodeData) 
+	    {
+	    }    
+	  });
+	
+	$('#layerOrderModal').modal('open');
 }
 
 function editSelectedLayer()
@@ -1685,12 +2289,62 @@ function removeSelectedLayer()
 				{
 					var index = data.layers.indexOf(lyr);
 					if (index !== -1) data.layers.splice(index, 1);
+					
+					// remove display object
+					for(var tool in data.tools)
+					{
+						tool = data.tools[tool];
+						if(tool.type == "layers")
+						{
+							// remove matching layer from display layers
+							if(tool.display == null) tool.display = [];
+						
+							var i = tool.display.length;
+							while (i--) 
+							{
+								var displayLayer = tool.display[i];
+								removeDisplayLayer(tool.display, lyr, displayLayer, tool.display); 
+							}
+						}
+					}
 				}
 			}
       	});
 		
 		if(index == nodesToRemoveCount) tree.reload(layerSource);
    	});
+}
+
+function removeDisplayLayer(subArray, lyr, displayLayer, rootArray)
+{
+	if(displayLayer.id == lyr.id)
+	{
+		//remove
+		var index = subArray.indexOf(displayLayer);
+		if (index > -1) subArray.splice(index, 1);
+		
+		// if we have children (should be impossible here) move them to the root
+		if(displayLayer.hasOwnProperty('items') && displayLayer.items != null && displayLayer.items.length > 0)
+		{
+			for(var child in displayLayer.items) rootArray.push(child);
+		}
+	}
+	else if(displayLayer.hasOwnProperty('items') && displayLayer.items != null && displayLayer.items.length > 0)
+	{
+		//scan for matching ID, and remove
+		var i = displayLayer.items.length
+		while (i--) 
+		{
+			var subLayer = displayLayer.items[i];
+			removeDisplayLayer(displayLayer.items, lyr, subLayer, rootArray); 
+		}
+		
+		if(displayLayer.items.length == 0)
+		{
+			var index = subArray.indexOf(displayLayer);
+			if (index > -1) subArray.splice(index, 1);
+		}
+	}
 }
 
 function openQueryEditor()
@@ -1770,13 +2424,13 @@ function addNewQuery()
 	for(var i = 0; i < data.tools.length; i++)
 	{
 		var thisTool = data.tools[i];
-		if(thisTool.type == "menu" && menuExists == false) menuExists = true;
+		if(thisTool.type == "list-menu" && menuExists == false) menuExists = true;
 		if(thisTool.type == "dropdown" && dropdownExists == false) dropdownExists = true;
 	}
 	
 	if(!menuExists)
 	{
-		var menuTool = { type: "menu" };
+		var menuTool = { type: "list-menu" };
 		data.tools.push(menuTool);
 	}
 	
@@ -2283,6 +2937,24 @@ function addVectorLayerToLayerList()
 		}
 	}
 	
+	// create layer display object
+	for(var tool in data.tools)
+	{
+		tool = data.tools[tool];
+		if(tool.type == "layers")
+		{
+			if(tool.display == null) tool.display = [];
+			
+			tool.display.push(
+			{
+				id: layer.id,
+			    type: "layer",
+			    title: layer.title,
+			    isVisible: true
+			});
+		}
+	}
+	
 	return layer;
 }
 
@@ -2358,6 +3030,24 @@ function addSelectedWmsLayer()
 			var layerSource = tree.getRootNode().children;
 			layerSource.push(lyrNode);
 			tree.reload(layerSource);
+			
+			// create layer display object
+    		for(var tool in data.tools)
+    		{
+    			tool = data.tools[tool];
+    			if(tool.type == "layers")
+    			{
+    				if(tool.display == null) tool.display = [];
+    				
+    				tool.display.push(
+    				{
+    					id: wmsItem.id,
+    				    type: "layer",
+    				    title: wmsItem.title,
+    				    isVisible: true
+    				});
+    			}
+    		}
 		}
    	});
 }
@@ -2415,6 +3105,24 @@ function getCompleteCatalogItem(mpcmId)
 	            	var layerSource = tree.getRootNode().children;
 	            	layerSource.push(lyrNode);
 	        		tree.reload(layerSource);
+	        		
+	        		// create layer display object
+	        		for(var tool in data.tools)
+	        		{
+	        			tool = data.tools[tool];
+	        			if(tool.type == "layers")
+	        			{
+	        				if(tool.display == null) tool.display = [];
+	        				
+	        				tool.display.push(
+	        				{
+	        					id: catalogCompleteItem.id,
+	        				    type: "layer",
+	        				    title: catalogCompleteItem.title,
+	        				    isVisible: true
+	        				});
+	        			}
+	        		}
         		}
             	else
         		{
@@ -2834,6 +3542,8 @@ $(document).ready(function()
 			if(editMode)
 			{
 				var bounds = basemapViewerMap.getBounds();
+				var center = basemapViewerMap.getBounds().getCenter();
+				var zoomLevel = basemapViewerMap.getZoom();
 
 				if(bounds.getWest() != bounds.getEast() && bounds.getNorth() != bounds.getSouth())
 				{
@@ -2841,6 +3551,12 @@ $(document).ready(function()
 					data.viewer.location.extent[1] = bounds.getNorth();
 					data.viewer.location.extent[2] = bounds.getEast();
 					data.viewer.location.extent[3] = bounds.getSouth();
+					
+					data.viewer.location.center[0] = center.lng;
+					data.viewer.location.center[1] = center.lat;
+					data.viewer.location.zoom = basemapViewerMap.getZoom();
+					
+					// remove extent, if it exists?
 				}
 			}
 		});
@@ -2915,6 +3631,14 @@ $(document).ready(function()
 	    }
 	});
 	$('#layerPopupTemplateModal').modal({ dismissible: false });
+	$('#layerOrderModal').modal(
+	{ 
+		dismissible: false,
+		complete: function()
+		{
+			rebuildDisplayLayers();
+		}
+	});
 
 });
 

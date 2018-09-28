@@ -14,7 +14,6 @@ public class About extends Tool
 
 	public About() 
 	{
-	    this.setTitle("About Panel");
 	    this.setDescription("Provide the contents of about panel.");
 	    this.setType(Tool.Type.ABOUT.toString());
 	}

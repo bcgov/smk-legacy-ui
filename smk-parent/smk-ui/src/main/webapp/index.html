@@ -85,6 +85,45 @@
    		  border-radius: 2px;
 		}
 		
+		span.drag-source 
+		{
+    		border: 1px solid grey;
+    		border-radius: 3px;
+    		padding: 2px;
+    		background-color: silver
+  		}
+
+		.display-order-container
+		{
+    	  width: 100%;
+		  height: 65%;
+		  overflow: auto;
+	      border: 1px solid rgb(223, 223, 223);
+   		  border-radius: 2px;
+  		}
+
+  		span.fancytree-node.fancytree-drag-source 
+  		{
+    		outline: 1px dotted grey;
+  		}
+/*
+  span.fancytree-node.fancytree-drag-source.fancytree-drag-remove {
+    opacity: 0.4;
+  }
+  span.fancytree-node.fancytree-drop-over {
+    outline: 1px solid gray;
+  }
+*/
+  		span.fancytree-node.fancytree-drop-accept 
+  		{
+    		outline: 1px dotted green;
+  		}
+  		
+  		span.fancytree-node.fancytree-drop-reject 
+  		{
+    		outline: 1px dotted red;
+		}
+		
 		</style>
   </head>
   <body>
@@ -245,6 +284,37 @@
 								     <input name="viewerGroup" type="radio" id="esri3dViewer" value="esri3d" v-model="viewer.type">
 								     <label for="esri3dViewer">ESRI ArcGIS 3D</label>
 								  </p>
+								</div>
+							</div>
+							<div class="row" style="margin-top: 20px;">
+								<div class="col s12">
+									<p>What kind of mode will the viewer use?</p>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col s12">
+								  <p>
+								     <input name="viewerModeGroup" type="radio" id="autoMode" value="auto" v-model="viewer.device">
+								     <label for="autoMode">Auto-Detect</label>
+								  </p>
+								  <p>
+								     <input name="viewerModeGroup" type="radio" id="desktopMode" value="desktop" v-model="viewer.device" />
+								     <label for="desktopMode">Desktop</label>
+								  </p>
+	    						  <p>
+								     <input name="viewerModeGroup" type="radio" id="mobileMode" value="mobile" v-model="viewer.device">
+								     <label for="mobileMode">Mobile</label>
+								  </p>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col s6 input-field">
+									<input id="createdDateField" type="text" disabled="true" v-model="createdDate">
+	          						<label for="createdDateField">Created Date</label>
+								</div>
+								<div class="col s6 input-field">
+									<input id="updatedDateField" type="text" disabled="true" v-model="modifiedDate">
+	          						<label for="updatedDateField">Updated Date</label>
 								</div>
 							</div>
 						</form>
@@ -762,6 +832,7 @@
 						      			</div>
 						      			<div class="row" style="padding: 10px;">
 						      				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="editSelectedLayer();" style="width: 170px;"><em style="position: absolute; top: 14px; left: 14px;" class="material-icons left">mode_edit</em>Edit</a>
+						      				<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="editLayerDisplayOrder();" style="width: 170px;"><em style="position: absolute; top: 14px; left: 14px;" class="material-icons left">reorder</em>Display Order</a>
 						      			</div>
 									</div>
 								</div>
@@ -855,8 +926,12 @@
 										<label class="black-text" for="dropdown">Query Dropdown Panel</label>
 									</p>
 									<p>
-										<input type="checkbox" id="menu" onclick="setToolActivation('menu')"/>
+										<input type="checkbox" id="menu" onclick="setToolActivation('list-menu')"/>
 										<label class="black-text" for="menu">Hamburger Menu</label>
+									</p>
+									<p>
+										<input type="checkbox" id="shortcutMenu" onclick="setToolActivation('shortcut-menu')"/>
+										<label class="black-text" for=shortcutMenu>Shortcut Menu</label>
 									</p>
 								</div>
 								<div class="col s9">
@@ -867,6 +942,29 @@
 										      <div class="collapsible-body">
 										      	<div class="row" >
 										      		<div id="about-content" style="height: 75%"></div>
+										      	</div>
+										      	<div class="row" >
+										      		<input type="checkbox" id="aboutActiveTool" onclick="toggleActiveAboutTool()"/>
+													<label class="black-text" for="aboutActiveTool">Active On Startup</label>
+										      	</div>
+										      	<div class="row input-field" >
+										      		<input id="aboutPanelHeader" type="text">
+					          						<label for="aboutPanelHeader">Title</label>
+										      	</div>
+										      	<div class="row" >
+										      		<p>Location</p>
+										      		<p>
+														<input name="aboutPositionGroup" type="radio" onclick="setToolPosition('about', 'list-menu')" id="aboutMenu" value="list-menu" />
+														<label class="black-text" for="aboutMenu">Menu</label>
+													</p>
+													<p>
+														<input name="aboutPositionGroup" type="radio" onclick="setTooltPositioon('about', 'toolbar')" id="aboutToolbar" value="toolbar" />
+														<label class="black-text" for="aboutToolbar">Toolbar</label>
+													</p>
+													<p>
+														<input name="aboutPositionGroup" type="radio" onclick="setToolPosition('about', 'shortcut-menu')" id="aboutShortcut" value="shortcut-menu" />
+														<label class="black-text" for="aboutShortcut">Shortcut Menu</label>
+													</p>
 										      	</div>
 											  </div>
 										    </li>
@@ -953,6 +1051,29 @@
 										    <li id="basemapPanelOptions" style="display: none;">
 										      <div class="collapsible-header"><em class="material-icons">map</em>Base Maps Panel Options</div>
 										      <div class="collapsible-body">
+										      		<div class="row" >
+											      		<input type="checkbox" id="basemapsActiveTool" onclick="toggleActiveBasemapsTool()"/>
+														<label class="black-text" for="basemapsActiveTool">Active On Startup</label>
+											      	</div>
+											      	<div class="row input-field" >
+											      		<input id="basemapPanelHeader" type="text">
+						          						<label for="basemapPanelHeader">Title</label>
+											      	</div>
+											      	<div class="row" >
+											      		<p>Location</p>
+											      		<p>
+															<input name="basemapPositionGroup" type="radio" onclick="setToolPosition('baseMaps', 'list-menu')" id="basemapMenu" value="list-menu" />
+															<label class="black-text" for="basemapMenu">Menu</label>
+														</p>
+														<p>
+															<input name="basemapPositionGroup" type="radio" onclick="setToolPosition('baseMaps', 'toolbar')" id="basemapToolbar" value="toolbar" />
+															<label class="black-text" for="basemapToolbar">Toolbar</label>
+														</p>
+														<p>
+															<input name="basemapPositionGroup" type="radio" onclick="setToolPosition('baseMaps', 'shortcut-menu')" id="basemapShortcut" value="shortcut-menu" />
+															<label class="black-text" for="basemapShortcut">Shortcut Menu</label>
+														</p>
+											      	</div>
 										      		<p>
 										      			Select which basemaps to make available in the Basemap selector
 										      		</p>
@@ -993,6 +1114,10 @@
 										    <li id="identifyOptions" style="display: none;">
 										      <div class="collapsible-header"><em class="material-icons">search</em>Identify Options</div>
 										      <div class="collapsible-body">
+										      	<div class="row input-field" >
+										      		<input id="identifyPanelHeader" type="text">
+					          						<label for="identifyPanelHeader">Title</label>
+										      	</div>
 												<div class="row" >
 													<div class="col s4 input-field">
 														<input id="identifyStyleOpacity" type="text">
@@ -1016,33 +1141,54 @@
 														<input id="identifyStyleStrokeStyle" type="text">
 						          						<label for="identifyStyleStrokeStyle">Stroke Style</label>
 													</div>
-												</div>
-												<div class="row" >
-								    				<div class="col s4">
-														<label for="identifyStyleStrokeColor" class="black-text">Stroke Color</label>
-														<input id="identifyStyleStrokeColor" type="color">
-													</div>
-													<div class="col s4">
-								    					<label for="identifyStyleFillColor" class="black-text">Fill Color</label>
-														<input id="identifyStyleFillColor" type="color">
-													</div>
-								      			</div>
-								      			<div class="row" >
-								      				<div class="col s4 input-field">
-								      					<input type="checkbox" id="identifyPanelVisible" />
-														<label class="black-text" for="identifyPanelVisible">Show in Panel</label>
-								      				</div>
-								      				<div class="col s4 input-field">
+													<div class="col s4 input-field">
 														<input id="identifyClickRadius" type="text">
 						          						<label for="identifyClickRadius">Click Radius</label>
 													</div>
+												</div>
+												<div class="row" >
+								    				<div class="col s3">
+														<label for="identifyStyleStrokeColor" class="black-text">Stroke Color</label>
+														<input id="identifyStyleStrokeColor" type="color">
+													</div>
+													<div class="col s3">
+								    					<label for="identifyStyleFillColor" class="black-text">Fill Color</label>
+														<input id="identifyStyleFillColor" type="color">
+													</div>
+								      				<div class="col s3">
+								      					<input type="checkbox" id="showConvexHulls" onclick="toggleConvexHullsTool()" />
+														<label class="black-text" for="showConvexHulls">Show Cluster Hulls</label>
+								      				</div>
+								      				<div class="col s3">
+								      					<input type="checkbox" id="identifyPanelVisible" />
+														<label class="black-text" for="identifyPanelVisible">Show in Panel</label>
+								      				</div>
 								      			</div>
+								      			<div class="row" >
+										      		<p>Location</p>
+										      		<p>
+														<input name="identifyPositionGroup" type="radio" onclick="setToolPosition('identify', 'list-menu')" id="identifyMenu" value="list-menu" />
+														<label class="black-text" for="identifyMenu">Menu</label>
+													</p>
+													<p>
+														<input name="identifyPositionGroup" type="radio" onclick="setToolPosition('identify', 'toolbar')" id="identifyToolbar" value="toolbar" />
+														<label class="black-text" for="identifyToolbar">Toolbar</label>
+													</p>
+													<p>
+														<input name="identifyPositionGroup" type="radio" onclick="setToolPosition('identify', 'shortcut-menu')" id="identifyShortcut" value="shortcut-menu" />
+														<label class="black-text" for="identifyShortcut">Shortcut Menu</label>
+													</p>
+										      	</div>
 											  </div>
 										    </li>
 										    <li id="selectionOptions" style="display: none;">
 										      <div class="collapsible-header"><em class="material-icons">select_all</em>Select Options</div>
 										      <div class="collapsible-body">
 												<div class="row" >
+													<div class="row input-field" >
+											      		<input id="selectPanelHeader" type="text">
+						          						<label for="selectPanelHeader">Title</label>
+											      	</div>
 													<div class="col s4 input-field">
 														<input id="selectStyleOpacity" type="text">
 						          						<label for="selectStyleOpacity">Opacity</label>
@@ -1077,6 +1223,102 @@
 													</div>
 													<div style="height: 100px;"></div>
 								      			</div>
+								      			<div class="row" >
+										      		<p>Location</p>
+										      		<p>
+														<input name="selectPositionGroup" type="radio" onclick="setToolPosition('select', 'list-menu')" id="selectMenu" value="list-menu" />
+														<label class="black-text" for="selectMenu">Menu</label>
+													</p>
+													<p>
+														<input name="selectPositionGroup" type="radio" onclick="setToolPosition('select', 'toolbar')" id="selectToolbar" value="toolbar" />
+														<label class="black-text" for="selectToolbar">Toolbar</label>
+													</p>
+													<p>
+														<input name="selectPositionGroup" type="radio" onclick="setToolPosition('select', 'shortcut-menu')" id="selectShortcut" value="shortcut-menu" />
+														<label class="black-text" for="selectShortcut">Shortcut Menu</label>
+													</p>
+										      	</div>
+											  </div>
+										    </li>
+										    <!-- New Panels for header/Active toggles -->
+										    <li id="directionsOptions" style="display: none;">
+										      <div class="collapsible-header"><em class="material-icons">directions_car</em>Directions Tool</div>
+										      <div class="collapsible-body">
+										      		<div class="row" >
+											      		<input type="checkbox" id="directionsActiveTool" onclick="toggleActiveDirectionsTool()"/>
+														<label class="black-text" for="directionsActiveTool">Active On Startup</label>
+											      	</div>
+											      	<div class="row input-field" >
+											      		<input id="directionsPanelHeader" type="text">
+						          						<label for="directionsPanelHeader">Title</label>
+											      	</div>
+											      	<div class="row input-field" >
+											      		<input id="directionsToolKey" type="text">
+						          						<label for="directionsToolKey">API Key</label>
+											      	</div>
+											      	<div class="row" >
+											      		<p>Location</p>
+											      		<p>
+															<input name="directionsPositionGroup" type="radio" onclick="setToolPosition('directions', 'list-menu')" id="directionsMenu" value="list-menu" />
+															<label class="black-text" for="directionsMenu">Menu</label>
+														</p>
+														<p>
+															<input name="directionsPositionGroup" type="radio" onclick="setToolPosition('directions', 'toolbar')" id="directionsToolbar" value="toolbar" />
+															<label class="black-text" for="directionsToolbar">Toolbar</label>
+														</p>
+														<p>
+															<input name="directionsPositionGroup" type="radio" onclick="setToolPosition('directions', 'shortcut-menu')" id="directionsShortcut" value="shortcut-menu" />
+															<label class="black-text" for="directionsShortcut">Shortcut Menu</label>
+														</p>
+											      	</div>
+											  </div>
+										    </li>
+										    <li id="layersOptions" style="display: none;">
+										      <div class="collapsible-header"><em class="material-icons">layers</em>Layers Panel</div>
+										      <div class="collapsible-body">
+										      		<div class="row" >
+											      		<input type="checkbox" id="layersActiveTool" onclick="toggleActiveLayersTool()"/>
+														<label class="black-text" for="layersActiveTool">Active On Startup</label>
+											      	</div>
+											      	<div class="row input-field" >
+											      		<input id="layersPanelHeader" type="text">
+						          						<label for="layersPanelHeader">Title</label>
+											      	</div>
+											      	<div class="row" >
+											      		<p>Location</p>
+											      		<p>
+															<input name="layersPositionGroup" type="radio" onclick="setToolPosition('layers', 'list-menu')" id="layersMenu" value="list-menu" />
+															<label class="black-text" for="layersMenu">Menu</label>
+														</p>
+														<p>
+															<input name="layersPositionGroup" type="radio" onclick="setToolPosition('layers', 'toolbar')" id="layersToolbar" value="toolbar" />
+															<label class="black-text" for="layersToolbar">Toolbar</label>
+														</p>
+														<p>
+															<input name="layersPositionGroup" type="radio" onclick="setToolPosition('layers', 'shortcut-menu')" id="layersShortcut" value="shortcut-menu" />
+															<label class="black-text" for="layersShortcut">Shortcut Menu</label>
+														</p>
+											      	</div>
+											  </div>
+										    </li>
+										    <li id="measurementOptions" style="display: none;">
+										      <div class="collapsible-header"><em class="material-icons">straighten</em>Measure Tool</div>
+										      <div class="collapsible-body">
+											      	<div class="row" >
+											      		<p>Location</p>
+											      		<p>
+															<input name="measurePositionGroup" type="radio" onclick="setToolPosition('measure', 'list-menu')" id="measurementMenu" value="list-menu" />
+															<label class="black-text" for="measurementMenu">Menu</label>
+														</p>
+														<p>
+															<input name="measurePositionGroup" type="radio" onclick="setToolPosition('measure', 'toolbar')" id="measurementToolbar" value="toolbar" />
+															<label class="black-text" for="measurementToolbar">Toolbar</label>
+														</p>
+														<p>
+															<input name="measurePositionGroup" type="radio" onclick="setToolPosition('measure', 'shortcut-menu')" id="measurementShortcut" value="shortcut-menu" />
+															<label class="black-text" for="measurementShortcut">Shortcut Menu</label>
+														</p>
+											      	</div>
 											  </div>
 										    </li>
 										  </ul>
@@ -1163,6 +1405,7 @@
 					</div>
 				</div>
 				<div class="row">
+					<!-- Options for dropdown, toolbar, menu, shortcut menu -->
 					<div class="col s5">
 						<input type="checkbox" id="queryOnDropdown" />
 						<label class="black-text" for="queryOnDropdown">Add to Dropdown (if tool is available)</label>
@@ -1263,6 +1506,28 @@
       </div>
       <div class="modal-footer">
         <a id="kmlUploadButton" style="display: none;" href="#!" class="modal-action modal-close waves-effect waves-red btn-flat">Close</a>
+      </div>
+    </div>
+    <div id="layerOrderModal" class="modal modal-fixed-footer">
+      <div class="modal-content">
+		<div class="row">
+			<h5>Layer Display Order</h5>
+		</div>
+		<div class="row">
+			<p>From this dialog you can set the layer display order, or create folders and groups for layers.</p>
+			<p>Folders will collect all child layers together, but allow you to interact with each layer independently. Groups will merge your layers together, and this grouping will behave a single layer, with no options for the individual children.</p>
+		</div>
+		<div id="layerDisplayOrderContent" class="row" style="background: white;">
+			<div id="layer-display-tree" class="display-order-container" style="height: calc(100vh - 677px);"></div>
+		</div>
+		<div class="row">
+			<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="addNewDisplayFolder();" style="width: 170px;"><em style="position: absolute; top: 14px; left: 14px;" class="material-icons left">create_new_folder</em>Add Folder</a>
+			<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="addNewDisplayGroup();" style="width: 170px;"><em style="position: absolute; top: 14px; left: 14px;" class="material-icons left">group_work</em>Add Group</a>
+			<a class="waves-effect waves-light btn-large nrpp-blue-dark" onclick="removeSelectedDisplayLayer();" style="width: 170px;"><em style="position: absolute; top: 14px; left: 14px;" class="material-icons left">delete_forever</em>Remove Selected</a>
+		</div>
+      </div>
+      <div class="modal-footer">
+      	<a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat">Close</a>
       </div>
     </div>
 	<script type="text/javascript">
