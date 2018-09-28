@@ -926,8 +926,12 @@
 										<label class="black-text" for="dropdown">Query Dropdown Panel</label>
 									</p>
 									<p>
-										<input type="checkbox" id="menu" onclick="setToolActivation('menu')"/>
+										<input type="checkbox" id="menu" onclick="setToolActivation('list-menu')"/>
 										<label class="black-text" for="menu">Hamburger Menu</label>
+									</p>
+									<p>
+										<input type="checkbox" id="shortcutMenu" onclick="setToolActivation('shortcut-menu')"/>
+										<label class="black-text" for=shortcutMenu>Shortcut Menu</label>
 									</p>
 								</div>
 								<div class="col s9">
@@ -937,6 +941,9 @@
 										      <div class="collapsible-header"><em class="material-icons">home</em>About Panel Options</div>
 										      <div class="collapsible-body">
 										      	<div class="row" >
+										      		<div id="about-content" style="height: 75%"></div>
+										      	</div>
+										      	<div class="row" >
 										      		<input type="checkbox" id="aboutActiveTool" onclick="toggleActiveAboutTool()"/>
 													<label class="black-text" for="aboutActiveTool">Active On Startup</label>
 										      	</div>
@@ -945,7 +952,19 @@
 					          						<label for="aboutPanelHeader">Title</label>
 										      	</div>
 										      	<div class="row" >
-										      		<div id="about-content" style="height: 75%"></div>
+										      		<p>Location</p>
+										      		<p>
+														<input name="aboutPositionGroup" type="radio" onclick="setToolPositioon('about', 'list-menu')" id="aboutMenu" value="list-menu" />
+														<label class="black-text" for="aboutMenu">Menu</label>
+													</p>
+													<p>
+														<input name="aboutPositionGroup" type="radio" onclick="setTooltPositioon('about', 'toolbar')" id="aboutToolbar" value="toolbar" />
+														<label class="black-text" for="aboutToolbar">Toolbar</label>
+													</p>
+													<p>
+														<input name="aboutPositionGroup" type="radio" onclick="setToolPositioon('about', 'shortcut-menu')" id="aboutShortcut" value="shortcut-menu" />
+														<label class="black-text" for="aboutShortcut">Shortcut Menu</label>
+													</p>
 										      	</div>
 											  </div>
 										    </li>
@@ -1040,6 +1059,21 @@
 											      		<input id="basemapPanelHeader" type="text">
 						          						<label for="basemapPanelHeader">Title</label>
 											      	</div>
+											      	<div class="row" >
+											      		<p>Location</p>
+											      		<p>
+															<input name="basemapPositionGroup" type="radio" onclick="setToolPositioon('baseMap', 'list-menu')" id="basemapMenu" value="list-menu" />
+															<label class="black-text" for="basemapMenu">Menu</label>
+														</p>
+														<p>
+															<input name="basemapPositionGroup" type="radio" onclick="setToolPositioon('baseMap', 'toolbar')" id="basemapToolbar" value="toolbar" />
+															<label class="black-text" for="basemapToolbar">Toolbar</label>
+														</p>
+														<p>
+															<input name="basemapPositionGroup" type="radio" onclick="setToolPositioon('baseMap', 'shortcut-menu')" id="basemapShortcut" value="shortcut-menu" />
+															<label class="black-text" for="basemapShortcut">Shortcut Menu</label>
+														</p>
+											      	</div>
 										      		<p>
 										      			Select which basemaps to make available in the Basemap selector
 										      		</p>
@@ -1130,6 +1164,21 @@
 														<label class="black-text" for="identifyPanelVisible">Show in Panel</label>
 								      				</div>
 								      			</div>
+								      			<div class="row" >
+										      		<p>Location</p>
+										      		<p>
+														<input name="identifyPositionGroup" type="radio" onclick="setToolPositioon('identify', 'list-menu')" id="identifyMenu" value="list-menu" />
+														<label class="black-text" for="identifyMenu">Menu</label>
+													</p>
+													<p>
+														<input name="identifyPositionGroup" type="radio" onclick="setToolPositioon('identify', 'toolbar')" id="identifyToolbar" value="toolbar" />
+														<label class="black-text" for="identifyToolbar">Toolbar</label>
+													</p>
+													<p>
+														<input name="identifyPositionGroup" type="radio" onclick="setToolPositioon('identify', 'shortcut-menu')" id="identifyShortcut" value="shortcut-menu" />
+														<label class="black-text" for="identifyShortcut">Shortcut Menu</label>
+													</p>
+										      	</div>
 											  </div>
 										    </li>
 										    <li id="selectionOptions" style="display: none;">
@@ -1174,6 +1223,21 @@
 													</div>
 													<div style="height: 100px;"></div>
 								      			</div>
+								      			<div class="row" >
+										      		<p>Location</p>
+										      		<p>
+														<input name="selectPositionGroup" type="radio" onclick="setToolPositioon('select', 'list-menu')" id="selectMenu" value="list-menu" />
+														<label class="black-text" for="selectMenu">Menu</label>
+													</p>
+													<p>
+														<input name="selectPositionGroup" type="radio" onclick="setToolPositioon('select', 'toolbar')" id="selectToolbar" value="toolbar" />
+														<label class="black-text" for="selectToolbar">Toolbar</label>
+													</p>
+													<p>
+														<input name="selectPositionGroup" type="radio" onclick="setToolPositioon('select', 'shortcut-menu')" id="selectShortcut" value="shortcut-menu" />
+														<label class="black-text" for="selectShortcut">Shortcut Menu</label>
+													</p>
+										      	</div>
 											  </div>
 										    </li>
 										    <!-- New Panels for header/Active toggles -->
@@ -1192,6 +1256,21 @@
 											      		<input id="directionsToolKey" type="text">
 						          						<label for="directionsToolKey">API Key</label>
 											      	</div>
+											      	<div class="row" >
+											      		<p>Location</p>
+											      		<p>
+															<input name="directionsPositionGroup" type="radio" onclick="setToolPositioon('directions', 'list-menu')" id="directionsMenu" value="list-menu" />
+															<label class="black-text" for="directionsMenu">Menu</label>
+														</p>
+														<p>
+															<input name="directionsPositionGroup" type="radio" onclick="setToolPositioon('directions', 'toolbar')" id="directionsToolbar" value="toolbar" />
+															<label class="black-text" for="directionsToolbar">Toolbar</label>
+														</p>
+														<p>
+															<input name="directionsPositionGroup" type="radio" onclick="setToolPositioon('directions', 'shortcut-menu')" id="directionsShortcut" value="shortcut-menu" />
+															<label class="black-text" for="directionsShortcut">Shortcut Menu</label>
+														</p>
+											      	</div>
 											  </div>
 										    </li>
 										    <li id="layersOptions" style="display: none;">
@@ -1204,6 +1283,41 @@
 											      	<div class="row input-field" >
 											      		<input id="layersPanelHeader" type="text">
 						          						<label for="layersPanelHeader">Title</label>
+											      	</div>
+											      	<div class="row" >
+											      		<p>Location</p>
+											      		<p>
+															<input name="layersPositionGroup" type="radio" onclick="setToolPositioon('layers', 'list-menu')" id="layersMenu" value="list-menu" />
+															<label class="black-text" for="layersMenu">Menu</label>
+														</p>
+														<p>
+															<input name="layersPositionGroup" type="radio" onclick="setToolPositioon('layers', 'toolbar')" id="layersToolbar" value="toolbar" />
+															<label class="black-text" for="layersToolbar">Toolbar</label>
+														</p>
+														<p>
+															<input name="layersPositionGroup" type="radio" onclick="setToolPositioon('layers', 'shortcut-menu')" id="layersShortcut" value="shortcut-menu" />
+															<label class="black-text" for="layersShortcut">Shortcut Menu</label>
+														</p>
+											      	</div>
+											  </div>
+										    </li>
+										    <li id="measurementOptions" style="display: none;">
+										      <div class="collapsible-header"><em class="material-icons">straighten</em>Measure Tool</div>
+										      <div class="collapsible-body">
+											      	<div class="row" >
+											      		<p>Location</p>
+											      		<p>
+															<input name="measurePositionGroup" type="radio" onclick="setToolPositioon('measure', 'list-menu')" id="measurementMenu" value="list-menu" />
+															<label class="black-text" for="measurementMenu">Menu</label>
+														</p>
+														<p>
+															<input name="measurePositionGroup" type="radio" onclick="setToolPositioon('measure', 'toolbar')" id="measurementToolbar" value="toolbar" />
+															<label class="black-text" for="measurementToolbar">Toolbar</label>
+														</p>
+														<p>
+															<input name="measurePositionGroup" type="radio" onclick="setToolPositioon('measure', 'shortcut-menu')" id="measurementShortcut" value="shortcut-menu" />
+															<label class="black-text" for="measurementShortcut">Shortcut Menu</label>
+														</p>
 											      	</div>
 											  </div>
 										    </li>
@@ -1291,6 +1405,7 @@
 					</div>
 				</div>
 				<div class="row">
+					<!-- Options for dropdown, toolbar, menu, shortcut menu -->
 					<div class="col s5">
 						<input type="checkbox" id="queryOnDropdown" />
 						<label class="black-text" for="queryOnDropdown">Add to Dropdown (if tool is available)</label>

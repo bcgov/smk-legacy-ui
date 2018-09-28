@@ -17,6 +17,7 @@ public class MapViewer implements Serializable
 	private ClusterOption clusterOption;
 	private String device;
 	private String themes;
+	private int deviceAutoBreakpoint;
 	
 	public MapViewer() 
 	{
@@ -83,6 +84,16 @@ public class MapViewer implements Serializable
     public void setThemes(String themes)
     {
         this.themes = themes;
+    }
+    
+    public int getDeviceAutoBreakpoint()
+    {
+        return deviceAutoBreakpoint;
+    }
+
+    public void setDeviceAutoBreakpoint(int deviceAutoBreakpoint)
+    {
+        this.deviceAutoBreakpoint = deviceAutoBreakpoint;
     }
 
     public String getBaseMap() { return baseMap; }

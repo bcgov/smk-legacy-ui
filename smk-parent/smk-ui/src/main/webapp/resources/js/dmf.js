@@ -45,14 +45,41 @@ var data = {
 	        title: ""
 	    },
 	    viewer: {
-	        type: "leaflet",
-	        location:{ extent:[]},
-	        baseMap: "Imagery"
+	    	type: "leaflet",
+            device: "auto",
+            deviceAutoBreakpoint: 500,
+            themes: [],
+            location: {
+                extent: [ -139.1782, 47.6039, -110.3533, 60.5939 ],
+            },
+            baseMap: 'Topographic',
+            clusterOption: {
+                showCoverageOnHover: false
+            }
 	    },
 	    tools: [
-			{ "type": "menu" },
-			{ "type": "dropdown" }
-	    ],
+                { type: 'about',        enabled: false },
+                { type: 'baseMaps',     enabled: false },
+                { type: 'coordinate',   enabled: false },
+                { type: 'directions',   enabled: false },
+                // { type: 'dropdown',     enabled: false }, -- so it won't be enabled by show-tools=all, no tools use it by default
+                { type: 'identify',     enabled: false },
+                { type: 'layers',       enabled: false },
+                { type: 'location',     enabled: false },
+                { type: 'markup',       enabled: false },
+                { type: 'measure',      enabled: false },
+                { type: 'menu',         enabled: false },
+                { type: 'list-menu',         enabled: false },
+                { type: 'minimap',      enabled: true },
+                { type: 'pan',          enabled: true },
+                // { type: 'query',        enabled: false }, -- so it won't be enabled by show-tools=all, as it needs an instance
+                { type: 'scale',        enabled: true },
+                { type: 'search',       enabled: true },
+                { type: 'select',       enabled: false },
+                { type: 'toolbar',      enabled: true },
+                // { type: 'version',      enabled: false }, -- so it won't be enabled by show-tools=all
+                { type: 'zoom',         enabled: true }
+            ],
 	    layers: [],
 	    _id: null,
 	    _rev: null
@@ -542,6 +569,8 @@ function setToolActivation(toolType)
 	    		$("#directionsOptions").show();
     		}
 	    	else if(tool.type == "directions" && tool.enabled == false) $("#directionsOptions").hide();
+	    	else if(tool.type == "measure" && tool.enabled == false) $("#measurementOptions").hide();
+	    	else if(tool.type == "measure" && tool.enabled == true) $("#measurementOptions").show();
 
 			//if(tool.enabled == true) Materialize.toast('Activated ' + tool.type + " tool!", 4000);
 			//else Materialize.toast('Deactivated ' + tool.type + " tool!", 4000);
@@ -663,6 +692,17 @@ function toggleZoomOption(zoomOption)
 			else if(zoomOption == "box") tool.box = !tool.box;
 			else if(zoomOption == "doubleClick") tool.doubleClick = !tool.doubleClick;
 			else if(zoomOption == "mouseWheel") tool.mouseWheel = !tool.mouseWheel;
+		}
+   	});
+}
+
+function setToolPositioon(toolName, position)
+{
+	data.tools.forEach(function(tool)
+   	{
+		if(tool.type == toolName)
+		{
+			tool.position = position;
 		}
    	});
 }
@@ -795,6 +835,9 @@ function setupMapConfigToolsUI()
     		if(tool.enabled)
 			{
     			$("#layerOptions").show();
+    			$("#layersMenu").prop('checked', tool.position == "list-menu");
+    			$("#layersToolbar").prop('checked', tool.baseMap == "toolbar");
+    			$("#layersShortcut").prop('checked', tool.baseMap == "shortcut-menu");
 			}
 		}
     	else if(tool.type == "pan") $("#panning").prop('checked', tool.enabled);
@@ -810,7 +853,19 @@ function setupMapConfigToolsUI()
 				$("#zoomMouseWheel").prop('checked', tool.mouseWheel);
 			}
 		}
-    	else if(tool.type == "measure") $("#measurement").prop('checked', tool.enabled);
+    	else if(tool.type == "measure") 
+    	{
+    		$("#measurement").prop('checked', tool.enabled);
+    		
+    		$("#measurementMenu").prop('checked', tool.position == "list-menu");
+			$("#measurementToolbar").prop('checked', tool.baseMap == "toolbar");
+			$("#measurementShortcut").prop('checked', tool.baseMap == "shortcut-menu");
+			
+			if(tool.enabled)
+			{
+    			$("#measurementOptions").show();
+			}
+    	}
     	else if(tool.type == "markup") $("#markup").prop('checked', tool.enabled);
     	else if(tool.type == "scale")
 		{
@@ -841,8 +896,12 @@ function setupMapConfigToolsUI()
     	else if(tool.type == "about")
 		{
     		$("#aboutPanelHeader").val(tool.title);
-    		
     		$("#aboutPanel").prop('checked', tool.enabled);
+    		
+    		$("#aboutMenu").prop('checked', tool.position == "list-menu");
+			$("#aboutToolbar").prop('checked', tool.baseMap == "toolbar");
+			$("#aboutShortcut").prop('checked', tool.baseMap == "shortcut-menu");
+    		
     		if(tool.enabled)
 			{
     			$("#aboutPanelOptions").show();
@@ -853,7 +912,11 @@ function setupMapConfigToolsUI()
 		{
     		$("#basemapPanelHeader").val(tool.title);
     		
-    		$("#basemapPanel").prop('checked', tool.enabled);
+    		$("#basemapMenu").prop('checked', tool.position == "list-menu");
+			$("#basemapToolbar").prop('checked', tool.baseMap == "toolbar");
+			$("#basemapShortcut").prop('checked', tool.baseMap == "shortcut-menu");
+    		
+			$("#basemapPanel").prop('checked', tool.enabled);
     		if(tool.enabled)
 			{
     			$("#basemapPanelOptions").show();
@@ -875,6 +938,10 @@ function setupMapConfigToolsUI()
 		{
     		$("#selectPanelHeader").val(tool.title);
     		
+    		$("#selectMenu").prop('checked', tool.position == "list-menu");
+			$("#selectToolbar").prop('checked', tool.baseMap == "toolbar");
+			$("#selectShortcut").prop('checked', tool.baseMap == "shortcut-menu");
+    		
     		$("#selectionPanel").prop('checked', tool.enabled);
     		if(tool.enabled)
 			{
@@ -892,6 +959,10 @@ function setupMapConfigToolsUI()
     	else if(tool.type == "identify") 
 		{
     		$("#showConvexHulls").prop('checked', data.viewer.clusterOption != null && data.viewer.clusterOption.showCoverageOnHover);
+    		
+    		$("#identifyMenu").prop('checked', tool.position == "list-menu");
+			$("#identifyToolbar").prop('checked', tool.baseMap == "toolbar");
+			$("#identifyShortcut").prop('checked', tool.baseMap == "shortcut-menu");
     		
     		$("#identifyPanelHeader").val(tool.title);
     		$("#identifyPanel").prop('checked', tool.enabled);
@@ -914,14 +985,21 @@ function setupMapConfigToolsUI()
     	else if(tool.type == "location") $("#location").prop('checked', tool.enabled);
     	else if(tool.type == "directions")
 		{
+    		$("#directionsMenu").prop('checked', tool.position == "list-menu");
+			$("#directionsToolbar").prop('checked', tool.baseMap == "toolbar");
+			$("#directionsShortcut").prop('checked', tool.baseMap == "shortcut-menu");
+			
     		$("#directions").prop('checked', tool.enabled);
     		$("#directionsPanelHeader").val(tool.title);
+    		if(tool.enabled)
     		{
     			$("#directionsOptions").show();
 			}
 		}
     	else if(tool.type == "dropdown") $("#dropdown").prop('checked', tool.enabled);
-    	else if(tool.type == "menu") $("#menu").prop('checked', tool.enabled);
+    	//else if(tool.type == "menu") $("#menu").prop('checked', tool.enabled); // menu removed as default
+    	else if(tool.type == "list-menu") $("#menu").prop('checked', tool.enabled);
+    	else if(tool.type == "shortcut-menu") $("#shortcutMenu").prop('checked', tool.enabled);
 	});
 
     // clear out any layers
@@ -996,41 +1074,43 @@ function finishToolEdits()
 }
 
 function addNewMapConfig()
-{
+{   
 	data.lmfId = "";
 	data.name = "";
 	data.lmfRevision = 1;
-	data.createdBy = "";
+	data.version = "";
+	data.createdBy = "User";
 	data.published = false;
 	data.surround = { type: "default", title: "" };
     data.viewer = {
-    	    "type": "leaflet",
-    	    "location": {
-    	      "extent": [
-    	        -142.33886718750003,
-    	        61.77312286453146,
-    	        -107.22656250000001,
-    	        45.920587344733654
-    	      ],
-    	      "center": [
-    	        -139.1782,
-    	        47.6039
-    	      ],
-    	      "zoom": 5
-    	    },
-    	    "baseMap": "Streets"
+    		"type": "leaflet",
+            "device": "auto",
+            "deviceAutoBreakpoint": 500,
+            "themes": [],
+            "location": {
+                "extent": [ -139.1782, 47.6039, -110.3533, 60.5939 ],
+            },
+            "baseMap": "Topographic",
+            "clusterOption": {
+                "showCoverageOnHover": false
+            }
     	  };
     data.layers = [];
     data._id = null;
     data._rev = null;
     data.tools = [
+  			    {
+  			      "type": "about",
+  			      "enabled": false,
+  			      "content": ""
+  			    },
 		        {
 			      "type": "coordinate",
-			      "enabled": true
+			      "enabled": false
 			    },
 			    {
 			      "type": "attribution",
-			      "enabled": true
+			      "enabled": false
 			    },
 			    {
 			      "type": "layers",
@@ -1050,11 +1130,11 @@ function addNewMapConfig()
 			    },
 			    {
 			      "type": "measure",
-			      "enabled": true
+			      "enabled": false
 			    },
 			    {
 			      "type": "markup",
-			      "enabled": true
+			      "enabled": false
 			    },
 			    {
 			      "type": "scale",
@@ -1072,13 +1152,8 @@ function addNewMapConfig()
 			      "enabled": false
 			    },
 			    {
-			      "type": "about",
-			      "enabled": true,
-			      "content": ""
-			    },
-			    {
 			      "type": "location",
-				  "enabled": true,
+				  "enabled": false,
 			    },
 			    {
 			      "type": "baseMaps",
@@ -1095,7 +1170,7 @@ function addNewMapConfig()
 			    },
 			    {
 			        "type": "select",
-			        "enabled": true,
+			        "enabled": false,
 			        "title": "Selection Panel",
 			        "style": {
 			          "strokeWidth": 1,
@@ -1117,7 +1192,7 @@ function addNewMapConfig()
 			      },
 			    {
 			        "type": "identify",
-			        "enabled": true,
+			        "enabled": false,
 			        "title": "Identify Panel",
 			        "style": {
 			          "strokeWidth": 1,
@@ -1140,6 +1215,18 @@ function addNewMapConfig()
 			    {
 			      "type": "search",
 			      "enabled": true
+			    },
+			    {
+			      "type": "list-menu",
+			      "enabled": true
+			    },
+			    {
+			      "type": "toolbar",
+			      "enabled": true
+			    },
+			    {
+			      "type": "shortcut-menu",
+			      "enabled": false
 			    }
 		    ];
 
@@ -1667,11 +1754,9 @@ function finishLayerEdits(save)
 					if(displayLayer.id == selectedLayerNode.data.id)
 					{
 						displayLayer.title = selectedLayerNode.data.title;
-					
 						break;
 					}
 				}
-				
 				break;
 			}
 		}
@@ -1703,7 +1788,10 @@ function createDisplayLayersFromNodes(node)
 	
 	if(node.data.type == "folder" || node.data.type == "group")
 	{
-		if(node.data.type == "folder") item.isExpanded = node.isExpanded;
+		if(node.data.type == "folder") 
+		{
+			item.isExpanded = false;
+		}
 		
 		item.items = [];
 		for(var child in node.children)
@@ -2334,13 +2422,13 @@ function addNewQuery()
 	for(var i = 0; i < data.tools.length; i++)
 	{
 		var thisTool = data.tools[i];
-		if(thisTool.type == "menu" && menuExists == false) menuExists = true;
+		if(thisTool.type == "list-menu" && menuExists == false) menuExists = true;
 		if(thisTool.type == "dropdown" && dropdownExists == false) dropdownExists = true;
 	}
 	
 	if(!menuExists)
 	{
-		var menuTool = { type: "menu" };
+		var menuTool = { type: "list-menu" };
 		data.tools.push(menuTool);
 	}
 	

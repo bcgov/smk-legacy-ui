@@ -77,6 +77,10 @@ public class MapConfiguration extends CouchDbDocument
 		this.setProject(mapConfiguration.getProject());
 
 		this.setCreatedBy(mapConfiguration.getCreatedBy());
+		this.setCreatedDate(mapConfiguration.getCreatedDate());
+		this.setModifiedBy(mapConfiguration.getModifiedBy());
+        this.setModifiedDate(mapConfiguration.getModifiedDate());
+		
 		this.setPublished(mapConfiguration.isPublished());
 
 		this.setSurround(new MapSurround(mapConfiguration.getSurround()));
