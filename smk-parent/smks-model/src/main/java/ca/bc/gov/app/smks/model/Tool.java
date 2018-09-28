@@ -115,8 +115,8 @@ public class Tool implements Serializable
     protected String instance;
     protected String position;
     
-    public Tool() {
-    	title = ""; 
+    public Tool() 
+    {
     	description = "";
     	type = Type.UNKNOWN.toString();
         enabled = true;

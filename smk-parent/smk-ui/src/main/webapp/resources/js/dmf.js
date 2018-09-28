@@ -50,7 +50,8 @@ var data = {
             deviceAutoBreakpoint: 500,
             themes: [],
             location: {
-                extent: [ -139.1782, 47.6039, -110.3533, 60.5939 ],
+            	center: [-125, 55],
+            	zoom: 5
             },
             baseMap: 'Topographic',
             clusterOption: {
@@ -696,7 +697,7 @@ function toggleZoomOption(zoomOption)
    	});
 }
 
-function setToolPositioon(toolName, position)
+function setToolPosition(toolName, position)
 {
 	data.tools.forEach(function(tool)
    	{
@@ -834,7 +835,7 @@ function setupMapConfigToolsUI()
     		$("#layerPanel").prop('checked', tool.enabled);
     		if(tool.enabled)
 			{
-    			$("#layerOptions").show();
+    			$("#layersOptions").show();
     			$("#layersMenu").prop('checked', tool.position == "list-menu");
     			$("#layersToolbar").prop('checked', tool.baseMap == "toolbar");
     			$("#layersShortcut").prop('checked', tool.baseMap == "shortcut-menu");
@@ -1088,7 +1089,8 @@ function addNewMapConfig()
             "deviceAutoBreakpoint": 500,
             "themes": [],
             "location": {
-                "extent": [ -139.1782, 47.6039, -110.3533, 60.5939 ],
+                "center": [ -125, 55 ],
+                "zoom": 5
             },
             "baseMap": "Topographic",
             "clusterOption": {
@@ -3540,6 +3542,8 @@ $(document).ready(function()
 			if(editMode)
 			{
 				var bounds = basemapViewerMap.getBounds();
+				var center = basemapViewerMap.getBounds().getCenter();
+				var zoomLevel = basemapViewerMap.getZoom();
 
 				if(bounds.getWest() != bounds.getEast() && bounds.getNorth() != bounds.getSouth())
 				{
@@ -3547,6 +3551,12 @@ $(document).ready(function()
 					data.viewer.location.extent[1] = bounds.getNorth();
 					data.viewer.location.extent[2] = bounds.getEast();
 					data.viewer.location.extent[3] = bounds.getSouth();
+					
+					data.viewer.location.center[0] = center.lng;
+					data.viewer.location.center[1] = center.lat;
+					data.viewer.location.zoom = basemapViewerMap.getZoom();
+					
+					// remove extent, if it exists?
 				}
 			}
 		});
