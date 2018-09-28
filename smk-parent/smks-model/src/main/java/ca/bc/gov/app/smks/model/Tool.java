@@ -28,6 +28,7 @@ import ca.bc.gov.app.smks.model.tool.Scale;
 import ca.bc.gov.app.smks.model.tool.Search;
 import ca.bc.gov.app.smks.model.tool.Select;
 import ca.bc.gov.app.smks.model.tool.ShortcutMenu;
+import ca.bc.gov.app.smks.model.tool.Toolbar;
 import ca.bc.gov.app.smks.model.tool.Zoom;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -58,8 +59,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
     @Type( name = "menu",			value = Menu.class ),
     @Type( name = "query",			value = Query.class ),
     @Type( name = "location",       value = Location.class),
-    @Type( name = "list-menu",       value = ListMenu.class),
-    @Type( name = "shortcut-menu",       value = ShortcutMenu.class)
+    @Type( name = "list-menu",      value = ListMenu.class),
+    @Type( name = "shortcut-menu",  value = ShortcutMenu.class),
+    @Type( name = "toolbar",        value = Toolbar.class )
 } )
 @JsonInclude(Include.NON_DEFAULT)
 public class Tool implements Serializable 
@@ -88,7 +90,8 @@ public class Tool implements Serializable
         LOCATION( Location.class ),
         SEARCH( Search.class ),
         LIST_MENU( ListMenu.class ),
-        SHORTCUT_MENU( ShortcutMenu.class );
+        SHORTCUT_MENU( ShortcutMenu.class ),
+        TOOLBAR( Toolbar.class );
 
         private final Class<?> toolClass;
 

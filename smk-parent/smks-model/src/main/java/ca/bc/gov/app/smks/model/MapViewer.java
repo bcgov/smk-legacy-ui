@@ -16,7 +16,7 @@ public class MapViewer implements Serializable
 	private String activeTool;
 	private ClusterOption clusterOption;
 	private String device;
-	private String themes;
+	private String[] themes;
 	private int deviceAutoBreakpoint;
 	
 	public MapViewer() 
@@ -76,12 +76,12 @@ public class MapViewer implements Serializable
         this.device = device;
     }
 
-    public String getThemes()
+    public String[] getThemes()
     {
         return themes;
     }
 
-    public void setThemes(String themes)
+    public void setThemes(String[] themes)
     {
         this.themes = themes;
     }
