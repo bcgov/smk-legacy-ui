@@ -2461,7 +2461,10 @@ function editQuery(id)
 			{
 				if(data.tools[j].type == "query" && data.tools[j].instance == selectedLayerNode.data.id + "--" + selectedQuery.id)
 				{
-					$("#queryOnDropdown").prop('checked', data.tools[j].position == "dropdown" ? true : false);
+					$("#queryMenu").prop('checked', data.tools[j].position == "list-menu" ? true : false);
+					$("#queryToolbar").prop('checked', data.tools[j].position == "toolbar" ? true : false);
+					$("#queryShortcut").prop('checked', data.tools[j].position == "shortcut-menu" ? true : false);
+					
 					$("#queryIcon").val(data.tools[j].icon);
 					break;
 				}
@@ -2670,7 +2673,7 @@ function saveQuery()
 		{
 			type: "query", 
 			instance: selectedLayerNode.data.id + "--" + selectedQuery.id,
-			position: $("#queryOnDropdown").is(":checked") ? "dropdown" : "toolbar", 
+			position: $("#queryShortcut").is(":checked") ? "shortcut-menu" : $("#queryToolbar").is(":checked") ? "toolbar" : "list-menu",
 			icon: $("#queryIcon").val()
 		};
 		
@@ -2682,7 +2685,7 @@ function saveQuery()
 		{
 			if(data.tools[fi].type == "query" && data.tools[fi].instance == selectedLayerNode.data.id + "--" + selectedQuery.id)
 			{
-				data.tools[fi].position = $("#queryOnDropdown").is(":checked") ? "dropdown" : "toolbar";
+				data.tools[fi].position = $("#queryShortcut").is(":checked") ? "shortcut-menu" : $("#queryToolbar").is(":checked") ? "toolbar" : "list-menu";
 				data.tools[fi].icon = $("#queryIcon").val();
 				break;
 			}

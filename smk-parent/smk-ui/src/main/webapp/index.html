@@ -1407,8 +1407,21 @@
 				<div class="row">
 					<!-- Options for dropdown, toolbar, menu, shortcut menu -->
 					<div class="col s5">
-						<input type="checkbox" id="queryOnDropdown" />
-						<label class="black-text" for="queryOnDropdown">Add to Dropdown (if tool is available)</label>
+						<div class="row" >
+				      		<p>Location</p>
+				      		<p>
+								<input name="queryPositionGroup" type="radio" id="queryMenu" value="list-menu" />
+								<label class="black-text" for="queryMenu">Menu</label>
+							</p>
+							<p>
+								<input name="queryPositionGroup" type="radio" id="queryToolbar" value="toolbar" />
+								<label class="black-text" for="queryToolbar">Toolbar</label>
+							</p>
+							<p>
+								<input name="queryPositionGroup" type="radio" id="queryShortcut" value="shortcut-menu" />
+								<label class="black-text" for="queryShortcut">Shortcut Menu</label>
+							</p>
+				      	</div>
 					</div>
 					<div class="col s4 input-field">
 						<em style="position: absolute; top: 14px; left: 14px;" id="iconDemo" class="material-icons prefix black-text">search</em>
