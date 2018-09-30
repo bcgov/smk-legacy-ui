@@ -188,7 +188,13 @@
 	  			</div>
 	  			<div id="appsTablePanel" style="display: none;">
 		          <p>Click on a maps name to preview. To edit the working copy of an application, click "edit" in the actions.</p>
-		            <div>
+		          	<div class="row" style="margin-bottom: 0px;">
+						<div class="col s12 input-field">
+							<input id="tableFilter" type="text" class="active" onkeyup="filterAppTable()">
+	        				<label for="tableFilter">Filter</label>
+						</div>
+					</div>
+		            <div class="row">
 	                  <table class="bordered highlight responsive-table" id="appsTable">
 	                    <thead>
 	                      <tr>
@@ -216,7 +222,13 @@
 	            <div class="card-content black-text" style="height: calc(100vh - 460px); overflow: auto;">
 	  			<div>
 		          <p>Click on a maps name to preview. To edit the working copy of an application, click "edit" in the actions.</p>
-		            <div>
+		          	<div class="row" style="margin-bottom: 0px;">
+						<div class="col s12 input-field">
+							<input id="tablePublishedFilter" type="text" class="active" onkeyup="filterPublishedAppTable()">
+	        				<label for="tablePublishedFilter">Filter</label>
+						</div>
+					</div>
+		            <div class="row">
 	                  <table class="bordered highlight responsive-table" id="publishedAppsTable">
 	                    <thead>
 	                      <tr>

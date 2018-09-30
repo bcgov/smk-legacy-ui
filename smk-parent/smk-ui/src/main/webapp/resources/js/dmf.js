@@ -3394,6 +3394,69 @@ function loadWmsLayers()
 	});
 }
 
+function filterPublishedAppTable()
+{
+	$("#publishedAppsTable > tbody").html("");
+	
+	var filterText = $("#tablePublishedFilter").val().toUpperCase();
+	
+	if(filterText.length > 2)
+	{
+		publishedMapConfigs.forEach(function(appConfig)
+		{
+			if(appConfig.name.toUpperCase().includes(filterText))
+			{
+	        	if($("#" + appConfig.lmfId).length == 0) 
+	        	{
+	        		$("#publishedAppsTable > tbody:last-child").append("<tr id='" + appConfig.lmfId + "\-pub'><td><a href='#' onclick='previewPublishedMapConfig(\"" + appConfig.lmfId + "\");' class='blue-text'>" + appConfig.name + "</a></td><td>" + appConfig.viewer.type + "</td><td>" + appConfig.lmfRevision + "." + (parseInt(appConfig._rev.split('-')[0]) - 1) + "</td><td><a href='#' onclick='unPublishMapConfig(\"" + appConfig.lmfId + "\");' class='blue-text'>Un-Publish</a></td><td><a href='" + serviceUrl + "MapConfigurations/Published/" + appConfig.lmfId + "/Export/' download='smk_client.zip' class='blue-text'>Export</a></td></tr>");
+	        	}
+			}
+		});
+	}
+	else
+	{
+		publishedMapConfigs.forEach(function(appConfig)
+		{
+        	if($("#" + appConfig.lmfId).length == 0) 
+        	{
+        		$("#publishedAppsTable > tbody:last-child").append("<tr id='" + appConfig.lmfId + "\-pub'><td><a href='#' onclick='previewPublishedMapConfig(\"" + appConfig.lmfId + "\");' class='blue-text'>" + appConfig.name + "</a></td><td>" + appConfig.viewer.type + "</td><td>" + appConfig.lmfRevision + "." + (parseInt(appConfig._rev.split('-')[0]) - 1) + "</td><td><a href='#' onclick='unPublishMapConfig(\"" + appConfig.lmfId + "\");' class='blue-text'>Un-Publish</a></td><td><a href='" + serviceUrl + "MapConfigurations/Published/" + appConfig.lmfId + "/Export/' download='smk_client.zip' class='blue-text'>Export</a></td></tr>");
+        	}
+		});
+	}
+}
+
+function filterAppTable()
+{
+	$("#appsTable > tbody").html("");
+	
+	var filterText = $("#tableFilter").val().toUpperCase();
+	
+	if(filterText.length > 2)
+	{
+		mapConfigs.forEach(function(appConfig)
+		{
+			if(appConfig.name.toUpperCase().includes(filterText))
+			{
+	        	if($("#" + appConfig.lmfId).length == 0) 
+	        	{
+	        		$("#appsTable > tbody:last-child").append("<tr id='" + appConfig.lmfId + "\'><td><a href='#' onclick='previewMapConfig(\"" + appConfig.lmfId + "\");' class='blue-text'>" + appConfig.name + "</a></td><td>" + appConfig.viewer.type + "</td><td>" + appConfig.lmfRevision + "." + (parseInt(appConfig._rev.split('-')[0]) - 1) + "</td><td><a href='#' onclick='editMapConfig(\"" + appConfig.lmfId + "\");' class='blue-text'>Edit</a></td><td><a href='#' onclick='publishMapConfig(\"" + appConfig.lmfId + "\");' class='blue-text'>Publish</a></td><td><a href='#' onclick='deleteMapConfig(\"" + appConfig.lmfId + "\");' class='blue-text'>Delete</a></td></tr>");
+	        	}
+			}
+		});
+	}
+	else
+	{
+		mapConfigs.forEach(function(appConfig)
+		{
+        	if($("#" + appConfig.lmfId).length == 0) 
+        	{
+        		$("#appsTable > tbody:last-child").append("<tr id='" + appConfig.lmfId + "\'><td><a href='#' onclick='previewMapConfig(\"" + appConfig.lmfId + "\");' class='blue-text'>" + appConfig.name + "</a></td><td>" + appConfig.viewer.type + "</td><td>" + appConfig.lmfRevision + "." + (parseInt(appConfig._rev.split('-')[0]) - 1) + "</td><td><a href='#' onclick='editMapConfig(\"" + appConfig.lmfId + "\");' class='blue-text'>Edit</a></td><td><a href='#' onclick='publishMapConfig(\"" + appConfig.lmfId + "\");' class='blue-text'>Publish</a></td><td><a href='#' onclick='deleteMapConfig(\"" + appConfig.lmfId + "\");' class='blue-text'>Delete</a></td></tr>");
+        	}
+		});
+	}
+}
+
+
 function loadConfigs()
 {
 	// clear the tables
@@ -3642,7 +3705,6 @@ $(document).ready(function()
 			rebuildDisplayLayers();
 		}
 	});
-
 });
 
 var fileContents;
