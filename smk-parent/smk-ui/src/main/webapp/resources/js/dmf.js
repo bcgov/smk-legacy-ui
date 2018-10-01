@@ -2002,87 +2002,60 @@ function editLayerDisplayOrder()
 	    },
 	    dnd5: 
 	    {
-	        preventForeignNodes: false,
-	        preventNonNodes: false,
+	        autoExpandMS: 400,
+	        // preventForeignNodes: true,
+	        // preventNonNodes: true,
 	        preventRecursiveMoves: true, // Prevent dropping nodes on own descendants
 	        preventVoidMoves: true, // Prevent dropping nodes 'before self', etc.
 	        scroll: true,
 	        scrollSpeed: 7,
 	        scrollSensitivity: 10,
-	        dragStart: function(node, nodeData) 
+	        dragStart: function(node, data)
 	        {
-	          /* This function MUST be defined to enable dragging for the tree.
-	           *
-	           * Return false to cancel dragging of node.
-	           * data.dataTransfer.setData() and .setDragImage() is available
-	           * here.
-	           */
 	          return true;
 	        },
-	        dragDrag: function(node, nodeData) 
+	        dragDrag: function(node, data) 
 	        {
-	        	nodeData.dataTransfer.dropEffect = "move";
+	          data.dataTransfer.dropEffect = "move";
 	        },
-	        dragEnd: function(node, nodeData) 
+	        dragEnd: function(node, data) 
 	        {
 	        },
-	        dragEnter: function(node, nodeData)
+	        dragEnter: function(node, data) 
 	        {
 	          // node.debug("dragEnter", data);
-	        	nodeData.dataTransfer.dropEffect = "move";
-	          // data.dataTransfer.effectAllowed = "copy";
+	          data.dataTransfer.dropEffect = "move";
+	          data.dataTransfer.effectAllowed = "copy";
 	          return true;
 	        },
-	        dragOver: function(node, nodeData) 
+	        
+	        dragOver: function(node, data) 
 	        {
-	        	if(node.data.type != "layer")
-        		{
-	        		nodeData.dataTransfer.dropEffect = "move";
-	        	}
+	          data.dataTransfer.dropEffect = "move";
+	          data.dataTransfer.effectAllowed = "copy";
 	        },
-	        dragLeave: function(node, nodeData) 
+	        dragLeave: function(node, data) 
 	        {
 	        },
-	        dragDrop: function(node, nodeData) 
+	        dragDrop: function(node, data) 
 	        {
-	        	if(node.data.type != "layer")
+	          node.debug("drop", data);
+
+	          if( data.otherNode ) 
+	          {
+	        	if(node.data.type != "layer" || data.hitMode == "after" || data.hitMode == "before")
+            	{
+	        	    data.otherNode.moveTo(node, data.hitMode);
+            	}
+	        	else if(node.data.type == "layer")
         		{
-	        		/* This function MUST be defined to enable dropping of items on
-	  	           * the tree.
-	  	           */
-	  	          var transfer = nodeData.dataTransfer;
-
-	  	          node.debug("drop", nodeData);
-
-	  	          // alert("Drop on " + node + ":\n"
-	  	          //   + "source:" + JSON.stringify(data.otherNodeData) + "\n"
-	  	          //   + "hitMode:" + data.hitMode
-	  	          //   + ", dropEffect:" + transfer.dropEffect
-	  	          //   + ", effectAllowed:" + transfer.effectAllowed);
-
-	  	          if( nodeData.otherNode ) 
-	  	          {
-	  	            // Drop another Fancytree node from same frame
-	  	            // (maybe from another tree however)
-	  	            var sameTree = (nodeData.otherNode.tree === nodeData.tree);
-
-	  	          nodeData.otherNode.moveTo(node, nodeData.hitMode);
-	  	          } 
-	  	          else if( nodeData.otherNodeData ) 
-	  	          {
-	  	            // Drop Fancytree node from different frame or window, so we only have
-	  	            // JSON representation available
-	  	            node.addChild(nodeData.otherNodeData, nodeData.hitMode);
-	  	          } 
-	  	          else 
-	  	          {
-	  	            // Drop a non-node
-	  	            node.addNode({ title: transfer.getData("text") }, nodeData.hitMode);
-	  	          }
-	  	          node.setExpanded();
-	        	}
+	        		data.otherNode.moveTo(node, "after");
+        		}
+	          }
+	          
+	          node.setExpanded();
 	        }
-	    },
+	      },
 	    edit: 
 	    {
 	        triggerStart: ["clickActive", "dblclick", "f2", "mac+enter", "shift+click"],
