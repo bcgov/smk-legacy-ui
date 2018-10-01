@@ -14,6 +14,9 @@ public class MapConfigInfo implements Serializable
 	private String id;
 	private int revision;
 	private String creator;
+	private String modifier;
+	private String createDate;
+	private String modifiedDate;
 	private boolean valid;
 	
 	public MapConfigInfo() { }
@@ -24,6 +27,9 @@ public class MapConfigInfo implements Serializable
 		this.id = config.getLmfId();
 		this.revision = config.getLmfRevision();
 		this.creator = config.getCreatedBy();
+		this.modifier = config.getModifiedBy();
+		this.createDate = config.getCreatedDate();
+		this.modifiedDate = config.getModifiedDate();
 		this.valid = true;
 	}
 	
@@ -76,4 +82,34 @@ public class MapConfigInfo implements Serializable
 	{
 	    this.valid = valid;
 	}
+
+    public String getModifier()
+    {
+        return modifier;
+    }
+
+    public void setModifier(String modifier)
+    {
+        this.modifier = modifier;
+    }
+
+    public String getCreateDate()
+    {
+        return createDate;
+    }
+
+    public void setCreateDate(String createDate)
+    {
+        this.createDate = createDate;
+    }
+
+    public String getModifiedDate()
+    {
+        return modifiedDate;
+    }
+
+    public void setModifiedDate(String modifiedDate)
+    {
+        this.modifiedDate = modifiedDate;
+    }
 }
