@@ -2002,87 +2002,60 @@ function editLayerDisplayOrder()
 	    },
 	    dnd5: 
 	    {
-	        preventForeignNodes: false,
-	        preventNonNodes: false,
+	        autoExpandMS: 400,
+	        // preventForeignNodes: true,
+	        // preventNonNodes: true,
 	        preventRecursiveMoves: true, // Prevent dropping nodes on own descendants
 	        preventVoidMoves: true, // Prevent dropping nodes 'before self', etc.
 	        scroll: true,
 	        scrollSpeed: 7,
 	        scrollSensitivity: 10,
-	        dragStart: function(node, nodeData) 
+	        dragStart: function(node, data)
 	        {
-	          /* This function MUST be defined to enable dragging for the tree.
-	           *
-	           * Return false to cancel dragging of node.
-	           * data.dataTransfer.setData() and .setDragImage() is available
-	           * here.
-	           */
 	          return true;
 	        },
-	        dragDrag: function(node, nodeData) 
+	        dragDrag: function(node, data) 
 	        {
-	        	nodeData.dataTransfer.dropEffect = "move";
+	          data.dataTransfer.dropEffect = "move";
 	        },
-	        dragEnd: function(node, nodeData) 
+	        dragEnd: function(node, data) 
 	        {
 	        },
-	        dragEnter: function(node, nodeData)
+	        dragEnter: function(node, data) 
 	        {
 	          // node.debug("dragEnter", data);
-	        	nodeData.dataTransfer.dropEffect = "move";
-	          // data.dataTransfer.effectAllowed = "copy";
+	          data.dataTransfer.dropEffect = "move";
+	          data.dataTransfer.effectAllowed = "copy";
 	          return true;
 	        },
-	        dragOver: function(node, nodeData) 
+	        
+	        dragOver: function(node, data) 
 	        {
-	        	if(node.data.type != "layer")
-        		{
-	        		nodeData.dataTransfer.dropEffect = "move";
-	        	}
+	          data.dataTransfer.dropEffect = "move";
+	          data.dataTransfer.effectAllowed = "copy";
 	        },
-	        dragLeave: function(node, nodeData) 
+	        dragLeave: function(node, data) 
 	        {
 	        },
-	        dragDrop: function(node, nodeData) 
+	        dragDrop: function(node, data) 
 	        {
-	        	if(node.data.type != "layer")
+	          node.debug("drop", data);
+
+	          if( data.otherNode ) 
+	          {
+	        	if(node.data.type != "layer" || data.hitMode == "after" || data.hitMode == "before")
+            	{
+	        	    data.otherNode.moveTo(node, data.hitMode);
+            	}
+	        	else if(node.data.type == "layer")
         		{
-	        		/* This function MUST be defined to enable dropping of items on
-	  	           * the tree.
-	  	           */
-	  	          var transfer = nodeData.dataTransfer;
-
-	  	          node.debug("drop", nodeData);
-
-	  	          // alert("Drop on " + node + ":\n"
-	  	          //   + "source:" + JSON.stringify(data.otherNodeData) + "\n"
-	  	          //   + "hitMode:" + data.hitMode
-	  	          //   + ", dropEffect:" + transfer.dropEffect
-	  	          //   + ", effectAllowed:" + transfer.effectAllowed);
-
-	  	          if( nodeData.otherNode ) 
-	  	          {
-	  	            // Drop another Fancytree node from same frame
-	  	            // (maybe from another tree however)
-	  	            var sameTree = (nodeData.otherNode.tree === nodeData.tree);
-
-	  	          nodeData.otherNode.moveTo(node, nodeData.hitMode);
-	  	          } 
-	  	          else if( nodeData.otherNodeData ) 
-	  	          {
-	  	            // Drop Fancytree node from different frame or window, so we only have
-	  	            // JSON representation available
-	  	            node.addChild(nodeData.otherNodeData, nodeData.hitMode);
-	  	          } 
-	  	          else 
-	  	          {
-	  	            // Drop a non-node
-	  	            node.addNode({ title: transfer.getData("text") }, nodeData.hitMode);
-	  	          }
-	  	          node.setExpanded();
-	        	}
+	        		data.otherNode.moveTo(node, "after");
+        		}
+	          }
+	          
+	          node.setExpanded();
 	        }
-	    },
+	      },
 	    edit: 
 	    {
 	        triggerStart: ["clickActive", "dblclick", "f2", "mac+enter", "shift+click"],
@@ -2461,7 +2434,10 @@ function editQuery(id)
 			{
 				if(data.tools[j].type == "query" && data.tools[j].instance == selectedLayerNode.data.id + "--" + selectedQuery.id)
 				{
-					$("#queryOnDropdown").prop('checked', data.tools[j].position == "dropdown" ? true : false);
+					$("#queryMenu").prop('checked', data.tools[j].position == "list-menu" ? true : false);
+					$("#queryToolbar").prop('checked', data.tools[j].position == "toolbar" ? true : false);
+					$("#queryShortcut").prop('checked', data.tools[j].position == "shortcut-menu" ? true : false);
+					
 					$("#queryIcon").val(data.tools[j].icon);
 					break;
 				}
@@ -2670,7 +2646,7 @@ function saveQuery()
 		{
 			type: "query", 
 			instance: selectedLayerNode.data.id + "--" + selectedQuery.id,
-			position: $("#queryOnDropdown").is(":checked") ? "dropdown" : "toolbar", 
+			position: $("#queryShortcut").is(":checked") ? "shortcut-menu" : $("#queryToolbar").is(":checked") ? "toolbar" : "list-menu",
 			icon: $("#queryIcon").val()
 		};
 		
@@ -2682,7 +2658,7 @@ function saveQuery()
 		{
 			if(data.tools[fi].type == "query" && data.tools[fi].instance == selectedLayerNode.data.id + "--" + selectedQuery.id)
 			{
-				data.tools[fi].position = $("#queryOnDropdown").is(":checked") ? "dropdown" : "toolbar";
+				data.tools[fi].position = $("#queryShortcut").is(":checked") ? "shortcut-menu" : $("#queryToolbar").is(":checked") ? "toolbar" : "list-menu";
 				data.tools[fi].icon = $("#queryIcon").val();
 				break;
 			}
@@ -3391,6 +3367,69 @@ function loadWmsLayers()
 	});
 }
 
+function filterPublishedAppTable()
+{
+	$("#publishedAppsTable > tbody").html("");
+	
+	var filterText = $("#tablePublishedFilter").val().toUpperCase();
+	
+	if(filterText.length > 2)
+	{
+		publishedMapConfigs.forEach(function(appConfig)
+		{
+			if(appConfig.name.toUpperCase().includes(filterText))
+			{
+	        	if($("#" + appConfig.lmfId).length == 0) 
+	        	{
+	        		$("#publishedAppsTable > tbody:last-child").append("<tr id='" + appConfig.lmfId + "\-pub'><td><a href='#' onclick='previewPublishedMapConfig(\"" + appConfig.lmfId + "\");' class='blue-text'>" + appConfig.name + "</a></td><td>" + appConfig.viewer.type + "</td><td>" + appConfig.lmfRevision + "." + (parseInt(appConfig._rev.split('-')[0]) - 1) + "</td><td><a href='#' onclick='unPublishMapConfig(\"" + appConfig.lmfId + "\");' class='blue-text'>Un-Publish</a></td><td><a href='" + serviceUrl + "MapConfigurations/Published/" + appConfig.lmfId + "/Export/' download='smk_client.zip' class='blue-text'>Export</a></td></tr>");
+	        	}
+			}
+		});
+	}
+	else
+	{
+		publishedMapConfigs.forEach(function(appConfig)
+		{
+        	if($("#" + appConfig.lmfId).length == 0) 
+        	{
+        		$("#publishedAppsTable > tbody:last-child").append("<tr id='" + appConfig.lmfId + "\-pub'><td><a href='#' onclick='previewPublishedMapConfig(\"" + appConfig.lmfId + "\");' class='blue-text'>" + appConfig.name + "</a></td><td>" + appConfig.viewer.type + "</td><td>" + appConfig.lmfRevision + "." + (parseInt(appConfig._rev.split('-')[0]) - 1) + "</td><td><a href='#' onclick='unPublishMapConfig(\"" + appConfig.lmfId + "\");' class='blue-text'>Un-Publish</a></td><td><a href='" + serviceUrl + "MapConfigurations/Published/" + appConfig.lmfId + "/Export/' download='smk_client.zip' class='blue-text'>Export</a></td></tr>");
+        	}
+		});
+	}
+}
+
+function filterAppTable()
+{
+	$("#appsTable > tbody").html("");
+	
+	var filterText = $("#tableFilter").val().toUpperCase();
+	
+	if(filterText.length > 2)
+	{
+		mapConfigs.forEach(function(appConfig)
+		{
+			if(appConfig.name.toUpperCase().includes(filterText))
+			{
+	        	if($("#" + appConfig.lmfId).length == 0) 
+	        	{
+	        		$("#appsTable > tbody:last-child").append("<tr id='" + appConfig.lmfId + "\'><td><a href='#' onclick='previewMapConfig(\"" + appConfig.lmfId + "\");' class='blue-text'>" + appConfig.name + "</a></td><td>" + appConfig.viewer.type + "</td><td>" + appConfig.lmfRevision + "." + (parseInt(appConfig._rev.split('-')[0]) - 1) + "</td><td><a href='#' onclick='editMapConfig(\"" + appConfig.lmfId + "\");' class='blue-text'>Edit</a></td><td><a href='#' onclick='publishMapConfig(\"" + appConfig.lmfId + "\");' class='blue-text'>Publish</a></td><td><a href='#' onclick='deleteMapConfig(\"" + appConfig.lmfId + "\");' class='blue-text'>Delete</a></td></tr>");
+	        	}
+			}
+		});
+	}
+	else
+	{
+		mapConfigs.forEach(function(appConfig)
+		{
+        	if($("#" + appConfig.lmfId).length == 0) 
+        	{
+        		$("#appsTable > tbody:last-child").append("<tr id='" + appConfig.lmfId + "\'><td><a href='#' onclick='previewMapConfig(\"" + appConfig.lmfId + "\");' class='blue-text'>" + appConfig.name + "</a></td><td>" + appConfig.viewer.type + "</td><td>" + appConfig.lmfRevision + "." + (parseInt(appConfig._rev.split('-')[0]) - 1) + "</td><td><a href='#' onclick='editMapConfig(\"" + appConfig.lmfId + "\");' class='blue-text'>Edit</a></td><td><a href='#' onclick='publishMapConfig(\"" + appConfig.lmfId + "\");' class='blue-text'>Publish</a></td><td><a href='#' onclick='deleteMapConfig(\"" + appConfig.lmfId + "\");' class='blue-text'>Delete</a></td></tr>");
+        	}
+		});
+	}
+}
+
+
 function loadConfigs()
 {
 	// clear the tables
@@ -3639,7 +3678,6 @@ $(document).ready(function()
 			rebuildDisplayLayers();
 		}
 	});
-
 });
 
 var fileContents;

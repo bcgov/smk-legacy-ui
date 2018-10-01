@@ -85,7 +85,7 @@
    		  border-radius: 2px;
 		}
 		
-		span.drag-source 
+		.drag-source 
 		{
     		border: 1px solid grey;
     		border-radius: 3px;
@@ -102,24 +102,27 @@
    		  border-radius: 2px;
   		}
 
-  		span.fancytree-node.fancytree-drag-source 
+  		.fancytree-node.fancytree-drag-source 
   		{
     		outline: 1px dotted grey;
   		}
-/*
-  span.fancytree-node.fancytree-drag-source.fancytree-drag-remove {
-    opacity: 0.4;
-  }
-  span.fancytree-node.fancytree-drop-over {
-    outline: 1px solid gray;
-  }
-*/
-  		span.fancytree-node.fancytree-drop-accept 
+
+  		.fancytree-node.fancytree-drag-source.fancytree-drag-remove 
+  		{
+    		opacity: 0.4;
+  		}
+  		
+  		.fancytree-node.fancytree-drop-over 
+  		{
+    		outline: 1px solid gray;
+  		}
+  		
+  		.fancytree-node.fancytree-drop-accept 
   		{
     		outline: 1px dotted green;
   		}
   		
-  		span.fancytree-node.fancytree-drop-reject 
+  		.fancytree-node.fancytree-drop-reject 
   		{
     		outline: 1px dotted red;
 		}
@@ -188,7 +191,13 @@
 	  			</div>
 	  			<div id="appsTablePanel" style="display: none;">
 		          <p>Click on a maps name to preview. To edit the working copy of an application, click "edit" in the actions.</p>
-		            <div>
+		          	<div class="row" style="margin-bottom: 0px;">
+						<div class="col s12 input-field">
+							<input id="tableFilter" type="text" class="active" onkeyup="filterAppTable()">
+	        				<label for="tableFilter">Filter</label>
+						</div>
+					</div>
+		            <div class="row">
 	                  <table class="bordered highlight responsive-table" id="appsTable">
 	                    <thead>
 	                      <tr>
@@ -216,7 +225,13 @@
 	            <div class="card-content black-text" style="height: calc(100vh - 460px); overflow: auto;">
 	  			<div>
 		          <p>Click on a maps name to preview. To edit the working copy of an application, click "edit" in the actions.</p>
-		            <div>
+		          	<div class="row" style="margin-bottom: 0px;">
+						<div class="col s12 input-field">
+							<input id="tablePublishedFilter" type="text" class="active" onkeyup="filterPublishedAppTable()">
+	        				<label for="tablePublishedFilter">Filter</label>
+						</div>
+					</div>
+		            <div class="row">
 	                  <table class="bordered highlight responsive-table" id="publishedAppsTable">
 	                    <thead>
 	                      <tr>
@@ -1252,10 +1267,6 @@
 											      		<input id="directionsPanelHeader" type="text">
 						          						<label for="directionsPanelHeader">Title</label>
 											      	</div>
-											      	<div class="row input-field" >
-											      		<input id="directionsToolKey" type="text">
-						          						<label for="directionsToolKey">API Key</label>
-											      	</div>
 											      	<div class="row" >
 											      		<p>Location</p>
 											      		<p>
@@ -1407,8 +1418,21 @@
 				<div class="row">
 					<!-- Options for dropdown, toolbar, menu, shortcut menu -->
 					<div class="col s5">
-						<input type="checkbox" id="queryOnDropdown" />
-						<label class="black-text" for="queryOnDropdown">Add to Dropdown (if tool is available)</label>
+						<div class="row" >
+				      		<p>Location</p>
+				      		<p>
+								<input name="queryPositionGroup" type="radio" id="queryMenu" value="list-menu" />
+								<label class="black-text" for="queryMenu">Menu</label>
+							</p>
+							<p>
+								<input name="queryPositionGroup" type="radio" id="queryToolbar" value="toolbar" />
+								<label class="black-text" for="queryToolbar">Toolbar</label>
+							</p>
+							<p>
+								<input name="queryPositionGroup" type="radio" id="queryShortcut" value="shortcut-menu" />
+								<label class="black-text" for="queryShortcut">Shortcut Menu</label>
+							</p>
+				      	</div>
 					</div>
 					<div class="col s4 input-field">
 						<em style="position: absolute; top: 14px; left: 14px;" id="iconDemo" class="material-icons prefix black-text">search</em>
