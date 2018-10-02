@@ -523,7 +523,6 @@ function setToolActivation(toolType)
     			$("#identifyStyleStrokeStyle").val(tool.style.strokeStyle);
     			$("#identifyStyleStrokeColor").val(tool.style.strokeColor);
     			$("#identifyStyleFillColor").val(tool.style.fillColor);
-    			$("#identifyPanelVisible").prop('checked', tool.showPanel);
     			$("#identifyClickRadius").val(tool.tolerance);
     		}
 	    	else if(tool.type == "identify" && tool.enabled == false) $("#identifyOptions").hide();
@@ -978,7 +977,6 @@ function setupMapConfigToolsUI()
     			$("#identifyStyleStrokeStyle").val(tool.style.strokeStyle);
     			$("#identifyStyleStrokeColor").val(tool.style.strokeColor);
     			$("#identifyStyleFillColor").val(tool.style.fillColor);
-    			$("#identifyPanelVisible").prop('checked', tool.showPanel);
     			$("#identifyClickRadius").val(tool.tolerance);
 			}
 		}
@@ -1029,7 +1027,6 @@ function finishToolEdits()
 			tool.style.strokeColor = $("#identifyStyleStrokeColor").val();
 			tool.style.fillColor = $("#identifyStyleFillColor").val();
 			tool.tolerance = $("#identifyClickRadius").val();
-			tool.showPanel = $("#identifyPanelVisible").is(":checked");
 			tool.title = $("#identifyPanelHeader").val();
 		}
 		else if(tool.type == "select") 
