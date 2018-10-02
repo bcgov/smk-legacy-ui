@@ -14,10 +14,10 @@ node ('master'){
             [name: 'APPBIN', value: 'http://delivery.apps.bcgov/artifactory/libs-release-local/ca/bc/gov/app'],
             [name: 'COUCHPW', value: '${COUCHPW}'],
             [name: 'SMKVER', value: '${SMKVER}']
-        ], namespace: 'dbc-mapsdk-tools', showBuildLogs: 'true', verbose: 'true', waitTime: '', waitUnit: 'sec'
+        ], namespace: 'dbc-mapsdk-dev', showBuildLogs: 'true', verbose: 'true', waitTime: '', waitUnit: 'sec'
     }
 
     stage ('OpenShift Image Release'){
-    openshiftTag alias: 'false', apiURL: 'https://console.pathfinder.gov.bc.ca', authToken: '${OCP_TOKEN}', destStream: 'smk', destTag: '${OCP_IMENV}', destinationAuthToken: '${OCP_TOKEN}', destinationNamespace: 'dbc-mapsdk-tools', namespace: 'dbc-mapsdk-tools', srcStream: 'smk', srcTag: 'latest', verbose: 'true'
+    openshiftTag alias: 'false', apiURL: 'https://console.pathfinder.gov.bc.ca', authToken: '${OCP_TOKEN}', destStream: 'smk', destTag: '${OCP_IMENV}', destinationAuthToken: '${OCP_TOKEN}', destinationNamespace: 'dbc-mapsdk-dev', namespace: 'dbc-mapsdk-dev', srcStream: 'smk', srcTag: 'latest', verbose: 'true'
     }
 }
