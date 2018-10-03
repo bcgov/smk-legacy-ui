@@ -47,6 +47,7 @@ var data = {
 	    viewer: {
 	    	type: "leaflet",
             device: "auto",
+            panelWidth: 400,
             deviceAutoBreakpoint: 500,
             themes: [],
             location: {
@@ -1083,6 +1084,7 @@ function addNewMapConfig()
     data.viewer = {
     		"type": "leaflet",
             "device": "auto",
+            "panelWidth": 400,
             "deviceAutoBreakpoint": 500,
             "themes": [],
             "location": {

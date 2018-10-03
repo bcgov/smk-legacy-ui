@@ -18,6 +18,7 @@ public class MapViewer implements Serializable
 	private String device;
 	private String[] themes;
 	private int deviceAutoBreakpoint;
+	private int panelWidth;
 	
 	public MapViewer() 
 	{
@@ -31,6 +32,10 @@ public class MapViewer implements Serializable
 		this.setActiveTool(mapViewer.getActiveTool());
 		this.setLocation(new ViewerLocation(mapViewer.getLocation()));
 		this.setClusterOption(mapViewer.getClusterOption());
+		this.setDevice(mapViewer.getDevice());
+		this.setThemes(mapViewer.getThemes());
+		this.setDeviceAutoBreakpoint(mapViewer.getDeviceAutoBreakpoint());
+		this.setPanelWidth(mapViewer.getPanelWidth());
 	}
 
 	public String getType() { return type; }
@@ -94,6 +99,16 @@ public class MapViewer implements Serializable
     public void setDeviceAutoBreakpoint(int deviceAutoBreakpoint)
     {
         this.deviceAutoBreakpoint = deviceAutoBreakpoint;
+    }
+
+    public int getPanelWidth()
+    {
+        return panelWidth;
+    }
+
+    public void setPanelWidth(int panelWidth)
+    {
+        this.panelWidth = panelWidth;
     }
 
     public String getBaseMap() { return baseMap; }
