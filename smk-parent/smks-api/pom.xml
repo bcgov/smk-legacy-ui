@@ -10,7 +10,7 @@
 	  </parent>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<spring.version>4.3.13.RELEASE</spring.version>
+		<spring.version>4.3.14.RELEASE</spring.version>
 		<jackson.version>1.9.10</jackson.version>
 		<jdk.version>1.8</jdk.version>
 		<ektorp.version>1.5.0</ektorp.version>
